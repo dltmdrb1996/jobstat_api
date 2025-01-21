@@ -124,6 +124,11 @@ tasks.named("generateSentryBundleIdJava") {
     dependsOn("kspKotlin")
 }
 
+tasks.named("sentryCollectSourcesJava") {
+    dependsOn("kspKotlin")
+}
+
+
 ktlint {
     version.set("1.5.0")
     verbose.set(true)
