@@ -19,9 +19,5 @@ internal class IndexController {
     fun helloRequiredWorld(
         @RequestParam(value = "msg", required = true) msg: String,
     ) = "Echo \"$msg\"!"
-
-//  @Suppress("SameReturnValue")
-//  @GetMapping(value = ["/restricted"])
-//  @PreAuthorize("hasAuthority('STANDARD_USER')")
-//  fun helloRestrictedWorld() = "Pong!"
+    
 }

@@ -43,7 +43,7 @@ jobs:
       - name: Run ktlintCheck
         run: ./gradlew ktlintCheck
 
-      # TestContainers가 자동으로 컨테이너를 관리하므로 별도의 컨테이너 실행 단계 불필요 테스트트ㅡ
+      # TestContainers가 자동으로 컨테이너를 관리하므로 별도의 컨테이너 실행 단계 불필요 테스
       - name: Run Tests
         run: ./gradlew test
         env:
