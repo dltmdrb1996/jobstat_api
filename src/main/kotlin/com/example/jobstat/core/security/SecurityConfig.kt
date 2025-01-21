@@ -82,8 +82,9 @@ class SecurityConfig(
         val configuration = CorsConfiguration()
         configuration.allowedOrigins =
             listOf(
-                "https://www.goatstat.com",
-                "https://goatstat.com",
+                "https://www.jobstatanalysis.com",
+                "https://jobstatanalysis.com",
+                "jobstatanalysis.com",
                 "http://localhost:8081",
                 "http://localhost:3000",
                 "http://localhost:8080",
