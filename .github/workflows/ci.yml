@@ -64,22 +64,11 @@ jobs:
             fi
           done <<< "${{ secrets.DEV_SECRET }}"
 
-      # jar 빌드 단계 추가
+      # jar 빌드 단계
       - name: Build with Gradle
         run: ./gradlew bootJar
         env:
           SPRING_PROFILES_ACTIVE: dev
-          DB_HOST: ${{ env.DB_HOST }}
-          DB_USERNAME: ${{ env.DB_USERNAME }}
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
-          MONGO_USERNAME: ${{ env.MONGO_USERNAME }}
-          MONGO_PASSWORD: ${{ env.MONGO_PASSWORD }}
-          MONGO_HOST: ${{ env.MONGO_HOST }}
-          JWT_SECRET: ${{ env.JWT_SECRET }}
-          REDIS_HOST: ${{ env.REDIS_HOST }}
-          SENTRY_AUTH_TOKEN: ${{ env.SENTRY_AUTH_TOKEN }}
-          SENTRY_DSN: ${{ env.SENTRY_DSN }}
-          CORS_ALLOWED_ORIGINS: ${{ env.CORS_ALLOWED_ORIGINS }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -91,13 +80,13 @@ jobs:
         env:
           TAG: ${{ github.sha }}
         run: |
-          # Spring App
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG
+          #           Spring App
+               docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG .
+               docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG
           
-          # Nginx
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG -f nginx/Dockerfile ./nginx
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG
+          #           Nginx
+               docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG -f nginx/Dockerfile ./nginx
+               docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG
 
   deploy:
     needs: docker-build-and-push
@@ -111,6 +100,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
+      # 1) 여기서도 DEV_SECRET을 다시 읽어와 GITHUB_ENV에 넣어줘야,
+      #    아래 SSH 스크립트에서 env.DB_HOST 처럼 참조 가능
+      - name: Set environment variables
+        run: |
+          while IFS= read -r line; do
+            if [ -n "$line" ]; then
+              echo "$line" >> $GITHUB_ENV
+            fi
+          done <<< "${{ secrets.DEV_SECRET }}"
+
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:
@@ -119,7 +118,21 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd /home/ec2-user/jobstat
+            
             export TAG=${{ github.sha }}
+            
+            export DB_PASSWORD="${{ env.DB_PASSWORD }}"
+            export MONGO_USERNAME="${{ env.MONGO_USERNAME }}"
+            export MONGO_PASSWORD="${{ env.MONGO_PASSWORD }}"
+            export SENTRY_DSN="${{ env.SENTRY_DSN }}"
+            export SENTRY_AUTH_TOKEN="${{ env.SENTRY_AUTH_TOKEN }}"
+            export JWT_SECRET="${{ env.JWT_SECRET }}"
+            export DB_HOST="${{ env.DB_HOST }}"
+            export MONGO_HOST="${{ env.MONGO_HOST }}"
+            export REDIS_HOST="${{ env.REDIS_HOST }}"
+            export CORS_ALLOWED_ORIGINS="${{ env.CORS_ALLOWED_ORIGINS }}"
+            
             docker-compose pull
             docker-compose up -d
+            
             docker system prune -af
