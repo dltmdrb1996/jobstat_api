@@ -147,6 +147,7 @@ jobs:
             # .env 파일 생성
             cat > .env << EOL
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
             TAG=${{ github.sha }}
             DB_USERNAME=${{ env.DB_USERNAME }}
             DB_PASSWORD=${{ env.DB_PASSWORD }}
