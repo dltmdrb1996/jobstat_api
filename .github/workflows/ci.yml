@@ -23,6 +23,16 @@ jobs:
             fi
           done <<< "${{ secrets.DEV_SECRET }}"
 
+      # 환경변수 확인 (안전하게 일부만 표시)
+      - name: Check environment variables
+        run: |
+          echo "MONGO_USERNAME is set: ${MONGO_USERNAME:+yes}"
+          echo "MONGO_PASSWORD length: ${#MONGO_PASSWORD}"
+          echo "SENTRY_DSN is set: ${SENTRY_DSN:+yes}"
+          echo "JWT_SECRET length: ${#JWT_SECRET}"
+          echo "Testing environment variables..."
+          env | grep -E "MONGO_|SENTRY_|JWT_" | sed 's/=.*$/=****/'
+
       # Docker 설정 - TestContainers가 사용할 Docker 데몬 필요
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
@@ -49,8 +59,8 @@ jobs:
           TESTCONTAINERS_REUSE_ENABLE: true
           SPRING_PROFILES_ACTIVE: test
 
-      - name: Build with Gradle
-        run: ./gradlew build
+#      - name: Build with Gradle
+#        run: ./gradlew build
 
       - name: Upload Test Results
         if: always()
