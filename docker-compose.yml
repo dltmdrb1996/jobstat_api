@@ -1,55 +1,46 @@
 version: '3.8'
 
 services:
-  app:
-    build: .
+
+  nginx:
+    image: ${DOCKERHUB_USERNAME}/jobstat-nginx:${TAG}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      - spring-app
+    restart: always
+
+  spring-app:
+    image: ${DOCKERHUB_USERNAME}/jobstat-app:${TAG}
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_HOST=${DB_HOST}  # 로컬 PC의 IP
+      - DB_PORT=3306
+      - DB_NAME=dev_jobstat
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_TOKEN_EXPIRATION=999999
+      - JWT_REFRESH_TOKEN_EXPIRATION=604800
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_HOST=${MONGO_HOST}  # 로컬 PC의 IP
+      - MONGO_PORT=27017
+      - MONGO_DB=dev_database
+      - REDIS_HOST=${REDIS_HOST}  # 로컬 PC의 IP
+      - REDIS_PORT=6379
+      - REDIS_DB=1
+      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      - SENTRY_DSN=${SENTRY_DSN}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     ports:
       - "8081:8081"
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      - DB_HOST=mysql
-      - DB_PORT=3306
-      - DB_NAME=prod_sample
-      - DB_USERNAME=root
-      - DB_PASSWORD=4181016aA!
-      - MONGO_HOST=mongo
-      - MONGO_PORT=27017
-      - MONGO_DB=prod_database
-      - MONGO_USERNAME=dltmdrb1996
-      - MONGO_PASSWORD=4181016aA!
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-      - REDIS_DB=2
-      - SENTRY_AUTH_TOKEN=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
-      - SENTRY_DSN=https://1c2f6532f9c24d2b17a9415cb43b7b64@o4507734288236544.ingest.us.sentry.io/4507734289481728
-      - JWT_SECRET=5aba6f8f2d36cb81a3fe1a3d0a98e451ce251340a4ea27cbce1fa4ec5f160349bcc975aebbf0a743406e7a269429b424fdfcb15eaf0721980df1da37e74d1b4e
-    depends_on:
-      - mysql
-      - mongo
-      - redis
-
-  mysql:
-    image: mysql:8.0
-    environment:
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=4181016aA!
-    volumes:
-      - mysql-data:/var/lib/mysql
-
-  mongo:
-    image: mongo:latest
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=your_mongo_username
-      - MONGO_INITDB_ROOT_PASSWORD=your_mongo_password
-    volumes:
-      - mongo-data:/data/db
-
-  redis:
-    image: redis:latest
-    volumes:
-      - redis-data:/data
+    restart: always
 
 volumes:
-  mysql-data:
-  mongo-data:
-  redis-data:
+  nginx-logs:

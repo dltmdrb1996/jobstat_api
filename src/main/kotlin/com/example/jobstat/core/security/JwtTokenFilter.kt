@@ -23,6 +23,7 @@ class JwtTokenFilter(
     companion object {
         val PERMIT_URLS: Array<String> =
             arrayOf(
+                "/test",
                 "/api/v1/auth/signup",
                 "/api/v1/auth/refresh",
                 "/api/v1/auth/signin",

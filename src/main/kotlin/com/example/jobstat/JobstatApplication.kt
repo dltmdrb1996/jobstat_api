@@ -11,8 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 @EnableAspectJAutoProxy
 @EnableJpaAuditing
 @EnableConfigurationProperties(MongoProperties::class)
-class LsgSampleApplication
+class JobstatApplication
 
 fun main(args: Array<String>) {
-    runApplication<LsgSampleApplication>(*args)
+    runApplication<JobstatApplication>(*args)
 }

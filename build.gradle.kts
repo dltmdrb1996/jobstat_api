@@ -128,6 +128,10 @@ tasks.named("sentryCollectSourcesJava") {
     dependsOn("kspKotlin")
 }
 
+tasks.named("sentryCollectSourcesJava") {
+    dependsOn("kspTestKotlin")
+}
+
 ktlint {
     version.set("1.5.0")
     verbose.set(true)
@@ -139,7 +143,5 @@ ktlint {
 
     filter {
         exclude("**/build/generated/**")
-        // 필요시 추가적으로 다른 디렉토리도 제외 가능
-        // exclude("**/build/generated/ksp/**")
     }
 }

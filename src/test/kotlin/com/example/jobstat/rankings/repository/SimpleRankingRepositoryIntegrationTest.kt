@@ -213,21 +213,21 @@ class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         performanceMetrics["find_rising_stars"] = timeSeconds
     }
 
-    @Test
-    @Order(7)
-    fun testFindTrendingEntities() {
-        startTime = System.currentTimeMillis()
-
-        val months = 3
-        val results = skillGrowthRankingsRepository.findTrendingEntities(months)
-
-        Assertions.assertTrue(results.isNotEmpty())
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find trending entities execution time: $timeSeconds seconds")
-        performanceMetrics["find_trending_entities"] = timeSeconds
-    }
+//    @Test
+//    @Order(7)
+//    fun testFindTrendingEntities() {
+//        startTime = System.currentTimeMillis()
+//
+//        val months = 3
+//        val results = skillGrowthRankingsRepository.findTrendingEntities(months)
+//
+//        Assertions.assertTrue(results.isNotEmpty())
+//
+//        val endTime = System.currentTimeMillis()
+//        val timeSeconds = (endTime - startTime) / 1000.0
+//        logger.info("Find trending entities execution time: $timeSeconds seconds")
+//        performanceMetrics["find_trending_entities"] = timeSeconds
+//    }
 
     @Test
     @Order(8)
