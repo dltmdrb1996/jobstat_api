@@ -1,38 +1,64 @@
 name: CI
 
 on:
+  pull_request:
+    branches: [ develop, main ]
   push:
-    branches:
-      - main
-      - release/**
-      - develop
-      - feature/**
+    branches: [ develop, main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      BRANCH_NAME: ${{ github.ref_name }}
-      SPRING_PROFILES_ACTIVE: ${{ contains(github.ref_name, 'main') || contains(github.ref_name, 'release/') ? 'prod' : 'dev' }}
-      SPRING_DATASOURCE_URL: ${{ contains(github.ref_name, 'main') || contains(github.ref_name, 'release/') ? 'jdbc:mysql://mysql-prod:3306/proddatabase' : 'jdbc:mysql://mysql-dev:3306/devdatabase' }}
-      SPRING_DATASOURCE_USERNAME: ${{ contains(github.ref_name, 'main') || contains(github.ref_name, 'release/') ? 'produser' : 'devuser' }}
-      SPRING_DATASOURCE_PASSWORD: ${{ contains(github.ref_name, 'main') || contains(github.ref_name, 'release/') ? 'prodpassword' : 'devpassword' }}
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
+      # 환경변수 설정
+      - name: Set environment variables
+        run: |
+          while IFS= read -r line; do
+            if [ -n "$line" ]; then
+              echo "$line" >> $GITHUB_ENV
+            fi
+          done <<< "${{ secrets.DEV_SECRET }}"
+
+      # Docker 설정 - TestContainers가 사용할 Docker 데몬 필요
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run ktlintFormat
+        run: ./gradlew ktlintFormat
+
+      - name: Run ktlintCheck
+        run: ./gradlew ktlintCheck
+
+      # TestContainers가 자동으로 컨테이너를 관리하므로 별도의 컨테이너 실행 단계 불필요
+      - name: Run Tests
+        run: ./gradlew test
+        env:
+          # TestContainers 관련 설정
+          TESTCONTAINERS_REUSE_ENABLE: true
+          SPRING_PROFILES_ACTIVE: test
 
       - name: Build with Gradle
         run: ./gradlew build
 
-      - name: Build Docker image
-        run: docker build -t lsgsample:latest .
-
-      - name: Run Docker Compose
-        run: docker-compose up -d
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: |
+            **/build/reports/tests/
+            **/build/test-results/
