@@ -2,8 +2,8 @@ package com.example.jobstat.sample.usecase.single
 
 import com.example.jobstat.core.usecase.LoggedUseCase
 import com.example.jobstat.core.usecase.impl.ValidUseCase
-import com.example.jobstat.sample.service.CustomerService
 import com.example.jobstat.sample.entity.Customer
+import com.example.jobstat.sample.service.CustomerService
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotEmpty
@@ -16,7 +16,6 @@ internal class GetCustomer(
     private val customerService: CustomerService,
     validator: Validator,
 ) : ValidUseCase<GetCustomer.Request, GetCustomer.Response>(validator) {
-
     @Transactional(readOnly = true)
     override fun execute(request: Request): Response {
         val customer = customerService.getCustomer(request.id)

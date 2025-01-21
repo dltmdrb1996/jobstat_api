@@ -14,8 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface LocationPostingCountRankingsRepository
-    : SimpleRankingRepository<LocationPostingCountRankingsDocument, LocationPostingCountRankingsDocument.LocationPostingRankingEntry, String> {
+interface LocationPostingCountRankingsRepository : SimpleRankingRepository<LocationPostingCountRankingsDocument, LocationPostingCountRankingsDocument.LocationPostingRankingEntry, String> {
     // 지역 고용 시장 분석
     fun findByEmploymentStats(
         baseDate: String,
@@ -42,7 +41,8 @@ class LocationPostingCountRankingsRepositoryImpl(
 ) : SimpleRankingRepositoryImpl<LocationPostingCountRankingsDocument, LocationPostingCountRankingsDocument.LocationPostingRankingEntry, String>(
         entityInformation,
         mongoOperations,
-    ), LocationPostingCountRankingsRepository {
+    ),
+    LocationPostingCountRankingsRepository {
     override fun findByEmploymentStats(
         baseDate: String,
         minEmploymentRate: Double,

@@ -10,7 +10,6 @@ data class ApiResponse<T>(
     val message: String,
     val data: T? = null,
 ) {
-
     companion object {
         private const val SUCCESS_MESSAGE = "Success"
         private const val CREATED_MESSAGE = "Created"
@@ -36,8 +35,7 @@ data class ApiResponse<T>(
             message: String = CREATED_MESSAGE,
         ): ResponseEntity<ApiResponse<T>> = createResponse(HttpStatus.CREATED, data, message)
 
-        fun create(message: String = CREATED_MESSAGE): ResponseEntity<ApiResponse<Unit>> =
-            createResponse(HttpStatus.CREATED, message = message)
+        fun create(message: String = CREATED_MESSAGE): ResponseEntity<ApiResponse<Unit>> = createResponse(HttpStatus.CREATED, message = message)
 
         fun fail(
             httpStatus: HttpStatus,

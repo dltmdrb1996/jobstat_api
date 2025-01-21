@@ -16,11 +16,10 @@ import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
 interface DistributionRankingRepository<
-        T : DistributionRankingDocument<E>,
-        E : DistributionRankingDocument.DistributionRankingEntry,
-        ID : Any> :
-    BaseRankingRepository<T, E, ID> {
-
+    T : DistributionRankingDocument<E>,
+    E : DistributionRankingDocument.DistributionRankingEntry,
+    ID : Any,
+> : BaseRankingRepository<T, E, ID> {
     fun findByDistributionPattern(
         baseDate: String,
         pattern: Map<String, Double>,
@@ -75,7 +74,11 @@ interface DistributionRankingRepository<
     ): T?
 }
 
-abstract class DistributionRankingRepositoryImpl<T : DistributionRankingDocument<E>, E : DistributionRankingDocument.DistributionRankingEntry, ID : Any>(
+abstract class DistributionRankingRepositoryImpl<
+    T : DistributionRankingDocument<E>,
+    E : DistributionRankingDocument.DistributionRankingEntry,
+    ID : Any,
+>(
     private val entityInformation: MongoEntityInformation<T, ID>,
     private val mongoOperations: MongoOperations,
 ) : BaseRankingRepositoryImpl<T, E, ID>(entityInformation, mongoOperations),
@@ -245,6 +248,7 @@ abstract class DistributionRankingRepositoryImpl<T : DistributionRankingDocument
     private class CustomAggregationOperation(
         private val jsonOperation: String,
     ) : AggregationOperation {
+        @Deprecated("Deprecated in Java")
         override fun toDocument(context: AggregationOperationContext): Document = Document.parse(jsonOperation)
     }
 
@@ -438,13 +442,13 @@ abstract class DistributionRankingRepositoryImpl<T : DistributionRankingDocument
                         "input" to Document("\$objectToArray", targetDistribution),
                         "as" to "item",
                         "in" to
-                                Document(
-                                    "\$multiply",
-                                    listOf(
-                                        "\$\$item.v",
-                                        Document("\$getField", listOf("\$rankings.distribution", "\$\$item.k")),
-                                    ),
+                            Document(
+                                "\$multiply",
+                                listOf(
+                                    "\$\$item.v",
+                                    Document("\$getField", listOf("\$rankings.distribution", "\$\$item.k")),
                                 ),
+                            ),
                     ),
                 ),
             ),

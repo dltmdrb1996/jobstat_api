@@ -14,9 +14,9 @@ interface ReadOnlyRole {
 internal class Role(
     override val id: Long = 0,
     @Column(nullable = false, unique = true)
-    override val name: String
-) : BaseEntity(), ReadOnlyRole {
-
+    override val name: String,
+) : BaseEntity(),
+    ReadOnlyRole {
     @OneToMany(mappedBy = "role")
     private val _userRoles: MutableSet<UserRole> = mutableSetOf()
 
@@ -24,14 +24,15 @@ internal class Role(
         get() = _userRoles.map { it.user }.toSet()
 }
 
-
 internal enum class RoleData(
-    val id : Long,
+    val id: Long,
     private val roleName: String,
-    val description: String
+    val description: String,
 ) {
-    USER(1L,"USER", "USER ROLE"),
-    ADMIN(2L,"ADMIN", "ADMIN ROLE"),
-    MANAGER(3L,"MANAGER", "MANAGER ROLE");
+    USER(1L, "USER", "USER ROLE"),
+    ADMIN(2L, "ADMIN", "ADMIN ROLE"),
+    MANAGER(3L, "MANAGER", "MANAGER ROLE"),
+    ;
+
     fun toEntity() = Role(id, roleName)
 }

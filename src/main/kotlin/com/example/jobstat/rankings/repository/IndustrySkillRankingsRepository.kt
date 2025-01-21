@@ -13,9 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface IndustrySkillRankingsRepository
-    :
-    RelationshipRankingRepository<IndustrySkillRankingsDocument, IndustrySkillRankingsDocument.IndustrySkillRankingEntry, String> {
+interface IndustrySkillRankingsRepository : RelationshipRankingRepository<IndustrySkillRankingsDocument, IndustrySkillRankingsDocument.IndustrySkillRankingEntry, String> {
     // 산업 간 공통 스킬 분석
     fun findCrossIndustrySkills(
         baseDate: String,

@@ -2,13 +2,13 @@ package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.ranking.BaseRankingDocument
 import com.example.jobstat.core.base.mongo.ranking.RankingEntry
-import org.springframework.data.repository.NoRepositoryBean
 import com.mongodb.client.model.Accumulators
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
+import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
 interface BaseRankingRepository<T : BaseRankingDocument<E>, E : RankingEntry, ID : Any> : BaseTimeSeriesRepository<T, ID> {

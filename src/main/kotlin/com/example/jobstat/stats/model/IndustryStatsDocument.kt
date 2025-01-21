@@ -16,8 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Field
 @CompoundIndexes(
     CompoundIndex(
         name = "skill_posting_lookup_idx",
-        def = "{'skills.posting_count': -1}"
-    )
+        def = "{'skills.posting_count': -1}",
+    ),
 )
 @Document(collection = "industry_stats_monthly")
 class IndustryStatsDocument(
@@ -53,7 +53,7 @@ class IndustryStatsDocument(
     @Field("contract_type_distribution")
     val contractTypeDistribution: List<ContractTypeDistribution>,
     @Field("rankings")
-    override val rankings: Map<RankingType,  IndustryRankingInfo>,
+    override val rankings: Map<RankingType, IndustryRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class IndustryStats(
         @Field("posting_count")

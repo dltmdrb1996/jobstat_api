@@ -14,7 +14,6 @@ import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
 import org.springframework.stereotype.Service
 
-
 @Service
 internal class RefreshToken(
     private val userService: UserService,
@@ -22,11 +21,10 @@ internal class RefreshToken(
     private val jwtTokenGenerator: JwtTokenGenerator,
     validator: Validator,
 ) : ValidUseCase<RefreshToken.Request, RefreshToken.Response>(validator) {
-
     @Transactional
     override fun execute(request: Request): Response {
         val id = tokenService.validateRefreshTokenAndReturnUserId(request.refreshToken)
-        userService.isActivated(id).trueOrThrow { throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 사용자입니다.")}
+        userService.isActivated(id).trueOrThrow { throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 사용자입니다.") }
         val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(id))
         val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(id))
         tokenService.storeRefreshToken(refreshToken, id, jwtTokenGenerator.getRefreshTokenExpiration())
@@ -39,7 +37,7 @@ internal class RefreshToken(
     )
 
     data class Response(
-        val accessToken : String,
-        val refreshToken : String,
+        val accessToken: String,
+        val refreshToken: String,
     )
 }

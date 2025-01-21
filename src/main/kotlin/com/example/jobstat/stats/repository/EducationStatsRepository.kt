@@ -1,10 +1,10 @@
 package com.example.jobstat.stats.repository
 
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Sorts
 import com.example.jobstat.core.base.repository.StatsMongoRepository
 import com.example.jobstat.core.base.repository.StatsMongoRepositoryImpl
 import com.example.jobstat.stats.model.EducationStatsDocument
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Sorts
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
@@ -13,8 +13,11 @@ import org.springframework.stereotype.Repository
 @NoRepositoryBean
 interface EducationStatsRepository : StatsMongoRepository<EducationStatsDocument, String> {
     fun findByRequirementRateGreaterThan(rate: Double): List<EducationStatsDocument>
+
     fun findByLevel(level: String): List<EducationStatsDocument>
+
     fun findByMarketValueIndexGreaterThan(index: Double): List<EducationStatsDocument>
+
     fun findTopByEmploymentRate(limit: Int): List<EducationStatsDocument>
 }
 
@@ -24,40 +27,39 @@ class EducationStatsRepositoryImpl(
     private val mongoOperations: MongoOperations,
 ) : StatsMongoRepositoryImpl<EducationStatsDocument, String>(entityInformation, mongoOperations),
     EducationStatsRepository {
-    
     override fun findByRequirementRateGreaterThan(rate: Double): List<EducationStatsDocument> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
-        
+
         return collection
             .find(
                 Filters.gt("stats.requirement_rate", rate),
             ).map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
-    
+
     override fun findByLevel(level: String): List<EducationStatsDocument> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
-        
+
         return collection
             .find(
                 Filters.eq("level", level),
             ).map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
-    
+
     override fun findByMarketValueIndexGreaterThan(index: Double): List<EducationStatsDocument> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
-        
+
         return collection
             .find(
                 Filters.gt("stats.market_value_index", index),
             ).map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
-    
+
     override fun findTopByEmploymentRate(limit: Int): List<EducationStatsDocument> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
-        
+
         return collection
             .find()
             .sort(Sorts.descending("stats.degree_holder_employment_rate"))
@@ -66,4 +68,3 @@ class EducationStatsRepositoryImpl(
             .toList()
     }
 }
-

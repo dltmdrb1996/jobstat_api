@@ -49,7 +49,7 @@ class CompanyStatsDocument(
     @Field("employee_satisfaction")
     val employeeSatisfaction: CompanyEmployeeSatisfaction,
     @Field("rankings")
-    override val rankings: Map<RankingType,  CompanyRankingInfo>,
+    override val rankings: Map<RankingType, CompanyRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class CompanyStats(
         @Field("posting_count")

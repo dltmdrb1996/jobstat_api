@@ -25,13 +25,13 @@ internal class TokenServiceImpl(
     }
 
     override fun validateRefreshTokenAndReturnUserId(refreshToken: String): Long {
-        val userIdKey = stringRedisTemplate.keys("$REFRESH_TOKEN_PREFIX*").find { key ->
-            stringRedisTemplate.opsForValue().get(key) == refreshToken
-        } ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 리프레시 토큰입니다.")
+        val userIdKey =
+            stringRedisTemplate.keys("$REFRESH_TOKEN_PREFIX*").find { key ->
+                stringRedisTemplate.opsForValue().get(key) == refreshToken
+            } ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 리프레시 토큰입니다.")
 
         return userIdKey.substringAfter(REFRESH_TOKEN_PREFIX).toLong()
     }
-
 
     override fun removeToken(userId: Long) {
         val userKey = "$REFRESH_TOKEN_PREFIX$userId"

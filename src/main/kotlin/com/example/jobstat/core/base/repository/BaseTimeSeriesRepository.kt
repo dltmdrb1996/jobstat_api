@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 
-
 @NoRepositoryBean
 interface BaseTimeSeriesRepository<T : BaseTimeSeriesDocument, ID : Any> : BaseMongoRepository<T, ID> {
     fun findByBaseDate(baseDate: String): T?
@@ -21,7 +20,6 @@ interface BaseTimeSeriesRepository<T : BaseTimeSeriesDocument, ID : Any> : BaseM
 
     fun findLatestN(n: Int): List<T>
 }
-
 
 abstract class BaseTimeSeriesRepositoryImpl<T : BaseTimeSeriesDocument, ID : Any>(
     private val entityInformation: MongoEntityInformation<T, ID>,

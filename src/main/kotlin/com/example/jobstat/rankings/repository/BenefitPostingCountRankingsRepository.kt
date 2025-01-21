@@ -14,8 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface BenefitPostingCountRankingsRepository :
-    SimpleRankingRepository<BenefitPostingCountRankingsDocument, BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry, String> {
+interface BenefitPostingCountRankingsRepository : SimpleRankingRepository<BenefitPostingCountRankingsDocument, BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry, String> {
     // 산업별 특화 복리후생 분석
     fun findUniqueIndustryBenefits(
         baseDate: String,
@@ -40,9 +39,9 @@ class BenefitPostingCountRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<BenefitPostingCountRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
 ) : SimpleRankingRepositoryImpl<BenefitPostingCountRankingsDocument, BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry, String>(
-    entityInformation,
-    mongoOperations,
-),
+        entityInformation,
+        mongoOperations,
+    ),
     BenefitPostingCountRankingsRepository {
     override fun findUniqueIndustryBenefits(
         baseDate: String,

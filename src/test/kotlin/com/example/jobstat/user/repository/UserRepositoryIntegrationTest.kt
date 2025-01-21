@@ -20,11 +20,11 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 @DisplayName("UserRepository 통합 테스트")
-@Transactional  // 추가
+@Transactional // 추가
 class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
-
     @Autowired
     private lateinit var userRepository: UserRepository
+
     @Autowired
     private lateinit var roleRepository: RoleRepository
 
@@ -33,11 +33,12 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
     @BeforeEach
     fun setUp() {
         cleanupTestData()
-        testUser = User.create(
-            username = "테스트123",  // 한글+숫자로 된 3-10자 username
-            email = "test@example.com",
-            birthDate = LocalDate.now().minusYears(20)
-        )
+        testUser =
+            User.create(
+                username = "테스트123", // 한글+숫자로 된 3-10자 username
+                email = "test@example.com",
+                birthDate = LocalDate.now().minusYears(20),
+            )
     }
 
     override fun cleanupTestData() {
@@ -51,7 +52,6 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Nested
     @DisplayName("사용자 생성 테스트")
     inner class CreateUserTest {
-
         @Test
         @DisplayName("올바른 정보로 사용자를 생성할 수 있다")
         fun `유효한 사용자 정보로 생성시 성공한다`() {
@@ -75,28 +75,29 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
         fun `잘못된 username으로 생성시 실패한다`() {
             assertFailsWith<IllegalArgumentException> {
                 User.create(
-                    username = "te",  // 3자 미만
+                    username = "te", // 3자 미만
                     email = "test@example.com",
-                    birthDate = LocalDate.now().minusYears(20)
+                    birthDate = LocalDate.now().minusYears(20),
                 )
             }
 
             assertFailsWith<IllegalArgumentException> {
                 User.create(
-                    username = "test!@#$",  // 특수문자 포함
+                    username = "test!@#$", // 특수문자 포함
                     email = "test@example.com",
-                    birthDate = LocalDate.now().minusYears(20)
+                    birthDate = LocalDate.now().minusYears(20),
                 )
             }
 
             assertFailsWith<IllegalArgumentException> {
                 User.create(
-                    username = "verylongusername",  // 10자 초과
+                    username = "verylongusername", // 10자 초과
                     email = "test@example.com",
-                    birthDate = LocalDate.now().minusYears(20)
+                    birthDate = LocalDate.now().minusYears(20),
                 )
             }
         }
+
         @Test
         @DisplayName("잘못된 email로 사용자 생성시 실패한다")
         fun `잘못된 email로 생성시 실패한다`() {
@@ -104,7 +105,7 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
                 User.create(
                     username = "testuser123",
                     email = "invalid-email", // 잘못된 이메일
-                    birthDate = LocalDate.now().minusYears(20)
+                    birthDate = LocalDate.now().minusYears(20),
                 )
             }
         }
@@ -116,7 +117,7 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
                 User.create(
                     username = "testuser123",
                     email = "test@example.com",
-                    birthDate = LocalDate.now().plusDays(1) // 미래 날짜
+                    birthDate = LocalDate.now().plusDays(1), // 미래 날짜
                 )
             }
         }
@@ -125,7 +126,6 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Nested
     @DisplayName("사용자 정보 수정 테스트")
     inner class UpdateUserTest {
-
         @Test
         @DisplayName("이메일을 수정할 수 있다")
         fun `이메일 수정시 성공한다`() {
@@ -202,7 +202,6 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Nested
     @DisplayName("사용자 조회 테스트")
     inner class FindUserTest {
-
         @Test
         @DisplayName("ID로 사용자를 조회할 수 있다")
         fun `ID로 사용자 조회시 성공한다`() {
@@ -249,8 +248,6 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Nested
     @DisplayName("사용자 권한 테스트")
     inner class UserRoleTest {
-
-
         private lateinit var userRole: Role
         private lateinit var adminRole: Role
         private lateinit var managerRole: Role
@@ -305,7 +302,7 @@ class UserRepositoryIntegrationTest : BatchOperationTestSupport() {
             // When
             savedUser.addRole(userRole)
             val userWithAdminRole = userRepository.save(savedUser)
-            userWithAdminRole.removeRole(adminRole)  // UserRole 대신 Role을 전달
+            userWithAdminRole.removeRole(adminRole) // UserRole 대신 Role을 전달
             val updatedUser = userRepository.save(userWithAdminRole)
 
             // Then

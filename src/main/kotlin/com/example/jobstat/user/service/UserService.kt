@@ -18,7 +18,7 @@ interface UserService {
 
     fun getAllUsers(): List<ReadUser>
 
-    fun updateUser(command : Map<String, Any>): ReadUser
+    fun updateUser(command: Map<String, Any>): ReadUser
 
     fun deleteUser(id: Long)
 

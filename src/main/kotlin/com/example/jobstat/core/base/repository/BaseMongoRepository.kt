@@ -2,17 +2,17 @@ package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.BaseDocument
 import com.mongodb.bulk.BulkWriteResult
-import org.springframework.data.mongodb.core.query.Query
-import org.springframework.data.mongodb.repository.MongoRepository
-import java.time.Instant
 import com.mongodb.client.model.*
 import org.bson.Document
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.MongoOperations
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.mongodb.repository.support.SimpleMongoRepository
 import org.springframework.data.repository.NoRepositoryBean
+import java.time.Instant
 
 @NoRepositoryBean
 interface BaseMongoRepository<T : BaseDocument, ID : Any> : MongoRepository<T, ID> {
@@ -171,6 +171,7 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
         return entities
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun bulkUpsert(entities: List<T>): BulkWriteResult {
         if (entities.isEmpty()) return BulkWriteResult.unacknowledged()
 

@@ -2,9 +2,9 @@ package com.example.jobstat.core.base.mongo.ranking
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.state.EntityType
+import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
-import org.springframework.data.annotation.Transient
 
 // Relationship Ranking Document
 @CompoundIndexes(

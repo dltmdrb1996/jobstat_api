@@ -1,11 +1,11 @@
 package com.example.jobstat.utils.dummy
 
 import com.example.jobstat.core.base.mongo.BaseDocument
-import org.springframework.data.mongodb.core.mapping.Document
-import org.springframework.data.mongodb.core.mapping.Field
 import com.example.jobstat.core.base.repository.BaseMongoRepository
 import com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl
 import org.springframework.data.mongodb.core.MongoOperations
+import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
@@ -18,11 +18,10 @@ class RecordRepositoryImpl(
     private val entityInformation: MongoEntityInformation<Record, String>,
     private val mongoOperations: MongoOperations,
 ) : BaseMongoRepositoryImpl<Record, String>(
-    entityInformation,
-    mongoOperations,
-),
+        entityInformation,
+        mongoOperations,
+    ),
     RecordRepository
-
 
 @Document(collection = "records")
 class Record(

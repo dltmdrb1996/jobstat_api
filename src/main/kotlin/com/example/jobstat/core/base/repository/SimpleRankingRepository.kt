@@ -108,25 +108,26 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline = listOf(
-            Aggregates.match(Filters.eq("base_date", baseDate)),
-            // unwind rankings array to access individual entries
-            Aggregates.unwind("\$rankings"),
-            // filter by growth_rate
-            Aggregates.match(
-                Filters.gte("rankings.growth_rate", minGrowthRate)
-            ),
-            // sort by growth rate in descending order
-            Aggregates.sort(Sorts.descending("rankings.growth_rate")),
-            // group back to original document structure
-            Aggregates.group(
-                "\$_id",
-                Accumulators.first("base_date", "\$base_date"),
-                Accumulators.first("period", "\$period"),
-                Accumulators.first("metrics", "\$metrics"),
-                Accumulators.push("rankings", "\$rankings")
+        val pipeline =
+            listOf(
+                Aggregates.match(Filters.eq("base_date", baseDate)),
+                // unwind rankings array to access individual entries
+                Aggregates.unwind("\$rankings"),
+                // filter by growth_rate
+                Aggregates.match(
+                    Filters.gte("rankings.growth_rate", minGrowthRate),
+                ),
+                // sort by growth rate in descending order
+                Aggregates.sort(Sorts.descending("rankings.growth_rate")),
+                // group back to original document structure
+                Aggregates.group(
+                    "\$_id",
+                    Accumulators.first("base_date", "\$base_date"),
+                    Accumulators.first("period", "\$period"),
+                    Accumulators.first("metrics", "\$metrics"),
+                    Accumulators.push("rankings", "\$rankings"),
+                ),
             )
-        )
 
         return collection
             .aggregate(pipeline)
@@ -140,55 +141,56 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline = listOf(
-            // 최근 데이터 조회
-            Aggregates.sort(Sorts.descending("base_date")),
-            Aggregates.limit(months),
-            // Unwind rankings 배열
-            Aggregates.unwind("\$rankings"),
-            // growth_rate 기준으로 필터링
-            Aggregates.match(
-                Filters.gte("rankings.growth_rate", minGrowthRate)
-            ),
-            // entity_id로 그룹화하여 일관된 성장 확인
-            Aggregates.group(
-                "\$rankings.entity_id",
-                Accumulators.sum("months_count", 1),
-                Accumulators.avg("avg_growth", "\$rankings.growth_rate"),
-                // 원본 필드들 보존
-                Accumulators.first("base_date", "\$base_date"),
-                Accumulators.first("period", "\$period"),
-                Accumulators.first("metrics", "\$metrics"),
-                Accumulators.first("rankings", "\$rankings")
-            ),
-            // months_count와 avg_growth 조건 체크
-            Aggregates.match(
-                Filters.and(
-                    Filters.eq("months_count", months),
-                    Filters.gte("avg_growth", minGrowthRate)
-                )
-            ),
-            // 최종 문서 구조로 재구성
-            Aggregates.project(
-                Document(mapOf(
-                    "_id" to "\$_id",
-                    "base_date" to "\$base_date",
-                    "period" to "\$period",
-                    "metrics" to "\$metrics",
-                    "rankings" to listOf("\$rankings")
-                ))
-            ),
-            // 평균 성장률 기준으로 정렬
-            Aggregates.sort(Sorts.descending("avg_growth"))
-        )
+        val pipeline =
+            listOf(
+                // 최근 데이터 조회
+                Aggregates.sort(Sorts.descending("base_date")),
+                Aggregates.limit(months),
+                // Unwind rankings 배열
+                Aggregates.unwind("\$rankings"),
+                // growth_rate 기준으로 필터링
+                Aggregates.match(
+                    Filters.gte("rankings.growth_rate", minGrowthRate),
+                ),
+                // entity_id로 그룹화하여 일관된 성장 확인
+                Aggregates.group(
+                    "\$rankings.entity_id",
+                    Accumulators.sum("months_count", 1),
+                    Accumulators.avg("avg_growth", "\$rankings.growth_rate"),
+                    // 원본 필드들 보존
+                    Accumulators.first("base_date", "\$base_date"),
+                    Accumulators.first("period", "\$period"),
+                    Accumulators.first("metrics", "\$metrics"),
+                    Accumulators.first("rankings", "\$rankings"),
+                ),
+                // months_count와 avg_growth 조건 체크
+                Aggregates.match(
+                    Filters.and(
+                        Filters.eq("months_count", months),
+                        Filters.gte("avg_growth", minGrowthRate),
+                    ),
+                ),
+                // 최종 문서 구조로 재구성
+                Aggregates.project(
+                    Document(
+                        mapOf(
+                            "_id" to "\$_id",
+                            "base_date" to "\$base_date",
+                            "period" to "\$period",
+                            "metrics" to "\$metrics",
+                            "rankings" to listOf("\$rankings"),
+                        ),
+                    ),
+                ),
+                // 평균 성장률 기준으로 정렬
+                Aggregates.sort(Sorts.descending("avg_growth")),
+            )
 
         return collection
             .aggregate(pipeline)
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
-
-
 
     override fun findRisingStars(
         months: Int,
@@ -221,38 +223,37 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
     override fun findTrendingEntities(months: Int): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline = listOf(
-            // Get recent data
-            Aggregates.sort(Sorts.descending("base_date")),
-            Aggregates.limit(months),
-            // Unwind rankings array
-            Aggregates.unwind("\$rankings"),
-            // Check if showing growth trend
-            Aggregates.match(
-                Filters.and(
-                    Filters.exists("rankings.growth_rate"),
-                    Filters.gt("rankings.growth_rate", 0),
-                    Filters.exists("rankings.growth_consistency"),
-                    Filters.gt("rankings.growth_consistency", 0.5)  // 일관성 체크 추가
-                )
-            ),
-            // Group back to original document structure
-            Aggregates.group(
-                "\$_id",
-                Accumulators.first("base_date", "\$base_date"),
-                Accumulators.first("period", "\$period"),
-                Accumulators.first("metrics", "\$metrics"),
-                Accumulators.push("rankings", "\$rankings")
-            ),
-            // Sort by average growth rate
-            Aggregates.sort(Sorts.descending("rankings.growth_rate"))
-        )
+        val pipeline =
+            listOf(
+                // Get recent data
+                Aggregates.sort(Sorts.descending("base_date")),
+                Aggregates.limit(months),
+                // Unwind rankings array
+                Aggregates.unwind("\$rankings"),
+                // Check if showing growth trend
+                Aggregates.match(
+                    Filters.and(
+                        Filters.exists("rankings.growth_rate"),
+                        Filters.gt("rankings.growth_rate", 0),
+                        Filters.exists("rankings.growth_consistency"),
+                        Filters.gt("rankings.growth_consistency", 0.5), // 일관성 체크 추가
+                    ),
+                ),
+                // Group back to original document structure
+                Aggregates.group(
+                    "\$_id",
+                    Accumulators.first("base_date", "\$base_date"),
+                    Accumulators.first("period", "\$period"),
+                    Accumulators.first("metrics", "\$metrics"),
+                    Accumulators.push("rankings", "\$rankings"),
+                ),
+                // Sort by average growth rate
+                Aggregates.sort(Sorts.descending("rankings.growth_rate")),
+            )
 
         return collection
             .aggregate(pipeline)
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
-
-
 }

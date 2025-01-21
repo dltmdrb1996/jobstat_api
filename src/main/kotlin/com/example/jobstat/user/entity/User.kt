@@ -16,6 +16,7 @@ interface ReadUser {
     val roles: Set<ReadOnlyRole>
 
     fun hasRole(roleName: String): Boolean
+
     fun isAdmin(): Boolean
 }
 
@@ -26,7 +27,8 @@ internal class User(
     email: String,
     birthDate: LocalDate,
     override val id: Long = 0L,
-) : SoftDeleteBaseEntity(), ReadUser {
+) : SoftDeleteBaseEntity(),
+    ReadUser {
     @Column(nullable = false, length = 10, unique = true)
     override var username: String = username
         protected set
@@ -54,13 +56,9 @@ internal class User(
     override val roles: Set<Role>
         get() = _userRoles.map { it.role }.toSet()
 
-    override fun hasRole(roleName: String): Boolean {
-        return roles.any { it.name == roleName }
-    }
+    override fun hasRole(roleName: String): Boolean = roles.any { it.name == roleName }
 
-    override fun isAdmin(): Boolean {
-        return hasRole("ADMIN")
-    }
+    override fun isAdmin(): Boolean = hasRole("ADMIN")
 
     fun addRole(role: UserRole) {
         _userRoles.add(role)
@@ -78,7 +76,6 @@ internal class User(
     fun updateAddress(newAddress: Address?) {
         this.address = newAddress
     }
-
 
     fun activate() {
         isActive = true

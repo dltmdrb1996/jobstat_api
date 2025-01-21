@@ -1,10 +1,10 @@
 package com.example.jobstat.stats.repository
 
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Sorts
 import com.example.jobstat.core.base.repository.StatsMongoRepository
 import com.example.jobstat.core.base.repository.StatsMongoRepositoryImpl
 import com.example.jobstat.stats.model.LocationStatsDocument
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Sorts
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean

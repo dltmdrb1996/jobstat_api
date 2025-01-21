@@ -24,7 +24,7 @@ import org.springframework.web.server.adapter.ForwardedHeaderTransformer
 class SecurityConfig(
     private val jwtTokenFilter: JwtTokenFilter,
     private val userDetailsService: UserDetailsService,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -38,20 +38,21 @@ class SecurityConfig(
                     response.status = exception.httpStatus.value()
                     response.contentType = MediaType.APPLICATION_JSON_VALUE
                     response.characterEncoding = "UTF-8"
-                    val errorResponse = mapOf(
-                        "status" to exception.httpStatus.value(),
-                        "error" to exception.httpStatus.reasonPhrase,
-                        "message" to (authException.message ?: "Authentication failed")
-                    )
+                    val errorResponse =
+                        mapOf(
+                            "status" to exception.httpStatus.value(),
+                            "error" to exception.httpStatus.reasonPhrase,
+                            "message" to (authException.message ?: "Authentication failed"),
+                        )
                     objectMapper.writeValue(response.writer, errorResponse)
                 }
-            }
-            .authorizeHttpRequests {
+            }.authorizeHttpRequests {
                 it
-                    .requestMatchers(*JwtTokenFilter.PERMIT_URLS).permitAll()
-                    .anyRequest().authenticated()
-            }
-            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
+                    .requestMatchers(*JwtTokenFilter.PERMIT_URLS)
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated()
+            }.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
             .headers { headers ->
                 headers
                     .xssProtection { xss -> xss.disable() }
@@ -59,20 +60,19 @@ class SecurityConfig(
                     .contentSecurityPolicy { csp ->
                         csp.policyDirectives(
                             "default-src 'self'; " +
-                                    "script-src 'self' https://scripts.goatstat.com; " +
-                                    "style-src 'self' https://styles.goatstat.com; " +
-                                    "img-src 'self' https://images.goatstat.com data:; " +
-                                    "font-src 'self' https://fonts.goatstat.com; " +
-                                    "connect-src 'self' https://api.goatstat.com; " +
-                                    "frame-src 'none'; " +
-                                    "object-src 'none'; " +
-                                    "base-uri 'self'; " +
-                                    "form-action 'self'; " +
-                                    "upgrade-insecure-requests;"
+                                "script-src 'self' https://scripts.goatstat.com; " +
+                                "style-src 'self' https://styles.goatstat.com; " +
+                                "img-src 'self' https://images.goatstat.com data:; " +
+                                "font-src 'self' https://fonts.goatstat.com; " +
+                                "connect-src 'self' https://api.goatstat.com; " +
+                                "frame-src 'none'; " +
+                                "object-src 'none'; " +
+                                "base-uri 'self'; " +
+                                "form-action 'self'; " +
+                                "upgrade-insecure-requests;",
                         )
                     }
-            }
-            .setSharedObject(ForwardedHeaderTransformer::class.java, ForwardedHeaderTransformer())
+            }.setSharedObject(ForwardedHeaderTransformer::class.java, ForwardedHeaderTransformer())
 
         return http.build()
     }
@@ -80,13 +80,14 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf(
-            "https://www.goatstat.com",
-            "https://goatstat.com",
-            "http://localhost:8081",
-            "http://localhost:3000",
-            "http://localhost:8080"
-        )
+        configuration.allowedOrigins =
+            listOf(
+                "https://www.goatstat.com",
+                "https://goatstat.com",
+                "http://localhost:8081",
+                "http://localhost:3000",
+                "http://localhost:8080",
+            )
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type")
         configuration.allowCredentials = true
@@ -94,5 +95,4 @@ class SecurityConfig(
         source.registerCorsConfiguration("/**", configuration)
         return source
     }
-
 }

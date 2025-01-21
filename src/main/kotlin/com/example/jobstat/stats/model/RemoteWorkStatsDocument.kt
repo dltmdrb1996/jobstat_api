@@ -42,7 +42,7 @@ class RemoteWorkStatsDocument(
     @Field("satisfaction_metrics")
     val satisfactionMetrics: RemoteWorkSatisfaction,
     @Field("rankings")
-    override val rankings: Map<RankingType,  RemoteWorkRankingInfo>,
+    override val rankings: Map<RankingType, RemoteWorkRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class RemoteWorkStats(
         @Field("posting_count")

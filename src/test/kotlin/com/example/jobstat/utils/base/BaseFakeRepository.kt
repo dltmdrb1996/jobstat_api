@@ -14,29 +14,30 @@ abstract class BaseFakeRepository<T : BaseEntity, F : TestFixture<T>> {
     protected abstract fun fixture(): F
 
     // 여러 엔티티 생성 및 저장을 위한 편의 메서드
-    fun saveAll(count: Int, customizer: F.(Int) -> Unit = {}): List<T> {
-        return (1..count).map { index ->
+    fun saveAll(
+        count: Int,
+        customizer: F.(Int) -> Unit = {},
+    ): List<T> =
+        (1..count).map { index ->
             fixture()
                 .apply { customizer(index) }
                 .create()
                 .let { save(it) }
         }
-    }
 
     open fun save(entity: T): T {
-        val finalEntity = if (!isValidId(entity.id)) {
-            createNewEntity(entity)
-        } else {
-            updateEntity(entity)
-        }
+        val finalEntity =
+            if (!isValidId(entity.id)) {
+                createNewEntity(entity)
+            } else {
+                updateEntity(entity)
+            }
 
         store[finalEntity.id] = finalEntity
         return finalEntity
     }
 
-    open fun findById(id: Long): T {
-        return findByIdOrNull(id) ?: throw EntityNotFoundException("Entity not found with id: $id")
-    }
+    open fun findById(id: Long): T = findByIdOrNull(id) ?: throw EntityNotFoundException("Entity not found with id: $id")
 
     open fun findByIdOrNull(id: Long): T? = store[id]
 
@@ -61,6 +62,7 @@ abstract class BaseFakeRepository<T : BaseEntity, F : TestFixture<T>> {
     protected open fun isValidId(id: Long): Boolean = id > 0
 
     protected abstract fun createNewEntity(entity: T): T
+
     protected abstract fun updateEntity(entity: T): T
 
     fun clear() {

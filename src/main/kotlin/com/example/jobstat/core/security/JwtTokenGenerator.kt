@@ -15,17 +15,17 @@ class JwtTokenGenerator(
 ) {
     private val key = Keys.hmacShaKeyFor(secret.toByteArray())
 
-    fun createAccessToken(payload: AccessPayload): String =
-        createToken(payload.id, payload.tokenType, accessTokenExpiration)
+    fun createAccessToken(payload: AccessPayload): String = createToken(payload.id, payload.tokenType, accessTokenExpiration)
 
-    fun createRefreshToken(payload: RefreshPayload): String =
-        createToken(payload.id, payload.tokenType, refreshTokenExpiration)
+    fun createRefreshToken(payload: RefreshPayload): String = createToken(payload.id, payload.tokenType, refreshTokenExpiration)
 
-    fun getRefreshTokenExpiration(): Long {
-        return refreshTokenExpiration.toLong()
-    }
+    fun getRefreshTokenExpiration(): Long = refreshTokenExpiration.toLong()
 
-    private fun createToken(id : Long, tokenType: TokenType, expirationInSeconds : Int): String {
+    private fun createToken(
+        id: Long,
+        tokenType: TokenType,
+        expirationInSeconds: Int,
+    ): String {
         val headerMap: MutableMap<String, Any> = HashMap()
         headerMap["typ"] = "JWT"
         headerMap["alg"] = "HS256"
@@ -37,7 +37,8 @@ class JwtTokenGenerator(
         val now = Date()
         val expiration = Date(now.time + expirationInSeconds * 1000)
 
-        return Jwts.builder()
+        return Jwts
+            .builder()
             .setHeader(headerMap)
             .setClaims(claims)
             .setExpiration(expiration)

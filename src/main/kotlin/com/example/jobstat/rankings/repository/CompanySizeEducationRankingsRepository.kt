@@ -12,8 +12,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface CompanySizeEducationRankingsRepository
-    : DistributionRankingRepository<CompanySizeEducationRankingsDocument, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry, String> {
+interface CompanySizeEducationRankingsRepository : DistributionRankingRepository<CompanySizeEducationRankingsDocument, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry, String> {
     // 교육 수준별 급여 분포 분석
     fun findSalaryDistributionByEducation(
         baseDate: String,
@@ -41,7 +40,8 @@ class CompanySizeEducationRankingsRepositoryImpl(
 ) : DistributionRankingRepositoryImpl<CompanySizeEducationRankingsDocument, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry, String>(
         entityInformation,
         mongoOperations,
-    ), CompanySizeEducationRankingsRepository {
+    ),
+    CompanySizeEducationRankingsRepository {
     override fun findSalaryDistributionByEducation(
         baseDate: String,
         educationLevel: String,

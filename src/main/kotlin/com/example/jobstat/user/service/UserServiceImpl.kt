@@ -12,8 +12,11 @@ import java.time.LocalDate
 internal class UserServiceImpl(
     private val userRepository: UserRepository,
 ) : UserService {
-
-    override fun createUser(username: String, email: String, birthDate: LocalDate): User {
+    override fun createUser(
+        username: String,
+        email: String,
+        birthDate: LocalDate,
+    ): User {
         val user = User.create(username, email, birthDate)
         isEmailAvailable(user.email).trueOrThrow { AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 이메일입니다.") }
         isUsernameAvailable(user.username).trueOrThrow { AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 아이디입니다.") }
@@ -36,7 +39,7 @@ internal class UserServiceImpl(
 
     override fun isUsernameAvailable(username: String): Boolean = !userRepository.existsByUsername(username)
 
-    override fun isEmailAvailable(email: String) : Boolean = !userRepository.existsByEmail(email)
+    override fun isEmailAvailable(email: String): Boolean = !userRepository.existsByEmail(email)
 
     override fun isActivated(id: Long): Boolean = userRepository.findById(id).isActive
 }

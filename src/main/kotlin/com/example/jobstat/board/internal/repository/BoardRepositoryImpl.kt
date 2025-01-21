@@ -36,6 +36,5 @@ internal class BoardRepositoryImpl(
 
     override fun findTopNByOrderByViewCountDesc(n: Int): List<Board> = boardJpaRepository.findTopNByOrderByViewCountDesc(n)
 
-    override fun findByTitleContainingOrContentContaining(keyword: String): List<Board> =
-        boardJpaRepository.findByTitleContainingOrContentContaining(keyword, keyword)
+    override fun findByTitleContainingOrContentContaining(keyword: String): List<Board> = boardJpaRepository.findByTitleContainingOrContentContaining(keyword, keyword)
 }

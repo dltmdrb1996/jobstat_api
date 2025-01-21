@@ -2,12 +2,12 @@ package com.example.jobstat.utils.base
 
 import com.example.jobstat.utils.TestMetrics
 import com.example.jobstat.utils.TestUtils
+import com.example.jobstat.utils.config.DockerTestConfig
+import com.example.jobstat.utils.config.TestMongoConfig
 import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_DATABASE
 import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_PASSWORD
 import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_USERNAME
 import com.example.jobstat.utils.config.TestMongoConfig.Companion.mongoContainer
-import com.example.jobstat.utils.config.DockerTestConfig
-import com.example.jobstat.utils.config.TestMongoConfig
 import com.example.jobstat.utils.config.TestMysqlConfig
 import jakarta.transaction.Transactional
 import org.junit.jupiter.api.AfterEach

@@ -1,14 +1,14 @@
 package com.example.jobstat.stats.repository
 
 import com.example.jobstat.core.base.mongo.ranking.RankingType
-import com.mongodb.client.model.Accumulators
-import com.mongodb.client.model.Aggregates
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Sorts
 import com.example.jobstat.core.base.repository.StatsMongoRepository
 import com.example.jobstat.core.base.repository.StatsMongoRepositoryImpl
 import com.example.jobstat.core.utils.StatisticsCalculationUtil
 import com.example.jobstat.stats.model.SkillStatsDocument
+import com.mongodb.client.model.Accumulators
+import com.mongodb.client.model.Aggregates
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Sorts
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
@@ -28,16 +28,22 @@ interface SkillStatsRepository : StatsMongoRepository<SkillStatsDocument, String
         baseDate: String,
     ): List<SkillStatsDocument>
 
-    fun calculateRank(type: RankingType, value: Double): Int
+    fun calculateRank(
+        type: RankingType,
+        value: Double,
+    ): Int
 
-    fun calculatePercentile(type: RankingType, value: Double): Double
+    fun calculatePercentile(
+        type: RankingType,
+        value: Double,
+    ): Double
 
     fun calculateMedianSalary(): Long
 
     fun findByEntityIdAndBaseDateBetween(
         entityId: Long,
         startDate: String,
-        endDate: String
+        endDate: String,
     ): List<SkillStatsDocument>
 }
 
@@ -94,9 +100,10 @@ class SkillStatsRepositoryImpl(
             .toList()
     }
 
-
-
-    override fun calculateRank(type: RankingType, value: Double): Int {
+    override fun calculateRank(
+        type: RankingType,
+        value: Double,
+    ): Int {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         // 현재 value보다 큰 값을 가진 문서의 수를 계산
@@ -104,26 +111,33 @@ class SkillStatsRepositoryImpl(
             .countDocuments(
                 Filters.and(
                     Filters.gt("rankings.${type.name}.value", value),
-                    Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate())
-                )
+                    Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate()),
+                ),
             ).toInt() + 1 // 1을 더해서 1-based rank 반환
     }
 
-    override fun calculatePercentile(type: RankingType, value: Double): Double {
+    override fun calculatePercentile(
+        type: RankingType,
+        value: Double,
+    ): Double {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         // 전체 문서 수
-        val totalCount = collection.countDocuments(
-            Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate())
-        ).toDouble()
+        val totalCount =
+            collection
+                .countDocuments(
+                    Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate()),
+                ).toDouble()
 
         // value보다 작거나 같은 값을 가진 문서의 수
-        val belowCount = collection.countDocuments(
-            Filters.and(
-                Filters.lte("rankings.${type.name}.value", value),
-                Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate())
-            )
-        ).toDouble()
+        val belowCount =
+            collection
+                .countDocuments(
+                    Filters.and(
+                        Filters.lte("rankings.${type.name}.value", value),
+                        Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate()),
+                    ),
+                ).toDouble()
 
         return (belowCount / totalCount) * 100
     }
@@ -132,27 +146,28 @@ class SkillStatsRepositoryImpl(
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         // 현재 기준 월의 모든 salary를 가져와서 중간값 계산
-        val pipeline = listOf(
-            Aggregates.match(
-                Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate())
-            ),
-            Aggregates.group(null, Accumulators.push("salaries", "\$stats.avg_salary")),
-            Aggregates.project(
-                Document(
-                    "\$arrayElemAt",
-                    listOf(
-                        "\$salaries",
-                        Document(
-                            "\$floor",
+        val pipeline =
+            listOf(
+                Aggregates.match(
+                    Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate()),
+                ),
+                Aggregates.group(null, Accumulators.push("salaries", "\$stats.avg_salary")),
+                Aggregates.project(
+                    Document(
+                        "\$arrayElemAt",
+                        listOf(
+                            "\$salaries",
                             Document(
-                                "\$divide",
-                                listOf(Document("\$size", "\$salaries"), 2)
-                            )
-                        )
-                    )
-                )
+                                "\$floor",
+                                Document(
+                                    "\$divide",
+                                    listOf(Document("\$size", "\$salaries"), 2),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
             )
-        )
 
         return collection
             .aggregate(pipeline)
@@ -165,7 +180,7 @@ class SkillStatsRepositoryImpl(
     override fun findByEntityIdAndBaseDateBetween(
         entityId: Long,
         startDate: String,
-        endDate: String
+        endDate: String,
     ): List<SkillStatsDocument> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
@@ -174,10 +189,9 @@ class SkillStatsRepositoryImpl(
                 Filters.and(
                     Filters.eq("entity_id", entityId),
                     Filters.gte("base_date", startDate),
-                    Filters.lte("base_date", endDate)
-                )
-            )
-            .sort(Sorts.descending("base_date"))
+                    Filters.lte("base_date", endDate),
+                ),
+            ).sort(Sorts.descending("base_date"))
             .hintString("snapshot_lookup_idx")
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()

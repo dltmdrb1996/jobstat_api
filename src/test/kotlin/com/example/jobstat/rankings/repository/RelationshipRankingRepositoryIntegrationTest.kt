@@ -291,7 +291,6 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         Assertions.assertTrue(results.isNotEmpty())
         Assertions.assertTrue(results.size <= limit)
 
-
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
         logger.info("Find growing relationships execution time: $timeSeconds seconds")
@@ -397,7 +396,6 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
         Assertions.assertTrue(results.isNotEmpty())
         // Verify growth rates meet minimum threshold
-
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0

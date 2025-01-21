@@ -6,12 +6,11 @@ enum class CompanySize {
     MEDIUM,
     LARGE,
     ENTERPRISE,
-    UNKNOWN;
+    UNKNOWN,
 }
 
-
-fun CompanySize.getCostFactor(): Double {
-    return when (this) {
+fun CompanySize.getCostFactor(): Double =
+    when (this) {
         CompanySize.ENTERPRISE -> 1.5
         CompanySize.LARGE -> 1.3
         CompanySize.MEDIUM -> 1.0
@@ -19,4 +18,3 @@ fun CompanySize.getCostFactor(): Double {
         CompanySize.MICRO -> 0.6
         CompanySize.UNKNOWN -> 0.8
     }
-}

@@ -7,7 +7,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class RateLimiter(
     private val permitsPerSecond: Int,
-    private val available: Queue<Long> = ConcurrentLinkedQueue()
+    private val available: Queue<Long> = ConcurrentLinkedQueue(),
 ) {
     init {
         require(permitsPerSecond >= 1)

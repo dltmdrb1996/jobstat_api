@@ -18,23 +18,25 @@ class JwtTokenParser(
 
     fun validateToken(token: String): AccessPayload {
         try {
-
-            log.info("JWT 토큰 검증 시작 ${token}")
-            val claims = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .body
-            val userId = if(claims["userId"] is Int) {
-                (claims["userId"] as Int).toLong()
-            } else {
-                claims["userId"] as Long
-            }
+            log.info("JWT 토큰 검증 시작 $token")
+            val claims =
+                Jwts
+                    .parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .body
+            val userId =
+                if (claims["userId"] is Int) {
+                    (claims["userId"] as Int).toLong()
+                } else {
+                    claims["userId"] as Long
+                }
 
             val tokenType = TokenType.fromValue(claims["tokenType"] as Int)
             require(tokenType in listOf(TokenType.ACCESS_TOKEN, TokenType.REFRESH_TOKEN)) { "올바른 토큰타입이 아닙니다." }
             return AccessPayload(userId, tokenType)
-        }  catch (ex: Exception) {
+        } catch (ex: Exception) {
             val appException =
                 when (ex) {
                     is SignatureException ->

@@ -14,9 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface LocationSalaryRankingsRepository
-    :
-    SimpleRankingRepository<LocationSalaryRankingsDocument, LocationSalaryRankingsDocument.LocationSalaryRankingEntry, String> {
+interface LocationSalaryRankingsRepository : SimpleRankingRepository<LocationSalaryRankingsDocument, LocationSalaryRankingsDocument.LocationSalaryRankingEntry, String> {
     // 생활비 조정 급여 분석
     fun findByCostAdjustedSalary(
         baseDate: String,

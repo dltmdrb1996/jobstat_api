@@ -40,7 +40,7 @@ class EducationStatsDocument(
     @Field("market_demand")
     val marketDemand: EducationMarketDemand,
     @Field("rankings")
-    override val rankings: Map<RankingType,  EducationRankingInfo>,
+    override val rankings: Map<RankingType, EducationRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class EducationStats(
         @Field("posting_count")

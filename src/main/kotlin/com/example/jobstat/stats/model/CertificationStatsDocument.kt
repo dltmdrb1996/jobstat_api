@@ -43,7 +43,7 @@ class CertificationStatsDocument(
     @Field("investment_metrics")
     val investmentMetrics: CertificationInvestmentMetrics,
     @Field("rankings")
-    override val rankings: Map<RankingType,  CertificationRankingInfo>,
+    override val rankings: Map<RankingType, CertificationRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class CertificationStats(
         @Field("posting_count")
