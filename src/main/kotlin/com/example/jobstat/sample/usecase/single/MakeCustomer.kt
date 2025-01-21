@@ -1,8 +1,8 @@
 package com.example.jobstat.sample.usecase.single
 
 import com.example.jobstat.core.usecase.impl.BaseUseCase
-import com.example.jobstat.sample.service.CustomerService
 import com.example.jobstat.sample.entity.Customer
+import com.example.jobstat.sample.service.CustomerService
 import jakarta.validation.constraints.NotEmpty
 import org.springframework.stereotype.Service
 import java.math.BigDecimal

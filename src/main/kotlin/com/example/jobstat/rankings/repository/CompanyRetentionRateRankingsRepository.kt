@@ -13,8 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface CompanyRetentionRateRankingsRepository
-    : SimpleRankingRepository<CompanyRetentionRateRankingsDocument, CompanyRetentionRateRankingsDocument.CompanyRetentionRankingEntry, String> {
+interface CompanyRetentionRateRankingsRepository : SimpleRankingRepository<CompanyRetentionRateRankingsDocument, CompanyRetentionRateRankingsDocument.CompanyRetentionRankingEntry, String> {
     // 이직률 패턴 분석
     fun findLowTurnoverCompanies(
         baseDate: String,

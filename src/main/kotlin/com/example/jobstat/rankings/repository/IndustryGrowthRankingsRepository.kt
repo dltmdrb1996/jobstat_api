@@ -14,9 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface IndustryGrowthRankingsRepository
-    :
-    SimpleRankingRepository<IndustryGrowthRankingsDocument, IndustryGrowthRankingsDocument.IndustryGrowthRankingEntry, String> {
+interface IndustryGrowthRankingsRepository : SimpleRankingRepository<IndustryGrowthRankingsDocument, IndustryGrowthRankingsDocument.IndustryGrowthRankingEntry, String> {
     // 혁신 지수 기반 분석
     fun findHighInnovationIndustries(
         baseDate: String,

@@ -1,16 +1,16 @@
 package com.example.jobstat.rankings.repository
 
-import com.example.jobstat.utils.dummy.Address
-import com.example.jobstat.utils.dummy.RecordRepository
 import com.example.jobstat.utils.base.BatchOperationTestSupport
+import com.example.jobstat.utils.dummy.Address
+import com.example.jobstat.utils.dummy.Record
+import com.example.jobstat.utils.dummy.RecordDto
+import com.example.jobstat.utils.dummy.RecordRepository
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.mongodb.core.query.Query
 import java.time.Instant
 import kotlin.random.Random
-import com.example.jobstat.utils.dummy.RecordDto
-import com.example.jobstat.utils.dummy.Record
 
 @TestMethodOrder(OrderAnnotation::class)
 class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {

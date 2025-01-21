@@ -16,23 +16,23 @@ import org.springframework.web.filter.OncePerRequestFilter
 @Component
 class JwtTokenFilter(
     private val jwtTokenParser: JwtTokenParser,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) : OncePerRequestFilter() {
     private val log = StructuredLogger(this::class.java)
 
     companion object {
-        val PERMIT_URLS : Array<String> = arrayOf(
-            "/api/v1/auth/signup",
-            "/api/v1/auth/refresh",
-            "/api/v1/auth/signin",
-            "/error",
-            "/actuator/health"
-        )
+        val PERMIT_URLS: Array<String> =
+            arrayOf(
+                "/api/v1/auth/signup",
+                "/api/v1/auth/refresh",
+                "/api/v1/auth/signin",
+                "/error",
+                "/actuator/health",
+            )
         private const val BEARER_PREFIX = "Bearer "
     }
 
-    override fun shouldNotFilter(request: HttpServletRequest): Boolean =
-        PERMIT_URLS.any { request.requestURI.startsWith(it) }
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean = PERMIT_URLS.any { request.requestURI.startsWith(it) }
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -57,15 +57,14 @@ class JwtTokenFilter(
             log.error("JWT 토큰 검증 중 오류 발생", ex)
             sendErrorResponse(
                 response,
-                AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "JWT 토큰 검증 중 오류가 발생했습니다")
+                AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "JWT 토큰 검증 중 오류가 발생했습니다"),
             )
             return
         }
         filterChain.doFilter(request, response)
     }
 
-    private fun getJwtFromRequest(request: HttpServletRequest): String? =
-        request.getHeader("Authorization")?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_PREFIX.length)
+    private fun getJwtFromRequest(request: HttpServletRequest): String? = request.getHeader("Authorization")?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_PREFIX.length)
 
     private fun sendErrorResponse(
         response: HttpServletResponse,
@@ -83,7 +82,7 @@ class JwtTokenFilter(
         objectMapper.writeValueAsString(
             ApiResponse.fail(
                 appException.httpStatus,
-                appException.detailInfo().toString()
-            )
+                appException.detailInfo().toString(),
+            ),
         )
 }

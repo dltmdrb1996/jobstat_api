@@ -43,7 +43,7 @@ class ContractTypeStatsDocument(
     @Field("conversion_metrics")
     val conversionMetrics: ContractTypeConversion,
     @Field("rankings")
-    override val rankings: Map<RankingType,  ContractTypeRankingInfo>,
+    override val rankings: Map<RankingType, ContractTypeRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class ContractTypeStats(
         @Field("posting_count")
@@ -275,7 +275,7 @@ class ContractTypeStatsDocument(
         compensationMetrics: ContractTypeCompensation = this.compensationMetrics,
         employmentMetrics: ContractTypeEmployment = this.employmentMetrics,
         conversionMetrics: ContractTypeConversion = this.conversionMetrics,
-        rankings: Map<RankingType,  ContractTypeRankingInfo> = this.rankings,
+        rankings: Map<RankingType, ContractTypeRankingInfo> = this.rankings,
     ) = ContractTypeStatsDocument(
         id = this.id,
         entityId = entityId,

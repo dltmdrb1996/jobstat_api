@@ -1,8 +1,8 @@
 package com.example.jobstat.core.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.example.jobstat.core.converter.RankingScoreReadConverter
 import com.example.jobstat.core.converter.RankingScoreWriteConverter
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.convert.converter.Converter

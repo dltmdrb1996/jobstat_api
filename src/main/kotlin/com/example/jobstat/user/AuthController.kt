@@ -13,13 +13,12 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api/v1/auth")
 internal class AuthController(
     private val signUpUseCase: SignUp,
-    private val refreshTokenUseCase : RefreshToken
+    private val refreshTokenUseCase: RefreshToken,
 ) {
-
     @PostMapping("/signup")
-    fun signUp(@RequestBody signUpRequest: SignUp.Request): ResponseEntity<ApiResponse<SignUp.Response>> {
-        return ApiResponse.ok(signUpUseCase(signUpRequest))
-    }
+    fun signUp(
+        @RequestBody signUpRequest: SignUp.Request,
+    ): ResponseEntity<ApiResponse<SignUp.Response>> = ApiResponse.ok(signUpUseCase(signUpRequest))
 
 //    @PostMapping("/signin")
 //    fun signIn(@RequestBody signInRequest: SignInRequest): ResponseEntity<ApiResponse<SignInResponse>> {
@@ -28,8 +27,7 @@ internal class AuthController(
 //    }
 //
     @PostMapping("/refresh")
-    fun refreshToken(@RequestBody refreshTokenRequest: RefreshToken.Request): ResponseEntity<ApiResponse<RefreshToken.Response>> {
-        return ApiResponse.ok(refreshTokenUseCase(refreshTokenRequest))
-    }
-
+    fun refreshToken(
+        @RequestBody refreshTokenRequest: RefreshToken.Request,
+    ): ResponseEntity<ApiResponse<RefreshToken.Response>> = ApiResponse.ok(refreshTokenUseCase(refreshTokenRequest))
 }

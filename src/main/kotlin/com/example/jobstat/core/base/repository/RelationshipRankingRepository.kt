@@ -11,7 +11,11 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
-interface RelationshipRankingRepository<T : RelationshipRankingDocument<E>, E : RelationshipRankingDocument.RelationshipRankingEntry, ID : Any> : BaseRankingRepository<T, E, ID> {
+interface RelationshipRankingRepository<
+    T : RelationshipRankingDocument<E>,
+    E : RelationshipRankingDocument.RelationshipRankingEntry,
+    ID : Any,
+> : BaseRankingRepository<T, E, ID> {
     fun findByPrimaryEntityId(
         primaryEntityId: Long,
         baseDate: String,
@@ -66,7 +70,11 @@ interface RelationshipRankingRepository<T : RelationshipRankingDocument<E>, E : 
     ): T?
 }
 
-abstract class RelationshipRankingRepositoryImpl<T : RelationshipRankingDocument<E>, E : RelationshipRankingDocument.RelationshipRankingEntry, ID : Any>(
+abstract class RelationshipRankingRepositoryImpl<
+    T : RelationshipRankingDocument<E>,
+    E : RelationshipRankingDocument.RelationshipRankingEntry,
+    ID : Any,
+>(
     private val entityInformation: MongoEntityInformation<T, ID>,
     private val mongoOperations: MongoOperations,
 ) : BaseRankingRepositoryImpl<T, E, ID>(entityInformation, mongoOperations),
@@ -201,36 +209,37 @@ abstract class RelationshipRankingRepositoryImpl<T : RelationshipRankingDocument
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline = listOf(
-            // 종료 날짜의 데이터를 기준으로 함
-            Aggregates.match(Filters.eq("base_date", endDate)),
-            Aggregates.unwind("\$rankings"),
-            Aggregates.unwind("\$rankings.related_rankings"),
-            // growth_rate가 양수인 관계만 필터링 (SkillRank의 growthRate 필드 사용)
-            Aggregates.match(Filters.gt("rankings.related_rankings.growth_rate", 0)),
-            // 성장률 기준으로 정렬
-            Aggregates.sort(Sorts.descending("rankings.related_rankings.growth_rate")),
-            Aggregates.limit(limit),
-            // 결과를 원래 문서 형태로 재구성
-            Aggregates.group(
-                "\$_id",
-                Accumulators.first("base_date", "\$base_date"),
-                Accumulators.first("period", "\$period"),
-                Accumulators.first("metrics", "\$metrics"),
-                Accumulators.first("primary_entity_type", "\$primary_entity_type"),
-                Accumulators.first("related_entity_type", "\$related_entity_type"),
-                Accumulators.push(
-                    "rankings",
-                    Document(
-                        "\$mergeObjects",
-                        listOf(
-                            "\$rankings",
-                            Document("related_rankings", listOf("\$rankings.related_rankings"))
-                        )
-                    )
-                )
+        val pipeline =
+            listOf(
+                // 종료 날짜의 데이터를 기준으로 함
+                Aggregates.match(Filters.eq("base_date", endDate)),
+                Aggregates.unwind("\$rankings"),
+                Aggregates.unwind("\$rankings.related_rankings"),
+                // growth_rate가 양수인 관계만 필터링 (SkillRank의 growthRate 필드 사용)
+                Aggregates.match(Filters.gt("rankings.related_rankings.growth_rate", 0)),
+                // 성장률 기준으로 정렬
+                Aggregates.sort(Sorts.descending("rankings.related_rankings.growth_rate")),
+                Aggregates.limit(limit),
+                // 결과를 원래 문서 형태로 재구성
+                Aggregates.group(
+                    "\$_id",
+                    Accumulators.first("base_date", "\$base_date"),
+                    Accumulators.first("period", "\$period"),
+                    Accumulators.first("metrics", "\$metrics"),
+                    Accumulators.first("primary_entity_type", "\$primary_entity_type"),
+                    Accumulators.first("related_entity_type", "\$related_entity_type"),
+                    Accumulators.push(
+                        "rankings",
+                        Document(
+                            "\$mergeObjects",
+                            listOf(
+                                "\$rankings",
+                                Document("related_rankings", listOf("\$rankings.related_rankings")),
+                            ),
+                        ),
+                    ),
+                ),
             )
-        )
 
         return collection
             .aggregate(pipeline)
@@ -353,41 +362,42 @@ abstract class RelationshipRankingRepositoryImpl<T : RelationshipRankingDocument
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline = listOf(
-            // 최근 데이터부터 조회
-            Aggregates.sort(Sorts.descending("base_date")),
-            Aggregates.limit(months),
-            // 문서 구조 풀기
-            Aggregates.unwind("\$rankings"),
-            Aggregates.unwind("\$rankings.related_rankings"),
-            // growth_rate가 최소값 이상인 것만 필터링
-            Aggregates.match(
-                Filters.gte("rankings.related_rankings.growth_rate", minGrowthRate)
-            ),
-            // 결과를 원래 문서 구조로 재구성
-            Aggregates.group(
-                "\$_id",
-                Accumulators.first("base_date", "\$base_date"),
-                Accumulators.first("period", "\$period"),
-                Accumulators.first("metrics", "\$metrics"),
-                Accumulators.first("primary_entity_type", "\$primary_entity_type"),
-                Accumulators.first("related_entity_type", "\$related_entity_type"),
-                Accumulators.push(
-                    "rankings",
-                    Document(
-                        "\$mergeObjects",
-                        listOf(
-                            "\$rankings",
-                            Document("related_rankings", listOf("\$rankings.related_rankings"))
-                        )
-                    )
-                )
-            ),
-            // growth_rate 기준으로 정렬
-            Aggregates.sort(
-                Sorts.descending("rankings.related_rankings.growth_rate")
+        val pipeline =
+            listOf(
+                // 최근 데이터부터 조회
+                Aggregates.sort(Sorts.descending("base_date")),
+                Aggregates.limit(months),
+                // 문서 구조 풀기
+                Aggregates.unwind("\$rankings"),
+                Aggregates.unwind("\$rankings.related_rankings"),
+                // growth_rate가 최소값 이상인 것만 필터링
+                Aggregates.match(
+                    Filters.gte("rankings.related_rankings.growth_rate", minGrowthRate),
+                ),
+                // 결과를 원래 문서 구조로 재구성
+                Aggregates.group(
+                    "\$_id",
+                    Accumulators.first("base_date", "\$base_date"),
+                    Accumulators.first("period", "\$period"),
+                    Accumulators.first("metrics", "\$metrics"),
+                    Accumulators.first("primary_entity_type", "\$primary_entity_type"),
+                    Accumulators.first("related_entity_type", "\$related_entity_type"),
+                    Accumulators.push(
+                        "rankings",
+                        Document(
+                            "\$mergeObjects",
+                            listOf(
+                                "\$rankings",
+                                Document("related_rankings", listOf("\$rankings.related_rankings")),
+                            ),
+                        ),
+                    ),
+                ),
+                // growth_rate 기준으로 정렬
+                Aggregates.sort(
+                    Sorts.descending("rankings.related_rankings.growth_rate"),
+                ),
             )
-        )
 
         return collection
             .aggregate(pipeline)

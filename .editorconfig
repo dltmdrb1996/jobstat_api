@@ -1,14 +1,21 @@
 root = true
 
 [*.{kt,kts}]
+# 기본 설정
 ktlint_code_style = ktlint_official
 ktlint_standard = enabled
 ktlint_experimental = disabled
+
+# max line length 규칙 비활성화
+max_line_length = off
+
+# deprecated 관련 규칙 비활성화
+ktlint_standard_deprecation = disabled
+
+# backing property 관련 규칙 비활성화
+ktlint_standard_backing-property-naming = disabled
+
+# 기존 규칙들 유지
 ktlint_standard_no-wildcard-imports = disabled
 ktlint_standard_package-name = disabled
-Ktlint_standard_no-empty-file = disabled
-
-
-# [*.kts]
-
-# [*.xml]
+ktlint_standard_no-empty-file = disabled

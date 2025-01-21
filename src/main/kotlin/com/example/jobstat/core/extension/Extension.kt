@@ -11,7 +11,6 @@ import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 
-
 // hashMap to jsonString don't use objectMapper.writeValueAsString
 fun Map<*, *>.toJsonString(): String {
     val sb = StringBuilder()
@@ -25,57 +24,54 @@ fun Map<*, *>.toJsonString(): String {
 }
 
 // boolean extension
-fun Boolean.trueOrThrow(exceptionSupplier: () -> Exception) : Boolean {
+fun Boolean.trueOrThrow(exceptionSupplier: () -> Exception): Boolean {
     if (!this) {
         throw exceptionSupplier()
     }
     return true
 }
 
-fun Boolean.falseOrThrow(exceptionSupplier: () -> Exception) : Boolean {
+fun Boolean.falseOrThrow(exceptionSupplier: () -> Exception): Boolean {
     if (this) {
         throw exceptionSupplier()
     }
     return false
 }
 
-fun <T> T?.requireNotNull(exceptionSupplier: () -> Exception) : T {
+fun <T> T?.requireNotNull(exceptionSupplier: () -> Exception): T {
     if (this == null) {
         throw exceptionSupplier()
     }
     return this
 }
 
-fun <T> T?.requireNotNullOrEmpty(exceptionSupplier: () -> Exception) : T {
+fun <T> T?.requireNotNullOrEmpty(exceptionSupplier: () -> Exception): T {
     if (this == null || this.toString().isEmpty()) {
         throw exceptionSupplier()
     }
     return this
 }
 
-fun <T> T?.requireNotNullOrBlank(exceptionSupplier: () -> Exception) : T {
+fun <T> T?.requireNotNullOrBlank(exceptionSupplier: () -> Exception): T {
     if (this == null || this.toString().isBlank()) {
         throw exceptionSupplier()
     }
     return this
 }
 
-fun <T> T?.requireNotNullOrZero(exceptionSupplier: () -> Exception) : T {
+fun <T> T?.requireNotNullOrZero(exceptionSupplier: () -> Exception): T {
     if (this == null || this.toString() == "0") {
         throw exceptionSupplier()
     }
     return this
 }
 
-fun <T> T?.requireNotNullOrFalse(exceptionSupplier: () -> Exception) : T {
+fun <T> T?.requireNotNullOrFalse(exceptionSupplier: () -> Exception): T {
     if (this == null || this.toString() == "false") {
         throw exceptionSupplier()
     }
     return this
 }
-
-
-
 
 fun Date.add(
     field: Int,
@@ -139,7 +135,6 @@ private fun getOrdinal(n: Int) =
         n % 10 == 3 -> "${n}rd"
         else -> "${n}th"
     }
-
 
 suspend fun <T> withRetry(
     maxAttempts: Int = 3,

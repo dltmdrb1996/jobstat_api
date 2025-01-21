@@ -12,9 +12,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface JobCategorySkillRankingsRepository
-    :
-    RelationshipRankingRepository<JobCategorySkillRankingsDocument, JobCategorySkillRankingsDocument.JobCategorySkillRankingEntry, String> {
+interface JobCategorySkillRankingsRepository : RelationshipRankingRepository<JobCategorySkillRankingsDocument, JobCategorySkillRankingsDocument.JobCategorySkillRankingEntry, String> {
     // 스킬 연관성 분석
     fun findCorrelatedSkills(
         baseDate: String,

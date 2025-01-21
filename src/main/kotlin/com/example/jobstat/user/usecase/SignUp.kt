@@ -23,14 +23,14 @@ internal class SignUp(
     private val jwtTokenGenerator: JwtTokenGenerator,
     validator: Validator,
 ) : ValidUseCase<SignUp.Request, SignUp.Response>(validator) {
-
     @Transactional
     override fun execute(request: Request): Response {
-         val user = userService.createUser(
-            username = request.username,
-            email = request.email,
-            birthDate = request.birthDate,
-        )
+        val user =
+            userService.createUser(
+                username = request.username,
+                email = request.email,
+                birthDate = request.birthDate,
+            )
 
         val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id))
         val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id))
@@ -50,7 +50,7 @@ internal class SignUp(
     )
 
     data class Response(
-        val accessToken : String,
-        val refreshToken : String,
+        val accessToken: String,
+        val refreshToken: String,
     )
 }

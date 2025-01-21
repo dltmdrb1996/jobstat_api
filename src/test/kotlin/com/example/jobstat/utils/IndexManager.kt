@@ -5,7 +5,10 @@ import java.util.concurrent.ConcurrentHashMap
 class IndexManager<K, V> {
     private val index = ConcurrentHashMap<K, V>()
 
-    fun put(key: K, value: V) {
+    fun put(
+        key: K,
+        value: V,
+    ) {
         index[key] = value
     }
 

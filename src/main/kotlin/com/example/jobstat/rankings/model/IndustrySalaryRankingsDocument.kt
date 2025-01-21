@@ -62,7 +62,7 @@ class IndustrySalaryRankingsDocument(
     }
 
     data class IndustrySalaryRankingEntry(
-       @Field("document_id")
+        @Field("document_id")
         override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,

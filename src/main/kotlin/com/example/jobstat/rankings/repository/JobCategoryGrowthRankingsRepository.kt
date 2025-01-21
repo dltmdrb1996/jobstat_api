@@ -13,9 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface JobCategoryGrowthRankingsRepository
-    :
-    SimpleRankingRepository<JobCategoryGrowthRankingsDocument, JobCategoryGrowthRankingsDocument.JobCategoryGrowthRankingEntry, String> {
+interface JobCategoryGrowthRankingsRepository : SimpleRankingRepository<JobCategoryGrowthRankingsDocument, JobCategoryGrowthRankingsDocument.JobCategoryGrowthRankingEntry, String> {
     // 산업 연관성 분석
     fun findByIndustryCorrelation(
         baseDate: String,

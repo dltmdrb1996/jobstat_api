@@ -430,5 +430,4 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
-
 }

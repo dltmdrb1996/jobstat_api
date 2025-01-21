@@ -16,8 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Field
 @CompoundIndexes(
     CompoundIndex(
         name = "skill_posting_lookup_idx",
-        def = "{'skills.posting_count': -1}"
-    )
+        def = "{'skills.posting_count': -1}",
+    ),
 )
 @Document(collection = "job_category_stats_monthly")
 class JobCategoryStatsDocument(
@@ -57,7 +57,7 @@ class JobCategoryStatsDocument(
     @Field("transition_paths")
     val transitionPaths: List<CareerTransitionPath>,
     @Field("rankings")
-    override val rankings: Map<RankingType,  JobCategoryRankingInfo>,
+    override val rankings: Map<RankingType, JobCategoryRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class JobCategoryStats(
         @Field("posting_count")

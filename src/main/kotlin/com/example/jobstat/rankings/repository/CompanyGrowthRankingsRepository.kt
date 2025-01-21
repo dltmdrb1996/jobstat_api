@@ -1,9 +1,9 @@
 package com.example.jobstat.rankings.repository
 
-import com.mongodb.client.model.*
 import com.example.jobstat.core.base.repository.SimpleRankingRepository
 import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.rankings.model.CompanyGrowthRankingsDocument
+import com.mongodb.client.model.*
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
@@ -16,8 +16,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface CompanyGrowthRankingsRepository
-    : SimpleRankingRepository<CompanyGrowthRankingsDocument, CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry, String> {
+interface CompanyGrowthRankingsRepository : SimpleRankingRepository<CompanyGrowthRankingsDocument, CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry, String> {
     // 다각적 성장 분석 (매출, 직원, 시장점유율 모두 성장하는 기업)
     fun findBalancedGrowthCompanies(
         baseDate: String,
@@ -43,9 +42,9 @@ class CompanyGrowthRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<CompanyGrowthRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
 ) : SimpleRankingRepositoryImpl<CompanyGrowthRankingsDocument, CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry, String>(
-    entityInformation,
-    mongoOperations,
-),
+        entityInformation,
+        mongoOperations,
+    ),
     CompanyGrowthRankingsRepository {
     override fun findBalancedGrowthCompanies(
         baseDate: String,

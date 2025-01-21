@@ -1,10 +1,10 @@
 package com.example.jobstat.rankings.repository
 
 import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.mongodb.client.model.Aggregates
-import com.mongodb.client.model.Filters
 import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.rankings.model.CompanyHiringVolumeRankingsDocument
+import com.mongodb.client.model.Aggregates
+import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
@@ -13,8 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface CompanyHiringVolumeRankingsRepository
-    : SimpleRankingRepository<CompanyHiringVolumeRankingsDocument, CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry, String> {
+interface CompanyHiringVolumeRankingsRepository : SimpleRankingRepository<CompanyHiringVolumeRankingsDocument, CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry, String> {
     // 부서별 채용 트렌드 분석
     fun findTopHiringDepartments(
         baseDate: String,

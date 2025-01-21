@@ -26,8 +26,7 @@ internal class CommentRepositoryImpl(
 
     override fun findByBoardId(boardId: Long): List<Comment> = commentJpaRepository.findByBoardId(boardId)
 
-    override fun findTop5ByBoardIdOrderByCreatedAtDesc(boardId: Long): List<Comment> =
-        commentJpaRepository.findTop5ByBoardIdOrderByCreatedAtDesc(boardId)
+    override fun findTop5ByBoardIdOrderByCreatedAtDesc(boardId: Long): List<Comment> = commentJpaRepository.findTop5ByBoardIdOrderByCreatedAtDesc(boardId)
 
     override fun deleteById(id: Long) = commentJpaRepository.deleteById(id)
 }

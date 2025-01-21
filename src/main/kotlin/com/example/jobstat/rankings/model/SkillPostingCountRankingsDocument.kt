@@ -25,7 +25,6 @@ class SkillPostingCountRankingsDocument(
         metrics,
         rankings,
     ) {
-
     data class SkillPostingMetrics(
         @Field("total_count")
         override val totalCount: Int,
@@ -40,7 +39,7 @@ class SkillPostingCountRankingsDocument(
     ) : RankingMetrics
 
     data class SkillPostingRankingEntry(
-       @Field("document_id")
+        @Field("document_id")
         override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,

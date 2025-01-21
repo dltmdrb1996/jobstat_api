@@ -1,6 +1,4 @@
-import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
@@ -62,11 +60,10 @@ dependencies {
     runtimeOnly("com.mysql:mysql-connector-j")
     implementation("redis.clients:jedis")
 
-    //ksp
+    // ksp
     implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
     implementation("com.google.devtools.ksp:symbol-processing-api:2.1.0-1.0.29")
     ksp(project(":ksp"))
-
 
     // Spring Boot DevTools
     developmentOnly("org.springframework.boot:spring-boot-devtools")

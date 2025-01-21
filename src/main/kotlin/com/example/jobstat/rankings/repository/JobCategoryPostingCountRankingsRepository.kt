@@ -14,9 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface JobCategoryPostingCountRankingsRepository
-    :
-    SimpleRankingRepository<JobCategoryPostingCountRankingsDocument, JobCategoryPostingCountRankingsDocument.JobCategoryPostingRankingEntry, String> {
+interface JobCategoryPostingCountRankingsRepository : SimpleRankingRepository<JobCategoryPostingCountRankingsDocument, JobCategoryPostingCountRankingsDocument.JobCategoryPostingRankingEntry, String> {
     // 지역별 수요 분석
     fun findByLocationDemand(
         baseDate: String,

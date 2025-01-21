@@ -13,9 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface JobCategorySalaryRankingsRepository
-    :
-    SimpleRankingRepository<JobCategorySalaryRankingsDocument, JobCategorySalaryRankingsDocument.JobCategorySalaryRankingEntry, String> {
+interface JobCategorySalaryRankingsRepository : SimpleRankingRepository<JobCategorySalaryRankingsDocument, JobCategorySalaryRankingsDocument.JobCategorySalaryRankingEntry, String> {
     // 산업별 급여 비교 분석
     fun findSalaryByIndustry(
         baseDate: String,

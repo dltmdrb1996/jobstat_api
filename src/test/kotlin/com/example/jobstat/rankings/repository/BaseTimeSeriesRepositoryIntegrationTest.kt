@@ -1,9 +1,9 @@
 package com.example.jobstat.rankings.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
-import com.example.jobstat.utils.dummy.TestTimeSeriesRepository
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import com.example.jobstat.utils.dummy.TestTimeSeriesDocument
+import com.example.jobstat.utils.dummy.TestTimeSeriesRepository
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.springframework.beans.factory.annotation.Autowired

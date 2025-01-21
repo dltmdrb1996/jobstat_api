@@ -43,7 +43,7 @@ class LocationStatsDocument(
     @Field("remote_work_stats")
     val remoteWorkStats: LocationRemoteWorkStats,
     @Field("rankings")
-    override val rankings: Map<RankingType,  LocationRankingInfo>,
+    override val rankings: Map<RankingType, LocationRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class LocationStats(
         @Field("posting_count")

@@ -14,8 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface SkillGrowthRankingsRepository
-    : SimpleRankingRepository<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String> {
+interface SkillGrowthRankingsRepository : SimpleRankingRepository<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String> {
     // 성장 일관성 분석
     fun findByGrowthConsistency(
         baseDate: String,
@@ -42,9 +41,10 @@ class SkillGrowthRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<SkillGrowthRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
 ) : SimpleRankingRepositoryImpl<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String>(
-    entityInformation,
-    mongoOperations,
-), SkillGrowthRankingsRepository {
+        entityInformation,
+        mongoOperations,
+    ),
+    SkillGrowthRankingsRepository {
     override fun findByGrowthConsistency(
         baseDate: String,
         minConsistency: Double,

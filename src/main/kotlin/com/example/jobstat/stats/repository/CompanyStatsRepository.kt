@@ -1,10 +1,10 @@
 package com.example.jobstat.stats.repository
 
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Sorts
 import com.example.jobstat.core.base.repository.StatsMongoRepository
 import com.example.jobstat.core.base.repository.StatsMongoRepositoryImpl
 import com.example.jobstat.stats.model.CompanyStatsDocument
+import com.mongodb.client.model.Filters
+import com.mongodb.client.model.Sorts
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
@@ -79,6 +79,4 @@ class CompanyStatsRepositoryImpl(
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
-
-
 }

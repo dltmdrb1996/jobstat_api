@@ -15,9 +15,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface CompanySizeBenefitRankingsRepository
-    :
-    DistributionRankingRepository<CompanySizeBenefitRankingsDocument, CompanySizeBenefitRankingsDocument.CompanySizeBenefitRankingEntry, String> {
+interface CompanySizeBenefitRankingsRepository : DistributionRankingRepository<CompanySizeBenefitRankingsDocument, CompanySizeBenefitRankingsDocument.CompanySizeBenefitRankingEntry, String> {
     // 회사 규모별 특화 복리후생 패턴 분석
     fun findDistinctiveBenefitsByCompanySize(
         baseDate: String,

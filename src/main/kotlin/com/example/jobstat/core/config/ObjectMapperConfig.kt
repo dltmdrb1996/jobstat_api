@@ -10,17 +10,16 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class ObjectMapperConfig {
-  companion object {
-    val OBJECT_MAPPER: ObjectMapper = ObjectMapper()
-      .registerModule(JavaTimeModule())
-      .registerKotlinModule()
-      .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-      .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
-      .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-  }
+    companion object {
+        val OBJECT_MAPPER: ObjectMapper =
+            ObjectMapper()
+                .registerModule(JavaTimeModule())
+                .registerKotlinModule()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    }
 
-  @Bean
-  fun objectMapper(): ObjectMapper {
-    return OBJECT_MAPPER
-  }
+    @Bean
+    fun objectMapper(): ObjectMapper = OBJECT_MAPPER
 }

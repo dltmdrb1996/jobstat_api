@@ -13,8 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface CompanySizeSkillRankingsRepository
-    : RelationshipRankingRepository<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry, String> {
+interface CompanySizeSkillRankingsRepository : RelationshipRankingRepository<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry, String> {
     // 회사 규모별 핵심 스킬 분석
     fun findCoreSkillsByCompanySize(
         baseDate: String,
