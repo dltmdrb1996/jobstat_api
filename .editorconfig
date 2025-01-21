@@ -19,3 +19,6 @@ ktlint_standard_backing-property-naming = disabled
 ktlint_standard_no-wildcard-imports = disabled
 ktlint_standard_package-name = disabled
 ktlint_standard_no-empty-file = disabled
+
+[**/ksp/**/*.kt]
+ktlint_standard = disabled

@@ -125,15 +125,17 @@ tasks.named("generateSentryBundleIdJava") {
 }
 
 ktlint {
-    version.set("1.5.0") // 또는 사용 중인 최신 버전
+    version.set("1.5.0")
     verbose.set(true)
     outputToConsole.set(true)
     android.set(false)
     reporters {
         reporter(ReporterType.JSON)
     }
+
     filter {
-        exclude("**/generated/**")
-        include("**/kotlin/**")
+        exclude("**/build/generated/**")
+        // 필요시 추가적으로 다른 디렉토리도 제외 가능
+        // exclude("**/build/generated/ksp/**")
     }
 }

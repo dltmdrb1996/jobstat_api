@@ -20,7 +20,7 @@ internal class AuthController(
         @RequestBody signUpRequest: SignUp.Request,
     ): ResponseEntity<ApiResponse<SignUp.Response>> = ApiResponse.ok(signUpUseCase(signUpRequest))
 
-//    @PostMapping("/signin")
+    //    @PostMapping("/signin")
 //    fun signIn(@RequestBody signInRequest: SignInRequest): ResponseEntity<ApiResponse<SignInResponse>> {
 //        val authResponse = authService.signIn(signInRequest)
 //        return ResponseEntity.ok(authResponse)

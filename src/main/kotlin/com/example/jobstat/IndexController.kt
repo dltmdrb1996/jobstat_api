@@ -19,5 +19,4 @@ internal class IndexController {
     fun helloRequiredWorld(
         @RequestParam(value = "msg", required = true) msg: String,
     ) = "Echo \"$msg\"!"
-    
 }

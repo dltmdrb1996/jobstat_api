@@ -18,7 +18,6 @@ interface SimpleRankingRepository<T : SimpleRankingDocument<E>, E : SimpleRankin
         maxValue: Double,
     ): List<T>
 
-//    fun findByPercentileRange(baseDate: String, minPercentile: Double, maxPercentile: Double): List<T>
     fun findByGrowthRate(
         baseDate: String,
         minGrowthRate: Double,
