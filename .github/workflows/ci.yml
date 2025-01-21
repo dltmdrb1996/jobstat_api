@@ -148,7 +148,7 @@ jobs:
             cat > .env << EOL
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             TAG=${{ github.sha }}
-            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_USERNAME=${{ env.DB_USERNAME }}
             DB_PASSWORD=${{ env.DB_PASSWORD }}
             MONGO_USERNAME=${{ env.MONGO_USERNAME }}
             MONGO_PASSWORD=${{ env.MONGO_PASSWORD }}
