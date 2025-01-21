@@ -82,11 +82,9 @@ jobs:
         env:
           TAG: ${{ github.sha }}
         run: |
-          #           Spring App
                docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG .
                docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG
           
-          #           Nginx
                docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG -f nginx/Dockerfile ./nginx
                docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG
 
@@ -95,22 +93,8 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
-      # IP 확인 스텝 추가
-      - name: Check Runner IP
-        run: |
-          echo "Runner IP address:"
-          curl -s https://api.ipify.org
-          echo ""
+      - uses: actions/checkout@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-
-      # 1) 여기서도 DEV_SECRET을 다시 읽어와 GITHUB_ENV에 넣어줘야,
-      #    아래 SSH 스크립트에서 env.DB_HOST 처럼 참조 가능
       - name: Set environment variables
         run: |
           while IFS= read -r line; do
@@ -119,14 +103,36 @@ jobs:
             fi
           done <<< "${{ secrets.DEV_SECRET }}"
 
-      - uses: actions/checkout@v3  # 이 단계 추가
-      - name: Copy configuration files to EC2  # 이름 변경
+      # 1. Get Actions IP
+      - name: Get Github Actions IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      # 2. Configure AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      # 3. Add IP to security group
+      - name: Add Github Actions IP to Security group
+        run: |
+          aws ec2 authorize-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      # 4. Copy files and deploy
+      - name: Copy configuration files to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.yml,nginx/"  # nginx 디렉토리 추가
+          source: "docker-compose.yml,nginx/"
           target: "/home/ubuntu/jobstat"
 
       - name: Deploy to EC2
@@ -135,11 +141,13 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: DOCKERHUB_USERNAME,TAG,DB_PASSWORD,DB_USERNAME,MONGO_USERNAME,MONGO_PASSWORD,SENTRY_DSN,SENTRY_AUTH_TOKEN,JWT_SECRET,DB_HOST,MONGO_HOST,REDIS_HOST,CORS_ALLOWED_ORIGINS
           script: |
             cd /home/ubuntu/jobstat
             
+            export DOCKERHUB_USERNAME="${{ secrets.DOCKERHUB_USERNAME }}"
             export TAG=${{ github.sha }}
-            
+            export DB_USERNAME="${{ secrets.DB_USERNAME }}"
             export DB_PASSWORD="${{ env.DB_PASSWORD }}"
             export MONGO_USERNAME="${{ env.MONGO_USERNAME }}"
             export MONGO_PASSWORD="${{ env.MONGO_PASSWORD }}"
@@ -155,3 +163,13 @@ jobs:
             docker-compose up -d
             
             docker system prune -af
+
+      # 5. Remove IP from security group
+      - name: Remove Github Actions IP from Security group
+        if: always()  # 이전 단계가 실패하더라도 항상 실행
+        run: |
+          aws ec2 revoke-security-group-ingress \
+            --group-id ${{ secrets.AWS_SG_ID }} \
+            --protocol tcp \
+            --port 22 \
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32
