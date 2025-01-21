@@ -1,0 +1,93 @@
+server:
+
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/plain
+    min-response-size: 2048
+  http2:
+    enabled: true
+  port: ${SERVER_PORT:8081}
+  forward-headers-strategy: NATIVE
+
+spring:
+  web:
+    resources:
+      add-mappings: false
+  application:
+    name: jobstat
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  h2:
+    console:
+      enabled: false
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=300s
+
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG
+    org:
+      hibernate:
+        SQL: DEBUG
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+    org.springframework.boot.autoconfigure: DEBUG
+    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
+  file:
+    name: logs/application.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
+
+jwt:
+  secret: ${JWT_SECRET}
+  accessTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION:999999}
+  refreshTokenExpiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800}
+  tokenPrefix: "Bearer "
+
+rate-limit:
+  limit: ${RATE_LIMIT:100}
+  duration: ${RATE_LIMIT_DURATION:1}
+  time-unit: ${RATE_LIMIT_TIME_UNIT:MINUTES}
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:"http://localhost:3000,http://localhost:8080"}
+  security:
+    public-paths:
+      - "/api/auth/**"
+      - "/api/token/refresh"
+      - "/api/public/**"
+  api:
+    rate-limit:
+      enabled: ${API_RATE_LIMIT_ENABLED:true}
+      limit: ${API_RATE_LIMIT:200}
+      duration: ${API_RATE_LIMIT_DURATION:1}
+      time-unit: ${API_RATE_LIMIT_TIME_UNIT:MINUTES}
+  cache:
+    ttl: ${CACHE_TTL:600}
+  mongodb:
+    page-size: ${MONGODB_PAGE_SIZE:20}

@@ -1,0 +1,65 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:dev_jobstat}?
+      serverTimezone=UTC&useSSL=false
+      &allowPublicKeyRetrieval=true
+      &rewriteBatchedStatements=true
+      &useServerPrepStmts=false
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 30000
+      connection-timeout: 20000
+      connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"  # 추가된 설정
+      cache-prepared-statements: true
+      prepared-statement-cache-size: 250
+      prepared-statement-cache-sql-limit: 2048
+
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:dev_database}
+      database: ${MONGO_DB:dev_database}
+      auto-index-creation: true
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:1}
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+    chunk-size: 1000
+    max-threads: 10
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+    show-sql: true
+
+batch:
+  chunk-size: 500
+  job-size: 100
+
+logging:
+  level:
+    root: INFO
+    com.wildrew.batch: DEBUG
+    org.springframework.jdbc.core: TRACE  # SQL 및 파라미터 로깅
+    org.hibernate.SQL: DEBUG             # SQL 로깅
+    org.hibernate.type.descriptor.sql: TRACE  # 파라미터 바인딩 로깅
+  file:
+    name: logs/application.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+

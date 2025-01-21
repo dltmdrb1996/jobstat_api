@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - release/**
+      - develop
+      - feature/**
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      BRANCH_NAME: ${{ github.ref_name }}
+      SPRING_PROFILES_ACTIVE: ${{ contains(github.ref_name, 'main') || contains(github.ref_name, 'release/') ? 'prod' : 'dev' }}
+      SPRING_DATASOURCE_URL: ${{ contains(github.ref_name, 'main') || contains(github.ref_name, 'release/') ? 'jdbc:mysql://mysql-prod:3306/proddatabase' : 'jdbc:mysql://mysql-dev:3306/devdatabase' }}
+      SPRING_DATASOURCE_USERNAME: ${{ contains(github.ref_name, 'main') || contains(github.ref_name, 'release/') ? 'produser' : 'devuser' }}
+      SPRING_DATASOURCE_PASSWORD: ${{ contains(github.ref_name, 'main') || contains(github.ref_name, 'release/') ? 'prodpassword' : 'devpassword' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: '11'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Build Docker image
+        run: docker build -t lsgsample:latest .
+
+      - name: Run Docker Compose
+        run: docker-compose up -d

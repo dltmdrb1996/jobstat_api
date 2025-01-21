@@ -1,0 +1,14 @@
+root = true
+
+[*.{kt,kts}]
+ktlint_code_style = ktlint_official
+ktlint_standard = enabled
+ktlint_experimental = disabled
+ktlint_standard_no-wildcard-imports = disabled
+ktlint_standard_package-name = disabled
+Ktlint_standard_no-empty-file = disabled
+
+
+# [*.kts]
+
+# [*.xml]
