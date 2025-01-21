@@ -121,7 +121,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ec2-user/jobstat
+            cd /home/ubuntu/jobstat
             
             export TAG=${{ github.sha }}
             
