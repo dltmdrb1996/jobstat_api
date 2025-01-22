@@ -1,6 +1,7 @@
 package com.example.jobstat.user
 
 import ApiResponse
+import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.user.usecase.RefreshToken
 import com.example.jobstat.user.usecase.SignUp
 import org.springframework.http.ResponseEntity
@@ -15,17 +16,18 @@ internal class AuthController(
     private val signUpUseCase: SignUp,
     private val refreshTokenUseCase: RefreshToken,
 ) {
+    @Public
     @PostMapping("/signup")
     fun signUp(
         @RequestBody signUpRequest: SignUp.Request,
     ): ResponseEntity<ApiResponse<SignUp.Response>> = ApiResponse.ok(signUpUseCase(signUpRequest))
 
-    //    @PostMapping("/signin")
+//        @PostMapping("/signin")
 //    fun signIn(@RequestBody signInRequest: SignInRequest): ResponseEntity<ApiResponse<SignInResponse>> {
 //        val authResponse = authService.signIn(signInRequest)
 //        return ResponseEntity.ok(authResponse)
 //    }
-//
+
     @PostMapping("/refresh")
     fun refreshToken(
         @RequestBody refreshTokenRequest: RefreshToken.Request,

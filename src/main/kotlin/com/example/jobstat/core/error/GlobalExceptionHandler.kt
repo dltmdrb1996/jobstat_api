@@ -5,13 +5,17 @@ import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.protocol.Message
+import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
-class GlobalExceptionHandler {
+class GlobalExceptionHandler(
+    private val environment: Environment,
+) {
     private val logger = StructuredLogger(this::class.java)
+    private val isProd = environment.activeProfiles.contains("dev")
 
     @ExceptionHandler(Exception::class)
     fun handleException(ex: Exception): ResponseEntity<ApiResponse<Unit>> {
@@ -27,9 +31,14 @@ class GlobalExceptionHandler {
 
         if (appException.isServerError()) {
             logger.error("Capture event", appException, appException.detailInfo())
-            captureEvent(appException)
+            if (isProd) captureEvent(appException)
         }
-        return ApiResponse.fail(appException.httpStatus, appException.detailInfo().toString())
+
+        return if (isProd) {
+            ApiResponse.fail(appException.httpStatus, appException.message)
+        } else {
+            ApiResponse.fail(appException.httpStatus, appException.detailInfo().toString())
+        }
     }
 
     private fun captureEvent(ex: AppException) {
