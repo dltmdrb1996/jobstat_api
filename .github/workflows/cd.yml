@@ -115,21 +115,6 @@ jobs:
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
-        env:
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          TAG: ${{ needs.create-tag.outputs.new_tag }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
-          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          MONGO_HOST: ${{ secrets.MONGO_HOST }}
-          REDIS_HOST: ${{ secrets.REDIS_HOST }}
-          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
@@ -137,12 +122,27 @@ jobs:
           envs: DOCKERHUB_USERNAME,DOCKERHUB_TOKEN,TAG,DB_USERNAME,DB_PASSWORD,MONGO_USERNAME,MONGO_PASSWORD,SENTRY_DSN,SENTRY_AUTH_TOKEN,JWT_SECRET,DB_HOST,MONGO_HOST,REDIS_HOST,CORS_ALLOWED_ORIGINS
           script: |
             cd /home/ubuntu/jobstat
-            
-            cat > .env << 'EOL'
-            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            TAG=${{ needs.create-tag.outputs.new_tag }}
-            EOL
-            
+
+            {
+              echo "DOCKERHUB_USERNAME=${DOCKERHUB_USERNAME}"
+              echo "DOCKERHUB_TOKEN=${DOCKERHUB_TOKEN}"
+              echo "TAG=${TAG}"
+              echo "DB_USERNAME=${DB_USERNAME}"
+              echo "DB_PASSWORD=${DB_PASSWORD}"
+              echo "MONGO_USERNAME=${MONGO_USERNAME}"
+              echo "MONGO_PASSWORD=${MONGO_PASSWORD}"
+              echo "SENTRY_DSN=${SENTRY_DSN}"
+              echo "SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}"
+              echo "JWT_SECRET=${JWT_SECRET}"
+              echo "DB_HOST=${DB_HOST}"
+              echo "MONGO_HOST=${MONGO_HOST}"
+              echo "REDIS_HOST=${REDIS_HOST}"
+              echo "CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}"
+            } > .env 2>/dev/null
+
+            chmod 600 .env
+
+            docker-compose down
             docker-compose pull
             docker-compose up -d
             docker system prune -af
