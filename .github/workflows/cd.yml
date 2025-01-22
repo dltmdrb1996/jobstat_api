@@ -72,7 +72,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:latest
 
   deploy:
-    needs: [docker-build-and-push, create-tag]
+    needs: [ docker-build-and-push, create-tag ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -115,35 +115,31 @@ jobs:
 
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          TAG: ${{ needs.create-tag.outputs.new_tag }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
+          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          MONGO_HOST: ${{ secrets.MONGO_HOST }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          CORS_ALLOWED_ORIGINS: ${{ secrets.CORS_ALLOWED_ORIGINS }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: DOCKERHUB_USERNAME,DOCKERHUB_TOKEN,TAG,DB_USERNAME,DB_PASSWORD,MONGO_USERNAME,MONGO_PASSWORD,SENTRY_DSN,SENTRY_AUTH_TOKEN,JWT_SECRET,DB_HOST,MONGO_HOST,REDIS_HOST,CORS_ALLOWED_ORIGINS
           script: |
             cd /home/ubuntu/jobstat
-
-            cat > .env << EOL
-            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
-            TAG=${{ needs.create-tag.outputs.new_tag }}
-            DB_USERNAME=${{ env.DB_USERNAME }}
-            DB_PASSWORD=${{ env.DB_PASSWORD }}
-            MONGO_USERNAME=${{ env.MONGO_USERNAME }}
-            MONGO_PASSWORD=${{ env.MONGO_PASSWORD }}
-            SENTRY_DSN=${{ env.SENTRY_DSN }}
-            SENTRY_AUTH_TOKEN=${{ env.SENTRY_AUTH_TOKEN }}
-            JWT_SECRET=${{ env.JWT_SECRET }}
-            DB_HOST=${{ env.DB_HOST }}
-            MONGO_HOST=${{ env.MONGO_HOST }}
-            REDIS_HOST=${{ env.REDIS_HOST }}
-            CORS_ALLOWED_ORIGINS=${{ env.CORS_ALLOWED_ORIGINS }}
-            EOL
-
-            chmod 600 .env
             
             docker-compose pull
             docker-compose up -d
-            
             docker system prune -af
 
       - name: Remove Github Actions IP from Security group

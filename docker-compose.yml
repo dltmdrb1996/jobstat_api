@@ -26,7 +26,7 @@ services:
     environment:
       - SERVER_PORT=8081
       - SPRING_PROFILES_ACTIVE=dev
-      - DB_HOST=${DB_HOST}  # 로컬 PC의 IP
+      - DB_HOST=${DB_HOST}
       - DB_PORT=3306
       - DB_NAME=dev_jobstat
       - DB_USERNAME=${DB_USERNAME}
@@ -36,10 +36,10 @@ services:
       - JWT_REFRESH_TOKEN_EXPIRATION=604800
       - MONGO_USERNAME=${MONGO_USERNAME}
       - MONGO_PASSWORD=${MONGO_PASSWORD}
-      - MONGO_HOST=${MONGO_HOST}  # 로컬 PC의 IP
+      - MONGO_HOST=${MONGO_HOST}
       - MONGO_PORT=27017
       - MONGO_DB=dev_database
-      - REDIS_HOST=${REDIS_HOST}  # 로컬 PC의 IP
+      - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=6379
       - REDIS_DB=1
       - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
