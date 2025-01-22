@@ -108,7 +108,7 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:latest
 
   deploy:
-    needs: docker-build-and-push
+    needs: [docker-build-and-push, create-tag]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
