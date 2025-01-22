@@ -3,11 +3,10 @@ version: '3.8'
 networks:
   web:
     driver: bridge
-  frontend:
-    driver: bridge
 
 services:
   nginx:
+    container_name: nginx
     image: ${DOCKERHUB_USERNAME}/jobstat-nginx:${TAG}
     ports:
       - "80:80"
@@ -22,6 +21,7 @@ services:
     restart: always
 
   spring-app:
+    container_name: spring-app
     image: ${DOCKERHUB_USERNAME}/jobstat-app:${TAG}
     environment:
       - SERVER_PORT=8081
