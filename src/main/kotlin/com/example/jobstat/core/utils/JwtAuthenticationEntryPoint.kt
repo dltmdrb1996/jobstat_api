@@ -14,22 +14,23 @@ import org.springframework.stereotype.Component
 
 @Component
 class JwtAuthenticationEntryPoint(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) : AuthenticationEntryPoint {
     private val cachedResponse: String by lazy {
         val exception = AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-        val errorResponse = ApiResponse<Unit>(
-            code = exception.httpStatus.value(),
-            status = exception.httpStatus,
-            message = "인증이 필요합니다",
-        )
+        val errorResponse =
+            ApiResponse<Unit>(
+                code = exception.httpStatus.value(),
+                status = exception.httpStatus,
+                message = "인증이 필요합니다",
+            )
         objectMapper.writeValueAsString(errorResponse)
     }
 
     override fun commence(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        authException: AuthenticationException
+        authException: AuthenticationException,
     ) {
         response.apply {
             status = HttpStatus.UNAUTHORIZED.value()

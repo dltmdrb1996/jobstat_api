@@ -31,7 +31,7 @@ class GlobalExceptionHandler(
 
         if (appException.isServerError()) {
             logger.error("Capture event", appException, appException.detailInfo())
-            if(isProd) captureEvent(appException)
+            if (isProd) captureEvent(appException)
         }
 
         return if (isProd) {

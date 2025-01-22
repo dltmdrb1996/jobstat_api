@@ -1,6 +1,5 @@
 package com.example.jobstat.core.security
 
-import ApiResponse
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.error.StructuredLogger
@@ -16,7 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArraySet
 
 @Component
 class JwtTokenFilter(
@@ -39,19 +37,19 @@ class JwtTokenFilter(
         cacheErrorResponse(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_VALIDATION_ERROR)
     }
 
-    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
-        return try {
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean =
+        try {
             when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
                 null -> false
-                is HandlerMethod -> handler.hasMethodAnnotation(Public::class.java)
-                        || handler.beanType.isAnnotationPresent(Public::class.java)
+                is HandlerMethod ->
+                    handler.hasMethodAnnotation(Public::class.java) ||
+                        handler.beanType.isAnnotationPresent(Public::class.java)
                 else -> false
             }
         } catch (ex: Exception) {
             log.error("Handler 조회 중 오류 발생", ex)
             false
         }
-    }
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -84,8 +82,7 @@ class JwtTokenFilter(
         filterChain.doFilter(request, response)
     }
 
-    private fun getJwtFromRequest(request: HttpServletRequest): String? =
-        request.getHeader("Authorization")?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_PREFIX.length)
+    private fun getJwtFromRequest(request: HttpServletRequest): String? = request.getHeader("Authorization")?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_PREFIX.length)
 
     private fun sendErrorResponse(
         response: HttpServletResponse,
@@ -99,14 +96,18 @@ class JwtTokenFilter(
         }
     }
 
-    private fun cacheErrorResponse(errorCode: ErrorCode, message: String) {
+    private fun cacheErrorResponse(
+        errorCode: ErrorCode,
+        message: String,
+    ) {
         val cacheKey = createCacheKey(errorCode, message)
         if (!errorResponseCache.containsKey(cacheKey)) {
-            val errorResponse = mapOf(
-                "code" to errorCode.code,
-                "status" to errorCode.defaultHttpStatus.value(),
-                "message" to message
-            )
+            val errorResponse =
+                mapOf(
+                    "code" to errorCode.code,
+                    "status" to errorCode.defaultHttpStatus.value(),
+                    "message" to message,
+                )
             errorResponseCache[cacheKey] = objectMapper.writeValueAsString(errorResponse)
         }
     }
@@ -114,15 +115,18 @@ class JwtTokenFilter(
     private fun getErrorResponse(appException: AppException): String {
         val cacheKey = createCacheKey(appException.errorCode, appException.message)
         return errorResponseCache.getOrPut(cacheKey) {
-            val errorResponse = mapOf(
-                "code" to appException.httpStatus.value(),
-                "status" to appException.httpStatus.name,
-                "message" to appException.message
-            )
+            val errorResponse =
+                mapOf(
+                    "code" to appException.httpStatus.value(),
+                    "status" to appException.httpStatus.name,
+                    "message" to appException.message,
+                )
             objectMapper.writeValueAsString(errorResponse)
         }
     }
 
-    private fun createCacheKey(errorCode: ErrorCode, message: String): String =
-        "${errorCode.name}:$message"
+    private fun createCacheKey(
+        errorCode: ErrorCode,
+        message: String,
+    ): String = "${errorCode.name}:$message"
 }

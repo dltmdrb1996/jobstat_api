@@ -4,5 +4,5 @@ package com.example.jobstat.core.security.annotation
 @Retention(AnnotationRetention.RUNTIME)
 annotation class RateLimit(
     val limit: Int = 100,
-    val duration: Int = 60
+    val duration: Int = 60,
 )
