@@ -1,12 +1,10 @@
 name: CI/CD
 
 on:
-  pull_request:
-    #    branches: [ develop, main ]
-    branches: [ main ]
   push:
-    #    branches: [ develop, main ]
-    branches: [ main ]
+    branches: [ "develop", "feature/*" ]
+  pull_request:
+    branches: [ "main", "develop" ]
 
 jobs:
   build-and-test:
@@ -22,27 +20,45 @@ jobs:
             fi
           done <<< "${{ secrets.DEV_SECRET }}"
 
-  #      - name: Set up JDK 21
-  #        uses: actions/setup-java@v3
-  #        with:
-  #          java-version: '21'
-  #          distribution: 'temurin'
-  #          cache: gradle
-  #
-  #      - name: Grant execute permission for gradlew
-  #        run: chmod +x gradlew
-  #
-  #      - name: Run ktlintCheck
-  #        run: ./gradlew ktlintCheck
-  #
-  #      - name: Run Tests
-  #        run: ./gradlew test
-  #        env:
-  #          SPRING_PROFILES_ACTIVE: test
-  #          TESTCONTAINERS_REUSE_ENABLE: true
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run ktlintCheck
+        run: ./gradlew ktlintCheck
+
+      - name: Run Tests
+        run: ./gradlew test
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          TESTCONTAINERS_REUSE_ENABLE: true
+
+  create-tag:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    outputs:
+      new_tag: ${{ steps.tag_version.outputs.new_tag }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Bump version and push tag
+        id: tag_version
+        uses: mathieudutour/github-tag-action@v6.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          default_bump: patch  # 특정 키워드가 없을 때 patch 버전 증가
+          release_branches: main
 
   docker-build-and-push:
-    needs: build-and-test
+    needs: create-tag
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
@@ -66,7 +82,6 @@ jobs:
             fi
           done <<< "${{ secrets.DEV_SECRET }}"
 
-      # jar 빌드 단계
       - name: Build with Gradle
         run: ./gradlew bootJar
         env:
@@ -80,13 +95,12 @@ jobs:
 
       - name: Build and push Docker images
         env:
-          TAG: ${{ github.sha }}
+          TAG: ${{ needs.create-tag.outputs.new_tag }}
         run: |
-               docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG .
-               docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG
-          
-               docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG -f nginx/Dockerfile ./nginx
-               docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG \
+                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest
 
   deploy:
     needs: docker-build-and-push
@@ -103,12 +117,10 @@ jobs:
             fi
           done <<< "${{ secrets.DEV_SECRET }}"
 
-      # 1. Get Actions IP
       - name: Get Github Actions IP
         id: ip
         uses: haythem/public-ip@v1.2
 
-      # 2. Configure AWS
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -116,7 +128,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-2
 
-      # 3. Add IP to security group
       - name: Add Github Actions IP to Security group
         run: |
           aws ec2 authorize-security-group-ingress \
@@ -125,7 +136,6 @@ jobs:
             --port 22 \
             --cidr ${{ steps.ip.outputs.ipv4 }}/32
 
-      # 4. Copy files and deploy
       - name: Copy configuration files to EC2
         uses: appleboy/scp-action@master
         with:
@@ -170,9 +180,8 @@ jobs:
 
             docker system prune -af
 
-      # 5. Remove IP from security group
       - name: Remove Github Actions IP from Security group
-        if: always()  # 이전 단계가 실패하더라도 항상 실행
+        if: always()
         run: |
           aws ec2 revoke-security-group-ingress \
             --group-id ${{ secrets.AWS_SG_ID }} \
