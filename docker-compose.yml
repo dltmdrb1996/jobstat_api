@@ -1,7 +1,12 @@
 version: '3.8'
 
-services:
+networks:
+  web:
+    driver: bridge
+  frontend:
+    driver: bridge
 
+services:
   nginx:
     image: ${DOCKERHUB_USERNAME}/jobstat-nginx:${TAG}
     ports:
@@ -12,7 +17,6 @@ services:
       - nginx-logs:/var/log/nginx
     networks:
       - web
-      - frontend
     depends_on:
       - spring-app
     restart: always
@@ -43,7 +47,6 @@ services:
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     networks:
       - web
-      - frontend
     expose:
       - "8081"
     restart: always
