@@ -1,16 +1,14 @@
 package com.example.jobstat.core.security
 
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.error.StructuredLogger
+import com.example.jobstat.core.utils.JwtAuthenticationEntryPoint
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.MediaType
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
@@ -23,35 +21,45 @@ import org.springframework.web.server.adapter.ForwardedHeaderTransformer
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig(
     private val jwtTokenFilter: JwtTokenFilter,
-    private val userDetailsService: UserDetailsService,
+    private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
+//    private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
     private val objectMapper: ObjectMapper,
 ) {
+    private lateinit var permittedUrls: Array<String>
+    private val log = StructuredLogger(this::class.java)
+
+//    private fun initializePermitUrls(): Array<String> {
+//        val publicUrls = buildSet {
+//            add("/error")
+//            add("/actuator/health")
+//
+//            requestMappingHandlerMapping.handlerMethods.forEach { (mapping, method) ->
+//                if (method.hasMethodAnnotation(Public::class.java) ||
+//                    method.beanType.isAnnotationPresent(Public::class.java)) {
+//
+//                    val patterns = mapping.patternValues
+//                    patterns.forEach { pattern ->
+//                        log.info("Adding public URL pattern: $pattern")
+//                        add(pattern)
+//                    }
+//                }
+//            }
+//        }.toTypedArray()
+//
+//        JwtTokenFilter.updatePermitUrls(publicUrls)
+//        log.info("Final Permitted URLs: ${publicUrls.joinToString()}")
+//        return publicUrls
+//    }
+
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .cors { it.configurationSource(corsConfigurationSource()) }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .exceptionHandling {
-                it.authenticationEntryPoint { _, response, authException ->
-                    val exception = AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-                    response.status = exception.httpStatus.value()
-                    response.contentType = MediaType.APPLICATION_JSON_VALUE
-                    response.characterEncoding = "UTF-8"
-                    val errorResponse =
-                        mapOf(
-                            "status" to exception.httpStatus.value(),
-                            "error" to exception.httpStatus.reasonPhrase,
-                            "message" to (authException.message ?: "Authentication failed"),
-                        )
-                    objectMapper.writeValue(response.writer, errorResponse)
-                }
-            }.authorizeHttpRequests {
-                it
-                    .requestMatchers(*JwtTokenFilter.PERMIT_URLS)
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated()
+            .exceptionHandling { it.authenticationEntryPoint(jwtAuthenticationEntryPoint) }
+            .authorizeHttpRequests {
+                it.anyRequest().permitAll() // 실제 인증은 JwtTokenFilter에서 처리
             }.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
             .headers { headers ->
                 headers
@@ -60,11 +68,11 @@ class SecurityConfig(
                     .contentSecurityPolicy { csp ->
                         csp.policyDirectives(
                             "default-src 'self'; " +
-                                "script-src 'self' https://scripts.goatstat.com; " +
-                                "style-src 'self' https://styles.goatstat.com; " +
-                                "img-src 'self' https://images.goatstat.com data:; " +
-                                "font-src 'self' https://fonts.goatstat.com; " +
-                                "connect-src 'self' https://api.goatstat.com; " +
+                                "script-src 'self' https://scripts.jobstatanalysis.com; " +
+                                "style-src 'self' https://styles.jobstatanalysis.com; " +
+                                "img-src 'self' https://images.jobstatanalysis.com data:; " +
+                                "font-src 'self' https://fonts.jobstatanalysis.com; " +
+                                "connect-src 'self' https://api.jobstatanalysis.com; " +
                                 "frame-src 'none'; " +
                                 "object-src 'none'; " +
                                 "base-uri 'self'; " +

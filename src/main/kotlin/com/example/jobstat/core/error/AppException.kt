@@ -23,6 +23,7 @@ enum class ErrorCode(
     DUPLICATE_RESOURCE("C006", "중복된 리소스입니다", HttpStatus.CONFLICT, AppExceptionType.CLIENT_ERROR),
     INVALID_REQUEST_BODY("C007", "유효하지 않은 요청 본문입니다", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
     CONSTRAINT_VIOLATION("C008", "제약 조건 위반입니다", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
+    TOO_MANY_REQUESTS("C009", "요청이 너무 많습니다", HttpStatus.TOO_MANY_REQUESTS, AppExceptionType.CLIENT_ERROR),
 
     // 서버 오류
     INTERNAL_ERROR("S001", "내부 서버 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
