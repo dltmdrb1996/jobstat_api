@@ -16,6 +16,9 @@ internal class IndexController {
     @GetMapping("/err")
     fun error(): Unit = throw AppException.fromErrorCode(ErrorCode.INTERNAL_ERROR, "Test error", "Test error detail")
 
+    @GetMapping("/api/v1/test")
+    fun apiTest() = "apiTest!"
+
     @GetMapping(value = ["/required"])
     fun helloRequiredWorld(
         @RequestParam(value = "msg", required = true) msg: String,
