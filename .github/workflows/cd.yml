@@ -138,6 +138,11 @@ jobs:
           script: |
             cd /home/ubuntu/jobstat
             
+            cat > .env << 'EOL'
+            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+            TAG=${{ needs.create-tag.outputs.new_tag }}
+            EOL
+            
             docker-compose pull
             docker-compose up -d
             docker system prune -af
