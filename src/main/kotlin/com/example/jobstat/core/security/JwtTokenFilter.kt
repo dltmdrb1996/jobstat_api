@@ -24,6 +24,7 @@ class JwtTokenFilter(
 ) : OncePerRequestFilter() {
     private val log = StructuredLogger(this::class.java)
     private val errorResponseCache = ConcurrentHashMap<String, String>()
+    private val shouldNotFilterCache = ConcurrentHashMap<String, Boolean>()
 
     companion object {
         private const val BEARER_PREFIX = "Bearer "
@@ -38,17 +39,19 @@ class JwtTokenFilter(
     }
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean =
-        try {
-            when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
-                null -> false
-                is HandlerMethod ->
-                    handler.hasMethodAnnotation(Public::class.java) ||
-                        handler.beanType.isAnnotationPresent(Public::class.java)
-                else -> false
+        shouldNotFilterCache.computeIfAbsent(request.requestURI) { uri ->
+            try {
+                when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
+                    null -> false
+                    is HandlerMethod -> {
+                        handler.hasMethodAnnotation(Public::class.java) ||
+                            handler.beanType.isAnnotationPresent(Public::class.java)
+                    }
+                    else -> false
+                }
+            } catch (ex: Exception) {
+                false
             }
-        } catch (ex: Exception) {
-            log.error("Handler 조회 중 오류 발생", ex)
-            false
         }
 
     override fun doFilterInternal(
@@ -56,6 +59,7 @@ class JwtTokenFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
+        log.info("doFilterInternal ${request.requestURI}")
         if (shouldNotFilter(request)) {
             filterChain.doFilter(request, response)
             return

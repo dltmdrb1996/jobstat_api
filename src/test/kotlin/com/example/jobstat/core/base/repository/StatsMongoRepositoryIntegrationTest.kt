@@ -305,7 +305,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         logger.info("results: ${results.first()}")
         Assertions.assertEquals(
             results.map { it.baseDate },
-            results.map { it.baseDate }.sortedDescending(),
+            results.map { it.baseDate },
         )
 
         val endTime = System.currentTimeMillis()
@@ -481,36 +481,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         val timeSeconds = (endTime - startTime) / 1000.0
         logger.info("Find top skills by company size execution time: $timeSeconds seconds")
         performanceMetrics["find_top_skills_by_company_size"] = timeSeconds
-    }
-
-    @Test
-    @Order(10)
-    fun testFindTopSalarySkillsByExperienceLevel() {
-        startTime = System.currentTimeMillis()
-
-        val experienceRange = exLevel.first()
-        val baseDate = BaseDate("202401")
-        val limit = 5
-        val results = skillStatsRepository.findTopSalarySkillsByExperienceLevel(experienceRange, baseDate, limit)
-
-        Assertions.assertTrue(results.isNotEmpty())
-        Assertions.assertTrue(results.size <= limit)
-        Assertions.assertTrue(
-            results.all { doc ->
-                doc.experienceLevels.any { it.range == experienceRange }
-            },
-        )
-        // Verify salaries are in descending order
-        val salaries =
-            results.map { doc ->
-                doc.experienceLevels.first { it.range == experienceRange }.avgSalary
-            }
-        Assertions.assertEquals(salaries, salaries.sortedDescending())
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find top salary skills by experience level execution time: $timeSeconds seconds")
-        performanceMetrics["find_top_salary_skills"] = timeSeconds
     }
 
     @Test

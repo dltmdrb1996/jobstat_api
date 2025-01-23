@@ -88,10 +88,14 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
-    // Testing
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.mockito:mockito-core:5.15.2")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.0")
+
+//    // Testing
+//    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+//    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // 컨테이너 테스트 관련
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
