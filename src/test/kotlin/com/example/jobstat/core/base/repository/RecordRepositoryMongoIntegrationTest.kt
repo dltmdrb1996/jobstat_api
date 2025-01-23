@@ -1,4 +1,4 @@
-package com.example.jobstat.rankings.repository
+package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import com.example.jobstat.utils.dummy.Address

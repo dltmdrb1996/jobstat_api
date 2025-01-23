@@ -1,6 +1,7 @@
 package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
+import com.example.jobstat.core.state.BaseDate
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
@@ -16,64 +17,64 @@ interface StatsMongoRepository<T : BaseStatsDocument, ID : Any> : BaseTimeSeries
 
     fun findByEntityIdAndBaseDate(
         entityId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
     ): T?
 
     fun findByBaseDateAndEntityIds(
-        baseDate: String,
+        baseDate: BaseDate,
         entityIds: List<Long>,
     ): List<T>
 
     fun findByBaseDateBetweenAndEntityId(
-        startDate: String,
-        endDate: String,
+        startDate: BaseDate,
+        endDate: BaseDate,
         entityId: Long,
     ): List<T>
 
     fun findLatestStatsByEntityId(entityId: Long): T?
 
     fun findTopGrowthSkills(
-        startDate: String,
-        endDate: String,
+        startDate: BaseDate,
+        endDate: BaseDate,
         limit: Int,
     ): List<T>
 
     // 특정 산업에서 수요가 높은 스킬들 조회
     fun findTopSkillsByIndustry(
         industryId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
         limit: Int,
     ): List<T>
 
     // 특정 기업 규모별 선호 스킬 조회
     fun findTopSkillsByCompanySize(
         companySize: String,
-        baseDate: String,
+        baseDate: BaseDate,
         limit: Int,
     ): List<T>
 
     // 연관 직무 카테고리에서 중요도가 높은 스킬들 조회
     fun findTopSkillsByJobCategory(
         jobCategoryId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
         limit: Int,
     ): List<T>
 
     // 경력 레벨별 평균 급여가 높은 스킬들 조회
     fun findTopSalarySkillsByExperienceLevel(
         experienceRange: String,
-        baseDate: String,
+        baseDate: BaseDate,
         limit: Int,
     ): List<T>
 
     fun findEmergingSkillsByIndustry(
         industryId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
         minGrowthRate: Double,
     ): List<T>
 
     fun findSkillsWithMultiIndustryGrowth(
-        baseDate: String,
+        baseDate: BaseDate,
         minIndustryCount: Int,
         minGrowthRate: Double,
     ): List<T>
@@ -84,6 +85,13 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
     private val mongoOperations: MongoOperations,
 ) : BaseTimeSeriesRepositoryImpl<T, ID>(entityInformation, mongoOperations),
     StatsMongoRepository<T, ID> {
+    /**
+     * 특정 엔티티의 모든 통계 데이터를 조회합니다.
+     * 기준일자를 기준으로 내림차순 정렬하여 반환합니다.
+     *
+     * @param entityId 조회할 엔티티 ID
+     * @return 해당 엔티티의 모든 통계 데이터 목록
+     */
     override fun findByEntityId(entityId: Long): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
@@ -96,9 +104,16 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 특정 엔티티의 특정 기준일자 통계 데이터를 조회합니다.
+     *
+     * @param entityId 엔티티 ID
+     * @param baseDate 기준 날짜
+     * @return 해당 엔티티의 통계 데이터, 없으면 null
+     */
     override fun findByEntityIdAndBaseDate(
         entityId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
     ): T? {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
@@ -106,7 +121,7 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .find(
                 Filters.and(
                     Filters.eq("entity_id", entityId),
-                    Filters.eq("base_date", baseDate),
+                    Filters.eq("base_date", baseDate.toString()),
                 ),
             ).hintString("snapshot_lookup_idx")
             .limit(1)
@@ -114,8 +129,16 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }
 
+    /**
+     * 특정 기준일자의 여러 엔티티 통계 데이터를 조회합니다.
+     * entityIds가 비어있는 경우 빈 리스트를 반환합니다.
+     *
+     * @param baseDate 기준 날짜
+     * @param entityIds 조회할 엔티티 ID 목록
+     * @return 해당 엔티티들의 통계 데이터 목록
+     */
     override fun findByBaseDateAndEntityIds(
-        baseDate: String,
+        baseDate: BaseDate,
         entityIds: List<Long>,
     ): List<T> {
         if (entityIds.isEmpty()) return emptyList()
@@ -125,7 +148,7 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
         return collection
             .find(
                 Filters.and(
-                    Filters.eq("base_date", baseDate),
+                    Filters.eq("base_date", baseDate.toString()),
                     Filters.`in`("entity_id", entityIds),
                 ),
             ).hintString("snapshot_lookup_idx")
@@ -134,9 +157,18 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 특정 기간 동안의 엔티티 통계 데이터를 조회합니다.
+     * 기준일자를 기준으로 오름차순 정렬하여 반환합니다.
+     *
+     * @param startDate 시작 날짜
+     * @param endDate 종료 날짜
+     * @param entityId 조회할 엔티티 ID
+     * @return 해당 기간의 통계 데이터 목록
+     */
     override fun findByBaseDateBetweenAndEntityId(
-        startDate: String,
-        endDate: String,
+        startDate: BaseDate,
+        endDate: BaseDate,
         entityId: Long,
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
@@ -145,8 +177,8 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .find(
                 Filters.and(
                     Filters.eq("entity_id", entityId),
-                    Filters.gte("base_date", startDate),
-                    Filters.lte("base_date", endDate),
+                    Filters.gte("base_date", startDate.toString()),
+                    Filters.lte("base_date", endDate.toString()),
                 ),
             ).sort(Sorts.ascending("base_date"))
             .hintString("snapshot_lookup_idx")
@@ -155,6 +187,12 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 특정 엔티티의 가장 최근 통계 데이터를 조회합니다.
+     *
+     * @param entityId 조회할 엔티티 ID
+     * @return 가장 최근 통계 데이터, 없으면 null
+     */
     override fun findLatestStatsByEntityId(entityId: Long): T? {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
@@ -167,9 +205,18 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }
 
+    /**
+     * 특정 기간 동안 가장 높은 성장률을 보인 스킬들을 조회합니다.
+     * 성장률을 기준으로 내림차순 정렬하여 상위 N개를 반환합니다.
+     *
+     * @param startDate 시작 날짜
+     * @param endDate 종료 날짜
+     * @param limit 조회할 스킬 수
+     * @return 성장률이 높은 스킬 목록
+     */
     override fun findTopGrowthSkills(
-        startDate: String,
-        endDate: String,
+        startDate: BaseDate,
+        endDate: BaseDate,
         limit: Int,
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
@@ -178,13 +225,12 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             listOf(
                 Aggregates.match(
                     Filters.and(
-                        Filters.gte("base_date", startDate),
-                        Filters.lte("base_date", endDate),
+                        Filters.gte("base_date", startDate.toString()),
+                        Filters.lte("base_date", endDate.toString()),
                     ),
                 ),
                 Aggregates.sort(Sorts.descending("stats.growth_rate")),
                 Aggregates.limit(limit),
-                // 프로젝션 제거
             )
 
         return collection
@@ -193,9 +239,18 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 특정 산업에서 수요가 높은 스킬들을 조회합니다.
+     * 산업 내 빈도수를 기준으로 내림차순 정렬하여 상위 N개를 반환합니다.
+     *
+     * @param industryId 산업 ID
+     * @param baseDate 기준 날짜
+     * @param limit 조회할 스킬 수
+     * @return 산업별 상위 스킬 목록
+     */
     override fun findTopSkillsByIndustry(
         industryId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
         limit: Int,
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
@@ -204,10 +259,10 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             listOf(
                 Aggregates.match(
                     Filters.and(
-                        Filters.eq("base_date", baseDate),
+                        Filters.eq("base_date", baseDate.toString()),
                         Filters.elemMatch(
-                            "industry_distribution", // @Field 애노테이션에 맞춰 스네이크 케이스 사용
-                            Filters.eq("industry_id", industryId), // @Field 애노테이션에 맞춰 스네이크 케이스 사용
+                            "industry_distribution",
+                            Filters.eq("industry_id", industryId),
                         ),
                     ),
                 ),
@@ -218,9 +273,9 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
                             "\$filter",
                             Document(
                                 mapOf(
-                                    "input" to "\$industry_distribution", // 스네이크 케이스 사용
+                                    "input" to "\$industry_distribution",
                                     "as" to "ind",
-                                    "cond" to Document("\$eq", listOf("\$\$ind.industry_id", industryId)), // 스네이크 케이스 사용
+                                    "cond" to Document("\$eq", listOf("\$\$ind.industry_id", industryId)),
                                 ),
                             ),
                         ),
@@ -236,18 +291,25 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 특정 경력 레벨에서 평균 급여가 높은 스킬들을 조회합니다.
+     * 평균 급여를 기준으로 내림차순 정렬하여 상위 N개를 반환합니다.
+     *
+     * @param experienceRange 경력 범위
+     * @param baseDate 기준 날짜
+     * @param limit 조회할 스킬 수
+     * @return 급여가 높은 스킬 목록
+     */
     override fun findTopSalarySkillsByExperienceLevel(
         experienceRange: String,
-        baseDate: String,
+        baseDate: BaseDate,
         limit: Int,
-    ): List<T> { // Replace `SkillStatsDocument` with your actual type if different
+    ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         val pipeline =
             listOf(
-                // Stage 1: Match documents with the specified base_date
-                Aggregates.match(Filters.eq("base_date", baseDate)),
-                // Stage 2: Add a new field 'filtered_experience_levels' by filtering the 'experience_levels' array
+                Aggregates.match(Filters.eq("base_date", baseDate.toString())),
                 Aggregates.addFields(
                     Field(
                         "filtered_experience_levels",
@@ -263,23 +325,15 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
                         ),
                     ),
                 ),
-                // Stage 3: Ensure that the 'filtered_experience_levels' array is not empty
                 Aggregates.match(Filters.gt("filtered_experience_levels.0", Document())),
-                // Stage 4: Add a new field 'max_avg_salary' by extracting the maximum 'avg_salary' from the filtered array
                 Aggregates.addFields(
                     Field(
                         "max_avg_salary",
                         Document("\$max", "\$filtered_experience_levels.avg_salary"),
                     ),
                 ),
-                // Stage 5: Sort the documents in descending order based on 'max_avg_salary'
                 Aggregates.sort(Sorts.descending("max_avg_salary")),
-                // Stage 6: Limit the number of returned documents
                 Aggregates.limit(limit),
-                // Optional Stage 7: Project the necessary fields (remove if you want the entire document)
-                // Aggregates.project(
-                //     Projections.exclude("max_avg_salary", "filtered_experience_levels")
-                // )
             )
 
         return collection
@@ -288,16 +342,25 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 특정 기업 규모에서 선호되는 스킬들을 조회합니다.
+     * 기업 규모별 빈도수를 기준으로 내림차순 정렬하여 상위 N개를 반환합니다.
+     *
+     * @param companySize 기업 규모
+     * @param baseDate 기준 날짜
+     * @param limit 조회할 스킬 수
+     * @return 기업 규모별 상위 스킬 목록
+     */
     override fun findTopSkillsByCompanySize(
         companySize: String,
-        baseDate: String,
+        baseDate: BaseDate,
         limit: Int,
-    ): List<T> { // Replace `List<T>` with the actual type if necessary
+    ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         val pipeline =
             listOf(
-                Aggregates.match(Filters.eq("base_date", baseDate)),
+                Aggregates.match(Filters.eq("base_date", baseDate.toString())),
                 Aggregates.addFields(
                     Field(
                         "company_size_distribution",
@@ -324,9 +387,18 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 특정 직무 카테고리에서 중요도가 높은 스킬들을 조회합니다.
+     * 중요도 점수를 기준으로 내림차순 정렬하여 상위 N개를 반환합니다.
+     *
+     * @param jobCategoryId 직무 카테고리 ID
+     * @param baseDate 기준 날짜
+     * @param limit 조회할 스킬 수
+     * @return 직무 카테고리별 상위 스킬 목록
+     */
     override fun findTopSkillsByJobCategory(
         jobCategoryId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
         limit: Int,
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
@@ -335,7 +407,7 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             listOf(
                 Aggregates.match(
                     Filters.and(
-                        Filters.eq("base_date", baseDate),
+                        Filters.eq("base_date", baseDate.toString()),
                         Filters.elemMatch(
                             "related_job_categories",
                             Filters.eq("job_category_id", jobCategoryId),
@@ -367,9 +439,18 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
-    // 추가 유용한 메서드들:
+    /**
+     * 여러 산업에서 동시에 성장하고 있는 스킬들을 조회합니다.
+     * 지정된 수 이상의 산업에서 최소 성장률 이상의 성장을 보이는 스킬들을 반환합니다.
+     * 성장률을 기준으로 내림차순 정렬됩니다.
+     *
+     * @param baseDate 기준 날짜
+     * @param minIndustryCount 최소 산업 수
+     * @param minGrowthRate 최소 성장률
+     * @return 다중 산업 성장 스킬 목록
+     */
     override fun findSkillsWithMultiIndustryGrowth(
-        baseDate: String,
+        baseDate: BaseDate,
         minIndustryCount: Int,
         minGrowthRate: Double,
     ): List<T> {
@@ -377,7 +458,7 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
 
         val pipeline =
             listOf(
-                Aggregates.match(Filters.eq("base_date", baseDate)),
+                Aggregates.match(Filters.eq("base_date", baseDate.toString())),
                 Aggregates.match(
                     Filters.and(
                         Filters.gte("stats.growth_rate", minGrowthRate),
@@ -402,9 +483,19 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 특정 산업에서 새롭게 부상하는 스킬들을 조회합니다.
+     * emerging_skill이 true이고 지정된 최소 성장률 이상을 보이는 스킬들을 반환합니다.
+     * 성장률을 기준으로 내림차순 정렬됩니다.
+     *
+     * @param industryId 산업 ID
+     * @param baseDate 기준 날짜
+     * @param minGrowthRate 최소 성장률
+     * @return 새롭게 부상하는 스킬 목록
+     */
     override fun findEmergingSkillsByIndustry(
         industryId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
         minGrowthRate: Double,
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
@@ -413,7 +504,7 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             listOf(
                 Aggregates.match(
                     Filters.and(
-                        Filters.eq("base_date", baseDate),
+                        Filters.eq("base_date", baseDate.toString()),
                         Filters.eq("emerging_skill", true),
                         Filters.gte("stats.growth_rate", minGrowthRate),
                         Filters.elemMatch(

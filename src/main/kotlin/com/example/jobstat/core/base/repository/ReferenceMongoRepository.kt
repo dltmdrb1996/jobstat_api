@@ -51,6 +51,12 @@ abstract class ReferenceMongoRepositoryImpl<T : BaseReferenceDocument, ID : Any>
 //        )
     }
 
+    /**
+     * 특정 reference ID에 해당하는 문서를 조회합니다.
+     *
+     * @param referenceId 조회할 reference ID
+     * @return 해당 reference ID의 문서, 없으면 null
+     */
     override fun findByReferenceId(referenceId: Long): T? {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
@@ -61,6 +67,13 @@ abstract class ReferenceMongoRepositoryImpl<T : BaseReferenceDocument, ID : Any>
             ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }
 
+    /**
+     * 여러 reference ID들에 해당하는 문서들을 조회합니다.
+     * referenceIds가 비어있는 경우 빈 리스트를 반환합니다.
+     *
+     * @param referenceIds 조회할 reference ID 목록
+     * @return reference ID들에 해당하는 문서 리스트
+     */
     override fun findByReferenceIds(referenceIds: List<Long>): List<T> {
         if (referenceIds.isEmpty()) return emptyList()
 
@@ -73,6 +86,12 @@ abstract class ReferenceMongoRepositoryImpl<T : BaseReferenceDocument, ID : Any>
             .toList()
     }
 
+    /**
+     * 특정 엔티티 타입에 해당하는 모든 문서를 조회합니다.
+     *
+     * @param entityType 조회할 엔티티 타입
+     * @return 해당 엔티티 타입의 문서 리스트
+     */
     override fun findByEntityType(entityType: EntityType): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
@@ -83,6 +102,13 @@ abstract class ReferenceMongoRepositoryImpl<T : BaseReferenceDocument, ID : Any>
             .toList()
     }
 
+    /**
+     * 특정 엔티티 타입과 상태를 가진 모든 문서를 조회합니다.
+     *
+     * @param entityType 조회할 엔티티 타입
+     * @param status 조회할 문서 상태
+     * @return 해당 조건을 만족하는 문서 리스트
+     */
     override fun findByEntityTypeAndStatus(
         entityType: EntityType,
         status: DocumentStatus,
@@ -100,6 +126,13 @@ abstract class ReferenceMongoRepositoryImpl<T : BaseReferenceDocument, ID : Any>
             .toList()
     }
 
+    /**
+     * 특정 reference ID와 엔티티 타입을 가진 문서를 조회합니다.
+     *
+     * @param referenceId 조회할 reference ID
+     * @param entityType 조회할 엔티티 타입
+     * @return 해당 조건을 만족하는 문서, 없으면 null
+     */
     override fun findByReferenceIdAndEntityType(
         referenceId: Long,
         entityType: EntityType,
@@ -117,6 +150,14 @@ abstract class ReferenceMongoRepositoryImpl<T : BaseReferenceDocument, ID : Any>
             ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }
 
+    /**
+     * 특정 reference ID를 가진 문서의 상태를 업데이트합니다.
+     * updatedAt 필드도 함께 현재 시간으로 업데이트됩니다.
+     *
+     * @param referenceId 업데이트할 문서의 reference ID
+     * @param status 새로운 상태
+     * @return 업데이트된 문서, 실패 시 null
+     */
     override fun updateStatus(
         referenceId: Long,
         status: DocumentStatus,

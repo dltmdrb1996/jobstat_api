@@ -98,7 +98,6 @@ jobs:
           source: "docker-compose.yml,nginx/"
           target: "/home/ubuntu/jobstat"
 
-#테스트
       - name: Deploy to EC2
         uses: appleboy/ssh-action@master
         with:

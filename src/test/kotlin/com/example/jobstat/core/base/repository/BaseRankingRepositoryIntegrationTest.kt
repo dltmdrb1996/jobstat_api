@@ -1,8 +1,10 @@
-package com.example.jobstat.rankings.repository
+package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
+import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.rankings.model.SkillGrowthRankingsDocument
+import com.example.jobstat.rankings.repository.SkillGrowthRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
@@ -153,7 +155,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindTopN() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val limit = 10
         val topSkills = skillGrowthRankingsRepository.findTopN(baseDate, limit)
 
@@ -178,7 +180,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindByRankRange() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val startRank = 5
         val endRank = 15
         val skills = skillGrowthRankingsRepository.findByRankRange(baseDate, startRank, endRank)
@@ -204,10 +206,9 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindTopMovers() {
         startTime = System.currentTimeMillis()
 
-        val startDate = "202401"
-        val endDate = "202402"
+        val baseDate = BaseDate("202401")
         val limit = 10
-        val movers = skillGrowthRankingsRepository.findTopMovers(startDate, endDate, limit)
+        val movers = skillGrowthRankingsRepository.findTopMovers(baseDate, limit)
 
         Assertions.assertTrue(movers.isNotEmpty())
         Assertions.assertTrue(movers.size <= limit)
@@ -228,10 +229,9 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindTopLosers() {
         startTime = System.currentTimeMillis()
 
-        val startDate = "202401"
-        val endDate = "202402"
+        val baseDate = BaseDate("202401")
         val limit = 10
-        val losers = skillGrowthRankingsRepository.findTopLosers(startDate, endDate, limit)
+        val losers = skillGrowthRankingsRepository.findTopLosers(baseDate, limit)
 
         Assertions.assertTrue(losers.isNotEmpty())
         Assertions.assertTrue(losers.size <= limit)
@@ -245,28 +245,6 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         val timeSeconds = (endTime - startTime) / 1000.0
         logger.info("Find top losers execution time: $timeSeconds seconds")
         performanceMetrics["find_top_losers"] = timeSeconds
-    }
-
-    @Test
-    @Order(6)
-    fun testFindStableEntities() {
-        startTime = System.currentTimeMillis()
-
-        val months = 3
-        val maxRankChange = 5
-        val stableSkills = skillGrowthRankingsRepository.findStableEntities(months, maxRankChange)
-
-        Assertions.assertTrue(
-            stableSkills.all { skill ->
-                val rankChange = skill.rankings.first().rankChange
-                rankChange == null || abs(rankChange) <= maxRankChange
-            },
-        )
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find stable entities execution time: $timeSeconds seconds")
-        performanceMetrics["find_stable_entities"] = timeSeconds
     }
 
     @Test

@@ -1,9 +1,11 @@
-package com.example.jobstat.rankings.repository
+package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
+import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.state.EntityType
 import com.example.jobstat.rankings.model.IndustrySkillRankingsDocument
+import com.example.jobstat.rankings.repository.IndustrySkillRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -169,7 +171,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindByPrimaryEntityId() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val primaryEntityId =
             allRecords
                 .first()
@@ -181,7 +183,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         Assertions.assertNotNull(result)
         result?.let {
             Assertions.assertEquals(primaryEntityId, it.rankings.first().primaryEntityId)
-            Assertions.assertEquals(baseDate, it.baseDate)
+            Assertions.assertEquals(baseDate.toString(), it.baseDate)
         }
 
         val endTime = System.currentTimeMillis()
@@ -195,7 +197,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindTopNRelatedEntities() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val primaryEntityId =
             allRecords
                 .first()
@@ -226,7 +228,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindByRelatedEntityId() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val relatedEntityId =
             allRecords
                 .first()
@@ -258,7 +260,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindStrongRelationships() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val minScore = 0.8
         val results = industrySkillRankingsRepository.findStrongRelationships(baseDate, minScore)
 
@@ -283,8 +285,8 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindGrowingRelationships() {
         startTime = System.currentTimeMillis()
 
-        val startDate = "202401"
-        val endDate = "202402"
+        val startDate = BaseDate("202401")
+        val endDate = BaseDate("202402")
         val limit = 5
         val results = industrySkillRankingsRepository.findGrowingRelationships(startDate, endDate, limit)
 
@@ -302,7 +304,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindCommonRelationships() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val primaryEntity1 = allRecords[0].rankings.first().primaryEntityId
         val primaryEntity2 = allRecords[1].rankings.first().primaryEntityId
         val results =
@@ -332,7 +334,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindStrongestPairs() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val limit = 5
         val results = industrySkillRankingsRepository.findStrongestPairs(baseDate, limit)
 
@@ -408,7 +410,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindByEntityIdAndBaseDate() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val entityId =
             allRecords
                 .first()
@@ -419,7 +421,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
         Assertions.assertNotNull(result)
         result?.let {
-            Assertions.assertEquals(baseDate, it.baseDate)
+            Assertions.assertEquals(baseDate.toString(), it.baseDate)
             // Entity should be either primary or in related rankings
             Assertions.assertTrue(
                 it.rankings.first().primaryEntityId == entityId ||

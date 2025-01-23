@@ -1,8 +1,9 @@
-package com.example.jobstat.rankings.repository
+package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.mongo.stats.*
+import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.stats.model.SkillStatsDocument
 import com.example.jobstat.stats.repository.SkillStatsRepository
 import com.example.jobstat.utils.base.BatchOperationTestSupport
@@ -319,13 +320,13 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
 
         val entityId = allRecords.first().entityId
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val result = skillStatsRepository.findByEntityIdAndBaseDate(entityId, baseDate)
 
         Assertions.assertNotNull(result)
         result?.let {
             Assertions.assertEquals(entityId, it.entityId)
-            Assertions.assertEquals(baseDate, it.baseDate)
+            Assertions.assertEquals(baseDate.toString(), it.baseDate)
         }
 
         val endTime = System.currentTimeMillis()
@@ -339,13 +340,13 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindByBaseDateAndEntityIds() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val entityIds = allRecords.take(5).map { it.entityId }
         val results = skillStatsRepository.findByBaseDateAndEntityIds(baseDate, entityIds)
 
         Assertions.assertTrue(results.isNotEmpty())
         Assertions.assertTrue(
-            results.all { it.baseDate == baseDate && it.entityId in entityIds },
+            results.all { it.baseDate == baseDate.toString() && it.entityId in entityIds },
         )
 
         val endTime = System.currentTimeMillis()
@@ -360,8 +361,8 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
 
         val entityId = allRecords.first().entityId
-        val startDate = "202401"
-        val endDate = "202403"
+        val startDate = BaseDate("202401")
+        val endDate = BaseDate("202403")
         val results =
             skillStatsRepository.findByBaseDateBetweenAndEntityId(
                 startDate,
@@ -373,8 +374,8 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         Assertions.assertTrue(
             results.all {
                 it.entityId == entityId &&
-                    it.baseDate >= startDate &&
-                    it.baseDate <= endDate
+                    it.baseDate >= startDate.toString() &&
+                    it.baseDate <= endDate.toString()
             },
         )
         // Verify results are ordered by date ascending
@@ -415,8 +416,8 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindTopGrowthSkills() {
         startTime = System.currentTimeMillis()
 
-        val startDate = "202401"
-        val endDate = "202403"
+        val startDate = BaseDate("202401")
+        val endDate = BaseDate("202403")
         val limit = 5
         val results = skillStatsRepository.findTopGrowthSkills(startDate, endDate, limit)
 
@@ -439,7 +440,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
 
         val industryId = industry.first().first
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val limit = 5
         val results = skillStatsRepository.findTopSkillsByIndustry(industryId, baseDate, limit)
 
@@ -463,7 +464,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
 
         val companySize = companySize.first()
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val limit = 5
         val results = skillStatsRepository.findTopSkillsByCompanySize(companySize, baseDate, limit)
 
@@ -488,7 +489,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
 
         val experienceRange = exLevel.first()
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val limit = 5
         val results = skillStatsRepository.findTopSalarySkillsByExperienceLevel(experienceRange, baseDate, limit)
 
@@ -518,7 +519,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
 
         val jobCategoryId = jobCategory.first().first
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val limit = 5
         val results = skillStatsRepository.findTopSkillsByJobCategory(jobCategoryId, baseDate, limit)
 
@@ -547,7 +548,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindSkillsWithMultiIndustryGrowth() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val minIndustryCount = 3
         val minGrowthRate = 20.0
         val results = skillStatsRepository.findSkillsWithMultiIndustryGrowth(baseDate, minIndustryCount, minGrowthRate)
@@ -571,7 +572,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
 
         val industryId = industry.first().first
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val minGrowthRate = 30.0
         val results = skillStatsRepository.findEmergingSkillsByIndustry(industryId, baseDate, minGrowthRate)
 
