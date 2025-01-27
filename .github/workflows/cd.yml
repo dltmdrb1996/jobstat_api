@@ -104,6 +104,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            mkdir -p /home/ubuntu/jobstat/backend
             cd /home/ubuntu/jobstat/backend
             
             docker network create public || true
