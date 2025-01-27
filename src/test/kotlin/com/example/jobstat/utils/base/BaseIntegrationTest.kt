@@ -74,7 +74,7 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
 
     protected val logger = LoggerFactory.getLogger(this::class.java)
     protected val executionTimes = mutableMapOf<String, Double>()
-    private var testStartTime: Long = 0
+    var testStartTime: Long = 0
 
     @BeforeEach
     fun setup() {

@@ -1,5 +1,6 @@
 package com.example.jobstat
 
+import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.security.annotation.Public
@@ -24,7 +25,7 @@ internal class IndexController {
         throw AppException.fromErrorCode(ErrorCode.INTERNAL_ERROR, "Test error", "Test error detail")
     }
 
-    @GetMapping("/api/v1/test")
+    @GetMapping("/api/${RestConstants.Versions.V1}/test")
     fun apiTest() = "apiTest!"
 
     @GetMapping(value = ["/required"])

@@ -7,7 +7,7 @@ networks:
 services:
   nginx:
     container_name: nginx
-    image: ${DOCKERHUB_USERNAME}/jobstat-nginx:${TAG}
+    image: ${DOCKERHUB_USERNAME}/jobstat-nginx:${BACKEND_TAG}
     ports:
       - "80:80"
       - "443:443"
@@ -22,7 +22,7 @@ services:
 
   spring-app:
     container_name: spring-app
-    image: ${DOCKERHUB_USERNAME}/jobstat-app:${TAG}
+    image: ${DOCKERHUB_USERNAME}/jobstat-app:${BACKEND_TAG}
     environment:
       - SERVER_PORT=8081
       - SPRING_PROFILES_ACTIVE=dev

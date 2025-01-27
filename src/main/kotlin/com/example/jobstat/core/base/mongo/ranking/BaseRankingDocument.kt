@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes
 @CompoundIndexes(
     CompoundIndex(
         name = "rank_lookup_idx",
-        def = "{'base_date': -1, 'rankings.rank': -1}",
+        def = "{'base_date': -1, 'rankings.rank': 1}",
     ),
 )
 abstract class BaseRankingDocument<T : RankingEntry>(

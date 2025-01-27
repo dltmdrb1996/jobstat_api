@@ -111,7 +111,7 @@ jobs:
             cat > .env << EOL
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
             DOCKERHUB_TOKEN=${{ secrets.DOCKERHUB_TOKEN }}
-            TAG=${{ needs.create-tag.outputs.new_tag }}
+            BACKEND_TAG=${{ needs.create-tag.outputs.new_tag }}
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             MONGO_USERNAME=${{ secrets.MONGO_USERNAME }}

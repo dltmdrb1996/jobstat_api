@@ -1,11 +1,12 @@
 package com.example.jobstat.user
 
+import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.user.usecase.SignUp
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/${RestConstants.Versions.V1}/user")
 internal class UserController(
     private val signUp: SignUp,
 ) {
