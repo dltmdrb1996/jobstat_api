@@ -107,9 +107,6 @@ jobs:
             mkdir -p /home/ubuntu/jobstat/backend
             cd /home/ubuntu/jobstat/backend
             
-            docker network create public || true
-            docker network create --internal internal || true
-            
             # Create .env file securely
             cat > .env << EOL
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
