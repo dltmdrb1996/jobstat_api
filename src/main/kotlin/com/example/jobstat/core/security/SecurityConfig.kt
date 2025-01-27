@@ -93,6 +93,8 @@ class SecurityConfig(
                 "https://www.jobstatanalysis.com",
                 "https://jobstatanalysis.com",
                 "jobstatanalysis.com",
+                "https://spring-app:8081",
+                "http://spring-app:8081",
                 "http://localhost:8081",
                 "http://localhost:3000",
                 "http://localhost:8080",
