@@ -7,7 +7,7 @@ networks:
 services:
   nginx:
     container_name: nginx
-    image: ${DOCKERHUB_USERNAME}/jobstat-nginx:${TAG}
+    image: ${DOCKERHUB_USERNAME}/jobstat-nginx:${BACKEND_TAG}
     ports:
       - "80:80"
       - "443:443"
@@ -22,7 +22,7 @@ services:
 
   spring-app:
     container_name: spring-app
-    image: ${DOCKERHUB_USERNAME}/jobstat-app:${TAG}
+    image: ${DOCKERHUB_USERNAME}/jobstat-app:${BACKEND_TAG}
     environment:
       - SERVER_PORT=8081
       - SPRING_PROFILES_ACTIVE=dev
@@ -49,6 +49,20 @@ services:
       - web
     expose:
       - "8081"
+    restart: always
+
+  frontend:
+    container_name: frontend
+    image: ${DOCKERHUB_USERNAME}/jobstat-frontend:latest
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=http://spring-app:8081
+    networks:
+      - web
+    expose:
+      - "3000"
+    depends_on:
+      - spring-app
     restart: always
 
 volumes:

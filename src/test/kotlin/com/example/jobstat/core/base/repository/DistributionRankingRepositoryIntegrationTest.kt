@@ -1,10 +1,12 @@
-package com.example.jobstat.rankings.repository
+package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.DistributionRankingDocument
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
+import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.state.EntityType
 import com.example.jobstat.rankings.model.CompanySizeEducationRankingsDocument
+import com.example.jobstat.rankings.repository.CompanySizeEducationRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
@@ -228,7 +230,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindByDominantCategory() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val category = "BACHELOR"
 
         val results = companySizeEducationRepository.findByDominantCategory(baseDate, category)
@@ -317,7 +319,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindUniformDistributions() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val maxVariance = 0.3
 
         val results = companySizeEducationRepository.findUniformDistributions(baseDate, maxVariance)
@@ -342,7 +344,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindSkewedDistributions() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val minSkewness = 0.7
 
         val results = companySizeEducationRepository.findSkewedDistributions(baseDate, minSkewness)
@@ -399,7 +401,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     fun testFindCategoryDominance() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val category = "BACHELOR"
         val minPercentage = 0.1
 
@@ -432,14 +434,14 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
                 .rankings
                 .first()
                 .entityId
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
 
         val result = companySizeEducationRepository.findByEntityIdAndBaseDate(entityId, baseDate)
 
         Assertions.assertNotNull(result)
         result?.let {
             Assertions.assertEquals(entityId, it.rankings.first().entityId)
-            Assertions.assertEquals(baseDate, it.baseDate)
+            Assertions.assertEquals(baseDate.toString(), it.baseDate)
         }
 
         val endTime = System.currentTimeMillis()

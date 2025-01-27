@@ -113,7 +113,6 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
     }
 
     fun findAllFast(): List<T> {
-        // 모든 Document를 최대 성능으로 가져오는 메서드
         // _id 인덱스를 활용한 순차 스캔
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 

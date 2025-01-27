@@ -1,8 +1,10 @@
-package com.example.jobstat.rankings.repository
+package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
+import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.rankings.model.SkillGrowthRankingsDocument
+import com.example.jobstat.rankings.repository.SkillGrowthRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -152,7 +154,7 @@ class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindByGrowthRate() {
         startTime = System.currentTimeMillis()
 
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val minGrowthRate = 20.0
         val results = skillGrowthRankingsRepository.findByGrowthRate(baseDate, minGrowthRate)
 
@@ -240,13 +242,13 @@ class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
                 .rankings
                 .first()
                 .entityId
-        val baseDate = "202401"
+        val baseDate = BaseDate("202401")
         val result = skillGrowthRankingsRepository.findByEntityIdAndBaseDate(entityId, baseDate)
 
         Assertions.assertNotNull(result)
         result?.let {
             Assertions.assertEquals(entityId, it.rankings.first().entityId)
-            Assertions.assertEquals(baseDate, it.baseDate)
+            Assertions.assertEquals(baseDate.toString(), it.baseDate)
         }
 
         val endTime = System.currentTimeMillis()

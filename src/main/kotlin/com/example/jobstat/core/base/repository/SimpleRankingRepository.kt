@@ -1,6 +1,7 @@
 package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.ranking.SimpleRankingDocument
+import com.example.jobstat.core.state.BaseDate
 import com.mongodb.client.model.Accumulators
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
@@ -13,13 +14,13 @@ import org.springframework.data.repository.NoRepositoryBean
 @NoRepositoryBean
 interface SimpleRankingRepository<T : SimpleRankingDocument<E>, E : SimpleRankingDocument.SimpleRankingEntry, ID : Any> : BaseRankingRepository<T, E, ID> {
     fun findByValueRange(
-        baseDate: String,
+        baseDate: BaseDate,
         minValue: Double,
         maxValue: Double,
     ): List<T>
 
     fun findByGrowthRate(
-        baseDate: String,
+        baseDate: BaseDate,
         minGrowthRate: Double,
     ): List<T>
 
@@ -37,7 +38,7 @@ interface SimpleRankingRepository<T : SimpleRankingDocument<E>, E : SimpleRankin
 
     fun findByEntityIdAndBaseDate(
         entityId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
     ): T?
 }
 
@@ -46,16 +47,23 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
     private val mongoOperations: MongoOperations,
 ) : BaseRankingRepositoryImpl<T, E, ID>(entityInformation, mongoOperations),
     SimpleRankingRepository<T, E, ID> {
+    /**
+     * 특정 엔티티의 기준일자 데이터를 조회합니다.
+     *
+     * @param entityId 엔티티 ID
+     * @param baseDate 기준 날짜
+     * @return 해당 엔티티의 랭킹 데이터, 없으면 null
+     */
     override fun findByEntityIdAndBaseDate(
         entityId: Long,
-        baseDate: String,
+        baseDate: BaseDate,
     ): T? {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         return collection
             .find(
                 Filters.and(
-                    Filters.eq("base_date", baseDate),
+                    Filters.eq("base_date", baseDate.toString()),
                     Filters.elemMatch(
                         "rankings",
                         Filters.eq("entity_id", entityId),
@@ -66,8 +74,17 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
             ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }
 
+    /**
+     * 특정 기준일자에서 지정된 값 범위 내의 엔티티들을 조회합니다.
+     * 값을 기준으로 내림차순 정렬하여 반환합니다.
+     *
+     * @param baseDate 기준 날짜
+     * @param minValue 최소값
+     * @param maxValue 최대값
+     * @return 값 범위 내의 엔티티 목록
+     */
     override fun findByValueRange(
-        baseDate: String,
+        baseDate: BaseDate,
         minValue: Double,
         maxValue: Double,
     ): List<T> {
@@ -76,7 +93,7 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
         return collection
             .find(
                 Filters.and(
-                    Filters.eq("base_date", baseDate),
+                    Filters.eq("base_date", baseDate.toString()),
                     Filters.gte("rankings.value", minValue),
                     Filters.lte("rankings.value", maxValue),
                 ),
@@ -85,31 +102,23 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
             .toList()
     }
 
-//    override fun findByPercentileRange(baseDate: String, minPercentile: Double, maxPercentile: Double): List<T> {
-//        val collection = mongoOperations.getCollection(entityInformation.collectionName)
-//
-//        // rankings의 percentile 필드가 RankingInfo 내부에 있으므로 경로 수정
-//        return collection.find(
-//            Filters.and(
-//                Filters.eq("base_date", baseDate),
-//                Filters.gte("percentile", minPercentile),  // 경로 수정
-//                Filters.lte("percentile", maxPercentile)   // 경로 수정
-//            )
-//        )
-//            .sort(Sorts.descending("percentile"))  // 정렬 경로도 수정
-//            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-//            .toList()
-//    }
-
+    /**
+     * 특정 기준일자에서 지정된 성장률 이상의 엔티티들을 조회합니다.
+     * 성장률을 기준으로 내림차순 정렬하여 반환합니다.
+     *
+     * @param baseDate 기준 날짜
+     * @param minGrowthRate 최소 성장률
+     * @return 지정된 성장률 이상의 엔티티 목록
+     */
     override fun findByGrowthRate(
-        baseDate: String,
+        baseDate: BaseDate,
         minGrowthRate: Double,
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         val pipeline =
             listOf(
-                Aggregates.match(Filters.eq("base_date", baseDate)),
+                Aggregates.match(Filters.eq("base_date", baseDate.toString())),
                 // unwind rankings array to access individual entries
                 Aggregates.unwind("\$rankings"),
                 // filter by growth_rate
@@ -134,6 +143,14 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
             .toList()
     }
 
+    /**
+     * 지정된 기간 동안 일정 성장률 이상을 꾸준히 유지한 엔티티들을 조회합니다.
+     * 평균 성장률을 기준으로 내림차순 정렬하여 반환합니다.
+     *
+     * @param months 조회할 개월 수
+     * @param minGrowthRate 최소 성장률
+     * @return 꾸준한 성장을 보인 엔티티 목록
+     */
     override fun findEntitiesWithConsistentGrowth(
         months: Int,
         minGrowthRate: Double,
@@ -191,6 +208,14 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
             .toList()
     }
 
+    /**
+     * 최근 순위가 크게 상승한 엔티티들을 조회합니다.
+     * 순위 변동을 기준으로 내림차순 정렬하여 반환합니다.
+     *
+     * @param months 조회할 개월 수
+     * @param minRankImprovement 최소 순위 상승폭
+     * @return 순위가 크게 상승한 엔티티 목록
+     */
     override fun findRisingStars(
         months: Int,
         minRankImprovement: Int,
@@ -219,6 +244,14 @@ abstract class SimpleRankingRepositoryImpl<T : SimpleRankingDocument<E>, E : Sim
             .toList()
     }
 
+    /**
+     * 최근 트렌드를 보이는 엔티티들을 조회합니다.
+     * 양의 성장률과 높은 성장 일관성을 보이는 엔티티들을 반환합니다.
+     * 성장률을 기준으로 내림차순 정렬됩니다.
+     *
+     * @param months 조회할 개월 수
+     * @return 트렌드를 보이는 엔티티 목록
+     */
     override fun findTrendingEntities(months: Int): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 

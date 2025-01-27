@@ -12,10 +12,8 @@ import org.springframework.stereotype.Repository
 @Document(collection = "test_time_series")
 class TestTimeSeriesDocument(
     id: String? = null,
-    @Field("base_date")
-    override val baseDate: String,
-    @Field("period")
-    override val period: SnapshotPeriod,
+    baseDate: String,
+    period: SnapshotPeriod,
     @Field("value")
     val value: Double,
     @Field("category")

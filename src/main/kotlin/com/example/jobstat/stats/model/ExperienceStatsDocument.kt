@@ -15,10 +15,8 @@ class ExperienceStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    @Field("base_date")
-    override val baseDate: String,
-    @Field("period")
-    override val period: SnapshotPeriod,
+    baseDate: String,
+    period: SnapshotPeriod,
     @Field("range")
     val range: String, // 0-2, 3-5, 5+ 등
     @Field("stats")

@@ -1,11 +1,11 @@
 package com.example.jobstat.core.base.mongo
 
-import org.springframework.data.annotation.Transient
+import org.springframework.data.mongodb.core.mapping.Field
 
 abstract class BaseTimeSeriesDocument(
     id: String? = null,
-    @Transient
+    @Field("base_date")
     open val baseDate: String,
-    @Transient
+    @Field("period")
     open val period: SnapshotPeriod,
 ) : BaseDocument(id)

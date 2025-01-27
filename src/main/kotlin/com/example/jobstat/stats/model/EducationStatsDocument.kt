@@ -15,10 +15,8 @@ class EducationStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    @Field("base_date")
-    override val baseDate: String,
-    @Field("period")
-    override val period: SnapshotPeriod,
+    baseDate: String,
+    period: SnapshotPeriod,
     @Field("level")
     val level: String, // HIGH_SCHOOL, ASSOCIATE, BACHELOR, MASTER, DOCTORATE, OTHER
     @Field("stats")
