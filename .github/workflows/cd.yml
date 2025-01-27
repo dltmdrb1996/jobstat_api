@@ -106,8 +106,8 @@ jobs:
           script: |
             cd /home/ubuntu/jobstat/backend
             
-            # Create network if not exists
-            docker network create web || true
+            docker network create public || true
+            docker network create --internal internal || true
             
             # Create .env file securely
             cat > .env << EOL
