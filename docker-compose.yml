@@ -2,7 +2,9 @@ version: '3.8'
 
 networks:
   web:
-    driver: bridge
+    external: true
+  backend:
+    internal: true
 
 services:
   nginx:
@@ -16,6 +18,7 @@ services:
       - nginx-logs:/var/log/nginx
     networks:
       - web
+      - backend
     depends_on:
       - spring-app
     restart: always
@@ -46,23 +49,10 @@ services:
       - SENTRY_DSN=${SENTRY_DSN}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     networks:
+      - backend
       - web
     expose:
       - "8081"
-    restart: always
-
-  frontend:
-    container_name: frontend
-    image: ${DOCKERHUB_USERNAME}/jobstat-frontend:latest
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=http://spring-app:8081
-    networks:
-      - web
-    expose:
-      - "3000"
-    depends_on:
-      - spring-app
     restart: always
 
 volumes:
