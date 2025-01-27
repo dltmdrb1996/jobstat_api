@@ -15,7 +15,7 @@ class GlobalExceptionHandler(
     private val environment: Environment,
 ) {
     private val logger = StructuredLogger(this::class.java)
-    private val isProd = environment.activeProfiles.contains("dev")
+    private val isProd = environment.activeProfiles.contains("prod")
 
     @ExceptionHandler(Exception::class)
     fun handleException(ex: Exception): ResponseEntity<ApiResponse<Unit>> {
@@ -30,7 +30,7 @@ class GlobalExceptionHandler(
             }
 
         if (appException.isServerError()) {
-            logger.error("Capture event", appException, appException.detailInfo())
+            logger.error("Capture event ${appException.detailInfo()}")
             if (isProd) captureEvent(appException)
         }
 

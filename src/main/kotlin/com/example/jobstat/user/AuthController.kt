@@ -1,6 +1,7 @@
 package com.example.jobstat.user
 
 import ApiResponse
+import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.user.usecase.RefreshToken
 import com.example.jobstat.user.usecase.SignUp
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/${RestConstants.Versions.V1}/auth")
 internal class AuthController(
     private val signUpUseCase: SignUp,
     private val refreshTokenUseCase: RefreshToken,

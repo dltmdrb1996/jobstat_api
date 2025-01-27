@@ -24,10 +24,8 @@ class IndustryStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    @Field("base_date")
-    override val baseDate: String,
-    @Field("period")
-    override val period: SnapshotPeriod,
+    baseDate: String,
+    period: SnapshotPeriod,
     @Field("name")
     val name: String,
     @Field("stats")

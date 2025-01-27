@@ -1,6 +1,7 @@
 package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.BaseTimeSeriesDocument
+import com.example.jobstat.core.state.BaseDate
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import org.springframework.data.mongodb.core.MongoOperations
@@ -9,11 +10,11 @@ import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
 interface BaseTimeSeriesRepository<T : BaseTimeSeriesDocument, ID : Any> : BaseMongoRepository<T, ID> {
-    fun findByBaseDate(baseDate: String): T?
+    fun findByBaseDate(baseDate: BaseDate): T?
 
     fun findByBaseDateBetween(
-        startDate: String,
-        endDate: String,
+        startDate: BaseDate,
+        endDate: BaseDate,
     ): List<T>
 
     fun findLatest(): T?
@@ -26,27 +27,33 @@ abstract class BaseTimeSeriesRepositoryImpl<T : BaseTimeSeriesDocument, ID : Any
     private val mongoOperations: MongoOperations,
 ) : BaseMongoRepositoryImpl<T, ID>(entityInformation, mongoOperations),
     BaseTimeSeriesRepository<T, ID> {
-    override fun findByBaseDate(baseDate: String): T? {
+    /**
+     * 특정 기준일자의 데이터를 조회합니다.
+     *
+     * @param baseDate 조회할 기준일자
+     * @return 해당 기준일자의 데이터
+     */
+    override fun findByBaseDate(baseDate: BaseDate): T? {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         return collection
-            .find(Filters.eq("base_date", baseDate))
+            .find(Filters.eq("base_date", baseDate.toString()))
             .limit(1)
             .firstOrNull()
             ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }
 
     override fun findByBaseDateBetween(
-        startDate: String,
-        endDate: String,
+        startDate: BaseDate,
+        endDate: BaseDate,
     ): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         return collection
             .find(
                 Filters.and(
-                    Filters.gte("base_date", startDate),
-                    Filters.lte("base_date", endDate),
+                    Filters.gte("base_date", startDate.toString()),
+                    Filters.lte("base_date", endDate.toString()),
                 ),
             ).sort(Sorts.ascending("base_date"))
             .batchSize(OPTIMAL_BATCH_SIZE)

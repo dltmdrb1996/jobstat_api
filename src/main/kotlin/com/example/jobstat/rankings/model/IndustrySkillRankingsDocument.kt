@@ -11,10 +11,8 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "industry_skill_rankings")
 class IndustrySkillRankingsDocument(
     id: String? = null,
-    @Field("base_date")
-    override val baseDate: String,
-    @Field("period")
-    override val period: SnapshotPeriod,
+    baseDate: String,
+    period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: IndustrySkillMetrics,
     @Field("primary_entity_type")

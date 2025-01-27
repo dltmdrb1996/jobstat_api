@@ -14,7 +14,8 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "remote_work_stats_monthly")
 class RemoteWorkStatsDocument(
     id: String? = null,
-    entityId: Long,
+    @Field("entity_id")
+    override val entityId: Long,
     baseDate: String,
     period: SnapshotPeriod,
     @Field("type")

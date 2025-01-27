@@ -1,6 +1,7 @@
-package com.example.jobstat.rankings.repository
+package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
+import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import com.example.jobstat.utils.dummy.TestTimeSeriesDocument
 import com.example.jobstat.utils.dummy.TestTimeSeriesRepository
@@ -122,11 +123,11 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindByBaseDate() {
         startTime = System.currentTimeMillis()
 
-        val testBaseDate = "202401"
+        val testBaseDate = BaseDate("202401")
         val records = testTimeSeriesRepository.findByBaseDate(testBaseDate)
 
         Assertions.assertNotNull(records)
-        Assertions.assertTrue(records?.baseDate == testBaseDate)
+        Assertions.assertTrue(records?.baseDate == testBaseDate.toString())
         records?.let {
             Assertions.assertEquals(
                 "2024-01-01T00:00:00Z",
@@ -149,13 +150,13 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testFindByBaseDateBetween() {
         startTime = System.currentTimeMillis()
 
-        val startDate = "202401"
-        val endDate = "202403"
+        val startDate = BaseDate("202401")
+        val endDate = BaseDate("202403")
         val records = testTimeSeriesRepository.findByBaseDateBetween(startDate, endDate)
 
         Assertions.assertTrue(records.isNotEmpty())
         Assertions.assertTrue(
-            records.all { it.baseDate >= startDate && it.baseDate <= endDate },
+            records.all { it.baseDate >= startDate.toString() && it.baseDate <= endDate.toString() },
         )
         // Verify all records have valid snapshot periods
         Assertions.assertTrue(
