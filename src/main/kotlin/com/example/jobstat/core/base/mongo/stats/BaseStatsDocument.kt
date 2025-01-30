@@ -12,7 +12,7 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes
         name = "snapshot_lookup_idx",
         def = "{'entity_id': 1, 'baseDate': 1}",
         unique = true,
-    ),
+    )
 )
 abstract class BaseStatsDocument(
     id: String? = null,
