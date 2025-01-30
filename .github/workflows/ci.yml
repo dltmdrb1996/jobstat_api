@@ -3,6 +3,8 @@ name: PR Check
 on:
   pull_request:
     branches: [ "main", "develop" ]
+  push:
+    branches: [ "main" ]
 
 jobs:
   build-and-test:
@@ -36,3 +38,16 @@ jobs:
         env:
           SPRING_PROFILES_ACTIVE: test
           TESTCONTAINERS_REUSE_ENABLE: true
+
+      - name: Build with Gradle
+        run: ./gradlew build -x test
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          MONGO_HOST: ${{ secrets.MONGO_HOST }}
+          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
+          REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
