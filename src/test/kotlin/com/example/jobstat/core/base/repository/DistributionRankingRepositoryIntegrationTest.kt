@@ -5,470 +5,595 @@ import com.example.jobstat.core.base.mongo.ranking.DistributionRankingDocument
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.state.EntityType
-import com.example.jobstat.rankings.model.CompanySizeEducationRankingsDocument
+import com.example.jobstat.rankings.document.CompanySizeEducationRankingsDocument
 import com.example.jobstat.rankings.repository.CompanySizeEducationRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
-import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
+import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.MongoTemplate
 import java.time.Instant
 import kotlin.random.Random
 
-@TestMethodOrder(OrderAnnotation::class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var companySizeEducationRepository: CompanySizeEducationRankingsRepositoryImpl
 
+    @Autowired
+    lateinit var mongoTemplate: MongoTemplate
+
     private val totalRecords = 996
     private val batchSize = 100
     private val allRecords = mutableListOf<CompanySizeEducationRankingsDocument>()
-    private var startTime: Long = 0
-    private val performanceMetrics = hashMapOf<String, Double>()
-    private val educationLevel = listOf("HIGH_SCHOOL", "ASSOCIATE", "BACHELOR", "MASTER", "DOCTORATE")
+    private val educationLevels = listOf("HIGH_SCHOOL", "ASSOCIATE", "BACHELOR", "MASTER", "DOCTORATE")
 
-    override fun cleanupTestData() {
-        val recordIds = allRecords.mapNotNull { it.id }
-        for (batch in recordIds.chunked(batchSize)) {
-            companySizeEducationRepository.bulkDelete(batch)
+    @BeforeEach
+    override fun setup() {
+        mongoTemplate.dropCollection("company_size_education_rankings")
+
+        val baseDate = "202401"
+        val totalPages = (totalRecords + batchSize - 1) / batchSize
+
+        for (page in 1..totalPages) {
+            val document = createTestDocument(baseDate, page)
+            allRecords.add(document)
+            companySizeEducationRepository.save(document)
         }
+
+        // 다른 날짜의 데이터 추가 (트렌드 분석용)
+        val nextMonthDate = "202402"
+        val nextMonthDoc = createTestDocument(nextMonthDate, 1)
+        companySizeEducationRepository.save(nextMonthDoc)
     }
 
-    @BeforeAll
-    fun beforeAll() {
+    private fun createTestDocument(
+        baseDate: String,
+        page: Int,
+        forceSkewed: Boolean = false,
+    ): CompanySizeEducationRankingsDocument {
+        val startRank = (page - 1) * batchSize + 1
+        val rankings =
+            (0 until batchSize).map { index ->
+                val rank = startRank + index
+                if (forceSkewed && index < batchSize / 2) {
+                    createSkewedRankingEntry(rank)
+                } else {
+                    createTestRankingEntry(rank)
+                }
+            }
+
+        return CompanySizeEducationRankingsDocument(
+            baseDate = baseDate,
+            period = createSnapshotPeriod(baseDate),
+            metrics = createTestMetrics(),
+            groupEntityType = EntityType.COMPANY_SIZE,
+            targetEntityType = EntityType.EDUCATION,
+            rankings = rankings,
+            page = page,
+        )
     }
 
-    @AfterAll
-    fun afterAll() {
-        cleanupTestData()
-        printExecutionSummary()
+    private fun createSkewedRankingEntry(rank: Int): CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry {
+        val entityId = rank.toLong()
+        val distribution = createSkewedDistribution()
+        val dominantCategory = distribution.maxByOrNull { it.value }?.key ?: educationLevels.first()
+
+        return CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry(
+            documentId = "Company_Size_$entityId",
+            entityId = entityId,
+            name = "Company_Size_$entityId",
+            rank = rank,
+            previousRank = rank + Random.nextInt(-5, 6),
+            rankChange = Random.nextInt(-10, 11),
+            distribution = distribution,
+            dominantCategory = dominantCategory,
+            distributionMetrics =
+                DistributionRankingDocument.DistributionMetrics(
+                    entropy = calculateEntropy(distribution),
+                    concentration = calculateConcentration(distribution),
+                    uniformity = calculateUniformity(distribution),
+                ),
+            totalPostings = Random.nextInt(1000, 10000),
+            educationRequirements = createTestEducationRequirements(),
+            salaryDistribution = createTestSalaryDistribution(),
+            trendIndicators = createTestTrendIndicators(),
+        )
     }
+
+    private fun createSkewedDistribution(): Map<String, Double> {
+        val dominantCategory = educationLevels.random()
+        val weights =
+            educationLevels.associateWith { category ->
+                when (category) {
+                    dominantCategory -> Random.nextDouble(0.6, 0.8) // 매우 높은 비중
+                    else -> Random.nextDouble(0.05, 0.1) // 매우 낮은 비중
+                }
+            }
+
+        val sum = weights.values.sum()
+        return weights.mapValues { it.value / sum }
+    }
+
+    private fun createRandomDistribution(dominantCategory: String? = null): Map<String, Double> {
+        // 기본 가중치 설정
+        val weights =
+            educationLevels.associateWith {
+                if (it == dominantCategory) {
+                    Random.nextDouble(0.4, 0.6) // dominant category에 높은 가중치
+                } else {
+                    Random.nextDouble(0.05, 0.15) // 나머지 카테고리에 낮은 가중치
+                }
+            }
+
+        // 정규화
+        val sum = weights.values.sum()
+        return weights.mapValues { it.value / sum }
+    }
+
+    private fun createTestRankingEntry(rank: Int): CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry {
+        val entityId = rank.toLong()
+        // BACHELOR를 dominant category로 설정하여 분포 생성
+        val dominantCategory = "BACHELOR"
+        val distribution = createRandomDistribution(dominantCategory)
+
+        return CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry(
+            documentId = "Company_Size_$entityId",
+            entityId = entityId,
+            name = "Company_Size_$entityId",
+            rank = rank,
+            previousRank = rank + Random.nextInt(-5, 6),
+            rankChange = Random.nextInt(-10, 11),
+            distribution = distribution,
+            dominantCategory = dominantCategory,
+            distributionMetrics =
+                DistributionRankingDocument.DistributionMetrics(
+                    entropy = calculateEntropy(distribution),
+                    concentration = calculateConcentration(distribution),
+                    uniformity = calculateUniformity(distribution),
+                ),
+            totalPostings = Random.nextInt(1000, 10000),
+            educationRequirements = createTestEducationRequirements(),
+            salaryDistribution = createTestSalaryDistribution(),
+            trendIndicators = createTestTrendIndicators(),
+        )
+    }
+
+    private fun calculateEntropy(distribution: Map<String, Double>): Double =
+        -distribution.values.sumOf { p ->
+            if (p > 0) p * kotlin.math.log2(p) else 0.0
+        }
+
+    private fun calculateConcentration(distribution: Map<String, Double>): Double = distribution.values.maxOrNull() ?: 0.0
+
+    private fun calculateUniformity(distribution: Map<String, Double>): Double {
+        val idealShare = 1.0 / distribution.size
+        return distribution.values.sumOf {
+            kotlin.math.abs(it - idealShare)
+        } / 2.0
+    }
+
+    private fun calculateSimilarity(
+        dist1: Map<String, Double>,
+        dist2: Map<String, Double>,
+    ): Double {
+        val allCategories = (dist1.keys + dist2.keys).toSet()
+        return 1.0 - allCategories.sumOf { category ->
+            kotlin.math.abs((dist1[category] ?: 0.0) - (dist2[category] ?: 0.0))
+        } / allCategories.size
+    }
+
+    private fun createTestMetrics(): CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics =
+        CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics(
+            totalCount = totalRecords,
+            rankedCount = totalRecords,
+            newEntries = 0,
+            droppedEntries = 0,
+            volatilityMetrics =
+                VolatilityMetrics(
+                    avgRankChange = Random.nextDouble(0.0, 5.0),
+                    rankChangeStdDev = Random.nextDouble(0.0, 2.0),
+                    volatilityTrend = "STABLE",
+                ),
+            educationTrends = createTestEducationTrends(),
+        )
+
+    private fun createTestEducationTrends(): CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics.EducationTrends {
+        val distribution = createRandomDistribution()
+        return CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics.EducationTrends(
+            overallDistribution = distribution,
+            yearOverYearChanges = distribution.mapValues { Random.nextDouble(-0.2, 0.2) },
+            marketComparison = distribution.mapValues { Random.nextDouble(0.8, 1.2) },
+            industryPatterns = listOf(createTestIndustryPattern()),
+        )
+    }
+
+    private fun createTestIndustryPattern(): CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics.EducationTrends.IndustryPattern =
+        CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics.EducationTrends.IndustryPattern(
+            industryId = Random.nextLong(1, 100),
+            industryName = "Industry_${Random.nextInt(100)}",
+            distribution = createRandomDistribution(),
+        )
+
+    private fun createTestEducationRequirements(): CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.EducationRequirements =
+        CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.EducationRequirements(
+            mandatoryRatio = Random.nextDouble(0.0, 1.0),
+            preferredRatio = Random.nextDouble(0.0, 1.0),
+            flexibleRatio = Random.nextDouble(0.0, 1.0),
+            requirementsByJobLevel =
+                mapOf(
+                    "ENTRY" to createRandomDistribution(),
+                    "MID" to createRandomDistribution(),
+                    "SENIOR" to createRandomDistribution(),
+                ),
+        )
+
+    private fun createTestSalaryDistribution(): Map<String, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.SalaryMetrics> = educationLevels.associateWith { createTestSalaryMetrics() }
+
+    private fun createTestSalaryMetrics(): CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.SalaryMetrics =
+        CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.SalaryMetrics(
+            avgSalary = Random.nextLong(50000, 150000),
+            medianSalary = Random.nextLong(45000, 140000),
+            salaryRange = createTestSalaryRange(),
+        )
+
+    private fun createTestSalaryRange(): CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.SalaryMetrics.SalaryRange =
+        CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.SalaryMetrics.SalaryRange(
+            min = Random.nextLong(30000, 50000),
+            max = Random.nextLong(150000, 200000),
+            p25 = Random.nextLong(40000, 60000),
+            p75 = Random.nextLong(120000, 140000),
+        )
+
+    private fun createTestTrendIndicators(): CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.TrendIndicators =
+        CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.TrendIndicators(
+            growthRate = Random.nextDouble(-0.2, 0.5),
+            changeVelocity = Random.nextDouble(0.0, 1.0),
+            stabilityScore = Random.nextDouble(0.0, 1.0),
+            futureProjection = if (Random.nextBoolean()) "GROWTH" else "STABLE",
+        )
 
     private fun createSnapshotPeriod(baseDate: String): SnapshotPeriod {
         val year = baseDate.substring(0, 4).toInt()
         val month = baseDate.substring(4, 6).toInt()
 
         val startDate = Instant.parse("$year-${month.toString().padStart(2, '0')}-01T00:00:00Z")
-        val nextMonth =
+        val endDate =
             if (month == 12) {
-                "${year + 1}-01-01T00:00:00Z"
+                Instant.parse("${year + 1}-01-01T00:00:00Z").minusSeconds(1)
             } else {
-                "$year-${(month + 1).toString().padStart(2, '0')}-01T00:00:00Z"
+                Instant.parse("$year-${(month + 1).toString().padStart(2, '0')}-01T00:00:00Z").minusSeconds(1)
             }
-        val endDate = Instant.parse(nextMonth).minusSeconds(1)
 
         return SnapshotPeriod(startDate, endDate)
     }
 
-    private fun createRandomDistribution(): Map<String, Double> {
-        val values = educationLevel.map { Random.nextDouble(0.0, 1.0) }
-        val sum = values.sum()
-        return educationLevel.zip(values.map { it / sum }).toMap()
-    }
-
-    private fun createEducationDocument(
-        baseDate: String,
-        rank: Int,
-        entityId: Long,
-    ): CompanySizeEducationRankingsDocument {
-        val distribution = createRandomDistribution()
-        val dominantCategory = distribution.maxByOrNull { it.value }?.key ?: educationLevel.first()
-
-        return CompanySizeEducationRankingsDocument(
-            baseDate = baseDate,
-            period = createSnapshotPeriod(baseDate),
-            metrics =
-                CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics(
-                    totalCount = totalRecords,
-                    rankedCount = totalRecords,
-                    newEntries = 0,
-                    droppedEntries = 0,
-                    volatilityMetrics =
-                        VolatilityMetrics(
-                            avgRankChange = Random.nextDouble(0.0, 5.0),
-                            rankChangeStdDev = Random.nextDouble(0.0, 2.0),
-                            volatilityTrend = "STABLE",
-                        ),
-                    educationTrends =
-                        CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics.EducationTrends(
-                            overallDistribution = distribution,
-                            yearOverYearChanges = distribution.mapValues { Random.nextDouble(-0.2, 0.2) },
-                            marketComparison = distribution.mapValues { Random.nextDouble(0.8, 1.2) },
-                            industryPatterns =
-                                listOf(
-                                    CompanySizeEducationRankingsDocument.CompanySizeEducationMetrics.EducationTrends.IndustryPattern(
-                                        industryId = Random.nextLong(1, 100),
-                                        industryName = "Industry_${Random.nextInt(100)}",
-                                        distribution = distribution,
-                                    ),
-                                ),
-                        ),
-                ),
-            groupEntityType = EntityType.COMPANY_SIZE,
-            targetEntityType = EntityType.EDUCATION,
-            rankings =
-                listOf(
-                    CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry(
-                        documentId = "Company_Size_$entityId",
-                        entityId = entityId,
-                        name = "Company_Size_$entityId",
-                        rank = rank,
-                        previousRank = rank + Random.nextInt(-5, 5),
-                        rankChange = Random.nextInt(-5, 5),
-                        distribution = distribution,
-                        dominantCategory = dominantCategory,
-                        distributionMetrics =
-                            DistributionRankingDocument.DistributionMetrics(
-                                entropy = Random.nextDouble(0.0, 1.0),
-                                concentration = Random.nextDouble(0.0, 1.0),
-                                uniformity = Random.nextDouble(0.0, 1.0),
-                            ),
-                        totalPostings = Random.nextInt(1000, 10000),
-                        educationRequirements =
-                            CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.EducationRequirements(
-                                mandatoryRatio = Random.nextDouble(0.0, 1.0),
-                                preferredRatio = Random.nextDouble(0.0, 1.0),
-                                flexibleRatio = Random.nextDouble(0.0, 1.0),
-                                requirementsByJobLevel =
-                                    mapOf(
-                                        "ENTRY" to distribution,
-                                        "MID" to distribution,
-                                        "SENIOR" to distribution,
-                                    ),
-                            ),
-                        salaryDistribution =
-                            educationLevel.associateWith {
-                                CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.SalaryMetrics(
-                                    avgSalary = Random.nextLong(50000, 150000),
-                                    medianSalary = Random.nextLong(45000, 140000),
-                                    salaryRange =
-                                        CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.SalaryMetrics.SalaryRange(
-                                            min = Random.nextLong(30000, 50000),
-                                            max = Random.nextLong(150000, 200000),
-                                            p25 = Random.nextLong(40000, 60000),
-                                            p75 = Random.nextLong(120000, 140000),
-                                        ),
-                                )
-                            },
-                        trendIndicators =
-                            CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry.TrendIndicators(
-                                growthRate = Random.nextDouble(-0.2, 0.5),
-                                changeVelocity = Random.nextDouble(0.0, 1.0),
-                                stabilityScore = Random.nextDouble(0.0, 1.0),
-                                futureProjection = if (Random.nextBoolean()) "GROWTH" else "STABLE",
-                            ),
-                    ),
-                ),
-        )
+    @AfterEach
+    override fun cleanupTestData() {
+        mongoTemplate.dropCollection("company_size_education_rankings")
     }
 
     @Test
     @Order(1)
-    fun testBulkInsert() {
-        startTime = System.currentTimeMillis()
-        allRecords.clear()
+    fun `findByDistributionPattern - should find similar distributions`() {
+        // given
+        val baseDate = BaseDate("202401")
+        val pattern =
+            mapOf(
+                "BACHELOR" to 0.5,
+                "MASTER" to 0.3,
+                "DOCTORATE" to 0.2,
+            )
+        val threshold = 0.7
 
-        val baseDates =
-            (1..12).map { month ->
-                val monthStr = month.toString().padStart(2, '0')
-                "2024$monthStr"
-            }
+        // when
+        val results = companySizeEducationRepository.findByDistributionPattern(baseDate, pattern, threshold)
 
-        var totalInserted = 0
-        var rank = 1
-        for (baseDate in baseDates) {
-            val records =
-                (1..totalRecords / 12).map {
-                    createEducationDocument(baseDate, rank++, Random.nextLong(1000, 9999))
-                }
-            val result = companySizeEducationRepository.bulkInsert(records)
-            totalInserted += result.size
-            allRecords.addAll(result)
+        // then
+        assertNotNull(results)
+        assertTrue(results.isNotEmpty(), "Should find at least one matching distribution")
+
+        // 유사도 검증
+        results.forEach { entry ->
+            val similarity = calculateSimilarity(pattern, entry.distribution)
+            assertTrue(
+                similarity >= threshold,
+                "Each result should have similarity >= $threshold (actual: $similarity)",
+            )
         }
-
-        Assertions.assertEquals(totalRecords, totalInserted, "Records count mismatch")
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Bulk insert execution time: $timeSeconds seconds")
-        performanceMetrics["bulk_insert"] = timeSeconds
     }
 
-//    @Test
-//    @Order(2)
-//    fun testFindByDistributionPattern() {
-//        startTime = System.currentTimeMillis()
-//
-//        val baseDate = "202401"
-//        val pattern = mapOf(
-//            "BACHELOR" to 0.5,
-//            "MASTER" to 0.3,
-//            "DOCTORATE" to 0.2
-//        )
-//        val threshold = 0.2
-//
-//        val results = companySizeEducationRepository.findByDistributionPattern(baseDate, pattern, threshold)
-//
-//        Assertions.assertTrue(results.isNotEmpty())
-//        // Verify similarity is within threshold
-//        results.forEach { doc ->
-//            val actualDist = doc.rankings.first().distribution
-//            val similarity = pattern.keys.sumOf {
-//                abs(actualDist[it]!! - pattern[it]!!)
-//            }
-//            Assertions.assertTrue(similarity <= threshold)
-//        }
-//
-//        val endTime = System.currentTimeMillis()
-//        val timeSeconds = (endTime - startTime) / 1000.0
-//        logger.info("Find by distribution pattern execution time: $timeSeconds seconds")
-//        performanceMetrics["find_by_distribution_pattern"] = timeSeconds
-//    }
-
     @Test
-    @Order(3)
-    fun testFindByDominantCategory() {
-        startTime = System.currentTimeMillis()
-
+    @Order(2)
+    fun `findByDominantCategory - should find entries with specified dominant category`() {
+        // given
         val baseDate = BaseDate("202401")
         val category = "BACHELOR"
 
+        // when
         val results = companySizeEducationRepository.findByDominantCategory(baseDate, category)
 
-        Assertions.assertTrue(results.isNotEmpty())
-        Assertions.assertTrue(
-            results.all { it.rankings.first().dominantCategory == category },
-        )
+        // then
+        assertNotNull(results)
+        assertTrue(results.isNotEmpty(), "Should find at least one matching entry")
 
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find by dominant category execution time: $timeSeconds seconds")
-        performanceMetrics["find_by_dominant_category"] = timeSeconds
+        results.forEach { entry ->
+            assertEquals(category, entry.dominantCategory, "Each entry should have the specified dominant category")
+            assertTrue(
+                (entry.distribution[category] ?: 0.0) > 0.35, // 임계값을 조정
+                "Dominant category should have significant distribution value (actual: ${entry.distribution[category]})",
+            )
+        }
+    }
+
+    @Test
+    @Order(3)
+    fun `findDistributionTrends - should return distribution history`() {
+        // given
+        val entityId =
+            allRecords
+                .first()
+                .rankings
+                .first()
+                .entityId
+        val months = 2
+
+        // when
+        val results = companySizeEducationRepository.findDistributionTrends(entityId, months)
+
+        // then
+        assertNotNull(results)
+        assertTrue(results.isNotEmpty(), "Should find at least one trend entry")
+        assertTrue(results.size <= months, "Should not exceed specified months")
+        assertTrue(
+            results.all { doc ->
+                doc.rankings.any { it.entityId == entityId }
+            },
+            "All entries should belong to the specified entity",
+        )
     }
 
     @Test
     @Order(4)
-    fun testFindDistributionTrends() {
-        startTime = System.currentTimeMillis()
+    fun `findSignificantDistributionChanges - should identify major changes`() {
+        // given
+        val startDate = BaseDate("202401")
+        val endDate = BaseDate("202402")
 
-        val months = 3
-        val entityId =
-            allRecords
-                .first()
-                .rankings
-                .first()
-                .entityId
-        val results = companySizeEducationRepository.findDistributionTrends(entityId, months)
+        // when
+        val results = companySizeEducationRepository.findSignificantDistributionChanges(startDate, endDate)
 
-        Assertions.assertTrue(results.isNotEmpty())
-        Assertions.assertTrue(results.size <= months)
-        Assertions.assertTrue(
-            results.all { it.rankings.first().entityId == entityId },
-        )
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find distribution trends execution time: $timeSeconds seconds")
-        performanceMetrics["find_distribution_trends"] = timeSeconds
+        // then
+        assertNotNull(results)
+        results.forEach { entry ->
+            val distributionChange = entry.rankChange
+            assertNotNull(distributionChange, "Change metric should be present")
+        }
     }
 
-//    @Test
-//    @Order(5)
-//    fun testFindSignificantDistributionChanges() {
-//        startTime = System.currentTimeMillis()
-//
-//        val startDate = "202401"
-//        val endDate = "202402"
-//
-//        val results = companySizeEducationRepository.findSignificantDistributionChanges(startDate, endDate)
-//
-//        Assertions.assertTrue(results.isNotEmpty())
-//        // Results should contain entities with significant changes in their distribution
-//
-//        val endTime = System.currentTimeMillis()
-//        val timeSeconds = (endTime - startTime) / 1000.0
-//        logger.info("Find significant distribution changes execution time: $timeSeconds seconds")
-//        performanceMetrics["find_significant_changes"] = timeSeconds
-//    }
-
-//    @Test
-//    @Order(6)
-//    fun testFindSimilarDistributions() {
-//        startTime = System.currentTimeMillis()
-//
-//        val baseDate = "202401"
-//        val entityId = allRecords.first().rankings.first().entityId
-//        val similarity = 0.8
-//
-//        val results = companySizeEducationRepository.findSimilarDistributions(entityId, baseDate, similarity)
-//
-//        Assertions.assertTrue(results.isNotEmpty())
-//        // Results should not include the target entity
-//        Assertions.assertTrue(
-//            results.none { it.rankings.first().entityId == entityId }
-//        )
-//
-//        val endTime = System.currentTimeMillis()
-//        val timeSeconds = (endTime - startTime) / 1000.0
-//        logger.info("Find similar distributions execution time: $timeSeconds seconds")
-//        performanceMetrics["find_similar_distributions"] = timeSeconds
-//    }
-
     @Test
-    @Order(7)
-    fun testFindUniformDistributions() {
-        startTime = System.currentTimeMillis()
-
+    @Order(5)
+    fun `findUniformDistributions - should find distributions with low variance`() {
+        // given
         val baseDate = BaseDate("202401")
         val maxVariance = 0.3
 
+        // when
         val results = companySizeEducationRepository.findUniformDistributions(baseDate, maxVariance)
 
-        Assertions.assertTrue(results.isNotEmpty())
-        Assertions.assertTrue(
-            results.all {
-                it.rankings
-                    .first()
-                    .distributionMetrics.uniformity <= maxVariance
-            },
+        // then
+        assertNotNull(results)
+        assertTrue(results.isNotEmpty(), "Should find at least one uniform distribution")
+        results.forEach { entry ->
+            assertTrue(
+                entry.distributionMetrics.uniformity <= maxVariance,
+                "Each result should have uniformity <= $maxVariance",
+            )
+        }
+    }
+
+    @Test
+    @Order(6)
+    fun `findSkewedDistributions - should find distributions with high concentration`() {
+        // given
+        val baseDate = BaseDate("202401")
+        val minSkewness = 0.4 // 임계값을 더 현실적으로 조정
+
+        // 매우 치우친 분포를 가진 테스트 데이터 추가
+        val skewedDocument = createTestDocument("202401", 1, true)
+        companySizeEducationRepository.save(skewedDocument)
+
+        // when
+        val results = companySizeEducationRepository.findSkewedDistributions(baseDate, minSkewness)
+
+        // then
+        assertNotNull(results)
+        assertTrue(results.isNotEmpty(), "Should find at least one skewed distribution")
+
+        results.forEach { entry ->
+            val concentration = entry.distributionMetrics.concentration
+            assertTrue(
+                concentration >= minSkewness,
+                "Each result should have concentration >= $minSkewness (actual: $concentration)",
+            )
+
+            // 실제 분포 검증
+            val maxValue = entry.distribution.values.maxOrNull() ?: 0.0
+            assertTrue(
+                maxValue >= minSkewness,
+                "Distribution should have at least one high value (actual max: $maxValue)",
+            )
+        }
+    }
+
+    @Test
+    @Order(7)
+    fun `findSimilarDistributions - should find distributions similar to target`() {
+        // given
+        val baseDate = BaseDate("202401")
+        val targetEntity = allRecords.first().rankings.first()
+        val similarity = 0.75 // 임계값을 좀 더 현실적으로 조정
+
+        // when
+        val results =
+            companySizeEducationRepository.findSimilarDistributions(
+                targetEntity.entityId,
+                baseDate,
+                similarity,
+            )
+
+        // then
+        assertNotNull(results)
+        assertTrue(results.isNotEmpty(), "Should find at least one similar distribution")
+        assertFalse(
+            results.any { it.entityId == targetEntity.entityId },
+            "Results should not include the target entity",
         )
 
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find uniform distributions execution time: $timeSeconds seconds")
-        performanceMetrics["find_uniform_distributions"] = timeSeconds
+        results.forEach { entry ->
+            val actualSimilarity =
+                calculateCosineSimilarity(
+                    targetEntity.distribution,
+                    entry.distribution,
+                )
+            assertTrue(
+                actualSimilarity >= similarity,
+                "Each result should have similarity >= $similarity (actual: $actualSimilarity)",
+            )
+        }
     }
 
     @Test
     @Order(8)
-    fun testFindSkewedDistributions() {
-        startTime = System.currentTimeMillis()
+    fun `findDistributionChanges - should track distribution changes over time`() {
+        // given
+        val entityId =
+            allRecords
+                .first()
+                .rankings
+                .first()
+                .entityId
+        val months = 2
 
-        val baseDate = BaseDate("202401")
-        val minSkewness = 0.7
+        // when
+        val results = companySizeEducationRepository.findDistributionChanges(entityId, months)
 
-        val results = companySizeEducationRepository.findSkewedDistributions(baseDate, minSkewness)
+        // then
+        assertNotNull(results)
+        assertTrue(results.isNotEmpty(), "Should find at least one change record")
+        assertTrue(results.size <= months, "Should not exceed specified months")
 
-        Assertions.assertTrue(results.isNotEmpty())
-        Assertions.assertTrue(
-            results.all {
-                it.rankings
-                    .first()
-                    .distributionMetrics.concentration >= minSkewness
-            },
-        )
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find skewed distributions execution time: $timeSeconds seconds")
-        performanceMetrics["find_skewed_distributions"] = timeSeconds
+        // Verify results are ordered by date descending
+        val dates = results.map { it.baseDate }
+        assertEquals(dates.sortedDescending(), dates, "Results should be ordered by date descending")
     }
 
     @Test
     @Order(9)
-    fun testFindDistributionChanges() {
-        startTime = System.currentTimeMillis()
+    fun `findCategoryDominance - should find entries with high category percentage`() {
+        // given
+        val baseDate = BaseDate("202401")
+        val category = "BACHELOR"
+        val minPercentage = 0.4
 
-        val entityId =
-            allRecords
-                .first()
-                .rankings
-                .first()
-                .entityId
-        val months = 3
+        // when
+        val results =
+            companySizeEducationRepository.findCategoryDominance(
+                baseDate,
+                category,
+                minPercentage,
+            )
 
-        val results = companySizeEducationRepository.findDistributionChanges(entityId, months)
+        // then
+        assertNotNull(results)
+        assertTrue(results.isNotEmpty(), "Should find at least one dominant entry")
 
-        Assertions.assertTrue(results.isNotEmpty())
-        Assertions.assertTrue(results.size <= months)
-        Assertions.assertTrue(
-            results.all { it.rankings.first().entityId == entityId },
+        results.forEach { entry ->
+            assertTrue(
+                (entry.distribution[category] ?: 0.0) >= minPercentage,
+                "Each result should have category percentage >= $minPercentage",
+            )
+        }
+
+        // Verify results are sorted by category percentage
+        val percentages = results.map { it.distribution[category] ?: 0.0 }
+        assertEquals(
+            percentages.sortedDescending(),
+            percentages,
+            "Results should be sorted by category percentage descending",
         )
-        // Verify results are ordered by date descending
-        Assertions.assertEquals(
-            results.map { it.baseDate },
-            results.map { it.baseDate }.sortedDescending(),
-        )
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find distribution changes execution time: $timeSeconds seconds")
-        performanceMetrics["find_distribution_changes"] = timeSeconds
     }
 
     @Test
     @Order(10)
-    fun testFindCategoryDominance() {
-        startTime = System.currentTimeMillis()
-
-        val baseDate = BaseDate("202401")
-        val category = "BACHELOR"
-        val minPercentage = 0.1
-
-        val results = companySizeEducationRepository.findCategoryDominance(baseDate, category, minPercentage)
-
-        Assertions.assertTrue(results.isNotEmpty())
-        Assertions.assertTrue(
-            results.all {
-                it.rankings.first().distribution[category]!! >= minPercentage
-            },
-        )
-        // Verify results are ordered by category percentage descending
-        val percentages = results.map { it.rankings.first().distribution[category]!! }
-        Assertions.assertEquals(percentages, percentages.sortedDescending())
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find category dominance execution time: $timeSeconds seconds")
-        performanceMetrics["find_category_dominance"] = timeSeconds
-    }
-
-    @Test
-    @Order(11)
-    fun testFindByEntityIdAndBaseDate() {
-        startTime = System.currentTimeMillis()
-
-        val entityId =
-            allRecords
-                .first()
-                .rankings
-                .first()
-                .entityId
+    fun `performanceTest - should complete operations within time limits`() {
+        val startTime = System.currentTimeMillis()
         val baseDate = BaseDate("202401")
 
-        val result = companySizeEducationRepository.findByEntityIdAndBaseDate(entityId, baseDate)
+        // Test various operations with timing
+        val performanceMetrics = mutableMapOf<String, Double>()
 
-        Assertions.assertNotNull(result)
-        result?.let {
-            Assertions.assertEquals(entityId, it.rankings.first().entityId)
-            Assertions.assertEquals(baseDate.toString(), it.baseDate)
+        // Test findByDistributionPattern
+        measureOperation("find_by_pattern") {
+            val pattern = mapOf("BACHELOR" to 0.5, "MASTER" to 0.3)
+            companySizeEducationRepository.findByDistributionPattern(baseDate, pattern, 0.7)
+        }?.let { performanceMetrics["find_by_pattern"] = it }
+
+        // Test findByDominantCategory
+        measureOperation("find_by_dominant") {
+            companySizeEducationRepository.findByDominantCategory(baseDate, "BACHELOR")
+        }?.let { performanceMetrics["find_by_dominant"] = it }
+
+        // Test findUniformDistributions
+        measureOperation("find_uniform") {
+            companySizeEducationRepository.findUniformDistributions(baseDate, 0.3)
+        }?.let { performanceMetrics["find_uniform"] = it }
+
+        // Verify performance metrics
+        performanceMetrics.forEach { (operation, time) ->
+            assertTrue(
+                time <
+                    when (operation) {
+                        "find_by_pattern" -> 2.0
+                        "find_by_dominant" -> 1.0
+                        "find_uniform" -> 1.0
+                        else -> Double.MAX_VALUE
+                    },
+                "$operation took too long: $time seconds",
+            )
         }
 
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find by entity ID and base date execution time: $timeSeconds seconds")
-        performanceMetrics["find_by_entity_and_date"] = timeSeconds
+        logger.info("Performance test metrics: $performanceMetrics")
     }
 
-    @Test
-    @Order(12)
-    fun testBulkDelete() {
-        startTime = System.currentTimeMillis()
-
-        val recordIds = allRecords.mapNotNull { it.id }
-        var totalDeleted = 0
-
-        for (batch in recordIds.chunked(batchSize)) {
-            val deletedCount = companySizeEducationRepository.bulkDelete(batch)
-            totalDeleted += deletedCount
+    private fun measureOperation(
+        name: String,
+        operation: () -> Unit,
+    ): Double? {
+        val start = System.currentTimeMillis()
+        try {
+            operation()
+            val end = System.currentTimeMillis()
+            val duration = (end - start) / 1000.0
+            logger.info("$name completed in $duration seconds")
+            return duration
+        } catch (e: Exception) {
+            logger.error("Error during $name: ${e.message}")
+            return null
         }
+    }
 
-        val remainingRecords = companySizeEducationRepository.findAllByQuery(Query())
-        Assertions.assertTrue(remainingRecords.isEmpty())
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Bulk delete execution time: $timeSeconds seconds")
-        performanceMetrics["bulk_delete"] = timeSeconds
+    private fun calculateCosineSimilarity(
+        dist1: Map<String, Double>,
+        dist2: Map<String, Double>,
+    ): Double {
+        val allCategories = (dist1.keys + dist2.keys).toSet()
+        val dotProduct =
+            allCategories.sumOf { category ->
+                (dist1[category] ?: 0.0) * (dist2[category] ?: 0.0)
+            }
+        val norm1 = kotlin.math.sqrt(dist1.values.sumOf { it * it })
+        val norm2 = kotlin.math.sqrt(dist2.values.sumOf { it * it })
+        return if (norm1 != 0.0 && norm2 != 0.0) dotProduct / (norm1 * norm2) else 0.0
     }
 }

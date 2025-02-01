@@ -1,9 +1,10 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.DistributionRankingRepository
 import com.example.jobstat.core.base.repository.DistributionRankingRepositoryImpl
 import com.example.jobstat.core.state.ExperienceLevel
-import com.example.jobstat.rankings.model.CompanySizeSalaryRankingsDocument
+import com.example.jobstat.rankings.document.CompanySizeSalaryRankingsDocument
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.COMPANY_SIZE_SALARY)
 @NoRepositoryBean
 interface CompanySizeSalaryRankingsRepository : DistributionRankingRepository<CompanySizeSalaryRankingsDocument, CompanySizeSalaryRankingsDocument.CompanySizeSalaryRankingEntry, String> {
     // 급여 공정성 분석

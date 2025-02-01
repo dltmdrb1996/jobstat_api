@@ -1,4 +1,4 @@
-package com.example.jobstat.rankings.model
+package com.example.jobstat.rankings.document
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.RankingMetrics
@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "company_retention_rate_rankings")
 class CompanyRetentionRateRankingsDocument(
     id: String? = null,
+    page: Int = 1,
     baseDate: String,
     period: SnapshotPeriod,
     @Field("metrics")
@@ -22,6 +23,7 @@ class CompanyRetentionRateRankingsDocument(
         period,
         metrics,
         rankings,
+        page,
     ) {
     data class CompanyRetentionMetrics(
         @Field("total_count")

@@ -1,4 +1,4 @@
-package com.example.jobstat.rankings.model
+package com.example.jobstat.rankings.document
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.DistributionRankingDocument
@@ -8,20 +8,21 @@ import com.example.jobstat.core.state.EntityType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
-@Document(collection = "company_size_salary_rankings")
-class CompanySizeSalaryRankingsDocument(
+@Document(collection = "company_size_benefit_rankings")
+class CompanySizeBenefitRankingsDocument(
     id: String? = null,
+    page: Int = 1,
     baseDate: String,
     period: SnapshotPeriod,
     @Field("metrics")
-    override val metrics: CompanySizeSalaryMetrics,
+    override val metrics: CompanySizeBenefitMetrics,
     @Field("group_entity_type")
     override val groupEntityType: EntityType = EntityType.COMPANY_SIZE,
     @Field("target_entity_type")
-    override val targetEntityType: EntityType = EntityType.SALARY,
+    override val targetEntityType: EntityType = EntityType.BENEFIT,
     @Field("rankings")
-    override val rankings: List<CompanySizeSalaryRankingEntry>,
-) : DistributionRankingDocument<CompanySizeSalaryRankingsDocument.CompanySizeSalaryRankingEntry>(
+    override val rankings: List<CompanySizeBenefitRankingEntry>,
+) : DistributionRankingDocument<CompanySizeBenefitRankingsDocument.CompanySizeBenefitRankingEntry>(
         id,
         baseDate,
         period,
@@ -29,8 +30,9 @@ class CompanySizeSalaryRankingsDocument(
         groupEntityType,
         targetEntityType,
         rankings,
+        page,
     ) {
-    data class CompanySizeSalaryMetrics(
+    data class CompanySizeBenefitMetrics(
         @Field("total_count")
         override val totalCount: Int,
         @Field("ranked_count")
@@ -41,10 +43,10 @@ class CompanySizeSalaryRankingsDocument(
         override val droppedEntries: Int,
         @Field("volatility_metrics")
         override val volatilityMetrics: VolatilityMetrics,
-        @Field("salary_trends")
-        val salaryTrends: SalaryTrends,
+        @Field("benefit_trends")
+        val benefitTrends: BenefitTrends,
     ) : RankingMetrics {
-        data class SalaryTrends(
+        data class BenefitTrends(
             @Field("overall_distribution")
             val overallDistribution: Map<String, Double>,
             @Field("year_over_year_changes")
@@ -65,7 +67,7 @@ class CompanySizeSalaryRankingsDocument(
         }
     }
 
-    data class CompanySizeSalaryRankingEntry(
+    data class CompanySizeBenefitRankingEntry(
         @Field("document_id")
         override val documentId: String,
         @Field("entity_id")
@@ -86,35 +88,28 @@ class CompanySizeSalaryRankingsDocument(
         override val distributionMetrics: DistributionMetrics,
         @Field("total_postings")
         val totalPostings: Int,
-        @Field("salary_metrics")
-        val salaryMetrics: SalaryMetrics,
-        @Field("experience_distribution")
-        val experienceDistribution: Map<String, SalaryRange>,
+        @Field("benefit_metrics")
+        val benefitMetrics: BenefitMetrics,
+        @Field("category_distribution")
+        val categoryDistribution: Map<String, BenefitCategory>,
         @Field("trend_indicators")
         val trendIndicators: TrendIndicators,
     ) : DistributionRankingEntry {
-        data class SalaryMetrics(
-            @Field("avg_salary")
-            val avgSalary: Long,
-            @Field("median_salary")
-            val medianSalary: Long,
-            @Field("percentile_range")
-            val percentileRange: SalaryRange,
-            @Field("compensation_ratio")
-            val compensationRatio: CompensationRatio,
-        ) {
-            data class CompensationRatio(
-                val baseSalary: Double,
-                val bonus: Double,
-                val benefits: Double,
-            )
-        }
+        data class BenefitMetrics(
+            @Field("provision_rate")
+            val provisionRate: Double,
+            @Field("satisfaction_score")
+            val satisfactionScore: Double,
+            @Field("monetary_value")
+            val monetaryValue: Long,
+            @Field("benefit_count")
+            val benefitCount: Int,
+        )
 
-        data class SalaryRange(
-            val min: Long,
-            val max: Long,
-            val p25: Long,
-            val p75: Long,
+        data class BenefitCategory(
+            val provisionRate: Double,
+            val importance: Double,
+            val satisfactionScore: Double,
         )
 
         data class TrendIndicators(
@@ -138,8 +133,8 @@ class CompanySizeSalaryRankingsDocument(
         ) { "Distribution percentages must sum to approximately 100%" }
         require(
             rankings.all {
-                it.salaryMetrics.percentileRange.max > it.salaryMetrics.percentileRange.min
+                it.benefitMetrics.provisionRate in 0.0..1.0
             },
-        ) { "Maximum salary must be greater than minimum salary" }
+        ) { "Provision rate must be between 0 and 1" }
     }
 }

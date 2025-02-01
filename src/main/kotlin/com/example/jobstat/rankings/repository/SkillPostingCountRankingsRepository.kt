@@ -1,8 +1,9 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.SimpleRankingRepository
 import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
-import com.example.jobstat.rankings.model.SkillPostingCountRankingsDocument
+import com.example.jobstat.rankings.document.SkillPostingCountRankingsDocument
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.SKILL_POSTING_COUNT)
 @NoRepositoryBean
 interface SkillPostingCountRankingsRepository : SimpleRankingRepository<SkillPostingCountRankingsDocument, SkillPostingCountRankingsDocument.SkillPostingRankingEntry, String> {
     // 산업별 수요 분석

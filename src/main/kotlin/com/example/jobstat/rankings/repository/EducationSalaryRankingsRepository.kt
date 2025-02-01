@@ -1,8 +1,9 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.SimpleRankingRepository
 import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
-import com.example.jobstat.rankings.model.EducationSalaryRankingsDocument
+import com.example.jobstat.rankings.document.EducationSalaryRankingsDocument
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.EDUCATION_SALARY)
 @NoRepositoryBean
 interface EducationSalaryRankingsRepository : SimpleRankingRepository<EducationSalaryRankingsDocument, EducationSalaryRankingsDocument.EducationSalaryRankingEntry, String> {
     // ROI 기반 교육 분석

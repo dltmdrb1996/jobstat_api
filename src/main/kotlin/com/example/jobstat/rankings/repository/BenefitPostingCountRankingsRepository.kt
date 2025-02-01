@@ -1,8 +1,9 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.SimpleRankingRepository
 import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
-import com.example.jobstat.rankings.model.BenefitPostingCountRankingsDocument
+import com.example.jobstat.rankings.document.BenefitPostingCountRankingsDocument
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.BENEFIT_POSTING_COUNT)
 @NoRepositoryBean
 interface BenefitPostingCountRankingsRepository : SimpleRankingRepository<BenefitPostingCountRankingsDocument, BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry, String> {
     // 산업별 특화 복리후생 분석

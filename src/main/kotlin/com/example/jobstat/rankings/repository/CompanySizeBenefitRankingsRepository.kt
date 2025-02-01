@@ -1,9 +1,10 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.DistributionRankingRepository
 import com.example.jobstat.core.base.repository.DistributionRankingRepositoryImpl
 import com.example.jobstat.core.state.CompanySize
-import com.example.jobstat.rankings.model.CompanySizeBenefitRankingsDocument
+import com.example.jobstat.rankings.document.CompanySizeBenefitRankingsDocument
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
@@ -14,6 +15,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.COMPANY_SIZE_BENEFIT)
 @NoRepositoryBean
 interface CompanySizeBenefitRankingsRepository : DistributionRankingRepository<CompanySizeBenefitRankingsDocument, CompanySizeBenefitRankingsDocument.CompanySizeBenefitRankingEntry, String> {
     // 회사 규모별 특화 복리후생 패턴 분석

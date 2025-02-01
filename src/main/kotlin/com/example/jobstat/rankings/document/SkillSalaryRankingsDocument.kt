@@ -1,4 +1,4 @@
-package com.example.jobstat.rankings.model
+package com.example.jobstat.rankings.document
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.RankingMetrics
@@ -7,23 +7,25 @@ import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
-@Document(collection = "skill_posting_count_rankings")
-class SkillPostingCountRankingsDocument(
+@Document(collection = "skill_salary_rankings")
+class SkillSalaryRankingsDocument(
     id: String? = null,
+    page: Int = 1,
     baseDate: String,
     period: SnapshotPeriod,
     @Field("metrics")
-    override val metrics: SkillPostingMetrics,
+    override val metrics: SkillSalaryMetrics,
     @Field("rankings")
-    override val rankings: List<SkillPostingRankingEntry>,
-) : SimpleRankingDocument<SkillPostingCountRankingsDocument.SkillPostingRankingEntry>(
+    override val rankings: List<SkillSalaryRankingEntry>,
+) : SimpleRankingDocument<SkillSalaryRankingsDocument.SkillSalaryRankingEntry>(
         id,
         baseDate,
         period,
         metrics,
         rankings,
+        page,
     ) {
-    data class SkillPostingMetrics(
+    data class SkillSalaryMetrics(
         @Field("total_count")
         override val totalCount: Int,
         @Field("ranked_count")
@@ -34,9 +36,20 @@ class SkillPostingCountRankingsDocument(
         override val droppedEntries: Int,
         @Field("volatility_metrics")
         override val volatilityMetrics: VolatilityMetrics,
-    ) : RankingMetrics
+        @Field("salary_distribution")
+        val salaryDistribution: SalaryDistribution,
+    ) : RankingMetrics {
+        data class SalaryDistribution(
+            @Field("median_salary")
+            val medianSalary: Long,
+            @Field("percentiles")
+            val percentiles: Map<Int, Long>,
+            @Field("industry_comparison")
+            val industryComparison: Map<Long, Double>,
+        )
+    }
 
-    data class SkillPostingRankingEntry(
+    data class SkillSalaryRankingEntry(
         @Field("document_id")
         override val documentId: String,
         @Field("entity_id")
@@ -51,25 +64,25 @@ class SkillPostingCountRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
-        @Field("total_postings")
-        val totalPostings: Int,
-        @Field("active_postings")
-        val activePostings: Int,
-        @Field("posting_trend")
-        val postingTrend: PostingTrend,
+        @Field("avg_salary")
+        val avgSalary: Long,
+        @Field("median_salary")
+        val medianSalary: Long,
+        @Field("salary_range")
+        val salaryRange: SalaryRange,
+        @Field("experience_premium")
+        val experiencePremium: Map<String, Double>,
     ) : SimpleRankingEntry {
-        data class PostingTrend(
-            @Field("month_over_month_change")
-            val monthOverMonthChange: Double,
-            @Field("year_over_year_change")
-            val yearOverYearChange: Double,
-            @Field("seasonality_index")
-            val seasonalityIndex: Double,
+        data class SalaryRange(
+            val min: Long,
+            val max: Long,
+            val p25: Long,
+            val p75: Long,
         )
     }
 
     override fun validate() {
         require(rankings.isNotEmpty()) { "Rankings must not be empty" }
-        require(rankings.all { it.totalPostings >= it.activePostings }) { "Active postings cannot exceed total postings" }
+        require(rankings.all { it.avgSalary > 0 }) { "All salaries must be positive" }
     }
 }

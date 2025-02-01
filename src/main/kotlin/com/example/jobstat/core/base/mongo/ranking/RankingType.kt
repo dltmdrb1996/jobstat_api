@@ -1,8 +1,10 @@
 package com.example.jobstat.core.base.mongo.ranking
 
+import java.io.Serializable
+
 enum class RankingType(
     val fieldName: String,
-) {
+) : Serializable {
     // 스킬 랭킹
     SKILL_SALARY("skillSalary"), // 기술스택별 급여
     SKILL_POSTING_COUNT("skillPostingCount"), // 기술스택별 채용공고 수
@@ -60,3 +62,58 @@ enum class RankingType(
                 ?: throw IllegalArgumentException("Invalid field name: $fieldName")
     }
 }
+
+fun Class<*>.toRankingType(): RankingType =
+    when (simpleName) {
+        "BenefitPostingCountRankingsDocument" -> RankingType.BENEFIT_POSTING_COUNT
+        "CompanyGrowthRankingsDocument" -> RankingType.COMPANY_GROWTH
+        "CompanyHiringVolumeRankingsDocument" -> RankingType.COMPANY_HIRING_VOLUME
+        "CompanyRetentionRateRankingsDocument" -> RankingType.COMPANY_RETENTION_RATE
+        "CompanySalaryRankingsDocument" -> RankingType.COMPANY_SALARY
+        "CompanySizeBenefitRankingsDocument" -> RankingType.COMPANY_SIZE_BENEFIT
+        "CompanySizeEducationRankingsDocument" -> RankingType.COMPANY_SIZE_EDUCATION
+        "CompanySizeSalaryRankingsDocument" -> RankingType.COMPANY_SIZE_SALARY
+        "CompanySizeSkillRankingsDocument" -> RankingType.COMPANY_SIZE_SKILL_DEMAND
+        "EducationSalaryRankingsDocument" -> RankingType.EDUCATION_SALARY
+        "IndustryGrowthRankingsDocument" -> RankingType.INDUSTRY_GROWTH
+        "IndustrySalaryRankingsDocument" -> RankingType.INDUSTRY_SALARY
+        "IndustrySkillRankingsDocument" -> RankingType.INDUSTRY_SKILL
+        "JobCategoryGrowthRankingsDocument" -> RankingType.JOB_CATEGORY_GROWTH
+        "JobCategoryPostingCountRankingsDocument" -> RankingType.JOB_CATEGORY_POSTING_COUNT
+        "JobCategorySalaryRankingsDocument" -> RankingType.JOB_CATEGORY_SALARY
+        "JobCategorySkillRankingsDocument" -> RankingType.JOB_CATEGORY_SKILL
+        "LocationPostingCountRankingsDocument" -> RankingType.LOCATION_POSTING_COUNT
+        "LocationSalaryRankingsDocument" -> RankingType.LOCATION_SALARY
+        "SkillGrowthRankingsDocument" -> RankingType.SKILL_GROWTH
+        "SkillPostingCountRankingsDocument" -> RankingType.SKILL_POSTING_COUNT
+        "SkillSalaryRankingsDocument" -> RankingType.SKILL_SALARY
+        else -> throw IllegalArgumentException("Unknown ranking document type: $simpleName")
+    }
+
+// 반대로 RankingType을 Document 클래스로 변환하는 함수도 추가
+fun RankingType.toDocumentClassName(): String =
+    when (this) {
+        RankingType.BENEFIT_POSTING_COUNT -> "BenefitPostingCountRankingsDocument"
+        RankingType.COMPANY_GROWTH -> "CompanyGrowthRankingsDocument"
+        RankingType.COMPANY_HIRING_VOLUME -> "CompanyHiringVolumeRankingsDocument"
+        RankingType.COMPANY_RETENTION_RATE -> "CompanyRetentionRateRankingsDocument"
+        RankingType.COMPANY_SALARY -> "CompanySalaryRankingsDocument"
+        RankingType.COMPANY_SIZE_BENEFIT -> "CompanySizeBenefitRankingsDocument"
+        RankingType.COMPANY_SIZE_EDUCATION -> "CompanySizeEducationRankingsDocument"
+        RankingType.COMPANY_SIZE_SALARY -> "CompanySizeSalaryRankingsDocument"
+        RankingType.COMPANY_SIZE_SKILL_DEMAND -> "CompanySizeSkillRankingsDocument"
+        RankingType.EDUCATION_SALARY -> "EducationSalaryRankingsDocument"
+        RankingType.INDUSTRY_GROWTH -> "IndustryGrowthRankingsDocument"
+        RankingType.INDUSTRY_SALARY -> "IndustrySalaryRankingsDocument"
+        RankingType.INDUSTRY_SKILL -> "IndustrySkillRankingsDocument"
+        RankingType.JOB_CATEGORY_GROWTH -> "JobCategoryGrowthRankingsDocument"
+        RankingType.JOB_CATEGORY_POSTING_COUNT -> "JobCategoryPostingCountRankingsDocument"
+        RankingType.JOB_CATEGORY_SALARY -> "JobCategorySalaryRankingsDocument"
+        RankingType.JOB_CATEGORY_SKILL -> "JobCategorySkillRankingsDocument"
+        RankingType.LOCATION_POSTING_COUNT -> "LocationPostingCountRankingsDocument"
+        RankingType.LOCATION_SALARY -> "LocationSalaryRankingsDocument"
+        RankingType.SKILL_GROWTH -> "SkillGrowthRankingsDocument"
+        RankingType.SKILL_POSTING_COUNT -> "SkillPostingCountRankingsDocument"
+        RankingType.SKILL_SALARY -> "SkillSalaryRankingsDocument"
+        else -> throw IllegalArgumentException("No corresponding document class for ranking type: $this")
+    }

@@ -1,8 +1,9 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.RelationshipRankingRepository
 import com.example.jobstat.core.base.repository.RelationshipRankingRepositoryImpl
-import com.example.jobstat.rankings.model.JobCategorySkillRankingsDocument
+import com.example.jobstat.rankings.document.JobCategorySkillRankingsDocument
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
@@ -11,6 +12,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.JOB_CATEGORY_SKILL)
 @NoRepositoryBean
 interface JobCategorySkillRankingsRepository : RelationshipRankingRepository<JobCategorySkillRankingsDocument, JobCategorySkillRankingsDocument.JobCategorySkillRankingEntry, String> {
     // 스킬 연관성 분석

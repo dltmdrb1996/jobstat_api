@@ -2,109 +2,81 @@ package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.ranking.BaseRankingDocument
 import com.example.jobstat.core.base.mongo.ranking.RankingEntry
-import com.example.jobstat.core.state.BaseDate
-import com.mongodb.client.model.Accumulators
-import com.mongodb.client.model.Aggregates
-import com.mongodb.client.model.Filters
-import com.mongodb.client.model.Sorts
+import com.example.jobstat.core.base.repository.BaseRankingRepository.Companion.DEFAULT_PAGE_SIZE
+import com.example.jobstat.core.extension.orThrowNotFound
+import com.mongodb.client.model.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
+import kotlin.math.abs
 
 @NoRepositoryBean
 interface BaseRankingRepository<T : BaseRankingDocument<E>, E : RankingEntry, ID : Any> : BaseTimeSeriesRepository<T, ID> {
-    /**
-     * 특정 기준일자의 상위 N개의 랭킹 데이터를 조회합니다.
-     * 랭킹 순위를 기준으로 오름차순 정렬하여 반환합니다.
-     *
-     * @param baseDate 기준 일자
-     * @param limit 조회할 데이터 수
-     * @return 상위 N개의 랭킹 엔티티 리스트
-     */
-    fun findTopN(
-        baseDate: BaseDate,
-        limit: Int,
-    ): List<T>
+    // 특정 페이지 조회
+    fun findByPage(
+        baseDate: String,
+        page: Int,
+    ): T
 
-    /**
-     * 특정 기준일자의 시작 순위부터 종료 순위 사이의 랭킹 데이터를 조회합니다.
-     * 랭킹 순위를 기준으로 오름차순 정렬하여 반환합니다.
-     *
-     * @param baseDate 기준 일자
-     * @param startRank 시작 순위
-     * @param endRank 종료 순위
-     * @return 해당 순위 범위의 랭킹 엔티티 리스트
-     */
+    // 전체 페이지 조회
+    fun findAllPages(baseDate: String): Flow<T>
+
+    // Top N 조회
+    fun findTopN(
+        baseDate: String,
+        limit: Int,
+    ): List<E>
+
+    // 랭크 범위 조회
     fun findByRankRange(
-        baseDate: BaseDate,
+        baseDate: String,
         startRank: Int,
         endRank: Int,
-    ): List<T>
+    ): List<E>
 
-    /**
-     * 특정 기준일자의 순위 상승폭이 가장 큰 엔티티들을 조회합니다.
-     * 순위 변동(rank\_change)을 기준으로 내림차순 정렬하여 반환합니다.
-     *
-     * @param baseDate 기준 일자
-     * @param limit 조회할 데이터 수
-     * @return 순위 상승폭이 가장 큰 엔티티 리스트
-     */
+    // 특정 엔티티 찾기
+    fun findByEntityId(
+        baseDate: String,
+        entityId: Long,
+    ): E?
+
+    // 랭킹 변동이 큰 상위 엔티티 조회
     fun findTopMovers(
-        baseDate: BaseDate,
+        startDate: String,
+        endDate: String,
         limit: Int,
-    ): List<T>
+    ): List<E>
 
-    /**
-     * 특정 기준일자의 순위 하락폭이 가장 큰 엔티티들을 조회합니다.
-     * 순위 변동(rank\_change)을 기준으로 오름차순 정렬하여 반환합니다.
-     *
-     * @param baseDate 기준 일자
-     * @param limit 조회할 데이터 수
-     * @return 순위 하락폭이 가장 큰 엔티티 리스트
-     */
+    // 랭킹 하락이 큰 상위 엔티티 조회
     fun findTopLosers(
-        baseDate: BaseDate,
+        startDate: String,
+        endDate: String,
         limit: Int,
-    ): List<T>
+    ): List<E>
 
-    /**
-     * 지정된 기간 동안 순위 변동이 큰(변동성이 높은) 엔티티들을 조회합니다.
-     * 최근 순으로 정렬된 데이터 중에서 지정된 순위 변동 폭 이상의 변화가 있는 엔티티들을 반환합니다.
-     *
-     * @param months 조회할 개월 수
-     * @param minRankChange 최소 순위 변동 폭
-     * @return 순위 변동성이 높은 엔티티 리스트
-     */
+    // 안정적인 랭킹 유지 엔티티 조회
+    fun findStableEntities(
+        months: Int,
+        maxRankChange: Int,
+    ): List<E>
+
+    // 변동성 높은 엔티티 조회
     fun findVolatileEntities(
         months: Int,
         minRankChange: Int,
-    ): List<T>
+    ): List<E>
 
-    /**
-     * 지정된 기간 동안 일정 순위 이내를 꾸준히 유지한 엔티티들을 조회합니다.
-     * 해당 기간 동안 지정된 최대 순위 이하를 계속 유지한 엔티티들을 반환합니다.
-     *
-     * @param months 조회할 개월 수
-     * @param maxRank 최대 순위 (이 순위 이하를 유지해야 함)
-     * @return 일정 순위를 꾸준히 유지한 엔티티 리스트
-     */
+    // 상위 랭킹 지속 유지 엔티티 조회
     fun findEntitiesWithConsistentRanking(
         months: Int,
         maxRank: Int,
-    ): List<T>
+    ): List<E>
 
-    /**
-     * 특정 엔티티의 지정된 기간 동안의 순위 이력을 조회합니다.
-     * 최근 순으로 정렬하여 해당 엔티티의 순위 변동 이력을 반환합니다.
-     *
-     * @param entityId 엔티티 ID
-     * @param months 조회할 개월 수
-     * @return 엔티티의 순위 이력 리스트
-     */
-    fun findRankingHistory(
-        entityId: Long,
-        months: Int,
-    ): List<T>
+    companion object {
+        const val DEFAULT_PAGE_SIZE = 100
+    }
 }
 
 abstract class BaseRankingRepositoryImpl<T : BaseRankingDocument<E>, E : RankingEntry, ID : Any>(
@@ -112,148 +84,199 @@ abstract class BaseRankingRepositoryImpl<T : BaseRankingDocument<E>, E : Ranking
     private val mongoOperations: MongoOperations,
 ) : BaseTimeSeriesRepositoryImpl<T, ID>(entityInformation, mongoOperations),
     BaseRankingRepository<T, E, ID> {
-    override fun findTopN(
-        baseDate: BaseDate,
-        limit: Int,
-    ): List<T> {
-        val collection = mongoOperations.getCollection(entityInformation.collectionName)
-
-        return collection
-            .find(Filters.eq("base_date", baseDate.toString()))
-            .sort(Sorts.ascending("rankings.rank")) // rank 오름차순 정렬 추가
-            .limit(limit)
-            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-            .toList()
-    }
-
-    override fun findByRankRange(
-        baseDate: BaseDate,
-        startRank: Int,
-        endRank: Int,
-    ): List<T> {
+    override fun findByPage(
+        baseDate: String,
+        page: Int,
+    ): T {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         return collection
             .find(
                 Filters.and(
-                    Filters.eq("base_date", baseDate.toString()),
-                    Filters.gte("rankings.rank", startRank),
-                    Filters.lte("rankings.rank", endRank),
+                    Filters.eq("base_date", baseDate),
+                    Filters.eq("page", page),
                 ),
-            ).sort(Sorts.ascending("rankings.rank")) // rank 오름차순 정렬 추가
-            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-            .toList()
+            ).firstOrNull()
+            .orThrowNotFound(entityInformation.collectionName, "baseDate: $baseDate, page: $page")
+            .let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }
 
-    override fun findTopMovers(
-        baseDate: BaseDate,
+    override fun findAllPages(baseDate: String): Flow<T> =
+        flow {
+            val collection = mongoOperations.getCollection(entityInformation.collectionName)
+
+            collection
+                .find(Filters.eq("base_date", baseDate))
+                .sort(Sorts.ascending("page"))
+                .forEach { doc ->
+                    emit(mongoOperations.converter.read(entityInformation.javaType, doc))
+                }
+        }
+
+    override fun findTopN(
+        baseDate: String,
         limit: Int,
-    ): List<T> {
+    ): List<E> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline =
-            listOf(
-                Aggregates.match(
-                    Filters.and(
-                        Filters.eq("base_date", baseDate.toString()),
-                        Filters.exists("rankings.rank_change"),
-                    ),
-                ),
-                Aggregates.sort(Sorts.descending("rankings.rank_change")),
-                Aggregates.limit(limit),
-            )
+        val requiredPages = (limit + DEFAULT_PAGE_SIZE - 1) / DEFAULT_PAGE_SIZE
 
         return collection
-            .aggregate(pipeline)
+            .find(Filters.eq("base_date", baseDate))
+            .sort(Sorts.ascending("page"))
+            .limit(requiredPages)
+            .flatMap { doc ->
+                mongoOperations.converter.read(entityInformation.javaType, doc).rankings
+            }.take(limit)
+    }
+
+    override fun findByRankRange(
+        baseDate: String,
+        startRank: Int,
+        endRank: Int,
+    ): List<E> {
+        val collection = mongoOperations.getCollection(entityInformation.collectionName)
+
+        val startPage = (startRank - 1) / DEFAULT_PAGE_SIZE + 1
+        val endPage = (endRank - 1) / DEFAULT_PAGE_SIZE + 1
+
+        return collection
+            .find(
+                Filters.and(
+                    Filters.eq("base_date", baseDate),
+                    Filters.gte("page", startPage),
+                    Filters.lte("page", endPage),
+                ),
+            ).sort(Sorts.ascending("page"))
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-            .toList()
+            .flatMap { doc ->
+                doc.rankings.filter { it.rank in startRank..endRank }
+            }
+    }
+
+    override fun findByEntityId(
+        baseDate: String,
+        entityId: Long,
+    ): E? {
+        val collection = mongoOperations.getCollection(entityInformation.collectionName)
+
+        return collection
+            .find(Filters.eq("base_date", baseDate))
+            .mapNotNull { doc ->
+                mongoOperations.converter
+                    .read(entityInformation.javaType, doc)
+                    .rankings
+                    .find { it.entityId == entityId }
+            }.firstOrNull()
+    }
+
+    // BaseRankingRepositoryImpl.kt의 나머지 메서드들 구현
+    override fun findTopMovers(
+        startDate: String,
+        endDate: String,
+        limit: Int,
+    ): List<E> {
+        val collection = mongoOperations.getCollection(entityInformation.collectionName)
+
+        // 모든 페이지에서 rankChange가 존재하는 엔티티들을 찾음
+        return collection
+            .find(Filters.eq("base_date", endDate))
+            .sort(Sorts.ascending("page"))
+            .flatMap { doc ->
+                mongoOperations.converter
+                    .read(entityInformation.javaType, doc)
+                    .rankings
+                    .filter { it.rankChange != null }
+            }.sortedByDescending { it.rankChange }
+            .take(limit)
     }
 
     override fun findTopLosers(
-        baseDate: BaseDate,
+        startDate: String,
+        endDate: String,
         limit: Int,
-    ): List<T> {
+    ): List<E> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline =
-            listOf(
-                Aggregates.match(
-                    Filters.and(
-                        Filters.eq("base_date", baseDate.toString()),
-                        Filters.exists("rankings.rank_change"),
-                    ),
-                ),
-                Aggregates.sort(Sorts.ascending("rankings.rank_change")), // rank_change 오름차순 정렬 추가
-                Aggregates.limit(limit),
-            )
+        return collection
+            .find(Filters.eq("base_date", endDate))
+            .sort(Sorts.ascending("page"))
+            .flatMap { doc ->
+                mongoOperations.converter
+                    .read(entityInformation.javaType, doc)
+                    .rankings
+                    .filter { it.rankChange != null }
+            }.sortedBy { it.rankChange }
+            .take(limit)
+    }
+
+    override fun findStableEntities(
+        months: Int,
+        maxRankChange: Int,
+    ): List<E> {
+        val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         return collection
-            .aggregate(pipeline)
-            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-            .toList()
+            .find(Filters.empty())
+            .sort(Sorts.descending("base_date"))
+            .limit(months)
+            .flatMap { doc ->
+                val document = mongoOperations.converter.read(entityInformation.javaType, doc)
+                document.rankings.filter { entry ->
+                    val rankChange = entry.rankChange
+                    rankChange == null || abs(rankChange) <= maxRankChange
+                }
+            }
     }
 
     override fun findVolatileEntities(
         months: Int,
         minRankChange: Int,
-    ): List<T> {
+    ): List<E> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline =
-            listOf(
-                Aggregates.limit(months),
-                Aggregates.match(
-                    Filters.or(
-                        Filters.lte("rankings.rank_change", -minRankChange),
-                        Filters.gte("rankings.rank_change", minRankChange),
-                    ),
-                ),
-            )
-
         return collection
-            .aggregate(pipeline)
-            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-            .toList()
+            .find(Filters.empty())
+            .sort(Sorts.descending("base_date"))
+            .limit(months)
+            .flatMap { doc ->
+                val document = mongoOperations.converter.read(entityInformation.javaType, doc)
+                document.rankings.filter { entry ->
+                    val rankChange = entry.rankChange
+                    rankChange != null && abs(rankChange) >= minRankChange
+                }
+            }
     }
 
     override fun findEntitiesWithConsistentRanking(
         months: Int,
         maxRank: Int,
-    ): List<T> {
+    ): List<E> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
-        val pipeline =
-            listOf(
-                Aggregates.limit(months),
-                Aggregates.match(Filters.lte("rankings.rank", maxRank)),
-                Aggregates.group(
-                    "\$rankings.entity_id",
-                    Accumulators.sum("count", 1),
-                ),
-                Aggregates.match(Filters.eq("count", months)),
-            )
+        // 최근 N개월간의 데이터를 가져와서 상위 랭킹을 유지한 엔티티들을 찾음
+        val recentDocs =
+            collection
+                .find(Filters.empty())
+                .sort(Sorts.descending("base_date"))
+                .limit(months)
+                .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
+                .toList()
 
-        return collection
-            .aggregate(pipeline)
-            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-            .toList()
-    }
+        // entityId별로 그룹화하여 모든 기간에서 maxRank 이내였는지 확인
+        val consistentEntities =
+            recentDocs
+                .flatMap { doc -> doc.rankings }
+                .groupBy { it.entityId }
+                .filter { (_, entries) ->
+                    entries.size == months && entries.all { it.rank <= maxRank }
+                }.keys
 
-    override fun findRankingHistory(
-        entityId: Long,
-        months: Int,
-    ): List<T> {
-        val collection = mongoOperations.getCollection(entityInformation.collectionName)
-
-        return collection
-            .find(
-                Filters.elemMatch(
-                    "rankings",
-                    Filters.eq("entity_id", entityId),
-                ),
-            ).sort(Sorts.descending("base_date"))
-            .limit(months)
-            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-            .toList()
+        // 가장 최근 문서에서 해당 엔티티들의 정보를 반환
+        return recentDocs
+            .firstOrNull()
+            ?.rankings
+            ?.filter { it.entityId in consistentEntities }
+            ?: emptyList()
     }
 }

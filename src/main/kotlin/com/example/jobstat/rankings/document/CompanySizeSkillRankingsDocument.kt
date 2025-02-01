@@ -1,4 +1,4 @@
-package com.example.jobstat.rankings.model
+package com.example.jobstat.rankings.document
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.RankingMetrics
@@ -8,20 +8,21 @@ import com.example.jobstat.core.state.EntityType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
-@Document(collection = "job_category_skill_rankings")
-class JobCategorySkillRankingsDocument(
+@Document(collection = "company_size_skill_rankings")
+class CompanySizeSkillRankingsDocument(
     id: String? = null,
+    page: Int = 1,
     baseDate: String,
     period: SnapshotPeriod,
     @Field("metrics")
-    override val metrics: JobCategorySkillMetrics,
+    override val metrics: CompanySizeSkillMetrics,
     @Field("primary_entity_type")
-    override val primaryEntityType: EntityType = EntityType.JOB_CATEGORY,
+    override val primaryEntityType: EntityType = EntityType.COMPANY_SIZE,
     @Field("related_entity_type")
     override val relatedEntityType: EntityType = EntityType.SKILL,
     @Field("rankings")
-    override val rankings: List<JobCategorySkillRankingEntry>,
-) : RelationshipRankingDocument<JobCategorySkillRankingsDocument.JobCategorySkillRankingEntry>(
+    override val rankings: List<CompanySizeSkillRankingEntry>,
+) : RelationshipRankingDocument<CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry>(
         id,
         baseDate,
         period,
@@ -29,8 +30,9 @@ class JobCategorySkillRankingsDocument(
         primaryEntityType,
         relatedEntityType,
         rankings,
+        page,
     ) {
-    data class JobCategorySkillMetrics(
+    data class CompanySizeSkillMetrics(
         @Field("total_count")
         override val totalCount: Int,
         @Field("ranked_count")
@@ -41,24 +43,24 @@ class JobCategorySkillRankingsDocument(
         override val droppedEntries: Int,
         @Field("volatility_metrics")
         override val volatilityMetrics: VolatilityMetrics,
-        @Field("skill_correlation")
-        val skillCorrelation: SkillCorrelation,
+        @Field("size_skill_correlation")
+        val sizeSkillCorrelation: SizeSkillCorrelation,
     ) : RankingMetrics {
-        data class SkillCorrelation(
-            @Field("skill_overlap_matrix")
-            val skillOverlapMatrix: Map<Long, Map<Long, Double>>,
-            @Field("complementary_skills")
-            val complementarySkills: List<SkillPair>,
+        data class SizeSkillCorrelation(
+            @Field("adoption_patterns")
+            val adoptionPatterns: Map<String, Map<Long, Double>>,
+            @Field("skill_complexity")
+            val skillComplexity: List<SizeComplexity>,
         ) {
-            data class SkillPair(
-                val skillId1: Long,
-                val skillId2: Long,
-                val correlationScore: Double,
+            data class SizeComplexity(
+                val companySize: String,
+                val averageSkillCount: Double,
+                val complexityScore: Double,
             )
         }
     }
 
-    data class JobCategorySkillRankingEntry(
+    data class CompanySizeSkillRankingEntry(
         @Field("document_id")
         override val documentId: String,
         @Field("entity_id")
@@ -79,8 +81,8 @@ class JobCategorySkillRankingsDocument(
         override val relatedRankings: List<SkillRank>,
         @Field("total_postings")
         val totalPostings: Int,
-        @Field("skill_diversity")
-        val skillDiversity: Double,
+        @Field("skill_adoption_rate")
+        val skillAdoptionRate: Double,
     ) : RelationshipRankingEntry {
         data class SkillRank(
             @Field("entity_id")
@@ -91,17 +93,17 @@ class JobCategorySkillRankingsDocument(
             override val rank: Int,
             @Field("score")
             override val score: Double,
-            @Field("required_rate")
-            val requiredRate: Double,
+            @Field("requirement_level")
+            val requirementLevel: Double,
             @Field("growth_rate")
             val growthRate: Double,
-            @Field("importance_score")
-            val importanceScore: Double,
+            @Field("size_relevance")
+            val sizeRelevance: Double,
         ) : RelatedEntityRank
     }
 
     override fun validate() {
         require(rankings.isNotEmpty()) { "Rankings must not be empty" }
-        require(rankings.all { it.relatedRankings.isNotEmpty() }) { "All job categories must have related skills" }
+        require(rankings.all { it.relatedRankings.isNotEmpty() }) { "All company sizes must have related skills" }
     }
 }

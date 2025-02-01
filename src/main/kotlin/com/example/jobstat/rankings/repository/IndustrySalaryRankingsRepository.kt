@@ -1,8 +1,9 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.SimpleRankingRepository
 import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
-import com.example.jobstat.rankings.model.IndustrySalaryRankingsDocument
+import com.example.jobstat.rankings.document.IndustrySalaryRankingsDocument
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
@@ -13,6 +14,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.INDUSTRY_SALARY)
 @NoRepositoryBean
 interface IndustrySalaryRankingsRepository : SimpleRankingRepository<IndustrySalaryRankingsDocument, IndustrySalaryRankingsDocument.IndustrySalaryRankingEntry, String> {
     // 지역별 조정 급여 분석

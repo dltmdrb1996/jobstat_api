@@ -1,8 +1,9 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.DistributionRankingRepository
 import com.example.jobstat.core.base.repository.DistributionRankingRepositoryImpl
-import com.example.jobstat.rankings.model.CompanySizeEducationRankingsDocument
+import com.example.jobstat.rankings.document.CompanySizeEducationRankingsDocument
 import com.mongodb.client.model.*
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
@@ -11,6 +12,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.COMPANY_SIZE_EDUCATION)
 @NoRepositoryBean
 interface CompanySizeEducationRankingsRepository : DistributionRankingRepository<CompanySizeEducationRankingsDocument, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry, String> {
     // 교육 수준별 급여 분포 분석

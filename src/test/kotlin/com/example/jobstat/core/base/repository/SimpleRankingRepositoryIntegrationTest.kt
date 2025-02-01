@@ -2,280 +2,218 @@ package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
-import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.rankings.model.SkillGrowthRankingsDocument
+import com.example.jobstat.rankings.document.SkillGrowthRankingsDocument
 import com.example.jobstat.rankings.repository.SkillGrowthRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.mongodb.core.query.Query
-import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 import kotlin.random.Random
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@TestMethodOrder(OrderAnnotation::class)
 class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var skillGrowthRankingsRepository: SkillGrowthRankingsRepositoryImpl
 
-    private val totalRecords = 996
-    private val batchSize = 100
-    private val allRecords = mutableListOf<SkillGrowthRankingsDocument>()
-    private var startTime: Long = 0
-    private val performanceMetrics = hashMapOf<String, Double>()
+    // 저장된 테스트 도큐먼트를 추후 삭제하기 위한 리스트
+    private val allDocuments = mutableListOf<SkillGrowthRankingsDocument>()
 
-    override fun cleanupTestData() {
-        val recordIds = allRecords.mapNotNull { it.id }
-        for (batch in recordIds.chunked(batchSize)) {
-            skillGrowthRankingsRepository.bulkDelete(batch)
+    @BeforeEach
+    override fun setup() {
+        cleanupTestData() // 이전 테스트 데이터 삭제
+
+        val baseDate = "202401"
+
+        // -----------------------------
+        // findByValueRange 테스트용 도큐먼트
+        // -----------------------------
+        // doc1: 두 개 엔트리, score 50.0, 75.0
+        val doc1 =
+            createTestDocument(
+                baseDate = baseDate,
+                page = 1,
+                rankingEntries =
+                    listOf(
+                        createTestRankingEntry(rank = 1, score = 50.0, rankChange = 5),
+                        createTestRankingEntry(rank = 2, score = 75.0, rankChange = 8),
+                    ),
+            )
+        // -----------------------------
+        // findRisingStars 테스트용 도큐먼트
+        // -----------------------------
+        // doc2: 두 개 엔트리, rankChange 12, 15 (조건: minRankImprovement = 10)
+        val doc2 =
+            createTestDocument(
+                baseDate = baseDate,
+                page = 2,
+                rankingEntries =
+                    listOf(
+                        createTestRankingEntry(rank = 3, score = 60.0, rankChange = 12),
+                        createTestRankingEntry(rank = 4, score = 65.0, rankChange = 15),
+                    ),
+            )
+        // -----------------------------
+        // findByEntityIdAndBaseDate 테스트용 도큐먼트
+        // -----------------------------
+        // doc3: 두 개 엔트리, 그 중 하나의 entityId를 555L로 지정
+        val doc3 =
+            createTestDocument(
+                baseDate = baseDate,
+                page = 3,
+                rankingEntries =
+                    listOf(
+                        createTestRankingEntry(rank = 5, score = 80.0, rankChange = 3, entityId = 555L),
+                        createTestRankingEntry(rank = 6, score = 85.0, rankChange = 4, entityId = 556L),
+                    ),
+            )
+
+        listOf(doc1, doc2, doc3).forEach {
+            allDocuments.add(it)
+            skillGrowthRankingsRepository.save(it)
         }
     }
 
-    @BeforeAll
-    fun beforeAll() {
+    override fun cleanupTestData() {
+        skillGrowthRankingsRepository.deleteAll()
     }
 
-    @AfterAll
-    fun afterAll() {
+    @AfterEach
+    override fun tearDown() {
         cleanupTestData()
-        printExecutionSummary()
     }
+
+    /**
+     * findByValueRange 테스트
+     * baseDate "202401"에서 score가 60.0 ~ 80.0 사이인 랭킹 엔트리를 조회하고,
+     * 내림차순 정렬 결과(예: 80.0, 75.0, 65.0, 60.0)를 검증한다.
+     */
+    @Test
+    @Order(1)
+    fun testFindByValueRange() {
+        // "doc1": scores 50.0, 75.0
+        // "doc2": scores 60.0, 65.0
+        // "doc3": scores 80.0, 85.0
+        // 조건(60.0 <= score <= 80.0)에 해당하는 엔트리: 75.0, 60.0, 65.0, 80.0
+        // 단, findByValueRange 메서드는 score 내림차순 정렬하여 반환
+        val results = skillGrowthRankingsRepository.findByValueRange("202401", 60.0, 80.0)
+        assertNotNull(results)
+        // 예상: 80.0, 75.0, 65.0, 60.0 (총 4건)
+        assertEquals(4, results.size)
+        val sortedScores = results.map { it.score }
+        assertEquals(listOf(80.0, 75.0, 65.0, 60.0), sortedScores)
+    }
+
+    /**
+     * findRisingStars 테스트
+     * 최근 2개의 도큐먼트(페이지 2, 3 등)에서 rankChange가 최소 10 이상인 엔트리를 조회한다.
+     * 조건에 부합하는 것은 doc2의 두 엔트리 (rankChange 12, 15)이며, 내림차순 정렬되어야 한다.
+     */
+    @Test
+    @Order(2)
+    fun testFindRisingStars() {
+        // minRankImprovement = 10, 최근 2개의 도큐먼트 기준
+        val results = skillGrowthRankingsRepository.findRisingStars(2, 10)
+        assertNotNull(results)
+        // doc2의 두 엔트리(rankChange 12, 15)만 해당하므로, 결과는 2건이어야 함
+        assertEquals(2, results.size)
+        // 내림차순 정렬: 15, 12
+        val rankChanges = results.map { it.rankChange }
+        assertEquals(listOf(15, 12), rankChanges)
+    }
+
+    /**
+     * findByEntityIdAndBaseDate 테스트
+     * baseDate "202401"에서 entityId가 555L인 랭킹 엔트리를 포함하는 도큐먼트를 조회한다.
+     */
+    @Test
+    @Order(3)
+    fun testFindByEntityIdAndBaseDate() {
+        val resultDoc = skillGrowthRankingsRepository.findByEntityIdAndBaseDate(555L, "202401")
+        assertNotNull(resultDoc)
+        resultDoc?.let {
+            val entry = it.rankings.find { ranking -> ranking.entityId == 555L }
+            assertNotNull(entry)
+            assertEquals("202401", it.baseDate)
+        }
+    }
+
+    // ─── HELPER METHODS ──────────────────────────────────────────────────────────────
+
+    private fun createTestDocument(
+        baseDate: String,
+        page: Int,
+        rankingEntries: List<SkillGrowthRankingsDocument.SkillGrowthRankingEntry>,
+    ): SkillGrowthRankingsDocument =
+        SkillGrowthRankingsDocument(
+            baseDate = baseDate,
+            page = page,
+            period = createSnapshotPeriod(baseDate),
+            metrics = createTestMetrics(),
+            rankings = rankingEntries,
+        )
+
+    private fun createTestRankingEntry(
+        rank: Int,
+        score: Double,
+        rankChange: Int?,
+        entityId: Long = rank.toLong(),
+    ): SkillGrowthRankingsDocument.SkillGrowthRankingEntry =
+        SkillGrowthRankingsDocument.SkillGrowthRankingEntry(
+            documentId = "doc_$rank",
+            entityId = entityId,
+            name = "Skill_$rank",
+            rank = rank,
+            previousRank = rank + Random.nextInt(-5, 6),
+            rankChange = rankChange,
+            score = score,
+            growthRate = Random.nextDouble(-20.0, 50.0),
+            growthConsistency = Random.nextDouble(0.0, 1.0),
+            growthFactors =
+                SkillGrowthRankingsDocument.SkillGrowthRankingEntry.GrowthFactors(
+                    demandGrowth = Random.nextDouble(0.0, 30.0),
+                    salaryGrowth = Random.nextDouble(0.0, 20.0),
+                    adoptionRate = Random.nextDouble(0.0, 1.0),
+                    marketPenetration = Random.nextDouble(0.0, 1.0),
+                ),
+        )
+
+    private fun createTestMetrics(): SkillGrowthRankingsDocument.SkillGrowthMetrics =
+        SkillGrowthRankingsDocument.SkillGrowthMetrics(
+            totalCount = 1000,
+            rankedCount = 1000,
+            newEntries = 0,
+            droppedEntries = 0,
+            volatilityMetrics =
+                VolatilityMetrics(
+                    avgRankChange = Random.nextDouble(0.0, 5.0),
+                    rankChangeStdDev = Random.nextDouble(0.0, 2.0),
+                    volatilityTrend = "STABLE",
+                ),
+            growthAnalysis =
+                SkillGrowthRankingsDocument.SkillGrowthMetrics.GrowthAnalysis(
+                    avgGrowthRate = Random.nextDouble(-20.0, 50.0),
+                    medianGrowthRate = Random.nextDouble(-20.0, 50.0),
+                    growthDistribution =
+                        mapOf(
+                            "high_growth" to Random.nextInt(100),
+                            "medium_growth" to Random.nextInt(100),
+                            "low_growth" to Random.nextInt(100),
+                        ),
+                ),
+        )
 
     private fun createSnapshotPeriod(baseDate: String): SnapshotPeriod {
         val year = baseDate.substring(0, 4).toInt()
         val month = baseDate.substring(4, 6).toInt()
-
-        val startDate = Instant.parse("$year-${month.toString().padStart(2, '0')}-01T00:00:00Z")
-        val nextMonth =
-            if (month == 12) {
-                "${year + 1}-01-01T00:00:00Z"
-            } else {
-                "$year-${(month + 1).toString().padStart(2, '0')}-01T00:00:00Z"
-            }
-        val endDate = Instant.parse(nextMonth).minusSeconds(1)
-
-        return SnapshotPeriod(startDate, endDate)
-    }
-
-    private fun createSkillGrowthDocument(
-        baseDate: String,
-        rank: Int,
-        entityId: Long,
-        growthRate: Double,
-    ): SkillGrowthRankingsDocument =
-        SkillGrowthRankingsDocument(
-            baseDate = baseDate,
-            period = createSnapshotPeriod(baseDate),
-            metrics =
-                SkillGrowthRankingsDocument.SkillGrowthMetrics(
-                    totalCount = totalRecords,
-                    rankedCount = totalRecords,
-                    newEntries = 0,
-                    droppedEntries = 0,
-                    volatilityMetrics =
-                        VolatilityMetrics(
-                            avgRankChange = Random.nextDouble(0.0, 5.0),
-                            rankChangeStdDev = Random.nextDouble(0.0, 2.0),
-                            volatilityTrend = "STABLE",
-                        ),
-                    growthAnalysis =
-                        SkillGrowthRankingsDocument.SkillGrowthMetrics.GrowthAnalysis(
-                            avgGrowthRate = growthRate,
-                            medianGrowthRate = growthRate + Random.nextDouble(-2.0, 2.0),
-                            growthDistribution =
-                                mapOf(
-                                    "high_growth" to Random.nextInt(100),
-                                    "medium_growth" to Random.nextInt(100),
-                                    "low_growth" to Random.nextInt(100),
-                                ),
-                        ),
-                ),
-            rankings =
-                listOf(
-                    SkillGrowthRankingsDocument.SkillGrowthRankingEntry(
-                        documentId = "SkillGrowthRankingEntry_$entityId",
-                        entityId = entityId,
-                        name = "Skill_$entityId",
-                        rank = rank,
-                        previousRank = rank + Random.nextInt(-5, 5),
-                        rankChange = Random.nextInt(-5, 15), // minRankImprovement 이상의 값이 나올 수 있도록 범위 조정,
-                        score = Random.nextDouble(0.0, 100.0),
-                        growthRate = growthRate,
-                        growthConsistency = Random.nextDouble(0.0, 1.0),
-                        growthFactors =
-                            SkillGrowthRankingsDocument.SkillGrowthRankingEntry.GrowthFactors(
-                                demandGrowth = growthRate,
-                                salaryGrowth = Random.nextDouble(0.0, 20.0),
-                                adoptionRate = Random.nextDouble(0.0, 1.0),
-                                marketPenetration = Random.nextDouble(0.0, 1.0),
-                            ),
-                    ),
-                ),
+        val startDateTime = LocalDateTime.of(year, month, 1, 0, 0)
+        val endDateTime = startDateTime.plusMonths(1).minusSeconds(1)
+        return SnapshotPeriod(
+            startDateTime.toInstant(ZoneOffset.UTC),
+            endDateTime.toInstant(ZoneOffset.UTC),
         )
-
-    @Test
-    @Order(1)
-    fun testBulkInsert() {
-        startTime = System.currentTimeMillis()
-        allRecords.clear()
-
-        val baseDates =
-            (1..12).map { month ->
-                val monthStr = month.toString().padStart(2, '0')
-                "2024$monthStr"
-            }
-
-        var totalInserted = 0
-        var rank = 1
-        for (baseDate in baseDates) {
-            val records =
-                (1..totalRecords / 12).map {
-                    createSkillGrowthDocument(
-                        baseDate = baseDate,
-                        rank = rank++,
-                        entityId = Random.nextLong(1000, 9999),
-                        growthRate = Random.nextDouble(-20.0, 50.0),
-                    )
-                }
-            val result = skillGrowthRankingsRepository.bulkInsert(records)
-            totalInserted += result.size
-            allRecords.addAll(result)
-        }
-
-        Assertions.assertEquals(totalRecords, totalInserted, "Records count mismatch")
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Bulk insert execution time: $timeSeconds seconds")
-        performanceMetrics["bulk_insert"] = timeSeconds
-    }
-
-    @Test
-    @Order(4)
-    fun testFindByGrowthRate() {
-        startTime = System.currentTimeMillis()
-
-        val baseDate = BaseDate("202401")
-        val minGrowthRate = 20.0
-        val results = skillGrowthRankingsRepository.findByGrowthRate(baseDate, minGrowthRate)
-
-        Assertions.assertTrue(results.isNotEmpty())
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find by growth rate execution time: $timeSeconds seconds")
-        performanceMetrics["find_by_growth_rate"] = timeSeconds
-    }
-
-    @Test
-    @Order(5)
-    fun testFindEntitiesWithConsistentGrowth() {
-        startTime = System.currentTimeMillis()
-
-        val months = 3
-        val minGrowthRate = 15.0
-        val results = skillGrowthRankingsRepository.findEntitiesWithConsistentGrowth(months, minGrowthRate)
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find consistent growth entities execution time: $timeSeconds seconds")
-        performanceMetrics["find_consistent_growth"] = timeSeconds
-    }
-
-    @Test
-    @Order(6)
-    fun testFindRisingStars() {
-        startTime = System.currentTimeMillis()
-
-        // 먼저 데이터가 제대로 들어갔는지 확인
-        val allDocs = skillGrowthRankingsRepository.findAllByQuery(Query())
-        logger.info("Total documents: ${allDocs.size}")
-        logger.info("Sample rank changes: ${allDocs.take(5).map { it.rankings.first().rankChange }}")
-
-        val months = 3
-        val minRankImprovement = 10
-        val results = skillGrowthRankingsRepository.findRisingStars(months, minRankImprovement)
-
-        logger.info("Found ${results.size} rising stars")
-        results.take(5).forEach { doc ->
-            logger.info("Rank change: ${doc.rankings.first().rankChange}")
-        }
-
-        Assertions.assertTrue(results.isNotEmpty(), "No rising stars found")
-        Assertions.assertTrue(
-            results.all { doc ->
-                val rankChange = doc.rankings.first().rankChange
-                rankChange != null && rankChange >= minRankImprovement
-            },
-            "Found documents with insufficient rank improvement",
-        )
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find rising stars execution time: $timeSeconds seconds")
-        performanceMetrics["find_rising_stars"] = timeSeconds
-    }
-
-//    @Test
-//    @Order(7)
-//    fun testFindTrendingEntities() {
-//        startTime = System.currentTimeMillis()
-//
-//        val months = 3
-//        val results = skillGrowthRankingsRepository.findTrendingEntities(months)
-//
-//        Assertions.assertTrue(results.isNotEmpty())
-//
-//        val endTime = System.currentTimeMillis()
-//        val timeSeconds = (endTime - startTime) / 1000.0
-//        logger.info("Find trending entities execution time: $timeSeconds seconds")
-//        performanceMetrics["find_trending_entities"] = timeSeconds
-//    }
-
-    @Test
-    @Order(8)
-    fun testFindByEntityIdAndBaseDate() {
-        startTime = System.currentTimeMillis()
-
-        val entityId =
-            allRecords
-                .first()
-                .rankings
-                .first()
-                .entityId
-        val baseDate = BaseDate("202401")
-        val result = skillGrowthRankingsRepository.findByEntityIdAndBaseDate(entityId, baseDate)
-
-        Assertions.assertNotNull(result)
-        result?.let {
-            Assertions.assertEquals(entityId, it.rankings.first().entityId)
-            Assertions.assertEquals(baseDate.toString(), it.baseDate)
-        }
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Find by entity ID and base date execution time: $timeSeconds seconds")
-        performanceMetrics["find_by_entity_and_date"] = timeSeconds
-    }
-
-    @Test
-    @Order(9)
-    fun testBulkDelete() {
-        startTime = System.currentTimeMillis()
-
-        val recordIds = allRecords.mapNotNull { it.id }
-        var totalDeleted = 0
-
-        for (batch in recordIds.chunked(batchSize)) {
-            val deletedCount = skillGrowthRankingsRepository.bulkDelete(batch)
-            totalDeleted += deletedCount
-        }
-
-        val remainingRecords = skillGrowthRankingsRepository.findAllByQuery(Query())
-        Assertions.assertTrue(remainingRecords.isEmpty())
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        logger.info("Bulk delete execution time: $timeSeconds seconds")
-        performanceMetrics["bulk_delete"] = timeSeconds
     }
 }

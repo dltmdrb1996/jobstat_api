@@ -1,8 +1,9 @@
 package com.example.jobstat.rankings.repository
 
+import com.example.jobstat.core.base.mongo.ranking.RankingType
 import com.example.jobstat.core.base.repository.SimpleRankingRepository
 import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
-import com.example.jobstat.rankings.model.CompanyGrowthRankingsDocument
+import com.example.jobstat.rankings.document.CompanyGrowthRankingsDocument
 import com.mongodb.client.model.*
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
+@RankingRepositoryType(RankingType.COMPANY_GROWTH)
 @NoRepositoryBean
 interface CompanyGrowthRankingsRepository : SimpleRankingRepository<CompanyGrowthRankingsDocument, CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry, String> {
     // 다각적 성장 분석 (매출, 직원, 시장점유율 모두 성장하는 기업)
