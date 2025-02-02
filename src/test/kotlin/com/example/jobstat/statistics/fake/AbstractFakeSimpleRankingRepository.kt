@@ -2,7 +2,7 @@ package com.example.jobstat.statistics.fake
 
 import com.example.jobstat.core.base.mongo.ranking.SimpleRankingDocument
 import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.rankings.fake.AbstractFakeRankingRepository
+import com.example.jobstat.utils.base.AbstractFakeRankingRepository
 
 abstract class AbstractFakeSimpleRankingRepository<T : SimpleRankingDocument<E>, E : SimpleRankingDocument.SimpleRankingEntry> :
     AbstractFakeRankingRepository<T, E>(),

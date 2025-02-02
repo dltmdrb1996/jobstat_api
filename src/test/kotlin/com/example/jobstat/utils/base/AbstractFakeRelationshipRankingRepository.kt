@@ -1,4 +1,4 @@
-package com.example.jobstat.rankings.fake
+package com.example.jobstat.utils.base
 
 import com.example.jobstat.core.base.mongo.ranking.RelationshipRankingDocument
 import com.example.jobstat.core.base.mongo.ranking.RelationshipRankingDocument.RelatedEntityRank

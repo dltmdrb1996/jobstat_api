@@ -1,4 +1,4 @@
-package com.example.jobstat.statistics.stats.fake
+package com.example.jobstat.utils.base
 
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.base.repository.StatsMongoRepository
