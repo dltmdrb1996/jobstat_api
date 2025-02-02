@@ -1,6 +1,8 @@
 package com.example.jobstat.core.state
 
-enum class CompanySize {
+import java.io.Serializable
+
+enum class CompanySize : Serializable {
     MICRO,
     SMALL,
     MEDIUM,

@@ -5,8 +5,8 @@ import com.example.jobstat.core.base.mongo.ranking.DistributionRankingDocument
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.state.EntityType
-import com.example.jobstat.rankings.document.CompanySizeEducationRankingsDocument
-import com.example.jobstat.rankings.repository.CompanySizeEducationRankingsRepositoryImpl
+import com.example.jobstat.statistics.rankings.document.CompanySizeEducationRankingsDocument
+import com.example.jobstat.statistics.rankings.repository.CompanySizeEducationRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

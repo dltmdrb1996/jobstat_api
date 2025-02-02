@@ -1,6 +1,8 @@
 package com.example.jobstat.core.base.mongo.stats
 
-interface RankingInfo {
+import java.io.Serializable
+
+interface RankingInfo : Serializable {
     val currentRank: Int
     val previousRank: Int?
     val rankChange: Int?

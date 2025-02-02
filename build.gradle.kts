@@ -74,6 +74,8 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // cache
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
     // coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")

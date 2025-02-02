@@ -3,6 +3,17 @@ package com.example.jobstat.core.state
 class BaseDate(
     private var value: String,
 ) {
+    companion object {
+        fun now(): BaseDate {
+            val now = java.time.LocalDate.now()
+            val year = now.year
+//            val month = now.monthValue
+            val month = 1
+            val monthString = if (month < 10) "0$month" else month.toString()
+            return BaseDate("$year$monthString")
+        }
+    }
+
     init {
         require(value.matches("""^\d{4}\d{2}$""".toRegex())) {
             "yearMonth must be in the format 'YYYY-MM'"
