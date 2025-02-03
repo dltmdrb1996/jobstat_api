@@ -5,6 +5,7 @@ import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
+import org.springframework.data.mongodb.core.mapping.Field
 
 @CompoundIndexes(
     CompoundIndex(
@@ -20,4 +21,6 @@ abstract class BaseRankingDocument<T : RankingEntry>(
     open val metrics: RankingMetrics,
     @Transient
     open val rankings: List<T>,
+    @Field("page")
+    val page: Int,
 ) : BaseTimeSeriesDocument(id, baseDate, period)

@@ -1,6 +1,8 @@
 package com.example.jobstat.core.base.mongo.stats
 
-interface BaseStats {
+import java.io.Serializable
+
+interface BaseStats : Serializable {
     val postingCount: Int
     val activePostingCount: Int
     val avgSalary: Long

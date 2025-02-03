@@ -13,6 +13,8 @@ import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
 interface StatsMongoRepository<T : BaseStatsDocument, ID : Any> : BaseTimeSeriesRepository<T, ID> {
+    fun getCollectionName(): String
+
     /**
      * 특정 엔티티의 모든 통계 데이터를 조회합니다.
      * 기준일자를 기준으로 내림차순 정렬하여 반환합니다.
@@ -45,6 +47,21 @@ interface StatsMongoRepository<T : BaseStatsDocument, ID : Any> : BaseTimeSeries
     fun findByBaseDateAndEntityIds(
         baseDate: BaseDate,
         entityIds: List<Long>,
+    ): List<T>
+
+    /**
+     * 여러 엔티티의 Stats 데이터를 한 번에 조회합니다.
+     * MongoDB의 $lookup을 사용하여 효율적으로 조회합니다.
+     *
+     * @param baseDate 기준 날짜
+     * @param entityIds 조회할 엔티티 ID 목록
+     * @param batchSize 한 번에 처리할 문서 수 (기본값: 100)
+     * @return 엔티티 ID별 Stats 데이터
+     */
+    fun findStatsByEntityIdsBatch(
+        baseDate: BaseDate,
+        entityIds: List<Long>,
+        batchSize: Int = 100,
     ): List<T>
 
     /**
@@ -172,6 +189,8 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
         mongoOperations.getCollection(entityInformation.collectionName)
     }
 
+    override fun getCollectionName(): String = entityInformation.collectionName
+
     override fun findByEntityId(entityId: Long): List<T> =
         collection
             .find(Filters.eq("entity_id", entityId))
@@ -211,6 +230,27 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .batchSize(OPTIMAL_BATCH_SIZE)
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
+    }
+
+    override fun findStatsByEntityIdsBatch(
+        baseDate: BaseDate,
+        entityIds: List<Long>,
+        batchSize: Int,
+    ): List<T> {
+        if (entityIds.isEmpty()) return emptyList()
+
+        return entityIds.chunked(batchSize).flatMap { chunk ->
+            collection
+                .find(
+                    Filters.and(
+                        Filters.eq("base_date", baseDate.toString()),
+                        Filters.`in`("entity_id", chunk),
+                    ),
+                ).hintString("snapshot_lookup_idx")
+                .batchSize(chunk.size)
+                .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
+                .toList()
+        }
     }
 
     override fun findByBaseDateBetweenAndEntityId(

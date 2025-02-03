@@ -1,3 +1,5 @@
+ddns.domain: ${DDNS_DOMAIN}
+
 server:
 
   compression:

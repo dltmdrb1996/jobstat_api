@@ -11,7 +11,8 @@ abstract class SimpleRankingDocument<T : SimpleRankingDocument.SimpleRankingEntr
     override val metrics: RankingMetrics,
     @Transient
     override val rankings: List<T>,
-) : BaseRankingDocument<T>(id, baseDate, period, metrics, rankings) {
+    page: Int,
+) : BaseRankingDocument<T>(id, baseDate, period, metrics, rankings, page) {
     interface SimpleRankingEntry : RankingEntry {
         val score: Double
     }

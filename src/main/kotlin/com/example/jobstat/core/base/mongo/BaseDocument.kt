@@ -4,6 +4,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.index.Indexed
 import org.springframework.data.mongodb.core.mapping.Field
 import org.springframework.data.mongodb.core.mapping.FieldType
+import java.io.Serializable
 import java.time.Instant
 
 abstract class BaseDocument(
@@ -16,7 +17,7 @@ abstract class BaseDocument(
     @Indexed(background = true)
     @Field("updatedAt")
     open var updatedAt: Instant = Instant.now(),
-) {
+) : Serializable {
     protected abstract fun validate()
 
     protected fun refreshUpdatedAt() {

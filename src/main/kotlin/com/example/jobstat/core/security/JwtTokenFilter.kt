@@ -39,7 +39,7 @@ class JwtTokenFilter(
     }
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean =
-        shouldNotFilterCache.computeIfAbsent(request.requestURI) { uri ->
+        shouldNotFilterCache.computeIfAbsent("${request.method}:${request.requestURI}") { _ ->
             try {
                 when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
                     null -> false
