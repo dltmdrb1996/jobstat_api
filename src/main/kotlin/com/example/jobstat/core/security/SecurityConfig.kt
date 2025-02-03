@@ -105,8 +105,10 @@ class SecurityConfig(
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type")
         configuration.allowCredentials = true
+
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source
     }
+
 }
