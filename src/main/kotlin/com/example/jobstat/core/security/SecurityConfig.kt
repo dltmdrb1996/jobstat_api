@@ -68,16 +68,14 @@ class SecurityConfig(
                     .contentSecurityPolicy { csp ->
                         csp.policyDirectives(
                             "default-src 'self'; " +
-                                "script-src 'self' https://scripts.jobstatanalysis.com; " +
-                                "style-src 'self' https://styles.jobstatanalysis.com; " +
-                                "img-src 'self' https://images.jobstatanalysis.com data:; " +
-                                "font-src 'self' https://fonts.jobstatanalysis.com; " +
-                                "connect-src 'self' https://api.jobstatanalysis.com; " +
+                                "script-src 'self' https://jobstatanalysis.com; " +
+                                "style-src 'self' 'unsafe-inline' https://jobstatanalysis.com; " +
+                                "img-src 'self' data: https: blob:; " +
+                                "font-src 'self' data: https://cdn.jsdelivr.net; " +
+                                "connect-src 'self' https://jobstatanalysis.com http://jobstatsdbdb.ddns.net:8081; " +
                                 "frame-src 'none'; " +
                                 "object-src 'none'; " +
-                                "base-uri 'self'; " +
-                                "form-action 'self'; " +
-                                "upgrade-insecure-requests;",
+                                "base-uri 'self';",
                         )
                     }
             }.setSharedObject(ForwardedHeaderTransformer::class.java, ForwardedHeaderTransformer())
@@ -90,6 +88,9 @@ class SecurityConfig(
         val configuration = CorsConfiguration()
         configuration.allowedOrigins =
             listOf(
+                "http://jobstatsdbdb.ddns.net:8081",
+                "https://jobstatsdbdb.ddns.net",
+                "http://jobstatsdbdb.ddns.net",
                 "https://www.jobstatanalysis.com",
                 "https://jobstatanalysis.com",
                 "jobstatanalysis.com",
