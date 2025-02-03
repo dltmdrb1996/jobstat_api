@@ -52,6 +52,7 @@ services:
       - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
       - SENTRY_DSN=${SENTRY_DSN}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - DDNS_DOMAIN=${DDNS_DOMAIN}
     networks:
       - public
       - internal

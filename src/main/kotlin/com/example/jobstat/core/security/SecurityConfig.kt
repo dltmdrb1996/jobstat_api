@@ -3,6 +3,7 @@ package com.example.jobstat.core.security
 import com.example.jobstat.core.error.StructuredLogger
 import com.example.jobstat.core.utils.JwtAuthenticationEntryPoint
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
@@ -25,6 +26,10 @@ class SecurityConfig(
 //    private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
     private val objectMapper: ObjectMapper,
 ) {
+
+    @Value("\${ddns.domain}")
+    private lateinit var ddnsDomain: String
+
     private lateinit var permittedUrls: Array<String>
     private val log = StructuredLogger(this::class.java)
 
@@ -72,7 +77,7 @@ class SecurityConfig(
                                 "style-src 'self' 'unsafe-inline' https://jobstatanalysis.com; " +
                                 "img-src 'self' data: https: blob:; " +
                                 "font-src 'self' data: https://cdn.jsdelivr.net; " +
-                                "connect-src 'self' https://jobstatanalysis.com http://jobstatsdbdb.ddns.net:8081; " +
+                                "connect-src 'self' https://jobstatanalysis.com ${ddnsDomain}; " +
                                 "frame-src 'none'; " +
                                 "object-src 'none'; " +
                                 "base-uri 'self';",
@@ -88,9 +93,7 @@ class SecurityConfig(
         val configuration = CorsConfiguration()
         configuration.allowedOrigins =
             listOf(
-                "http://jobstatsdbdb.ddns.net:8081",
-                "https://jobstatsdbdb.ddns.net",
-                "http://jobstatsdbdb.ddns.net",
+                "${ddnsDomain}",
                 "https://www.jobstatanalysis.com",
                 "https://jobstatanalysis.com",
                 "jobstatanalysis.com",

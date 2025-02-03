@@ -49,3 +49,4 @@ jobs:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          DDNS_DOMAIN: ${{ secrets.DDNS_DOMAIN }}
