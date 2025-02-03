@@ -26,7 +26,6 @@ class SecurityConfig(
 //    private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
     private val objectMapper: ObjectMapper,
 ) {
-
     @Value("\${ddns.domain}")
     private lateinit var ddnsDomain: String
 
@@ -77,7 +76,7 @@ class SecurityConfig(
                                 "style-src 'self' 'unsafe-inline' https://jobstatanalysis.com; " +
                                 "img-src 'self' data: https: blob:; " +
                                 "font-src 'self' data: https://cdn.jsdelivr.net; " +
-                                "connect-src 'self' https://jobstatanalysis.com ${ddnsDomain}; " +
+                                "connect-src 'self' https://jobstatanalysis.com $ddnsDomain; " +
                                 "frame-src 'none'; " +
                                 "object-src 'none'; " +
                                 "base-uri 'self';",
@@ -93,7 +92,7 @@ class SecurityConfig(
         val configuration = CorsConfiguration()
         configuration.allowedOrigins =
             listOf(
-                "${ddnsDomain}",
+                "$ddnsDomain",
                 "https://www.jobstatanalysis.com",
                 "https://jobstatanalysis.com",
                 "jobstatanalysis.com",
