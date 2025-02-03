@@ -29,7 +29,8 @@ abstract class RelationshipRankingDocument<T : RelationshipRankingDocument.Relat
     open val relatedEntityType: EntityType,
     @Transient
     override val rankings: List<T>,
-) : BaseRankingDocument<T>(id, baseDate, period, metrics, rankings) {
+    page: Int,
+) : BaseRankingDocument<T>(id, baseDate, period, metrics, rankings, page) {
     interface RelationshipRankingEntry : RankingEntry {
         val primaryEntityId: Long
         val primaryEntityName: String

@@ -1,6 +1,7 @@
 package com.example.jobstat.core.base.mongo.ranking
 
 import org.springframework.data.mongodb.core.mapping.Field
+import java.io.Serializable
 
 data class VolatilityMetrics(
     @Field("avg_rank_change")
@@ -9,4 +10,4 @@ data class VolatilityMetrics(
     val rankChangeStdDev: Double,
     @Field("volatility_trend")
     val volatilityTrend: String,
-)
+) : Serializable

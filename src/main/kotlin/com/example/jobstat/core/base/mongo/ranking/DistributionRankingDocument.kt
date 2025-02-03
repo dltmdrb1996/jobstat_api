@@ -28,7 +28,8 @@ abstract class DistributionRankingDocument<T : DistributionRankingDocument.Distr
     open val targetEntityType: EntityType,
     @Transient
     override val rankings: List<T>,
-) : BaseRankingDocument<T>(id, baseDate, period, metrics, rankings) {
+    page: Int,
+) : BaseRankingDocument<T>(id, baseDate, period, metrics, rankings, page) {
     interface DistributionRankingEntry : RankingEntry {
         val distribution: Map<String, Double>
         val dominantCategory: String

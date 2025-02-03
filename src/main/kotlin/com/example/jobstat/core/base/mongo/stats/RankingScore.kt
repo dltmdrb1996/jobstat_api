@@ -3,6 +3,7 @@ package com.example.jobstat.core.base.mongo.stats
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import org.springframework.data.mongodb.core.mapping.Field
+import java.io.Serializable
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -20,7 +21,7 @@ import org.springframework.data.mongodb.core.mapping.Field
     JsonSubTypes.Type(value = CompanyWorkLifeBalanceScore::class, name = "company_work_life_balance_score"),
     JsonSubTypes.Type(value = EntryLevelFriendlinessScore::class, name = "entry_level_friendliness_score"),
 )
-interface RankingScore {
+interface RankingScore : Serializable {
     val value: Double
 }
 
