@@ -39,8 +39,6 @@ class SkillPostingCountRankingsDocument(
     ) : RankingMetrics
 
     data class SkillPostingRankingEntry(
-        @Field("document_id")
-        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")

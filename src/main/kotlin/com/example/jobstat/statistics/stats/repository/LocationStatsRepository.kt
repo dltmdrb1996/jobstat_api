@@ -2,7 +2,7 @@ package com.example.jobstat.statistics.stats.repository
 
 import com.example.jobstat.core.base.repository.StatsMongoRepository
 import com.example.jobstat.core.base.repository.StatsMongoRepositoryImpl
-import com.example.jobstat.statistics.stats.model.LocationStatsDocument
+import com.example.jobstat.statistics.stats.document.LocationStatsDocument
 import com.example.jobstat.statistics.stats.registry.StatsRepositoryType
 import com.example.jobstat.statistics.stats.registry.StatsType
 import com.mongodb.client.model.Filters

@@ -5,8 +5,8 @@ import java.io.Serializable
 
 data class RankingPage(
     val items: RankingData,
+    val rankedCount: Int,
     val hasNextPage: Boolean,
-    val nextCursor: Int?,
 ) : Serializable
 
 data class RankingData(

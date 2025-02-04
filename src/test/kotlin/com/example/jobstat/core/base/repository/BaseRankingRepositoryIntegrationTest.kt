@@ -332,7 +332,6 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         (0 until batchSize).map { index ->
             val rank = startRank + index
             SkillGrowthRankingsDocument.SkillGrowthRankingEntry(
-                documentId = "doc_$rank",
                 entityId = rank.toLong(),
                 name = "Skill_$rank",
                 rank = rank,

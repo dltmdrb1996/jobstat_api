@@ -69,8 +69,6 @@ class CompanySizeEducationRankingsDocument(
     }
 
     data class CompanySizeEducationRankingEntry(
-        @Field("document_id")
-        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
