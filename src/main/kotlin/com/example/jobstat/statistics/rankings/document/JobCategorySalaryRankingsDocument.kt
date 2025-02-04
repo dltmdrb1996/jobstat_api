@@ -45,7 +45,6 @@ class JobCategorySalaryRankingsDocument(
     }
 
     data class JobCategorySalaryRankingEntry(
-        @Field("document_id") override val documentId: String,
         @Field("entity_id") override val entityId: Long,
         @Field("name") override val name: String,
         @Field("rank") override val rank: Int,

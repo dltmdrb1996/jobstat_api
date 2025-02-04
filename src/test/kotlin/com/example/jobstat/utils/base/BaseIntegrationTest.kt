@@ -32,11 +32,11 @@ import kotlin.system.measureTimeMillis
         "spring.batch.job.enabled=false",
         "batch.chunk-size=2000",
         "batch.max-threads=10",
-        "jwt.secret=01234567890123456789012345678901", // 32자 이상
         "jwt.secret=test-jwt-secret-key-that-is-long-enough-for-hmac-sha256", // 더 길게
         "spring.jpa.hibernate.ddl-auto=create",
         "spring.jpa.show-sql=true",
         "spring.jpa.properties.hibernate.format_sql=true",
+        "ddns.domain=http://localhost:8080", // 테스트용 도메인 추가
     ],
 )
 abstract class BaseIntegrationTest {

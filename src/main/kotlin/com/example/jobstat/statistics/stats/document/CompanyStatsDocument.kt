@@ -1,4 +1,4 @@
-package com.example.jobstat.statistics.stats.model
+package com.example.jobstat.statistics.stats.document
 
 import com.example.jobstat.core.base.mongo.CommonDistribution
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
@@ -103,7 +103,7 @@ class CompanyStatsDocument(
         @Field("growth_rate")
         val growthRate: Double,
         @Field("skill_requirements")
-        val skillRequirements: List<CompanyJobCategory.JobCategorySkillRequirement>,
+        val skillRequirements: List<JobCategorySkillRequirement>,
         @Field("hiring_difficulty_score")
         val hiringDifficultyScore: Double,
         @Field("turnover_rate")
@@ -208,9 +208,9 @@ class CompanyStatsDocument(
         @Field("seasonal_patterns")
         val seasonalPatterns: Map<String, Double>,
         @Field("growth_positions")
-        val growthPositions: List<CompanyHiringTrends.GrowthPosition>,
+        val growthPositions: List<GrowthPosition>,
         @Field("hiring_forecast")
-        val hiringForecast: CompanyHiringTrends.HiringForecast,
+        val hiringForecast: HiringForecast,
     ) : Serializable {
         data class GrowthPosition(
             @Field("job_category_id")

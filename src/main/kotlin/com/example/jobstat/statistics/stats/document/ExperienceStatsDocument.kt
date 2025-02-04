@@ -1,4 +1,4 @@
-package com.example.jobstat.statistics.stats.model
+package com.example.jobstat.statistics.stats.document
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument

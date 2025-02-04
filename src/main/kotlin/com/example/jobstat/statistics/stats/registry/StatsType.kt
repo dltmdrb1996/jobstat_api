@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics.stats.registry
 
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
-import com.example.jobstat.statistics.stats.model.*
+import com.example.jobstat.statistics.stats.document.*
 
 enum class StatsType {
     BENEFIT,
