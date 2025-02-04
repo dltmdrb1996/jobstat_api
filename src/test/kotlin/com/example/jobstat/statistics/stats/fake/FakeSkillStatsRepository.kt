@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics.stats.fake
 
 import com.example.jobstat.statistics.rankings.model.RankingType
-import com.example.jobstat.statistics.stats.model.SkillStatsDocument
+import com.example.jobstat.statistics.stats.document.SkillStatsDocument
 import com.example.jobstat.statistics.stats.repository.SkillStatsRepository
 import com.example.jobstat.utils.base.AbstractFakeStatsRepository
 import org.springframework.data.domain.Example

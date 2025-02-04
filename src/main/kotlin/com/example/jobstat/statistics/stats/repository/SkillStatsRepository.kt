@@ -4,7 +4,7 @@ import com.example.jobstat.core.base.repository.StatsMongoRepository
 import com.example.jobstat.core.base.repository.StatsMongoRepositoryImpl
 import com.example.jobstat.core.utils.StatisticsCalculationUtil
 import com.example.jobstat.statistics.rankings.model.RankingType
-import com.example.jobstat.statistics.stats.model.SkillStatsDocument
+import com.example.jobstat.statistics.stats.document.SkillStatsDocument
 import com.example.jobstat.statistics.stats.registry.StatsRepositoryType
 import com.example.jobstat.statistics.stats.registry.StatsType
 import com.mongodb.client.model.Accumulators

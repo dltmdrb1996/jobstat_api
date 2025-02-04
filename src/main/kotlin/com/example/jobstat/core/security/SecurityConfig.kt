@@ -32,29 +32,6 @@ class SecurityConfig(
     private lateinit var permittedUrls: Array<String>
     private val log = StructuredLogger(this::class.java)
 
-//    private fun initializePermitUrls(): Array<String> {
-//        val publicUrls = buildSet {
-//            add("/error")
-//            add("/actuator/health")
-//
-//            requestMappingHandlerMapping.handlerMethods.forEach { (mapping, method) ->
-//                if (method.hasMethodAnnotation(Public::class.java) ||
-//                    method.beanType.isAnnotationPresent(Public::class.java)) {
-//
-//                    val patterns = mapping.patternValues
-//                    patterns.forEach { pattern ->
-//                        log.info("Adding public URL pattern: $pattern")
-//                        add(pattern)
-//                    }
-//                }
-//            }
-//        }.toTypedArray()
-//
-//        JwtTokenFilter.updatePermitUrls(publicUrls)
-//        log.info("Final Permitted URLs: ${publicUrls.joinToString()}")
-//        return publicUrls
-//    }
-
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
@@ -110,5 +87,4 @@ class SecurityConfig(
         source.registerCorsConfiguration("/**", configuration)
         return source
     }
-
 }
