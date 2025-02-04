@@ -121,8 +121,8 @@ class JobCategoryStatsDocument(
         val preferredRatio: Double,
         @Field("emerging_skill")
         val emergingSkill: Boolean,
-        @Field("skills_correlation")
-        val skillsCorrelation: Map<Long, Double>,
+//        @Field("skills_correlation")
+//        val skillsCorrelation: Map<Long, Double>,
     )
 
     data class JobCategoryCertification(
