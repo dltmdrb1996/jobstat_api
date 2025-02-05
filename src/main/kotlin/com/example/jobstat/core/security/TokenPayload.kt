@@ -2,11 +2,13 @@ package com.example.jobstat.core.security
 
 data class AccessPayload(
     val id: Long,
+    val roles: List<String>,
     val tokenType: TokenType = TokenType.ACCESS_TOKEN,
 )
 
 data class RefreshPayload(
     val id: Long,
+    val roles: List<String>,
     val tokenType: TokenType = TokenType.REFRESH_TOKEN,
 )
 
@@ -20,6 +22,6 @@ enum class TokenType(
     companion object {
         fun fromValue(value: Int): TokenType =
             entries.firstOrNull { it.value == value }
-                ?: throw IllegalArgumentException("Invalid token type value: $value")
+                ?: throw IllegalArgumentException("유효하지 않은 토큰 타입입니다: $value")
     }
 }

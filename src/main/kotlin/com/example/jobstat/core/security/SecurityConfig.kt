@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
@@ -23,13 +25,9 @@ import org.springframework.web.server.adapter.ForwardedHeaderTransformer
 class SecurityConfig(
     private val jwtTokenFilter: JwtTokenFilter,
     private val jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
-//    private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
-    private val objectMapper: ObjectMapper,
 ) {
     @Value("\${ddns.domain}")
     private lateinit var ddnsDomain: String
-
-    private lateinit var permittedUrls: Array<String>
     private val log = StructuredLogger(this::class.java)
 
     @Bean

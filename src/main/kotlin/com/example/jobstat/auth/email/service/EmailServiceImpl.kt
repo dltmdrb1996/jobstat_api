@@ -1,0 +1,38 @@
+package com.example.jobstat.auth.email.service
+
+import com.example.jobstat.core.error.AppException
+import com.example.jobstat.core.error.ErrorCode
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.mail.SimpleMailMessage
+import org.springframework.mail.javamail.JavaMailSender
+import org.springframework.scheduling.annotation.Async
+import org.springframework.stereotype.Service
+
+@Service
+class EmailServiceImpl(
+    private val emailSender: JavaMailSender,
+    @Value("\${spring.mail.username}") private val fromEmail: String,
+) : EmailService {
+    private val log = LoggerFactory.getLogger(javaClass)
+
+    @Async
+    override fun sendVerificationEmail(to: String, code: String) {
+        try {
+            val message = SimpleMailMessage().apply {
+                setFrom(fromEmail)
+                setTo(to)
+                setSubject("[JobStat] 이메일 인증")
+                setText("인증 코드: $code\n30분 안에 인증을 완료해주세요.")
+            }
+            emailSender.send(message)
+            log.info("Verification email sent to: $to")
+        } catch (e: Exception) {
+            log.error("Failed to send verification email to: $to", e)
+            throw AppException.fromErrorCode(
+                ErrorCode.EMAIL_SENDING_FAILURE,
+                "이메일 발송에 실패했습니다."
+            )
+        }
+    }
+}

@@ -7,9 +7,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
 import org.springframework.data.redis.core.StringRedisTemplate
-import kotlin.time.Duration
 
-// @EnableCaching
 @Configuration
 class RedisConfig(
     @Value("\${spring.data.redis.host}") private val host: String,
@@ -31,29 +29,4 @@ class RedisConfig(
     @Bean
     fun stringRedisTemplate(): StringRedisTemplate = StringRedisTemplate(createLettuceConnectionFactory())
 
-//    @Bean
-//    fun cacheManager(redisConnectionFactory: RedisConnectionFactory): RedisCacheManager {
-//        val defaultConfig =
-//            RedisCacheConfiguration
-//                .defaultCacheConfig()
-//                .serializeKeysWith(
-//                    RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer()),
-//                ).serializeValuesWith(
-//                    RedisSerializationContext.SerializationPair.fromSerializer(
-//                        GenericJackson2JsonRedisSerializer(),
-//                    ),
-//                ).entryTtl(defaultTtl)
-//
-//        val cacheConfigurations =
-//            mapOf(
-//                "StatsByEntityIdAndBaseDate" to defaultConfig,
-//                "statsWithRanking" to defaultConfig,
-//            )
-//
-//        return RedisCacheManager
-//            .builder(redisConnectionFactory)
-//            .cacheDefaults(defaultConfig)
-//            .withInitialCacheConfigurations(cacheConfigurations)
-//            .build()
-//    }
 }

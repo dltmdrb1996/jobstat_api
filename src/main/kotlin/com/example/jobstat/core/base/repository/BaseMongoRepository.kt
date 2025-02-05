@@ -16,7 +16,10 @@ import java.time.Instant
 
 @NoRepositoryBean
 interface BaseMongoRepository<T : BaseDocument, ID : Any> : MongoRepository<T, ID> {
-    // Fetch Operations
+    /**
+     * createdAt 인덱스를 활용한 범위 쿼리를 수행합니다
+     * 최적의 성능을 위해 배치 사이즈를 적용합니다
+     */
     fun findByCreatedAtBetween(
         start: Instant,
         end: Instant,
@@ -24,6 +27,9 @@ interface BaseMongoRepository<T : BaseDocument, ID : Any> : MongoRepository<T, I
 
     fun findAllByQuery(query: Query): List<T>
 
+    /**
+     * _id 인덱스를 활용하여 여러 문서를 효율적으로 조회합니다
+     */
     fun bulkFindByIds(ids: List<ID>): List<T>
 
     // Insert Operations
@@ -52,6 +58,10 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
                 .bypassDocumentValidation(true)
     }
 
+    /**
+     * createdAt 인덱스를 활용한 범위 쿼리를 수행합니다
+     * 최적의 성능을 위해 배치 사이즈를 적용합니다
+     */
     override fun findByCreatedAtBetween(
         start: Instant,
         end: Instant,
@@ -72,6 +82,9 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * _id 인덱스를 활용하여 여러 문서를 효율적으로 조회합니다
+     */
     override fun bulkFindByIds(ids: List<ID>): List<T> {
         if (ids.isEmpty()) return emptyList()
 
@@ -88,6 +101,10 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
             .toList()
     }
 
+    /**
+     * 정렬이 요청된 경우 정렬을 적용하고
+     * 그렇지 않은 경우 _id 기준으로 정렬하여 인덱스 스캔을 최적화합니다
+     */
     override fun findAllByQuery(query: Query): List<T> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
         val filter = queryToFilter(query)

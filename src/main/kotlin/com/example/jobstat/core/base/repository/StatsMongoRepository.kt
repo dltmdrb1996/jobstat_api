@@ -16,8 +16,8 @@ interface StatsMongoRepository<T : BaseStatsDocument, ID : Any> : BaseTimeSeries
     fun getCollectionName(): String
 
     /**
-     * 특정 엔티티의 모든 통계 데이터를 조회합니다.
-     * 기준일자를 기준으로 내림차순 정렬하여 반환합니다.
+     * 특정 엔티티의 모든 통계 데이터를 조회합니다
+     * 기준일자를 기준으로 내림차순 정렬하여 반환합니다
      *
      * @param entityId 조회할 엔티티 ID
      * @return 해당 엔티티의 모든 통계 데이터 목록
@@ -88,13 +88,8 @@ interface StatsMongoRepository<T : BaseStatsDocument, ID : Any> : BaseTimeSeries
     fun findLatestStatsByEntityId(entityId: Long): T?
 
     /**
-     * 특정 기간 동안 가장 높은 성장률을 보인 스킬들을 조회합니다.
-     * 성장률을 기준으로 내림차순 정렬하여 상위 N개를 반환합니다.
-     *
-     * @param startDate 시작 날짜
-     * @param endDate 종료 날짜
-     * @param limit 조회할 스킬 수
-     * @return 성장률이 높은 스킬 목록
+     * 특정 기간 동안 가장 높은 성장률을 보인 스킬들을 조회합니다
+     * 성장률을 기준으로 내림차순 정렬하여 상위 N개를 반환합니다
      */
     fun findTopGrowthSkills(
         startDate: BaseDate,

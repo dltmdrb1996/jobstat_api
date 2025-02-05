@@ -32,7 +32,7 @@ class RateLimitAspect {
         if (requests.size >= rateLimit.limit) {
             throw AppException.fromErrorCode(
                 ErrorCode.TOO_MANY_REQUESTS,
-                "Rate limit exceeded. Please try again later.",
+                "요청 한도를 초과했습니다. 잠시 후 다시 시도해주세요.",
             )
         }
 

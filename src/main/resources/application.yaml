@@ -1,7 +1,6 @@
 ddns.domain: ${DDNS_DOMAIN}
 
 server:
-
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/plain
@@ -12,6 +11,17 @@ server:
   forward-headers-strategy: NATIVE
 
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_ID}
+    password: ${GMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   web:
     resources:
       add-mappings: false
@@ -30,8 +40,6 @@ spring:
       enabled: false
   cache:
     type: caffeine
-    caffeine:
-      spec: maximumSize=500,expireAfterWrite=300s
 
 logging:
   level:

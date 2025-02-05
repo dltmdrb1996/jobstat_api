@@ -13,7 +13,7 @@ data class SnapshotPeriod(
 ) : Serializable {
     init {
         require(!startDate.isAfter(endDate)) {
-            "Start date ($startDate) must be before or equal to end date ($endDate)"
+            "시작일($startDate)은 종료일($endDate)보다 이전이거나 같아야 합니다"
         }
     }
 

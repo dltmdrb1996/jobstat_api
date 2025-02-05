@@ -9,7 +9,6 @@ import com.example.jobstat.statistics.rankings.model.*
 import com.example.jobstat.statistics.rankings.repository.RankingRepositoryRegistry
 import com.example.jobstat.statistics.stats.service.StatsAnalysisService
 import org.slf4j.LoggerFactory
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 interface RankingAnalysisService {
@@ -77,11 +76,6 @@ class RankingAnalysisServiceImpl(
 
     private val logger = LoggerFactory.getLogger(RankingAnalysisServiceImpl::class.java)
 
-    @Cacheable(
-        cacheNames = ["statsWithRanking"],
-        key = "#rankingType + ':' + #baseDate + ':' + #page",
-        unless = "#result == null",
-    )
     override fun <T : BaseStatsDocument> findStatsWithRanking(
         rankingType: RankingType,
         baseDate: BaseDate,

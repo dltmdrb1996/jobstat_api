@@ -24,6 +24,11 @@ enum class ErrorCode(
     INVALID_REQUEST_BODY("C007", "유효하지 않은 요청 본문입니다", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
     CONSTRAINT_VIOLATION("C008", "제약 조건 위반입니다", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
     TOO_MANY_REQUESTS("C009", "요청이 너무 많습니다", HttpStatus.TOO_MANY_REQUESTS, AppExceptionType.CLIENT_ERROR),
+    VERIFICATION_CODE_ALREADY_SENT("C010", "이미 발송된 인증 코드가 있습니다. 잠시 후 다시 시도해주세요.", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
+    VERIFICATION_NOT_FOUND("C011", "인증 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND, AppExceptionType.CLIENT_ERROR),
+    VERIFICATION_EXPIRED("C012", "만료된 인증 코드입니다.", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
+    INVALID_VERIFICATION_CODE("C013", "잘못된 인증 코드입니다.", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
+
 
     // 서버 오류
     INTERNAL_ERROR("S001", "내부 서버 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
@@ -31,6 +36,8 @@ enum class ErrorCode(
     EXTERNAL_SERVICE_ERROR("S003", "외부 서비스 호출에 실패했습니다", HttpStatus.SERVICE_UNAVAILABLE, AppExceptionType.SERVER_ERROR),
     SQL_SYNTAX_ERROR("S004", "SQL 구문 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
     TRANSACTION_ERROR("S005", "트랜잭션 처리 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
+    EMAIL_SENDING_FAILURE("S006", "이메일 발송에 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
+
 }
 
 open class AppException private constructor(
