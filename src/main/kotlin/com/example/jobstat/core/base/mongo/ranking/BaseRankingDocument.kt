@@ -7,6 +7,8 @@ import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Field
 
+// 순위 정보를 저장하는 기본 문서 클래스
+// 순위 조회를 위한 인덱스를 포함합니다
 @CompoundIndexes(
     CompoundIndex(
         name = "rank_lookup_idx",

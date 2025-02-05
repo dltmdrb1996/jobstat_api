@@ -10,8 +10,17 @@ import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
 interface BaseTimeSeriesRepository<T : BaseTimeSeriesDocument, ID : Any> : BaseMongoRepository<T, ID> {
+    /**
+     * 특정 기준일자의 데이터를 조회합니다
+     * @param baseDate 조회할 기준일자
+     */
     fun findByBaseDate(baseDate: BaseDate): T?
 
+    /**
+     * 지정된 기간의 데이터를 조회합니다
+     * @param startDate 시작일
+     * @param endDate 종료일
+     */
     fun findByBaseDateBetween(
         startDate: BaseDate,
         endDate: BaseDate,

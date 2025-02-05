@@ -2,7 +2,7 @@ package com.example.jobstat.statistics.rankings.usecase
 
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.usecase.UseCase
 import com.example.jobstat.statistics.rankings.model.RankingType
 import com.example.jobstat.statistics.rankings.model.RankingWithStats
 import com.example.jobstat.statistics.rankings.model.toStatsType
@@ -10,17 +10,32 @@ import com.example.jobstat.statistics.rankings.service.RankingAnalysisService
 import com.example.jobstat.statistics.stats.document.*
 import com.example.jobstat.statistics.stats.registry.StatsType
 import jakarta.transaction.Transactional
+import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
 class GetRankingWithStats(
     private val rankingAnalysisService: RankingAnalysisService,
-    validator: Validator,
-) : ValidUseCase<GetRankingWithStats.Request, GetRankingWithStats.Response<*>>(validator) {
+    private val validator: Validator,
+) : UseCase<GetRankingWithStats.Request, GetRankingWithStats.Response<*>> {
+    @Cacheable(
+        cacheNames = ["statsWithRanking"],
+        key = "#request.rankingType + ':' + #request.baseDate + ':' + #request.page",
+        unless = "#result == null",
+    )
+    override operator fun invoke(request: Request): Response<*> {
+        val violations = validator.validate(request)
+        if (violations.isNotEmpty()) {
+            throw ConstraintViolationException(violations)
+        }
+        return execute(request)
+    }
+
     @Transactional
-    override fun execute(request: Request): Response<*> {
+    fun execute(request: Request): Response<*> {
         val statsType: StatsType = request.rankingType.toStatsType()
 
         return when (statsType) {

@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.util.*
+import javax.crypto.SecretKey
 
 @Component
 class JwtTokenGenerator(
@@ -13,35 +14,40 @@ class JwtTokenGenerator(
     @Value("\${jwt.accessTokenExpiration}") private val accessTokenExpiration: Int,
     @Value("\${jwt.refreshTokenExpiration}") private val refreshTokenExpiration: Int,
 ) {
-    private val key = Keys.hmacShaKeyFor(secret.toByteArray())
 
-    fun createAccessToken(payload: AccessPayload): String = createToken(payload.id, payload.tokenType, accessTokenExpiration)
+    private companion object {
+        private val HEADER_MAP: Map<String, Any> = mapOf(
+            "typ" to "JWT",
+            "alg" to "HS256"
+        )
+    }
 
-    fun createRefreshToken(payload: RefreshPayload): String = createToken(payload.id, payload.tokenType, refreshTokenExpiration)
+    private val key : SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
+
+    fun createAccessToken(payload: AccessPayload): String =
+        createToken(payload.id, payload.roles, payload.tokenType, accessTokenExpiration)
+
+    fun createRefreshToken(payload: RefreshPayload): String =
+        createToken(payload.id, payload.roles, payload.tokenType, refreshTokenExpiration)
 
     fun getRefreshTokenExpiration(): Long = refreshTokenExpiration.toLong()
 
     private fun createToken(
         id: Long,
+        roles: List<String>,
         tokenType: TokenType,
         expirationInSeconds: Int,
     ): String {
-        val headerMap: MutableMap<String, Any> = HashMap()
-        headerMap["typ"] = "JWT"
-        headerMap["alg"] = "HS256"
+        val now = System.currentTimeMillis()
+        val expiration = now + (expirationInSeconds * 1000)
 
-        val claims: MutableMap<String, Any?> = HashMap()
-        claims["userId"] = id
-        claims["tokenType"] = tokenType.value
-
-        val now = Date()
-        val expiration = Date(now.time + expirationInSeconds * 1000)
-
-        return Jwts
-            .builder()
-            .setHeader(headerMap)
-            .setClaims(claims)
-            .setExpiration(expiration)
+        return Jwts.builder()
+            .setHeader(HEADER_MAP)
+            .claim("userId", id)
+            .claim("tokenType", tokenType.value)
+            .claim("roles", roles)
+            .setIssuedAt(Date(now))
+            .setExpiration(Date(expiration))
             .signWith(key, SignatureAlgorithm.HS256)
             .compact()
     }

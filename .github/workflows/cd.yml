@@ -123,6 +123,8 @@ jobs:
             REDIS_HOST=${{ secrets.REDIS_HOST }}
             CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
             DDNS_DOMAIN=${{ secrets.DDNS_DOMAIN }}
+            GMAIL_ID=${{ secrets.GMAIL_ID }}
+            GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}
             EOL
             
             chmod 600 .env

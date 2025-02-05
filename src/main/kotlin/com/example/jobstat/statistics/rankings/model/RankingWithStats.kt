@@ -9,7 +9,7 @@ data class RakingWithStatsPage<T : BaseStatsDocument>(
     val hasNextPage: Boolean,
 )
 
-data class RankingWithStats<T : BaseStatsDocument>(
+data class RankingWithStats<T : Any>(
     val ranking: RankingEntry,
     val stat: T,
 )

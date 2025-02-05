@@ -50,3 +50,5 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
           DDNS_DOMAIN: ${{ secrets.DDNS_DOMAIN }}
+          GMAIL_ID: ${{ secrets.GMAIL_ID }}
+          GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
