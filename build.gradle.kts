@@ -84,6 +84,9 @@ dependencies {
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
+    // Spring Boot Mail
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
     // Additional Libraries
     implementation("org.hibernate.validator:hibernate-validator")
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")

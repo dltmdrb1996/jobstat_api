@@ -3,12 +3,16 @@ package com.example.jobstat.core.security
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.error.StructuredLogger
+import com.example.jobstat.core.security.annotation.AdminAuth
 import com.example.jobstat.core.security.annotation.Public
+import com.example.jobstat.auth.user.entity.RoleData
+import com.example.jobstat.auth.user.service.UserService
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -21,21 +25,27 @@ class JwtTokenFilter(
     private val jwtTokenParser: JwtTokenParser,
     private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
     private val objectMapper: ObjectMapper,
+    private val userService: UserService,
 ) : OncePerRequestFilter() {
     private val log = StructuredLogger(this::class.java)
     private val errorResponseCache = ConcurrentHashMap<String, String>()
     private val shouldNotFilterCache = ConcurrentHashMap<String, Boolean>()
+    private val adminCheckCache = ConcurrentHashMap<String, Boolean>()
 
     companion object {
         private const val BEARER_PREFIX = "Bearer "
-        private const val JWT_TOKEN_MISSING = "허용되지 않은 접근입니다"
-        private const val JWT_TOKEN_VALIDATION_ERROR = "보안 검증 중 오류가 발생했습니다"
+        private const val JWT_TOKEN_MISSING = "인증 토큰이 필요합니다"
+        private const val JWT_TOKEN_VALIDATION_ERROR = "인증 토큰 검증에 실패했습니다"
+
+        // AdminAuth 체크 실패 시 반환할 에러 메시지
+        private const val JWT_ADMIN_AUTH_ERROR = "관리자 권한이 필요합니다"
     }
 
     init {
         // 알려진 에러 케이스들을 미리 캐시
         cacheErrorResponse(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_MISSING)
         cacheErrorResponse(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_VALIDATION_ERROR)
+        cacheErrorResponse(ErrorCode.AUTHENTICATION_FAILURE, JWT_ADMIN_AUTH_ERROR)
     }
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean =
@@ -43,10 +53,24 @@ class JwtTokenFilter(
             try {
                 when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
                     null -> false
-                    is HandlerMethod -> {
-                        handler.hasMethodAnnotation(Public::class.java) ||
+                    is HandlerMethod -> handler.hasMethodAnnotation(Public::class.java) ||
                             handler.beanType.isAnnotationPresent(Public::class.java)
-                    }
+
+                    else -> false
+                }
+            } catch (ex: Exception) {
+                false
+            }
+        }
+
+    private fun checkAdminAuth(request: HttpServletRequest): Boolean =
+        adminCheckCache.computeIfAbsent("${request.method}:${request.requestURI}") { _ ->
+            try {
+                when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
+                    null -> false
+                    is HandlerMethod -> handler.hasMethodAnnotation(AdminAuth::class.java) ||
+                            handler.beanType.isAnnotationPresent(AdminAuth::class.java)
+
                     else -> false
                 }
             } catch (ex: Exception) {
@@ -59,7 +83,7 @@ class JwtTokenFilter(
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        log.info("doFilterInternal ${request.requestURI}")
+        log.info("JWT 필터 처리 시작: ${request.requestURI}")
         if (shouldNotFilter(request)) {
             filterChain.doFilter(request, response)
             return
@@ -68,25 +92,43 @@ class JwtTokenFilter(
         try {
             getJwtFromRequest(request)?.let { jwt ->
                 val accessPayload = jwtTokenParser.validateToken(jwt)
-                val authentication = UsernamePasswordAuthenticationToken(accessPayload.id, null, emptyList())
-                SecurityContextHolder.getContext().authentication = authentication
+
+                if (checkAdminAuth(request)) {
+                    val isAdmin = accessPayload.roles.contains(RoleData.ADMIN.name)
+                    if(!isAdmin) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_ADMIN_AUTH_ERROR)
+
+                    SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
+                        accessPayload.id,
+                        null,
+                        listOf(SimpleGrantedAuthority("ROLE_${RoleData.ADMIN.name}"))
+                    )
+                } else {
+                    // 그 외의 경우는 토큰 검증만 하고 기본 인증 정보만 설정
+                    SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
+                        accessPayload.id,
+                        null,
+                        emptyList()
+                    )
+                }
             } ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_MISSING)
         } catch (ex: AppException) {
-            log.error("JWT 토큰 검증 실패", ex)
+            log.error("JWT 토큰 검증에 실패했습니다", ex)
             sendErrorResponse(response, ex)
             return
         } catch (ex: Exception) {
-            log.error("JWT 토큰 검증 중 오류 발생", ex)
+            log.error("JWT 토큰 처리 중 오류가 발생했습니다", ex)
             sendErrorResponse(
                 response,
                 AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_VALIDATION_ERROR),
             )
             return
         }
+
         filterChain.doFilter(request, response)
     }
 
-    private fun getJwtFromRequest(request: HttpServletRequest): String? = request.getHeader("Authorization")?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_PREFIX.length)
+    private fun getJwtFromRequest(request: HttpServletRequest): String? =
+        request.getHeader("Authorization")?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_PREFIX.length)
 
     private fun sendErrorResponse(
         response: HttpServletResponse,

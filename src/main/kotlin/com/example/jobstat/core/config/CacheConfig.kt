@@ -5,15 +5,13 @@ import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.caffeine.CaffeineCache
 import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.annotation.Scheduled
+import org.springframework.context.annotation.Primary
 import java.time.Duration
 
-@EnableScheduling
+// @EnableScheduling
 @EnableCaching
 @Configuration
 class CacheConfig : CachingConfigurer {
@@ -22,6 +20,8 @@ class CacheConfig : CachingConfigurer {
     companion object {
         private const val STATS_CACHE_SIZE = 2000L
         private const val RANKING_CACHE_SIZE = 100L
+        private const val LOGIN_ATTEMPTS_CACHE_SIZE = 10000L
+        private val LOGIN_ATTEMPT_EXPIRE = Duration.ofMinutes(30)
         private val EXPIRE_AFTER_ACCESS = Duration.ofDays(1)
     }
 
@@ -58,26 +58,36 @@ class CacheConfig : CachingConfigurer {
                     .recordStats()
                     .build()
 
-            val cacheNames = setOf("StatsByEntityIdAndBaseDate", "statsWithRanking")
+            caches["loginAttempts"] =
+                Caffeine
+                    .newBuilder()
+                    .maximumSize(LOGIN_ATTEMPTS_CACHE_SIZE)
+                    .expireAfterWrite(LOGIN_ATTEMPT_EXPIRE)
+                    .recordStats()
+                    .build()
+
+            val cacheNames = setOf("StatsByEntityIdAndBaseDate", "statsWithRanking", "loginAttempts")
             setCacheNames(cacheNames)
         }
     }
 
-    @Scheduled(fixedRate = 1000)
-    fun logCacheStats() {
-        val cacheManager = cacheManager()
-        cacheManager.cacheNames.forEach { cacheName ->
-            val cache = cacheManager.getCache(cacheName)
-            if (cache is CaffeineCache) {
-                val stats = cache.nativeCache.stats()
-                log.info("""
-                    Cache '$cacheName' Stats:
-                    - Hits: ${stats.hitCount()}
-                    - Misses: ${stats.missCount()}
-                    - Hit Rate: ${String.format("%.2f", stats.hitRate() * 100)}%
-                    - Evictions: ${stats.evictionCount()}
-                """.trimIndent())
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 1000)
+//    fun logCacheStats() {
+//        val cacheManager = cacheManager()
+//        cacheManager.cacheNames.forEach { cacheName ->
+//            val cache = cacheManager.getCache(cacheName)
+//            if (cache is CaffeineCache) {
+//                val stats = cache.nativeCache.stats()
+//                log.info(
+//                    """
+//                    Cache '$cacheName' Stats:
+//                    - Hits: ${stats.hitCount()}
+//                    - Misses: ${stats.missCount()}
+//                    - Hit Rate: ${String.format("%.2f", stats.hitRate() * 100)}%
+//                    - Evictions: ${stats.evictionCount()}
+//                    """.trimIndent(),
+//                )
+//            }
+//        }
+//    }
 }

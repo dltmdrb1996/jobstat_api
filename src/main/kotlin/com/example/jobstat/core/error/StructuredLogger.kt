@@ -5,11 +5,21 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import java.util.UUID
 
+/**
+ * 구조화된 로깅을 위한 래퍼 클래스
+ * 로그 이벤트에 대한 추가 정보와 컨텍스트를 포함합니다
+ */
 class StructuredLogger(
     private val clazz: Class<*>,
 ) {
     private val logger = LoggerFactory.getLogger(clazz)
 
+    /**
+     * 에러 수준의 로그를 기록합니다
+     * @param message 로그 메시지
+     * @param ex 예외 객체 (선택사항)
+     * @param additionalInfo 추가 정보 맵 (선택사항)
+     */
     fun error(
         message: String,
         ex: Throwable? = null,
