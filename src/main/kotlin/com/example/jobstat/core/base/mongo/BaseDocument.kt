@@ -20,9 +20,9 @@ abstract class BaseDocument(
     @Field("updatedAt")
     open var updatedAt: Instant = Instant.now(),
 ) : Serializable {
-    protected abstract fun validate()
+    protected abstract fun validate() // 검증 메서드
 
-    protected fun refreshUpdatedAt() {
+    protected fun refreshUpdatedAt() { // 수정일시 갱신
         updatedAt = Instant.now()
     }
 

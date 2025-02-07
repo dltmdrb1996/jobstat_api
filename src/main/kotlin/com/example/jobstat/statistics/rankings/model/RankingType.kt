@@ -88,7 +88,7 @@ fun Class<*>.toRankingType(): RankingType =
         "SkillGrowthRankingsDocument" -> RankingType.SKILL_GROWTH
         "SkillPostingCountRankingsDocument" -> RankingType.SKILL_POSTING_COUNT
         "SkillSalaryRankingsDocument" -> RankingType.SKILL_SALARY
-        else -> throw IllegalArgumentException("Unknown ranking document type: $simpleName")
+        else -> throw IllegalArgumentException("알 수 없는 랭킹 문서 타입입니다: $simpleName")
     }
 
 // 반대로 RankingType을 Document 클래스로 변환하는 함수도 추가
@@ -116,7 +116,7 @@ fun RankingType.toDocumentClassName(): String =
         RankingType.SKILL_GROWTH -> "SkillGrowthRankingsDocument"
         RankingType.SKILL_POSTING_COUNT -> "SkillPostingCountRankingsDocument"
         RankingType.SKILL_SALARY -> "SkillSalaryRankingsDocument"
-        else -> throw IllegalArgumentException("No corresponding document class for ranking type: $this")
+        else -> throw IllegalArgumentException("해당 랭킹 타입에 대응하는 문서 클래스가 없습니다: $this")
     }
 
 fun RankingType.toStatsType(): StatsType =

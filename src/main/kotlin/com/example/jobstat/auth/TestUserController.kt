@@ -1,8 +1,8 @@
 package com.example.jobstat.auth
 
-import ApiResponse
 import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.security.annotation.Public
+import com.example.jobstat.core.wrapper.ApiResponse
 import org.springframework.context.annotation.Profile
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -66,9 +66,9 @@ class TestUserController {
     }
 
     enum class ActivityType {
-        POST_CREATED,
-        COMMENT_ADDED,
-        PROFILE_UPDATED,
+        POST_CREATED, // 게시물 작성됨
+        COMMENT_ADDED, // 댓글 추가됨
+        PROFILE_UPDATED, // 프로필 업데이트됨
     }
 
     data class User(

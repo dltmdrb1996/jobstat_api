@@ -13,6 +13,6 @@ data class Salary(
     val avg: String?,
 ) {
     init {
-        require(min <= max) { "Minimum salary must be less than or equal to maximum salary" }
+        require(min <= max) { "최소 급여는 최대 급여보다 작거나 같아야 합니다" }
     }
 }

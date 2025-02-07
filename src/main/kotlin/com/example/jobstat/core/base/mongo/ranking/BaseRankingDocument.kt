@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 // 순위 조회를 위한 인덱스를 포함합니다
 @CompoundIndexes(
     CompoundIndex(
-        name = "rank_lookup_idx",
+        name = "rank_lookup_idx", // 순위 조회 인덱스
         def = "{'base_date': -1, 'rankings.rank': 1}",
     ),
 )

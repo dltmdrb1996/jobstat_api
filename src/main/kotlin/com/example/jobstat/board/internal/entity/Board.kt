@@ -1,53 +1,78 @@
 package com.example.jobstat.board.internal.entity
 
-import com.example.jobstat.core.base.SoftDeleteBaseEntity
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.base.BaseEntity
 import jakarta.persistence.*
+import java.time.LocalDateTime
+
+interface ReadBoard {
+    val id: Long
+    val title: String
+    val content: String
+    val author: String
+    val password: String?
+    val viewCount: Int
+    val likeCount: Int
+    val category: ReadBoardCategory
+    val comments: List<ReadComment>
+    val createdAt: LocalDateTime
+    val updatedAt: LocalDateTime
+}
 
 @Entity
 @Table(name = "boards")
-class Board(
+class Board protected constructor(
     title: String,
     content: String,
     author: String,
-) : SoftDeleteBaseEntity() {
+    password: String?,
+    category: BoardCategory,
+) : BaseEntity(),
+    ReadBoard {
     @Column(nullable = false, length = 100)
-    var title: String = title
+    override var title: String = title
         protected set
 
     @Column(nullable = false, length = 5000)
-    var content: String = content
+    override var content: String = content
+        protected set
+
+    @Column(nullable = false, length = 50)
+    override var author: String = author
+        protected set
+
+    @Column(length = 60)
+    override var password: String? = password
         protected set
 
     @Column(nullable = false)
-    var author: String = author
+    override var viewCount: Int = 0
         protected set
 
     @Column(nullable = false)
-    var viewCount: Int = 0
+    override var likeCount: Int = 0
         protected set
 
-    @Column(nullable = false)
-    var likeCount: Int = 0
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    override var category: BoardCategory = category
         protected set
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "category_id")
-    var category: BoardCategory? = null
+    @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true)
+    override var comments: MutableList<Comment> = mutableListOf()
         protected set
 
-    @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    private val _comments: MutableList<Comment> = mutableListOf()
-    val comments: List<Comment>
-        get() = _comments
+    fun updateContent(
+        newTitle: String,
+        newContent: String,
+    ) {
+        require(newTitle.isNotBlank() && newTitle.length <= 100) { "제목은 1자에서 100자 사이여야 합니다" }
+        require(newContent.isNotBlank() && newContent.length <= 5000) { "내용은 1자에서 5000자 사이여야 합니다" }
+        this.title = newTitle
+        this.content = newContent
+    }
 
-    @PrePersist
-    @PreUpdate
-    fun validate() {
-        if (title.isBlank() || content.isBlank() || author.isBlank()) {
-            throw AppException.fromErrorCode(ErrorCode.INVALID_ARGUMENT, "제목, 내용, 작성자는 비어있을 수 없습니다.")
-        }
+    fun addComment(comment: Comment) {
+        comments.add(comment)
     }
 
     fun incrementViewCount() {
@@ -58,19 +83,20 @@ class Board(
         likeCount++
     }
 
-    fun updateContent(
-        newTitle: String,
-        newContent: String,
-    ) {
-        this.title = newTitle
-        this.content = newContent
-    }
-
     companion object {
         fun create(
             title: String,
             content: String,
             author: String,
-        ): Board = Board(title, content, author)
+            password: String?,
+            category: BoardCategory,
+        ): Board {
+            require(title.isNotBlank()) { "제목은 비워둘 수 없습니다" }
+            require(title.length <= 100) { "제목은 1자에서 100자 사이여야 합니다" }
+            require(content.isNotBlank()) { "내용은 비워둘 수 없습니다" }
+            require(content.length <= 5000) { "내용은 1자에서 5000자 사이여야 합니다" }
+            require(author.isNotBlank()) { "작성자는 비워둘 수 없습니다" }
+            return Board(title, content, author, password, category)
+        }
     }
 }

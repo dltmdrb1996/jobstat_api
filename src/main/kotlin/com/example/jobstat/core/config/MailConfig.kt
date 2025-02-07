@@ -9,11 +9,10 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.scheduling.annotation.EnableAsync
 
 @Configuration
-@EnableAsync  // @Async 어노테이션 활성화
+@EnableAsync // @Async 어노테이션 활성화
 class MailConfig(
     private val environment: Environment,
 ) {
-
     private val isProd = environment.activeProfiles.contains("prod")
 
     @Bean
@@ -33,7 +32,7 @@ class MailConfig(
         props["mail.transport.protocol"] = "smtp"
         props["mail.smtp.auth"] = "true"
         props["mail.smtp.starttls.enable"] = "true"
-        if(!isProd) props["mail.debug"] = "true"  // 디버그 모드 활성화
+        if (!isProd) props["mail.debug"] = "true" // 디버그 모드 활성화
 
         return mailSender
     }

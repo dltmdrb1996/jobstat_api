@@ -9,17 +9,15 @@ import org.springframework.stereotype.Service
 internal class EmailVerificationServiceImpl(
     private val emailVerificationRepository: EmailVerificationRepository,
 ) : EmailVerificationService {
-
     override fun create(email: String): EmailVerification {
         val verification = EmailVerification.create(email)
         return emailVerificationRepository.save(verification)
     }
 
-    override fun findLatestByEmail(email: String): EmailVerification? {
-        return emailVerificationRepository.findLatestByEmail(email)
-    }
+    override fun findLatestByEmail(email: String): EmailVerification? = emailVerificationRepository.findLatestByEmail(email)
 
-    override fun matchesCode(verification: ReadEmailVerification, code: String): Boolean {
-        return verification.code == code && verification.isValid()
-    }
+    override fun matchesCode(
+        verification: ReadEmailVerification,
+        code: String,
+    ): Boolean = verification.code == code && verification.isValid()
 }

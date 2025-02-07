@@ -32,4 +32,18 @@ interface UserService {
     fun getUserWithRoles(id: Long): ReadUser
 
     fun getUserRoles(id: Long): List<String>
+
+    fun activateUser(id: Long)
+
+    fun deactivateUser(id: Long)
+
+    fun updatePassword(
+        userId: Long,
+        newPassword: String,
+    )
+
+    fun updateEmail(
+        userId: Long,
+        newEmail: String,
+    )
 }

@@ -16,7 +16,7 @@ class BaseDate(
 
     init {
         require(value.matches("""^\d{4}\d{2}$""".toRegex())) {
-            "yearMonth must be in the format 'YYYY-MM'"
+            "연월은 'YYYY-MM' 형식이어야 합니다"
         }
     }
 

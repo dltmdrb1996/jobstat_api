@@ -1,6 +1,8 @@
 package com.example.jobstat.core.extension
 
 import kotlinx.coroutines.delay
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.web.servlet.function.ServerRequest
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -11,7 +13,6 @@ import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
 
-// hashMap to jsonString don't use objectMapper.writeValueAsString
 fun Map<*, *>.toJsonString(): String {
     val sb = StringBuilder()
     sb.append("{")
@@ -154,3 +155,10 @@ suspend fun <T> withRetry(
     }
     throw IllegalStateException("This line should never be reached")
 }
+
+fun <T, R> Page<T>.map(converter: (T) -> R): Page<R> =
+    PageImpl(
+        content.map(converter),
+        pageable,
+        totalElements,
+    )

@@ -110,8 +110,8 @@ class LocationSalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
-        require(rankings.all { it.salaryMetrics.nominalAvgSalary > 0 }) { "Nominal salary must be positive" }
-        require(rankings.all { it.salaryMetrics.adjustedAvgSalary > 0 }) { "Adjusted salary must be positive" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.all { it.salaryMetrics.nominalAvgSalary > 0 }) { "명목 평균 급여는 양수여야 합니다" }
+        require(rankings.all { it.salaryMetrics.adjustedAvgSalary > 0 }) { "조정된 평균 급여는 양수여야 합니다" }
     }
 }

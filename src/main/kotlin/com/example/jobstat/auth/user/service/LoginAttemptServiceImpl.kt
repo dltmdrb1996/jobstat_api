@@ -10,8 +10,9 @@ import java.time.Instant
 class LoginAttemptServiceImpl(
     cacheManager: CacheManager,
 ) : LoginAttemptService {
-    val cache: Cache = cacheManager.getCache("loginAttempts")
-        ?: throw IllegalStateException("Cache 'loginAttempts' not found")
+    val cache: Cache =
+        cacheManager.getCache("loginAttempts")
+            ?: throw IllegalStateException("Cache 'loginAttempts' not found")
 
     companion object {
         private const val MAX_ATTEMPTS = 5
@@ -20,13 +21,17 @@ class LoginAttemptServiceImpl(
 
     override fun recordFailedAttempt(username: String) {
         val attempts = getAttempts(username)
-        val attemptInfo = LoginAttemptInfo(
-            count = attempts.count + 1,
-            lastFailedAt = Instant.now(),
-            blockedUntil = if (attempts.count + 1 >= MAX_ATTEMPTS) {
-                Instant.now().plus(BLOCK_DURATION)
-            } else null
-        )
+        val attemptInfo =
+            LoginAttemptInfo(
+                count = attempts.count + 1,
+                lastFailedAt = Instant.now(),
+                blockedUntil =
+                    if (attempts.count + 1 >= MAX_ATTEMPTS) {
+                        Instant.now().plus(BLOCK_DURATION)
+                    } else {
+                        null
+                    },
+            )
         cache.put(username, attemptInfo)
     }
 
@@ -53,6 +58,6 @@ class LoginAttemptServiceImpl(
     data class LoginAttemptInfo(
         val count: Int,
         val lastFailedAt: Instant?,
-        val blockedUntil: Instant?
+        val blockedUntil: Instant?,
     )
 }

@@ -16,21 +16,21 @@ import org.springframework.stereotype.Repository
 @RankingRepositoryType(RankingType.JOB_CATEGORY_SALARY)
 @NoRepositoryBean
 interface JobCategorySalaryRankingsRepository : SimpleRankingRepository<JobCategorySalaryRankingsDocument, JobCategorySalaryRankingsDocument.JobCategorySalaryRankingEntry, String> {
-    // 산업별 급여 비교 분석
+    // 생활비 조정 급여 분석
     fun findSalaryByIndustry(
         baseDate: String,
         industryId: Long,
         minMarketPosition: Double,
     ): List<JobCategorySalaryRankingsDocument>
 
-    // 경력별 프리미엄 분석
+    // 원격 근무 영향도 분석
     fun findByExperienceImpact(
         baseDate: String,
         experienceLevel: String,
         minPremium: Double,
     ): List<JobCategorySalaryRankingsDocument>
 
-    // 기업 규모별 급여 편차 분석
+    // 지역별 산업 집중도 분석
     fun findBySizeVariance(
         baseDate: String,
         companySize: String,

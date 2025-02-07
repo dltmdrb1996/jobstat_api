@@ -71,8 +71,8 @@ class JobCategorySalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
-        require(rankings.all { it.avgSalary > 0 }) { "Average salary must be positive" }
-        require(rankings.all { it.medianSalary > 0 }) { "Median salary must be positive" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.all { it.avgSalary > 0 }) { "평균 급여는 양수여야 합니다" }
+        require(rankings.all { it.medianSalary > 0 }) { "중간값 급여는 양수여야 합니다" }
     }
 }

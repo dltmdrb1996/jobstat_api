@@ -8,12 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Field
 
 @CompoundIndexes(
     CompoundIndex(
-        name = "reference_lookup_idx",
+        name = "reference_lookup_idx", // 참조 조회 인덱스
         def = "{'reference_id': 1, 'entity_type': 1}",
         unique = true,
     ),
     CompoundIndex(
-        name = "status_lookup_idx",
+        name = "status_lookup_idx", // 상태 조회 인덱스
         def = "{'entity_type': 1, 'status': 1}",
     ),
 )

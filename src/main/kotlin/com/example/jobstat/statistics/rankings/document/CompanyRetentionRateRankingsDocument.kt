@@ -137,11 +137,11 @@ class CompanyRetentionRateRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
         require(
             rankings.all {
                 it.retentionDetails.overallRetention in 0.0..100.0
             },
-        ) { "Retention rate must be between 0 and 100 percent" }
+        ) { "유지율은 0에서 100 퍼센트 사이여야 합니다" }
     }
 }

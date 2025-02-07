@@ -97,11 +97,11 @@ class IndustryGrowthRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
         require(
             rankings.all {
                 it.growthAnalysis.revenueGrowth >= -100.0
             },
-        ) { "Revenue growth cannot be less than -100%" }
+        ) { "매출 성장률은 -100% 미만이 될 수 없습니다" }
     }
 }

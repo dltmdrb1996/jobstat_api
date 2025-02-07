@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 @Profile("dev") // dev 프로파일에서만 활성화
 internal class IndexController {
     private val logger = LoggerFactory.getLogger(this::class.java)
+
     @Public
     @GetMapping(value = ["/", "/test"])
     fun helloWorld() = "Pong!"
