@@ -17,20 +17,20 @@ import org.springframework.stereotype.Repository
 @RankingRepositoryType(RankingType.JOB_CATEGORY_POSTING_COUNT)
 @NoRepositoryBean
 interface JobCategoryPostingCountRankingsRepository : SimpleRankingRepository<JobCategoryPostingCountRankingsDocument, JobCategoryPostingCountRankingsDocument.JobCategoryPostingRankingEntry, String> {
-    // 지역별 수요 분석
+    // 지역 고용 시장 분석
     fun findByLocationDemand(
         baseDate: String,
         locationId: Long,
         minDemand: Int,
     ): List<JobCategoryPostingCountRankingsDocument>
 
-    // 원격 근무 트렌드 분석
+    // 시장 잠재력 분석
     fun findHighRemoteWorkCategories(
         baseDate: String,
         minRemoteRatio: Double,
     ): List<JobCategoryPostingCountRankingsDocument>
 
-    // 채용 경쟁률 분석
+    // 원격 근무 기회 분석
     fun findByCompetitionRate(
         baseDate: String,
         minCompetitionRate: Double,

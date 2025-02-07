@@ -31,7 +31,7 @@ abstract class ParallelTransactionalUseCase<Request : Any, Response : Any> : Cor
                 results.addAll(deferredResults.awaitAll())
 
                 if (hasError.get()) {
-                    throw RuntimeException("One or more operations failed")
+                    throw RuntimeException("하나 이상의 작업이 실패했습니다")
                 }
 
                 createResponse(results.filterNotNull())

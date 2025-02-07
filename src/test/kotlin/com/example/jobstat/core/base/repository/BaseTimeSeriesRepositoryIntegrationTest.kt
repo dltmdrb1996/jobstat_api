@@ -13,6 +13,7 @@ import java.time.Instant
 import kotlin.random.Random
 
 @TestMethodOrder(OrderAnnotation::class)
+@DisplayName("BaseTimeSeriesRepository 통합 테스트")
 class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var testTimeSeriesRepository: TestTimeSeriesRepository
@@ -71,6 +72,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(1)
+    @DisplayName("스냅샷 기간이 유효하게 생성된다")
     fun testSnapshotPeriodValidity() {
         val baseDate = "202401"
         val snapshotPeriod = createSnapshotPeriod(baseDate)
@@ -88,6 +90,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(2)
+    @DisplayName("대량의 데이터를 삽입할 수 있다")
     fun testBulkInsert() {
         startTime = System.currentTimeMillis()
         allRecords.clear()
@@ -120,6 +123,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(3)
+    @DisplayName("기준일자로 데이터를 조회할 수 있다")
     fun testFindByBaseDate() {
         startTime = System.currentTimeMillis()
 
@@ -147,6 +151,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(4)
+    @DisplayName("기간 내의 데이터를 조회할 수 있다")
     fun testFindByBaseDateBetween() {
         startTime = System.currentTimeMillis()
 
@@ -171,6 +176,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(5)
+    @DisplayName("최신 데이터를 조회할 수 있다")
     fun testFindLatest() {
         startTime = System.currentTimeMillis()
 
@@ -197,6 +203,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(6)
+    @DisplayName("최신 N개의 데이터를 조회할 수 있다")
     fun testFindLatestN() {
         startTime = System.currentTimeMillis()
 
@@ -222,6 +229,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(7)
+    @DisplayName("대량의 데이터를 삭제할 수 있다")
     fun testBulkDelete() {
         startTime = System.currentTimeMillis()
 

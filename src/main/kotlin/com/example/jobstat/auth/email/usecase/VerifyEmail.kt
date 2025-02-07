@@ -11,16 +11,17 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import org.springframework.stereotype.Service
 
+// 이메일 인증 확인 유스케이스
 @Service
 internal class VerifyEmail(
     private val emailVerificationService: EmailVerificationService,
     validator: Validator,
 ) : ValidUseCase<VerifyEmail.Request, Unit>(validator) {
-
     @Transactional
     override fun execute(request: Request) {
-        val verification = emailVerificationService.findLatestByEmail(request.email)
-            ?: throw AppException.fromErrorCode(ErrorCode.VERIFICATION_NOT_FOUND, "인증 정보를 찾을 수 없습니다.")
+        val verification =
+            emailVerificationService.findLatestByEmail(request.email)
+                ?: throw AppException.fromErrorCode(ErrorCode.VERIFICATION_NOT_FOUND, "인증 정보를 찾을 수 없습니다.")
 
         if (!verification.isValid()) {
             throw AppException.fromErrorCode(ErrorCode.VERIFICATION_EXPIRED, "만료된 인증 코드입니다.")
@@ -35,7 +36,6 @@ internal class VerifyEmail(
         @field:NotBlank
         @field:Email
         val email: String,
-
         @field:NotBlank
         @field:Pattern(regexp = "^[0-9]{6}$")
         val code: String,

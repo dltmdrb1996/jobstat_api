@@ -140,12 +140,12 @@ class EducationSalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
-        require(rankings.all { it.salaryMetrics.avgSalary > 0 }) { "Average salary must be positive" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.all { it.salaryMetrics.avgSalary > 0 }) { "평균 급여는 양수여야 합니다" }
         require(
             rankings.all {
                 it.educationImpact.employmentMetrics.employmentRate in 0.0..100.0
             },
-        ) { "Employment rate must be between 0 and 100 percent" }
+        ) { "고용률은 0에서 100 퍼센트 사이여야 합니다" }
     }
 }

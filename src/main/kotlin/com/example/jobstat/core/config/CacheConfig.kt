@@ -8,7 +8,6 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
 import java.time.Duration
 
 // @EnableScheduling
@@ -80,11 +79,11 @@ class CacheConfig : CachingConfigurer {
 //                val stats = cache.nativeCache.stats()
 //                log.info(
 //                    """
-//                    Cache '$cacheName' Stats:
-//                    - Hits: ${stats.hitCount()}
-//                    - Misses: ${stats.missCount()}
-//                    - Hit Rate: ${String.format("%.2f", stats.hitRate() * 100)}%
-//                    - Evictions: ${stats.evictionCount()}
+//                    캐시 '$cacheName' 통계:
+//                    - 히트: ${stats.hitCount()}
+//                    - 미스: ${stats.missCount()}
+//                    - 히트율: ${String.format("%.2f", stats.hitRate() * 100)}%
+//                    - 제거: ${stats.evictionCount()}
 //                    """.trimIndent(),
 //                )
 //            }

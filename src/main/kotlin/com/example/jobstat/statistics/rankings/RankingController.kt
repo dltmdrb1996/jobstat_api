@@ -1,15 +1,12 @@
 package com.example.jobstat.statistics.rankings
 
-import ApiResponse
 import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.state.BaseDate
+import com.example.jobstat.core.wrapper.ApiResponse
 import com.example.jobstat.statistics.rankings.model.RankingType
 import com.example.jobstat.statistics.rankings.usecase.*
 import com.example.jobstat.statistics.rankings.usecase.GetBenefitRankingWithStats.Companion.BENEFIT_RANKING_TYPES
-//import com.example.jobstat.statistics.rankings.usecase.GetCertificationRankingWithStats.Companion.CERTIFICATION_RANKING_TYPES
-//import com.example.jobstat.statistics.rankings.usecase.GetCompanyRankingWithStats.Companion.COMPANY_RANKING_TYPES
-//import com.example.jobstat.statistics.rankings.usecase.GetEducationRankingWithStats.Companion.EDUCATION_RANKING_TYPES
 import com.example.jobstat.statistics.rankings.usecase.GetIndustryRankingWithStats.Companion.INDUSTRY_RANKING_TYPES
 import com.example.jobstat.statistics.rankings.usecase.GetJobCategoryRankingWithStats.Companion.JOB_CATEGORY_RANKING_TYPES
 import com.example.jobstat.statistics.rankings.usecase.GetLocationRankingWithStats.Companion.LOCATION_RANKING_TYPES
@@ -25,27 +22,24 @@ class RankingController(
     private val getSkillRankingWithStats: GetSkillRankingWithStats,
     private val getJobCategoryRankingWithStats: GetJobCategoryRankingWithStats,
     private val getIndustryRankingWithStats: GetIndustryRankingWithStats,
-//    private val getCertificationRankingWithStats: GetCertificationRankingWithStats,
     private val getLocationRankingWithStats: GetLocationRankingWithStats,
-//    private val getCompanyRankingWithStats: GetCompanyRankingWithStats,
     private val getBenefitRankingWithStats: GetBenefitRankingWithStats,
-//    private val getEducationRankingWithStats: GetEducationRankingWithStats,
 ) {
-    @Public
-    @GetMapping("/{rankingType}/{baseDate}")
-    fun getRankings(
-        @PathVariable rankingType: RankingType,
-        @PathVariable baseDate: String,
-        @RequestParam(required = false) page: Int?,
-    ): ResponseEntity<ApiResponse<GetRankingPage.Response>> {
-        val req =
-            GetRankingPage.Request(
-                rankingType = rankingType,
-                baseDate = BaseDate(baseDate),
-                page = page,
-            )
-        return ApiResponse.ok(getRankingPage(req))
-    }
+//    @Public
+//    @GetMapping("/{rankingType}/{baseDate}")
+//    fun getRankings(
+//        @PathVariable rankingType: RankingType,
+//        @PathVariable baseDate: String,
+//        @RequestParam(required = false) page: Int?,
+//    ): ResponseEntity<ApiResponse<GetRankingPage.Response>> {
+//        val req =
+//            GetRankingPage.Request(
+//                rankingType = rankingType,
+//                baseDate = BaseDate(baseDate),
+//                page = page,
+//            )
+//        return ApiResponse.ok(getRankingPage(req))
+//    }
 
     @Public
     @GetMapping("/skills/{rankingType}/{baseDate}/stats")
@@ -179,7 +173,6 @@ class RankingController(
 //            )
 //        return ApiResponse.ok(getCertificationRankingWithStats(req))
 //    }
-
 
 //    @Public
 //    @GetMapping("/education/{rankingType}/{baseDate}/stats")

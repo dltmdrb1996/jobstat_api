@@ -110,14 +110,14 @@ class IndustrySalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
-        require(rankings.all { it.salaryDetails.avgSalary > 0 }) { "Salary must be positive" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.all { it.salaryDetails.avgSalary > 0 }) { "급여는 양수여야 합니다" }
         require(
             rankings.all {
                 it.compensationStructure.baseRatio +
                     it.compensationStructure.bonusRatio +
                     (it.compensationStructure.equityRatio ?: 0.0) <= 1.0
             },
-        ) { "Compensation ratios must sum to less than or equal to 1" }
+        ) { "보상 비율의 합은 1 이하여야 합니다" }
     }
 }

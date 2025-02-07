@@ -14,21 +14,19 @@ class JwtTokenGenerator(
     @Value("\${jwt.accessTokenExpiration}") private val accessTokenExpiration: Int,
     @Value("\${jwt.refreshTokenExpiration}") private val refreshTokenExpiration: Int,
 ) {
-
     private companion object {
-        private val HEADER_MAP: Map<String, Any> = mapOf(
-            "typ" to "JWT",
-            "alg" to "HS256"
-        )
+        private val HEADER_MAP: Map<String, Any> =
+            mapOf(
+                "typ" to "JWT",
+                "alg" to "HS256",
+            )
     }
 
-    private val key : SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
+    private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
 
-    fun createAccessToken(payload: AccessPayload): String =
-        createToken(payload.id, payload.roles, payload.tokenType, accessTokenExpiration)
+    fun createAccessToken(payload: AccessPayload): String = createToken(payload.id, payload.roles, payload.tokenType, accessTokenExpiration)
 
-    fun createRefreshToken(payload: RefreshPayload): String =
-        createToken(payload.id, payload.roles, payload.tokenType, refreshTokenExpiration)
+    fun createRefreshToken(payload: RefreshPayload): String = createToken(payload.id, payload.roles, payload.tokenType, refreshTokenExpiration)
 
     fun getRefreshTokenExpiration(): Long = refreshTokenExpiration.toLong()
 
@@ -41,7 +39,8 @@ class JwtTokenGenerator(
         val now = System.currentTimeMillis()
         val expiration = now + (expirationInSeconds * 1000)
 
-        return Jwts.builder()
+        return Jwts
+            .builder()
             .setHeader(HEADER_MAP)
             .claim("userId", id)
             .claim("tokenType", tokenType.value)

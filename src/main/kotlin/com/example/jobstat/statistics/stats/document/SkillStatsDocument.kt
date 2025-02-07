@@ -37,10 +37,10 @@ class SkillStatsDocument(
     override val rankings: Map<RankingType, SkillRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     override fun validate() {
-        require(experienceLevels.isNotEmpty()) { "Experience levels must not be empty" }
-        require(companySizeDistribution.isNotEmpty()) { "Company size distribution must not be empty" }
-        require(industryDistribution.isNotEmpty()) { "Industry distribution must not be empty" }
-        require(relatedJobCategories.isNotEmpty()) { "Related job categories must not be empty" }
+        require(experienceLevels.isNotEmpty()) { "경력 수준이 비어있으면 안됩니다" }
+        require(companySizeDistribution.isNotEmpty()) { "회사 규모 분포가 비어있으면 안됩니다" }
+        require(industryDistribution.isNotEmpty()) { "산업 분포가 비어있으면 안됩니다" }
+        require(relatedJobCategories.isNotEmpty()) { "관련 직무 카테고리가 비어있으면 안됩니다" }
     }
 
     override fun toString(): String = "SkillStatsDocument(id=$id, entityId=$entityId, baseDate='$baseDate', period=$period, name='$name', stats=$stats, experienceLevels=$experienceLevels, companySizeDistribution=$companySizeDistribution, industryDistribution=$industryDistribution, isSoftSkill=$isSoftSkill, isEmergingSkill=$isEmergingSkill, relatedJobCategories=$relatedJobCategories, rankings=$rankings)"

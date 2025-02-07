@@ -17,21 +17,25 @@ class EmailServiceImpl(
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Async
-    override fun sendVerificationEmail(to: String, code: String) {
+    override fun sendVerificationEmail(
+        to: String,
+        code: String,
+    ) {
         try {
-            val message = SimpleMailMessage().apply {
-                setFrom(fromEmail)
-                setTo(to)
-                setSubject("[JobStat] 이메일 인증")
-                setText("인증 코드: $code\n30분 안에 인증을 완료해주세요.")
-            }
+            val message =
+                SimpleMailMessage().apply {
+                    setFrom(fromEmail)
+                    setTo(to)
+                    setSubject("[JobStat] 이메일 인증")
+                    setText("인증 코드: $code\n30분 안에 인증을 완료해주세요.")
+                }
             emailSender.send(message)
-            log.info("Verification email sent to: $to")
+            log.info("인증 이메일 발송 완료: $to")
         } catch (e: Exception) {
-            log.error("Failed to send verification email to: $to", e)
+            log.error("인증 이메일 발송 실패: $to", e)
             throw AppException.fromErrorCode(
                 ErrorCode.EMAIL_SENDING_FAILURE,
-                "이메일 발송에 실패했습니다."
+                "이메일 발송에 실패했습니다.",
             )
         }
     }

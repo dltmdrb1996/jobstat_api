@@ -21,9 +21,9 @@ class MongoConfig(
     @Bean
     fun mappingMongoConverter(mongoMappingContext: MongoMappingContext): MappingMongoConverter {
         val converter = MappingMongoConverter(NoOpDbRefResolver.INSTANCE, mongoMappingContext)
-        converter.setTypeMapper(DefaultMongoTypeMapper(null)) // Disable default _class field
+        converter.setTypeMapper(DefaultMongoTypeMapper(null)) // 기본 _class 필드 비활성화
 
-        // Register custom converters
+        // 커스텀 컨버터 등록
         val converters: List<Converter<*, *>> =
             listOf(
                 rankingScoreReadConverter,

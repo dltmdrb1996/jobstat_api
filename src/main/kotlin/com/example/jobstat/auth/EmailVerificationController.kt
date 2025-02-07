@@ -1,10 +1,10 @@
 package com.example.jobstat.auth
 
-import ApiResponse
-import com.example.jobstat.core.constants.RestConstants
-import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.auth.email.usecase.RequestEmailVerification
 import com.example.jobstat.auth.email.usecase.VerifyEmail
+import com.example.jobstat.core.constants.RestConstants
+import com.example.jobstat.core.security.annotation.Public
+import com.example.jobstat.core.wrapper.ApiResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody

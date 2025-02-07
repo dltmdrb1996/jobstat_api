@@ -20,7 +20,7 @@ internal class TokenServiceImpl(
         expirationInSeconds: Long,
     ) {
         val userKey = "$REFRESH_TOKEN_PREFIX$userId"
-        // 새 토큰 저장 (기존 토큰이 있다면 자동으로 덮어씁니다)
+        // 새로운 리프레시 토큰을 저장합니다 (기존 토큰이 있다면 자동으로 덮어씁니다)
         stringRedisTemplate.opsForValue().set(userKey, refreshToken, expirationInSeconds, TimeUnit.SECONDS)
     }
 

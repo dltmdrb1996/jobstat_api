@@ -43,6 +43,8 @@ class CertificationStatsDocument(
     val investmentMetrics: CertificationInvestmentMetrics,
     @Field("rankings")
     override val rankings: Map<RankingType, CertificationRankingInfo>,
+    @Field("type")
+    val type: String, // "HIGH_SCHOOL", "ASSOCIATE", "BACHELOR", "MASTER", "DOCTORATE", "OTHER" -> "고등학교", "전문학사", "학사", "석사", "박사", "기타"
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class CertificationStats(
         @Field("posting_count")
@@ -254,7 +256,7 @@ class CertificationStatsDocument(
     ) : RankingInfo
 
     override fun validate() {
-        TODO("Not yet implemented")
+        TODO("아직 구현되지 않음")
     }
 
     fun copy(
@@ -274,6 +276,7 @@ class CertificationStatsDocument(
         careerImpact: CertificationCareerImpact = this.careerImpact,
         investmentMetrics: CertificationInvestmentMetrics = this.investmentMetrics,
         rankings: Map<RankingType, CertificationRankingInfo> = this.rankings,
+        type: String = this.type,
     ) = CertificationStatsDocument(
         id,
         entityId,
@@ -291,5 +294,6 @@ class CertificationStatsDocument(
         careerImpact,
         investmentMetrics,
         rankings,
+        type,
     )
 }
