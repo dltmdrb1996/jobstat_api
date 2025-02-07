@@ -1,6 +1,6 @@
 package com.example.jobstat.core.error
 
-import ApiResponse
+import com.example.jobstat.core.wrapper.ApiResponse
 import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryLevel

@@ -16,6 +16,7 @@ import java.time.Instant
 import kotlin.random.Random
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@DisplayName("DistributionRankingRepository 통합 테스트")
 class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var companySizeEducationRepository: CompanySizeEducationRankingsRepositoryImpl
@@ -273,6 +274,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(1)
+    @DisplayName("분포 패턴과 유사한 데이터를 찾을 수 있다")
     fun `findByDistributionPattern - should find similar distributions`() {
         // given
         val baseDate = BaseDate("202401")
@@ -303,6 +305,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(2)
+    @DisplayName("지정된 주요 카테고리를 가진 데이터를 찾을 수 있다")
     fun `findByDominantCategory - should find entries with specified dominant category`() {
         // given
         val baseDate = BaseDate("202401")
@@ -326,6 +329,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(3)
+    @DisplayName("분포 트렌드를 조회할 수 있다")
     fun `findDistributionTrends - should return distribution history`() {
         // given
         val entityId =
@@ -353,6 +357,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(4)
+    @DisplayName("중요한 분포 변화를 식별할 수 있다")
     fun `findSignificantDistributionChanges - should identify major changes`() {
         // given
         val startDate = BaseDate("202401")
@@ -371,6 +376,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(5)
+    @DisplayName("균일한 분포를 찾을 수 있다")
     fun `findUniformDistributions - should find distributions with low variance`() {
         // given
         val baseDate = BaseDate("202401")
@@ -392,6 +398,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(6)
+    @DisplayName("치우친 분포를 찾을 수 있다")
     fun `findSkewedDistributions - should find distributions with high concentration`() {
         // given
         val baseDate = BaseDate("202401")
@@ -426,6 +433,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(7)
+    @DisplayName("유사한 분포를 찾을 수 있다")
     fun `findSimilarDistributions - should find distributions similar to target`() {
         // given
         val baseDate = BaseDate("202401")
@@ -463,6 +471,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(8)
+    @DisplayName("시간에 따른 분포 변화를 추적할 수 있다")
     fun `findDistributionChanges - should track distribution changes over time`() {
         // given
         val entityId =
@@ -488,6 +497,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(9)
+    @DisplayName("카테고리 우세도를 찾을 수 있다")
     fun `findCategoryDominance - should find entries with high category percentage`() {
         // given
         val baseDate = BaseDate("202401")
@@ -524,6 +534,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(10)
+    @DisplayName("성능 테스트를 실행한다")
     fun `performanceTest - should complete operations within time limits`() {
         val startTime = System.currentTimeMillis()
         val baseDate = BaseDate("202401")

@@ -24,4 +24,6 @@ internal interface UserRepository {
     fun existsByEmail(email: String): Boolean
 
     fun findByIdWithRoles(id: Long): User
+
+    fun deleteAll()
 }

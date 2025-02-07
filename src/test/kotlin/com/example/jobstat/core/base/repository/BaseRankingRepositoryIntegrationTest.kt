@@ -18,6 +18,7 @@ import kotlin.random.Random
 import kotlin.time.measureTime
 
 @TestMethodOrder(OrderAnnotation::class)
+@DisplayName("BaseRankingRepository 통합 테스트")
 class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var skillGrowthRankingsRepository: SkillGrowthRankingsRepositoryImpl
@@ -70,6 +71,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(1)
+    @DisplayName("페이지별 랭킹 조회가 가능하다")
     fun testFindByPage() {
         val baseDate = "202401"
         val page = 1
@@ -85,6 +87,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(2)
+    @DisplayName("모든 페이지를 조회할 수 있다")
     fun testFindAllPages() {
         val baseDate = "202401"
         val expectedPages = (totalRecords + batchSize - 1) / batchSize // 올림 처리
@@ -103,6 +106,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(3)
+    @DisplayName("상위 N개의 랭킹을 조회할 수 있다")
     fun testFindTopN() {
         val baseDate = "202401"
         val limit = 10
@@ -115,6 +119,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(4)
+    @DisplayName("특정 순위 범위의 랭킹을 조회할 수 있다")
     fun testFindByRankRange() {
         val baseDate = "202401"
         val startRank = 95
@@ -135,6 +140,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(5)
+    @DisplayName("엔티티 ID로 랭킹을 조회할 수 있다")
     fun testFindByEntityId() {
         val baseDate = "202401"
         val sampleEntity = allRecords.first().rankings.first()
@@ -149,6 +155,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(6)
+    @DisplayName("상위 상승 엔티티를 조회할 수 있다")
     fun testFindTopMovers() {
         val startDate = "202401"
         val endDate = "202402"
@@ -176,6 +183,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(7)
+    @DisplayName("상위 하락 엔티티를 조회할 수 있다")
     fun testFindTopLosers() {
         val startDate = "202401"
         val endDate = "202402"
@@ -202,6 +210,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(8)
+    @DisplayName("안정적인 엔티티를 조회할 수 있다")
     fun testFindStableEntities() {
         val months = 3
         val maxRankChange = 5
@@ -231,6 +240,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(9)
+    @DisplayName("변동성이 큰 엔티티를 조회할 수 있다")
     fun testFindVolatileEntities() {
         val months = 3
         val minRankChange = 10
@@ -246,6 +256,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(10)
+    @DisplayName("일관된 순위를 유지하는 엔티티를 조회할 수 있다")
     fun testFindEntitiesWithConsistentRanking() {
         val months = 3
         val maxRank = 10
@@ -261,6 +272,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(12)
+    @DisplayName("성능 테스트를 실행한다")
     fun testPerformance() {
         startTime = System.currentTimeMillis()
 

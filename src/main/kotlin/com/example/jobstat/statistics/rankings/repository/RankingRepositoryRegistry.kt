@@ -19,7 +19,7 @@ class RankingRepositoryRegistry(
                 .findAnnotation<RankingRepositoryType>()
                 ?.type
                 ?: getRankingTypeFromClassName(repo.javaClass.simpleName)
-                ?: throw IllegalArgumentException("Could not determine RankingType for repository: ${repo.javaClass}")
+                ?: throw IllegalArgumentException("저장소를 찾을 수 없습니다: ${repo.javaClass}")
         }
 
     private fun getRankingTypeFromClassName(className: String): RankingType? =
@@ -52,7 +52,7 @@ class RankingRepositoryRegistry(
     @Suppress("UNCHECKED_CAST")
     fun <T : BaseRankingDocument<*>> getRepository(rankingType: RankingType): BaseRankingRepository<T, *, *> =
         repositoryMap[rankingType] as? BaseRankingRepository<T, *, *>
-            ?: throw IllegalArgumentException("Repository not found for type: $rankingType")
+            ?: throw IllegalArgumentException("저장소를 찾을 수 없습니다: $rankingType")
 
     fun hasRepository(rankingType: RankingType): Boolean = rankingType in repositoryMap
 }

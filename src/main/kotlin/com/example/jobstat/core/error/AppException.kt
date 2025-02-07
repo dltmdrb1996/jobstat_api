@@ -28,7 +28,7 @@ enum class ErrorCode(
     VERIFICATION_NOT_FOUND("C011", "인증 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND, AppExceptionType.CLIENT_ERROR),
     VERIFICATION_EXPIRED("C012", "만료된 인증 코드입니다.", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
     INVALID_VERIFICATION_CODE("C013", "잘못된 인증 코드입니다.", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
-
+    ACCOUNT_DISABLED("C014", "비활성화된 계정입니다.", HttpStatus.FORBIDDEN, AppExceptionType.CLIENT_ERROR),
 
     // 서버 오류
     INTERNAL_ERROR("S001", "내부 서버 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
@@ -37,7 +37,6 @@ enum class ErrorCode(
     SQL_SYNTAX_ERROR("S004", "SQL 구문 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
     TRANSACTION_ERROR("S005", "트랜잭션 처리 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
     EMAIL_SENDING_FAILURE("S006", "이메일 발송에 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
-
 }
 
 open class AppException private constructor(

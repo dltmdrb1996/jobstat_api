@@ -14,6 +14,7 @@ import java.time.Instant
 import kotlin.random.Random
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@DisplayName("RelationshipRankingRepository 통합 테스트")
 class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var industrySkillRankingsRepository: IndustrySkillRankingsRepositoryImpl
@@ -112,6 +113,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(1)
+    @DisplayName("주요 엔티티 ID로 데이터를 조회할 수 있다")
     fun `findByPrimaryEntityId - should return correct entry for primary entity id`() {
         // given
         val baseDate = BaseDate("202401")
@@ -191,6 +193,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(4)
+    @DisplayName("강한 관계를 가진 데이터를 찾을 수 있다")
     fun `findStrongRelationships - should find relationships with scores above threshold`() {
         // given
         val baseDate = BaseDate("202401")
@@ -210,6 +213,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(5)
+    @DisplayName("가장 강한 관계를 가진 상위 쌍을 찾을 수 있다")
     fun `findStrongestPairs - should return limited number of pairs with highest scores`() {
         // given
         val baseDate = BaseDate("202401")
@@ -228,6 +232,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @Test
     @Order(6)
+    @DisplayName("공통 관계를 가진 데이터를 찾을 수 있다")
     fun `findCommonRelationships - should find shared relationships between entities`() {
         // given
         val baseDate = BaseDate("202401")

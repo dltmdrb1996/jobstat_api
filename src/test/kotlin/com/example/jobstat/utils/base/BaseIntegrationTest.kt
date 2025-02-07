@@ -37,6 +37,8 @@ import kotlin.system.measureTimeMillis
         "spring.jpa.show-sql=true",
         "spring.jpa.properties.hibernate.format_sql=true",
         "ddns.domain=http://localhost:8080", // 테스트용 도메인 추가
+        "spring.mail.username=test@gamil.com",
+        "spring.mail.password=test-password",
     ],
 )
 abstract class BaseIntegrationTest {

@@ -13,6 +13,7 @@ import java.time.Instant
 import kotlin.random.Random
 
 @TestMethodOrder(OrderAnnotation::class)
+@DisplayName("RecordRepository Mongo 통합 테스트")
 class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var recordRepository: RecordRepository
@@ -50,6 +51,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(1)
+    @DisplayName("대량의 데이터를 삽입할 수 있다")
     fun testBulkInsert() {
         startTime = System.currentTimeMillis()
         allRecords.clear()
@@ -72,6 +74,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(2)
+    @DisplayName("쿼리로 모든 데이터를 조회할 수 있다")
     fun testFindAllByQuery() {
         startTime = System.currentTimeMillis()
 
@@ -95,6 +98,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(3)
+    @DisplayName("ID 목록으로 데이터를 조회할 수 있다")
     fun testBulkFindByIds() {
         startTime = System.currentTimeMillis()
 
@@ -120,6 +124,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(4)
+    @DisplayName("생성일자 범위로 데이터를 조회할 수 있다")
     fun testFindByCreatedAtBetween() {
         startTime = System.currentTimeMillis()
 
@@ -146,6 +151,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(5)
+    @DisplayName("대량의 데이터를 수정할 수 있다")
     fun testBulkUpdate() {
         startTime = System.currentTimeMillis()
 
@@ -175,6 +181,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(6)
+    @DisplayName("대량의 데이터를 upsert할 수 있다")
     fun testBulkUpsert() {
         startTime = System.currentTimeMillis()
 
@@ -245,6 +252,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(7)
+    @DisplayName("대량의 데이터를 삭제할 수 있다")
     fun testBulkDelete() {
         startTime = System.currentTimeMillis()
 

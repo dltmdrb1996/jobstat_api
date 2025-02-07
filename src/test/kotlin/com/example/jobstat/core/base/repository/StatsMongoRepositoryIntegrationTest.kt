@@ -14,6 +14,7 @@ import java.time.Instant
 import kotlin.random.Random
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
+@DisplayName("StatsMongo 통합 테스트")
 class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var skillStatsRepository: SkillStatsRepository
@@ -244,6 +245,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(1)
+    @DisplayName("대량의 데이터를 삽입할 수 있다")
     fun testBulkInsert() {
         startTime = System.currentTimeMillis()
         allRecords.clear()
@@ -293,6 +295,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(2)
+    @DisplayName("엔티티 ID로 데이터를 조회할 수 있다")
     fun testFindByEntityId() {
         startTime = System.currentTimeMillis()
 
@@ -316,6 +319,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(3)
+    @DisplayName("엔티티 ID와 기준일자로 데이터를 조회할 수 있다")
     fun testFindByEntityIdAndBaseDate() {
         startTime = System.currentTimeMillis()
 
@@ -337,6 +341,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(4)
+    @DisplayName("기준일자와 엔티티 ID 목록으로 데이터를 조회할 수 있다")
     fun testFindByBaseDateAndEntityIds() {
         startTime = System.currentTimeMillis()
 
@@ -357,6 +362,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(5)
+    @DisplayName("기간과 엔티티 ID로 데이터를 조회할 수 있다")
     fun testFindByBaseDateBetweenAndEntityId() {
         startTime = System.currentTimeMillis()
 
@@ -392,6 +398,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(6)
+    @DisplayName("엔티티 ID의 최신 통계를 조회할 수 있다")
     fun testFindLatestStatsByEntityId() {
         startTime = System.currentTimeMillis()
 
@@ -413,6 +420,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(7)
+    @DisplayName("성장률이 높은 상위 스킬을 찾을 수 있다")
     fun testFindTopGrowthSkills() {
         startTime = System.currentTimeMillis()
 
@@ -436,6 +444,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(8)
+    @DisplayName("산업별 상위 스킬을 찾을 수 있다")
     fun testFindTopSkillsByIndustry() {
         startTime = System.currentTimeMillis()
 
@@ -460,6 +469,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(9)
+    @DisplayName("회사 규모별 상위 스킬을 찾을 수 있다")
     fun testFindTopSkillsByCompanySize() {
         startTime = System.currentTimeMillis()
 
@@ -485,6 +495,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(11)
+    @DisplayName("직무 카테고리별 상위 스킬을 찾을 수 있다")
     fun testFindTopSkillsByJobCategory() {
         startTime = System.currentTimeMillis()
 
@@ -515,6 +526,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(12)
+    @DisplayName("여러 산업에서 성장하는 스킬을 찾을 수 있다")
     fun testFindSkillsWithMultiIndustryGrowth() {
         startTime = System.currentTimeMillis()
 
@@ -538,6 +550,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(13)
+    @DisplayName("산업별 신흥 스킬을 찾을 수 있다")
     fun testFindEmergingSkillsByIndustry() {
         startTime = System.currentTimeMillis()
 
@@ -566,6 +579,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @Test
     @Order(14)
+    @DisplayName("대량의 데이터를 삭제할 수 있다")
     fun testBulkDelete() {
         startTime = System.currentTimeMillis()
 

@@ -15,6 +15,7 @@ import java.time.ZoneOffset
 import kotlin.random.Random
 
 @TestMethodOrder(OrderAnnotation::class)
+@DisplayName("SimpleRankingRepository 통합 테스트")
 class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var skillGrowthRankingsRepository: SkillGrowthRankingsRepositoryImpl
@@ -93,6 +94,7 @@ class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
      */
     @Test
     @Order(1)
+    @DisplayName("값의 범위로 데이터를 조회할 수 있다")
     fun testFindByValueRange() {
         // "doc1": scores 50.0, 75.0
         // "doc2": scores 60.0, 65.0
@@ -114,6 +116,7 @@ class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
      */
     @Test
     @Order(2)
+    @DisplayName("급상승 중인 데이터를 찾을 수 있다")
     fun testFindRisingStars() {
         // minRankImprovement = 10, 최근 2개의 도큐먼트 기준
         val results = skillGrowthRankingsRepository.findRisingStars(2, 10)
@@ -131,6 +134,7 @@ class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
      */
     @Test
     @Order(3)
+    @DisplayName("엔티티 ID와 기준일자로 데이터를 조회할 수 있다")
     fun testFindByEntityIdAndBaseDate() {
         val resultDoc = skillGrowthRankingsRepository.findByEntityIdAndBaseDate(555L, "202401")
         assertNotNull(resultDoc)

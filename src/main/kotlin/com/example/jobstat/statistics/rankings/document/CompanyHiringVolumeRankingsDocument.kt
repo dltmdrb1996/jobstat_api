@@ -121,11 +121,11 @@ class CompanyHiringVolumeRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
         require(
             rankings.all {
                 it.hiringDetails.totalPositions >= it.hiringDetails.filledPositions
             },
-        ) { "Filled positions cannot exceed total positions" }
+        ) { "채용된 포지션 수는 전체 포지션 수를 초과할 수 없습니다" }
     }
 }

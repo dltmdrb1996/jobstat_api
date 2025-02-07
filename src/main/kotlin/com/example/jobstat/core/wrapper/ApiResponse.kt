@@ -1,3 +1,5 @@
+package com.example.jobstat.core.wrapper
+
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus

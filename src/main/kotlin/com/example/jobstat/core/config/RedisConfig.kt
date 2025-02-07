@@ -28,5 +28,4 @@ class RedisConfig(
 
     @Bean
     fun stringRedisTemplate(): StringRedisTemplate = StringRedisTemplate(createLettuceConnectionFactory())
-
 }

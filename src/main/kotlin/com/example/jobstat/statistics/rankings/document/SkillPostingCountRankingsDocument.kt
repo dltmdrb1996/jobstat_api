@@ -69,7 +69,7 @@ class SkillPostingCountRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
-        require(rankings.all { it.totalPostings >= it.activePostings }) { "Active postings cannot exceed total postings" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.all { it.totalPostings >= it.activePostings }) { "활성 채용공고 수는 전체 채용공고 수를 초과할 수 없습니다" }
     }
 }

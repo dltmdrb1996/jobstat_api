@@ -1,11 +1,11 @@
 package com.example.jobstat.auth.token.usecase
 
+import com.example.jobstat.auth.token.service.TokenService
+import com.example.jobstat.auth.user.service.UserService
 import com.example.jobstat.core.security.AccessPayload
 import com.example.jobstat.core.security.JwtTokenGenerator
 import com.example.jobstat.core.security.RefreshPayload
 import com.example.jobstat.core.usecase.impl.ValidUseCase
-import com.example.jobstat.auth.token.service.TokenService
-import com.example.jobstat.auth.user.service.UserService
 import jakarta.transaction.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
@@ -29,7 +29,7 @@ internal class RefreshToken(
     }
 
     data class Request(
-        @field:NotBlank
+        @field:NotBlank(message = "리프레시 토큰은 필수 값입니다")
         val refreshToken: String,
     )
 

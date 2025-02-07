@@ -21,6 +21,6 @@ enum class EntityType(
     companion object {
         fun fromCode(code: String) =
             values().find { it.code == code }
-                ?: throw IllegalArgumentException("Invalid entity type code: $code")
+                ?: throw IllegalArgumentException("유효하지 않은 엔티티 타입 코드입니다: $code")
     }
 }

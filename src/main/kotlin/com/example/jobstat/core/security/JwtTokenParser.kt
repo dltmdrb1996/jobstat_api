@@ -17,17 +17,19 @@ class JwtTokenParser(
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
     private val log = StructuredLogger(this::class.java)
 
-    private val jwtParser = Jwts.parserBuilder()
-        .setSigningKey(key)
-        .build()
+    private val jwtParser =
+        Jwts
+            .parserBuilder()
+            .setSigningKey(key)
+            .build()
 
     @Suppress("UNCHECKED_CAST")
-    fun validateToken(token: String): AccessPayload {
-        return try {
+    fun validateToken(token: String): AccessPayload =
+        try {
             val claims = jwtParser.parseClaimsJws(token).body
             val id = (claims["userId"] as Int).toLong()
             val roles = (claims["roles"] as ArrayList<String>)
-            log.info("roles: ${roles.joinToString(", ")}")
+            log.info("권한: ${roles.joinToString(", ")}")
             val tokenType = TokenType.fromValue(claims["tokenType"] as Int)
             AccessPayload(
                 id = id,
@@ -55,28 +57,28 @@ class JwtTokenParser(
                         AppException.fromErrorCode(
                             ErrorCode.AUTHENTICATION_FAILURE,
                             message = "JWT 토큰이 만료되었습니다",
-                            detailInfo = "Expired JWT token",
+                            detailInfo = "만료된 JWT 토큰",
                         )
 
                     is UnsupportedJwtException ->
                         AppException.fromErrorCode(
                             ErrorCode.AUTHENTICATION_FAILURE,
                             message = "지원되지 않는 JWT 토큰입니다",
-                            detailInfo = "Unsupported JWT token",
+                            detailInfo = "지원되지 않는 JWT 토큰",
                         )
 
                     is IllegalArgumentException ->
                         AppException.fromErrorCode(
                             ErrorCode.AUTHENTICATION_FAILURE,
                             message = "JWT 토큰이 비어있습니다",
-                            detailInfo = "JWT claims string is empty",
+                            detailInfo = "JWT claims 문자열이 비어있음",
                         )
 
                     is ClassCastException ->
                         AppException.fromErrorCode(
                             ErrorCode.AUTHENTICATION_FAILURE,
                             message = "JWT 토큰의 데이터 형식이 올바르지 않습니다",
-                            detailInfo = "Invalid JWT claims data type",
+                            detailInfo = "잘못된 JWT claims 데이터 타입",
                         )
 
                     is JwtException ->
@@ -95,5 +97,4 @@ class JwtTokenParser(
                 }
             throw appException
         }
-    }
 }

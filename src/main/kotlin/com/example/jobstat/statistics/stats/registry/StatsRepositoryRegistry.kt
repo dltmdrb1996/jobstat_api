@@ -17,7 +17,7 @@ class StatsRepositoryRegistry(
                 .findAnnotation<StatsRepositoryType>()
                 ?.type
                 ?: getStatsTypeFromCollectionName(repo.getCollectionName())
-                ?: throw IllegalArgumentException("Could not determine StatsType for repository: ${repo.javaClass}")
+                ?: throw IllegalArgumentException("리포지토리의 StatsType을 결정할 수 없습니다: ${repo.javaClass}")
         }
 
     private fun getStatsTypeFromCollectionName(collectionName: String): StatsType? =
@@ -39,7 +39,7 @@ class StatsRepositoryRegistry(
     @Suppress("UNCHECKED_CAST")
     fun <T : BaseStatsDocument> getRepository(statsType: StatsType): StatsMongoRepository<T, String> =
         repositoryMap[statsType] as? StatsMongoRepository<T, String>
-            ?: throw IllegalArgumentException("Repository not found for type: $statsType")
+            ?: throw IllegalArgumentException("해당 타입의 리포지토리를 찾을 수 없습니다: $statsType")
 
     fun hasRepository(statsType: StatsType): Boolean = statsType in repositoryMap
 }

@@ -9,7 +9,7 @@ abstract class LoggingUseCase<in Request : Any, out Response : Any> : UseCase<Re
 
     final override operator fun invoke(request: Request): Response =
         try {
-            logger.info("Executing use case: ${this.javaClass.simpleName} with request: $request")
+            logger.info("유스케이스 실행 중: ${this.javaClass.simpleName}, 요청 내용: $request")
 //            val startTime = Instant.now()
 
             validateRequest(request)
@@ -19,10 +19,10 @@ abstract class LoggingUseCase<in Request : Any, out Response : Any> : UseCase<Re
                     execute(request)
                 }
 
-            logger.info("Use case: ${this.javaClass.simpleName} completed in ${duration.inWholeMilliseconds}ms")
+            logger.info("유스케이스: ${this.javaClass.simpleName} 완료, 소요 시간: ${duration.inWholeMilliseconds}ms")
             response
         } catch (e: Exception) {
-            logger.error("Error executing use case: ${this.javaClass.simpleName}", e)
+            logger.error("유스케이스 실행 중 오류 발생: ${this.javaClass.simpleName}", e)
             throw e
         }
 

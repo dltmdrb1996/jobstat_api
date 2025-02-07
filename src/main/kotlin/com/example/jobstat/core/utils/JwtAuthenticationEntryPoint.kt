@@ -1,8 +1,8 @@
 package com.example.jobstat.core.utils
 
-import ApiResponse
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.wrapper.ApiResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse

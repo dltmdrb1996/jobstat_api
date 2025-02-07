@@ -102,7 +102,7 @@ class IndustrySkillRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
-        require(rankings.all { it.relatedRankings.isNotEmpty() }) { "All industries must have related skills" }
+        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.all { it.relatedRankings.isNotEmpty() }) { "모든 산업은 관련 기술을 가지고 있어야 합니다" }
     }
 }

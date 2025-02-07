@@ -18,4 +18,6 @@ internal interface RoleRepository {
     fun existsById(id: Long): Boolean
 
     fun existsByName(name: String): Boolean
+
+    fun deleteAll()
 }

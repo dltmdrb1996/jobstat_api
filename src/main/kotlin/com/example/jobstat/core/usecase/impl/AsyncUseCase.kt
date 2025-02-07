@@ -12,17 +12,17 @@ abstract class AsyncUseCase<in Request : Any, out Response : Any> : CoroutineUse
     final override suspend operator fun invoke(request: Request): Response =
         withContext(Dispatchers.Default) {
             try {
-                logger.info("Executing async use case: ${this@AsyncUseCase.javaClass.simpleName} with request: $request")
+                logger.info("비동기 유스케이스 실행 중: ${this@AsyncUseCase.javaClass.simpleName}, 요청 내용: $request")
                 val (response, duration) =
                     measureTimedValue {
                         execute(request)
                     }
                 logger.info(
-                    "Async use case: ${this@AsyncUseCase.javaClass.simpleName} completed in ${duration.inWholeMilliseconds}ms",
+                    "비동기 유스케이스: ${this@AsyncUseCase.javaClass.simpleName} 완료, 소요 시간: ${duration.inWholeMilliseconds}ms",
                 )
                 response
             } catch (e: Exception) {
-                logger.error("Error executing async use case: ${this@AsyncUseCase.javaClass.simpleName}", e)
+                logger.error("비동기 유스케이스 실행 중 오류 발생: ${this@AsyncUseCase.javaClass.simpleName}", e)
                 throw e
             }
         }

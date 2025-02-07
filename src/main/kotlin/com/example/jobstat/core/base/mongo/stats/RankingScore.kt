@@ -11,15 +11,15 @@ import java.io.Serializable
     property = "score_type", // 타입 정보를 저장할 필드
 )
 @JsonSubTypes(
-    JsonSubTypes.Type(value = PostingCountScore::class, name = "posting_count_score"),
-    JsonSubTypes.Type(value = SalaryScore::class, name = "salary_score"),
-    JsonSubTypes.Type(value = GrowthScore::class, name = "growth_score"),
-    JsonSubTypes.Type(value = DemandScore::class, name = "demand_score"),
-    JsonSubTypes.Type(value = MonthlyChangeScore::class, name = "monthly_change_score"),
-    JsonSubTypes.Type(value = CompanyGrowthScore::class, name = "company_growth_score"),
-    JsonSubTypes.Type(value = CompanyHiringScore::class, name = "company_hiring_score"),
-    JsonSubTypes.Type(value = CompanyWorkLifeBalanceScore::class, name = "company_work_life_balance_score"),
-    JsonSubTypes.Type(value = EntryLevelFriendlinessScore::class, name = "entry_level_friendliness_score"),
+    JsonSubTypes.Type(value = PostingCountScore::class, name = "게시물_수_점수"),
+    JsonSubTypes.Type(value = SalaryScore::class, name = "급여_점수"),
+    JsonSubTypes.Type(value = GrowthScore::class, name = "성장_점수"),
+    JsonSubTypes.Type(value = DemandScore::class, name = "수요_점수"),
+    JsonSubTypes.Type(value = MonthlyChangeScore::class, name = "월간_변화_점수"),
+    JsonSubTypes.Type(value = CompanyGrowthScore::class, name = "기업_성장_점수"),
+    JsonSubTypes.Type(value = CompanyHiringScore::class, name = "기업_채용_점수"),
+    JsonSubTypes.Type(value = CompanyWorkLifeBalanceScore::class, name = "기업_워라밸_점수"),
+    JsonSubTypes.Type(value = EntryLevelFriendlinessScore::class, name = "신입_친화도_점수"),
 )
 interface RankingScore : Serializable {
     val value: Double
@@ -49,7 +49,7 @@ data class GrowthScore(
     @Field("growth_rate")
     val growthRate: Double,
     @Field("consistency_score")
-    val consistencyScore: Double?, // 성장의 일관성 점수
+    val consistencyScore: Double?,
 ) : RankingScore
 
 data class DemandScore(

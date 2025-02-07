@@ -1,7 +1,7 @@
 package com.example.jobstat.board.usecase
 
-import com.example.jobstat.board.BoardService
-import com.example.jobstat.board.CommentService
+import com.example.jobstat.board.internal.service.BoardService
+import com.example.jobstat.board.internal.service.CommentService
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import jakarta.transaction.Transactional
 import jakarta.validation.Validator
@@ -17,10 +17,15 @@ class AddCommentToBoard(
 ) : ValidUseCase<AddCommentToBoard.Request, AddCommentToBoard.Response>(validator) {
     @Transactional
     override fun execute(request: Request): Response {
-        val board =
-            boardService.getBoardById(request.boardId)
-                ?: throw NoSuchElementException("Board not found")
-        val comment = commentService.createComment(request.boardId, request.content, request.author)
+        // 게시글이 없으면 예외를 발생시킵니다
+        val board = boardService.getBoardById(request.boardId)
+        val comment =
+            commentService.createComment(
+                boardId = request.boardId,
+                content = request.content,
+                author = request.author,
+                password = null,
+            )
         return Response(
             boardId = board.id,
             commentId = comment.id,
@@ -31,12 +36,9 @@ class AddCommentToBoard(
     }
 
     data class Request(
-        @field:Positive
-        val boardId: Long,
-        @field:NotBlank
-        val content: String,
-        @field:NotBlank
-        val author: String,
+        @field:Positive val boardId: Long,
+        @field:NotBlank val content: String,
+        @field:NotBlank val author: String,
     )
 
     data class Response(
