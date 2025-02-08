@@ -32,7 +32,7 @@ class AddCommentToBoardTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         commentService = CommentServiceImpl(commentRepository, boardRepository)
         addCommentToBoard = AddCommentToBoard(boardService, commentService, Validation.buildDefaultValidatorFactory().validator)
 

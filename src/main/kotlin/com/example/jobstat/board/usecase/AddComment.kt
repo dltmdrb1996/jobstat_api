@@ -10,13 +10,12 @@ import jakarta.validation.constraints.Size
 import org.springframework.stereotype.Service
 
 @Service
-class AddComment(
+internal class AddComment(
     private val commentService: CommentService,
     validator: Validator,
 ) : ValidUseCase<AddComment.Request, AddComment.Response>(validator) {
     @Transactional
     override fun execute(request: Request): Response {
-        // password is not provided – guest comment (password = null)
         val comment =
             commentService.createComment(
                 boardId = request.boardId,

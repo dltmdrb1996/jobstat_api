@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class GetRecentComments(
+internal class GetRecentComments(
     private val commentService: CommentService,
     validator: Validator,
 ) : ValidUseCase<GetRecentComments.Request, GetRecentComments.Response>(validator) {

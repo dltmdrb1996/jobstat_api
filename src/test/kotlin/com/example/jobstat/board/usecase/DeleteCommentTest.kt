@@ -34,7 +34,7 @@ class DeleteCommentTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         commentService = CommentServiceImpl(commentRepository, boardRepository)
         passwordUtil = FakePasswordUtil()
         deleteComment = DeleteComment(commentService, passwordUtil, Validation.buildDefaultValidatorFactory().validator)

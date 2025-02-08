@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Positive
 import org.springframework.stereotype.Service
 
 @Service
-class DeleteComment(
+internal class DeleteComment(
     private val commentService: CommentService,
     private val bcryptPasswordUtil: PasswordUtil,
     validator: Validator,

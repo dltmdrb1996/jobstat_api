@@ -8,8 +8,9 @@ import jakarta.validation.Validator
 import jakarta.validation.constraints.Positive
 import org.springframework.stereotype.Service
 
+// 회원 비회원 로직 분리해야함
 @Service
-class DeleteBoard(
+internal class DeleteBoard(
     private val boardService: BoardService,
     private val bcryptPasswordUtil: PasswordUtil,
     validator: Validator,

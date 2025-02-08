@@ -14,7 +14,7 @@ interface ReadUser {
     val address: Address?
     val password: String
     val isActive: Boolean
-    val roles: Set<ReadOnlyRole>
+    val roles: Set<ReadRole>
 
     fun getRolesString(): List<String> = roles.map { it.name }
 

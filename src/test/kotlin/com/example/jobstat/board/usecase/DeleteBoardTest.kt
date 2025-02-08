@@ -30,7 +30,7 @@ class DeleteBoardTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         passwordUtil = FakePasswordUtil()
         deleteBoard = DeleteBoard(boardService, passwordUtil, Validation.buildDefaultValidatorFactory().validator)
         testCategory =
