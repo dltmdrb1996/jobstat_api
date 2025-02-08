@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Size
 import org.springframework.stereotype.Service
 
 @Service
-class UpdateBoard(
+internal class UpdateBoard(
     private val boardService: BoardService,
     private val bcryptPasswordUtil: PasswordUtil,
     validator: Validator,

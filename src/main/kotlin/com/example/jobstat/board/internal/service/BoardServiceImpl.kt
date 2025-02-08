@@ -4,7 +4,6 @@ import com.example.jobstat.board.internal.entity.Board
 import com.example.jobstat.board.internal.entity.ReadBoard
 import com.example.jobstat.board.internal.repository.BoardRepository
 import com.example.jobstat.board.internal.repository.CategoryRepository
-import com.example.jobstat.board.internal.repository.CommentRepository
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import org.springframework.data.domain.Page
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional
 internal class BoardServiceImpl(
     private val boardRepository: BoardRepository,
     private val categoryRepository: CategoryRepository,
-    private val commentRepository: CommentRepository,
 ) : BoardService {
     override fun createBoard(
         title: String,
@@ -25,6 +23,7 @@ internal class BoardServiceImpl(
         author: String,
         categoryId: Long?,
         password: String?,
+        userId: Long?,
     ): ReadBoard {
         val category =
             categoryId?.let { categoryRepository.findById(it) }
@@ -73,8 +72,6 @@ internal class BoardServiceImpl(
     }
 
     override fun deleteBoard(id: Long) {
-        // 댓글은 orphanRemoval 및 cascade로 처리되지만 필요시 명시적 삭제도 수행합니다.
-        commentRepository.deleteByBoardId(id)
         boardRepository.deleteById(id)
     }
 

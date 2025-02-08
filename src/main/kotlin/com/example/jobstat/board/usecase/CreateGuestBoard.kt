@@ -7,12 +7,11 @@ import jakarta.transaction.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.springframework.stereotype.Service
 
 @Service
-class CreateGuestBoard(
+internal class CreateGuestBoard(
     private val boardService: BoardService,
     private val bcryptPasswordUtil: PasswordUtil,
     validator: Validator,
@@ -38,9 +37,7 @@ class CreateGuestBoard(
         @field:NotBlank @field:Size(max = 100) val title: String,
         @field:NotBlank @field:Size(max = 5000) val content: String,
         @field:NotBlank val author: String,
-        @field:NotBlank
-        @field:Pattern(regexp = "^[0-9]{4,12}$", message = "비밀번호는 4-12자리 숫자여야 합니다")
-        val password: String,
+        @field:Size(min = 4, max = 20) val password: String,
         @field:NotNull val categoryId: Long,
     )
 

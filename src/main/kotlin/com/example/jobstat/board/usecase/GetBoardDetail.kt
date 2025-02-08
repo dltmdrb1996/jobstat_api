@@ -11,7 +11,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
 @Service
-class GetBoardDetail(
+internal class GetBoardDetail(
     private val boardService: BoardService,
     private val commentService: CommentService,
     validator: Validator,

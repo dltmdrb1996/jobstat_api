@@ -29,7 +29,7 @@ class GetRecentCommentsTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         commentService = CommentServiceImpl(commentRepository, boardRepository)
         getRecentComments = GetRecentComments(commentService, Validation.buildDefaultValidatorFactory().validator)
 

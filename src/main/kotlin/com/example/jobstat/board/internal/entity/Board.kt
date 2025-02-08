@@ -20,12 +20,13 @@ interface ReadBoard {
 
 @Entity
 @Table(name = "boards")
-class Board protected constructor(
+internal class Board protected constructor(
     title: String,
     content: String,
     author: String,
     password: String?,
     category: BoardCategory,
+    userId: Long?,
 ) : BaseEntity(),
     ReadBoard {
     @Column(nullable = false, length = 100)
@@ -88,15 +89,16 @@ class Board protected constructor(
             title: String,
             content: String,
             author: String,
-            password: String?,
+            password: String? = null,
             category: BoardCategory,
+            userId: Long? = null,
         ): Board {
             require(title.isNotBlank()) { "제목은 비워둘 수 없습니다" }
             require(title.length <= 100) { "제목은 1자에서 100자 사이여야 합니다" }
             require(content.isNotBlank()) { "내용은 비워둘 수 없습니다" }
             require(content.length <= 5000) { "내용은 1자에서 5000자 사이여야 합니다" }
             require(author.isNotBlank()) { "작성자는 비워둘 수 없습니다" }
-            return Board(title, content, author, password, category)
+            return Board(title, content, author, password, category, userId)
         }
     }
 }

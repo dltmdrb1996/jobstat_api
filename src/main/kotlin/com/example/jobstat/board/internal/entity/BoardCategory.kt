@@ -8,7 +8,7 @@ interface ReadBoardCategory {
     val name: String
     val displayName: String
     val description: String
-    val boards: Set<Board>
+    val boards: Set<ReadBoard>
 }
 
 @Entity
@@ -16,7 +16,7 @@ interface ReadBoardCategory {
     name = "board_categories",
     indexes = [Index(name = "idx_category_name", columnList = "name", unique = true)],
 )
-class BoardCategory protected constructor(
+internal class BoardCategory protected constructor(
     name: String,
     displayName: String,
     description: String,

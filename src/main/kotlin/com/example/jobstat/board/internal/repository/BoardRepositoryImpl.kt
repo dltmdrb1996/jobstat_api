@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
-interface BoardJpaRepository : JpaRepository<Board, Long> {
+internal interface BoardJpaRepository : JpaRepository<Board, Long> {
     fun findByAuthor(
         author: String,
         pageable: Pageable,

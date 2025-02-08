@@ -30,7 +30,7 @@ class GetBoardDetailTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         commentService = CommentServiceImpl(commentRepository, boardRepository)
         getBoardDetail = GetBoardDetail(boardService, commentService, Validation.buildDefaultValidatorFactory().validator)
 

@@ -3,7 +3,6 @@ package com.example.jobstat.board.usecase
 import com.example.jobstat.board.fake.CategoryFixture
 import com.example.jobstat.board.fake.repository.FakeBoardRepository
 import com.example.jobstat.board.fake.repository.FakeCategoryRepository
-import com.example.jobstat.board.fake.repository.FakeCommentRepository
 import com.example.jobstat.board.internal.service.BoardService
 import com.example.jobstat.board.internal.service.BoardServiceImpl
 import jakarta.validation.Validation
@@ -25,7 +24,7 @@ class GetBoardListTest {
     fun setUp() {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, FakeCommentRepository())
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         getBoardList = GetBoardList(boardService, Validation.buildDefaultValidatorFactory().validator)
 
         val category =

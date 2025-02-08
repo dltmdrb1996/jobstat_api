@@ -28,7 +28,7 @@ class GetTopBoardsTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         getTopBoards = GetTopBoards(boardService, Validation.buildDefaultValidatorFactory().validator)
 
         val category =

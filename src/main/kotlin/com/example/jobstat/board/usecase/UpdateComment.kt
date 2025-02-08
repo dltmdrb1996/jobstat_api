@@ -11,7 +11,7 @@ import jakarta.validation.constraints.Size
 import org.springframework.stereotype.Service
 
 @Service
-class UpdateComment(
+internal class UpdateComment(
     private val commentService: CommentService,
     private val bcryptPasswordUtil: PasswordUtil,
     validator: Validator,

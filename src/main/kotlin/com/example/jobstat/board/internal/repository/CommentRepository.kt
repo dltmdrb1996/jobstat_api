@@ -4,7 +4,7 @@ import com.example.jobstat.board.internal.entity.Comment
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
-interface CommentRepository {
+internal interface CommentRepository {
     fun findAll(pageable: Pageable): Page<Comment>
 
     fun save(comment: Comment): Comment

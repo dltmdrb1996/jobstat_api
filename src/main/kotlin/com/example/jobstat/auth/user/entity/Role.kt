@@ -3,7 +3,7 @@ package com.example.jobstat.auth.user.entity
 import com.example.jobstat.core.base.BaseEntity
 import jakarta.persistence.*
 
-interface ReadOnlyRole {
+interface ReadRole {
     val id: Long
     val name: String
     val users: Set<ReadUser>
@@ -19,7 +19,7 @@ interface ReadOnlyRole {
 internal class Role private constructor(
     name: String,
 ) : BaseEntity(),
-    ReadOnlyRole {
+    ReadRole {
     @Column(nullable = false, unique = true, length = 50)
     override var name: String = name
         protected set

@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Positive
 import org.springframework.stereotype.Service
 
 @Service
-class AddCommentToBoard(
+internal class AddCommentToBoard(
     private val boardService: BoardService,
     private val commentService: CommentService,
     validator: Validator,
