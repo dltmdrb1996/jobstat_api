@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 import java.util.*
 
-interface CategoryJpaRepository : JpaRepository<BoardCategory, Long> {
+internal interface CategoryJpaRepository : JpaRepository<BoardCategory, Long> {
     fun existsByName(name: String): Boolean
 
     fun findByName(name: String): Optional<BoardCategory>

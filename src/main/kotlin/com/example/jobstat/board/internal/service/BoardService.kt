@@ -11,6 +11,7 @@ interface BoardService {
         author: String,
         categoryId: Long?,
         password: String?,
+        userId: Long? = null,
     ): ReadBoard
 
     fun getBoardById(id: Long): ReadBoard

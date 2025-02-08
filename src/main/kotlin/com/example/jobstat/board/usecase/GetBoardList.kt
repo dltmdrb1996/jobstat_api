@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class GetBoardList(
+internal class GetBoardList(
     private val boardService: BoardService,
     validator: Validator,
 ) : ValidUseCase<GetBoardList.Request, GetBoardList.Response>(validator) {

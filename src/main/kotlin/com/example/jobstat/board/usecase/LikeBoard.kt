@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Positive
 import org.springframework.stereotype.Service
 
 @Service
-class LikeBoard(
+internal class LikeBoard(
     private val boardService: BoardService,
     validator: Validator,
 ) : ValidUseCase<LikeBoard.Request, LikeBoard.Response>(validator) {

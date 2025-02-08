@@ -6,7 +6,6 @@ import com.example.jobstat.board.fake.repository.FakeCategoryRepository
 import com.example.jobstat.board.fake.repository.FakeCommentRepository
 import com.example.jobstat.board.internal.entity.Board
 import com.example.jobstat.board.internal.entity.BoardCategory
-import com.example.jobstat.board.internal.entity.Comment
 import com.example.jobstat.board.internal.service.BoardService
 import com.example.jobstat.board.internal.service.BoardServiceImpl
 import com.example.jobstat.core.error.AppException
@@ -31,7 +30,7 @@ class BoardServiceTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
 
         // 카테고리 생성 – Fixture를 사용 (CategoryFixture는 name, displayName, description을 모두 받음)
         testCategory =
@@ -490,32 +489,6 @@ class BoardServiceTest {
                 assertFailsWith<EntityNotFoundException> {
                     boardService.getBoardById(savedBoard.id)
                 }
-            }
-
-            @Test
-            @DisplayName("게시글 삭제시 연관된 댓글도 삭제된다")
-            fun deleteBoardWithComments() {
-                val savedBoard =
-                    boardService.createBoard(
-                        title = "Board with comments",
-                        content = "Content",
-                        author = "testUser",
-                        categoryId = testCategory.id,
-                        password = null,
-                    ) as Board
-                repeat(3) { idx ->
-                    val comment =
-                        Comment.create(
-                            content = "Comment $idx",
-                            author = "commenter",
-                            password = null,
-                            savedBoard,
-                        )
-                    commentRepository.save(comment)
-                }
-                assertEquals(3L, commentRepository.countByBoardId(savedBoard.id))
-                boardService.deleteBoard(savedBoard.id)
-                assertEquals(0L, commentRepository.countByBoardId(savedBoard.id))
             }
 
             @Test

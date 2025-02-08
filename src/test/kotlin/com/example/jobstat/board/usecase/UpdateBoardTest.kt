@@ -30,7 +30,7 @@ class UpdateBoardTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         passwordUtil = FakePasswordUtil()
         updateBoard = UpdateBoard(boardService, passwordUtil, Validation.buildDefaultValidatorFactory().validator)
 

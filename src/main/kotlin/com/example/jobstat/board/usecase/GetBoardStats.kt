@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class GetBoardStats(
+internal class GetBoardStats(
     private val boardService: BoardService,
     private val commentService: CommentService,
     validator: Validator,

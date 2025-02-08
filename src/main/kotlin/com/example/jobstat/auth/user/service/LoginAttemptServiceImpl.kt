@@ -7,7 +7,7 @@ import java.time.Duration
 import java.time.Instant
 
 @Component
-class LoginAttemptServiceImpl(
+internal class LoginAttemptServiceImpl(
     cacheManager: CacheManager,
 ) : LoginAttemptService {
     val cache: Cache =

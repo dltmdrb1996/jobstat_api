@@ -13,7 +13,7 @@ import java.util.*
 @RequestMapping("/api/${RestConstants.Versions.V1}/test/users")
 @Profile("dev")
 @Public
-class TestUserController {
+internal class TestUserController {
     private val random = Random()
 
     @GetMapping("/{userId}/profile")

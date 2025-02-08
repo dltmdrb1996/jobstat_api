@@ -28,7 +28,7 @@ class CreateGuestBoardTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         // FakePasswordUtil는 단순히 접두사 "encoded:"를 붙임 (테스트용)
         val passwordUtil = FakePasswordUtil()
         createGuestBoard = CreateGuestBoard(boardService, passwordUtil, Validation.buildDefaultValidatorFactory().validator)

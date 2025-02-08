@@ -2,7 +2,7 @@ package com.example.jobstat.board.internal.repository
 
 import com.example.jobstat.board.internal.entity.BoardCategory
 
-interface CategoryRepository {
+internal interface CategoryRepository {
     fun save(category: BoardCategory): BoardCategory
 
     fun findById(id: Long): BoardCategory

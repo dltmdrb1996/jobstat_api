@@ -16,7 +16,7 @@ interface ReadComment {
 
 @Entity
 @Table(name = "comments")
-class Comment protected constructor(
+internal class Comment protected constructor(
     content: String,
     author: String,
     password: String?,

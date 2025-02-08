@@ -31,7 +31,7 @@ class GetBoardStatsTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         commentService = CommentServiceImpl(commentRepository, boardRepository)
         getBoardStats = GetBoardStats(boardService, commentService, Validation.buildDefaultValidatorFactory().validator)
 

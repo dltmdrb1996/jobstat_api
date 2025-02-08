@@ -25,7 +25,7 @@ class LikeBoardTest {
         boardRepository = FakeBoardRepository()
         categoryRepository = FakeCategoryRepository()
         commentRepository = FakeCommentRepository()
-        boardService = BoardServiceImpl(boardRepository, categoryRepository, commentRepository)
+        boardService = BoardServiceImpl(boardRepository, categoryRepository)
         likeBoard = LikeBoard(boardService, Validation.buildDefaultValidatorFactory().validator)
 
         // 카테고리 인스턴스 생성 후 반드시 저장하여 올바른 id가 할당되도록 함
