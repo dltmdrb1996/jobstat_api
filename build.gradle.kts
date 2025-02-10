@@ -99,10 +99,6 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.0")
 //    testImplementation("io.mockk:mockk:1.13.16")
 
-//    // Testing
-//    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-//    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
     // 컨테이너 테스트 관련
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:mongodb:1.20.4")
@@ -155,3 +151,38 @@ ktlint {
         exclude("**/build/generated/**")
     }
 }
+
+// tasks.register("checkInternalModifier") {
+//    doLast {
+//        val sourceDir = project.projectDir.resolve("src/main/kotlin")
+//        var hasError = false
+//
+//        sourceDir.walk()
+//            .filter { it.isFile && it.extension == "kt" }
+//            .forEach { file ->
+//                val content = file.readText()
+//                val packageLine = content.lines().find { it.startsWith("package") }
+//
+//                // domain 패키지에 있는 파일만 검사
+//                if (packageLine?.contains(".domain.") == true) {
+//                    // 클래스/데이터 클래스 선언을 찾음
+//                    val classDeclarations = content.lines().filter { line ->
+//                        (line.contains("class ") || line.contains("data class ")) &&
+//                                !line.contains("interface") && // 인터페이스 제외
+//                                !line.contains("Service") // Service 인터페이스 제외
+//                    }
+//
+//                    classDeclarations.forEach { declaration ->
+//                        if (!declaration.contains("internal")) {
+//                            println("Error: Missing internal modifier in ${file.name}: $declaration")
+//                            hasError = true
+//                        }
+//                    }
+//                }
+//            }
+//
+//        if (hasError) {
+//            throw GradleException("Found classes without internal modifier in domain package")
+//        }
+//    }
+// }
