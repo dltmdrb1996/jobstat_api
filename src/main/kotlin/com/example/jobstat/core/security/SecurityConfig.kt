@@ -1,7 +1,8 @@
 package com.example.jobstat.core.security
 
-import com.example.jobstat.core.error.StructuredLogger
 import com.example.jobstat.core.utils.JwtAuthenticationEntryPoint
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -25,7 +26,7 @@ class SecurityConfig(
 ) {
     @Value("\${ddns.domain}")
     private lateinit var ddnsDomain: String
-    private val log = StructuredLogger(this::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {

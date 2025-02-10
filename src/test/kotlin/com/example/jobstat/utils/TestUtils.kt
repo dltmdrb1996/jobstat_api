@@ -1,18 +1,19 @@
 package com.example.jobstat.utils
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.system.measureTimeMillis
 
 object TestUtils {
-    private val logger = LoggerFactory.getLogger(TestUtils::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     fun logMemoryUsage() {
         val runtime = Runtime.getRuntime()
         val usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
         val totalMemory = runtime.totalMemory() / 1024 / 1024
-        logger.info("Memory Usage: Used=${usedMemory}MB, Total=${totalMemory}MB")
+        log.info("Memory Usage: Used=${usedMemory}MB, Total=${totalMemory}MB")
     }
 
     fun <T> measureTimeAndLog(
@@ -27,7 +28,7 @@ object TestUtils {
             }
         val endTime = LocalDateTime.now()
 
-        logger.info(
+        log.info(
             """
             Operation '$operation' completed:
             - Execution time: ${executionTime / 1000.0} seconds

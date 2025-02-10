@@ -31,6 +31,7 @@ internal class AuthController(
         @RequestBody loginRequest: Login.Request,
     ): ResponseEntity<ApiResponse<Login.Response>> = ApiResponse.ok(loginUseCase(loginRequest))
 
+    @Public
     @PostMapping("/refresh")
     fun refreshToken(
         @RequestBody refreshTokenRequest: RefreshToken.Request,

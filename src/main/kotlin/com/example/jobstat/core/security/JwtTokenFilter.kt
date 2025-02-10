@@ -4,13 +4,15 @@ import com.example.jobstat.auth.user.entity.RoleData
 import com.example.jobstat.auth.user.service.UserService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.error.StructuredLogger
 import com.example.jobstat.core.security.annotation.AdminAuth
 import com.example.jobstat.core.security.annotation.Public
+import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
@@ -27,9 +29,11 @@ class JwtTokenFilter(
     private val objectMapper: ObjectMapper,
     private val userService: UserService,
 ) : OncePerRequestFilter() {
-    private val log = StructuredLogger(this::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
     private val errorResponseCache = ConcurrentHashMap<String, String>()
     private val shouldNotFilterCache = ConcurrentHashMap<String, Boolean>()
+    private val handlerMethodCache = ConcurrentHashMap<String, HandlerMethod?>()
+    private val publicWithTokenCheckCache = ConcurrentHashMap<String, Boolean>()
     private val adminCheckCache = ConcurrentHashMap<String, Boolean>()
 
     companion object {
@@ -48,13 +52,63 @@ class JwtTokenFilter(
 
     override fun shouldNotFilter(request: HttpServletRequest): Boolean =
         shouldNotFilterCache.computeIfAbsent("${request.method}:${request.requestURI}") { _ ->
+            val handlerMethod = getHandlerMethodFromCache(request)
+            when {
+                handlerMethod == null -> false
+                handlerMethod.hasMethodAnnotation(Public::class.java) -> true
+                handlerMethod.beanType.isAnnotationPresent(Public::class.java) -> true
+                else -> false
+            }
+        }
+
+    override fun doFilterInternal(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain,
+    ) {
+        log.info("JWT 필터 처리 시작: ${request.requestURI}, ${shouldNotFilter(request)}")
+        if (shouldNotFilter(request)) {
+            filterChain.doFilter(request, response)
+            return
+        }
+
+        val isPublicWithTokenCheck = isPublicWithTokenCheck(request)
+
+        try {
+            getJwtFromRequest(request)?.let { jwt ->
+                val accessPayload = jwtTokenParser.validateToken(jwt)
+                if (checkAdminAuth(request)) {
+                    handleAdminAuth(accessPayload)
+                } else {
+                    setSecurityContextHolder(accessPayload)
+                }
+            } ?: run {
+                if (!isPublicWithTokenCheck) {
+                    throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_MISSING)
+                }
+            }
+        } catch (ex: AppException) {
+            sendErrorResponse(response, ex)
+            return
+        } catch (ex: Exception) {
+            sendErrorResponse(
+                response,
+                AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_VALIDATION_ERROR),
+            )
+            return
+        }
+
+        filterChain.doFilter(request, response)
+    }
+
+    private fun isPublicWithTokenCheck(request: HttpServletRequest): Boolean =
+        publicWithTokenCheckCache.computeIfAbsent("${request.method}:${request.requestURI}") { _ ->
             try {
                 when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
                     null -> false
                     is HandlerMethod ->
-                        handler.hasMethodAnnotation(Public::class.java) ||
-                            handler.beanType.isAnnotationPresent(Public::class.java)
-
+                        handler.hasMethodAnnotation(PublicWithTokenCheck::class.java) ||
+                            handler.beanType.isAnnotationPresent(PublicWithTokenCheck::class.java)
                     else -> false
                 }
             } catch (ex: Exception) {
@@ -78,55 +132,19 @@ class JwtTokenFilter(
             }
         }
 
-    override fun doFilterInternal(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        filterChain: FilterChain,
-    ) {
-        log.info("JWT 필터 처리 시작: ${request.requestURI}")
-        if (shouldNotFilter(request)) {
-            filterChain.doFilter(request, response)
-            return
-        }
+    private fun handleAdminAuth(accessPayload: AccessPayload) {
+        val isAdmin = accessPayload.roles.contains(RoleData.ADMIN.name)
+        if (!isAdmin) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_ADMIN_AUTH_ERROR)
+        setSecurityContextHolder(accessPayload)
+    }
 
-        try {
-            getJwtFromRequest(request)?.let { jwt ->
-                val accessPayload = jwtTokenParser.validateToken(jwt)
-
-                if (checkAdminAuth(request)) {
-                    val isAdmin = accessPayload.roles.contains(RoleData.ADMIN.name)
-                    if (!isAdmin) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_ADMIN_AUTH_ERROR)
-
-                    SecurityContextHolder.getContext().authentication =
-                        UsernamePasswordAuthenticationToken(
-                            accessPayload.id,
-                            null,
-                            listOf(SimpleGrantedAuthority("ROLE_${RoleData.ADMIN.name}")),
-                        )
-                } else {
-                    // 그 외의 경우는 토큰 검증만 하고 기본 인증 정보만 설정
-                    SecurityContextHolder.getContext().authentication =
-                        UsernamePasswordAuthenticationToken(
-                            accessPayload.id,
-                            null,
-                            emptyList(),
-                        )
-                }
-            } ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_MISSING)
-        } catch (ex: AppException) {
-            log.error("JWT 토큰 검증에 실패했습니다", ex)
-            sendErrorResponse(response, ex)
-            return
-        } catch (ex: Exception) {
-            log.error("JWT 토큰 처리 중 오류가 발생했습니다", ex)
-            sendErrorResponse(
-                response,
-                AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_VALIDATION_ERROR),
+    private fun setSecurityContextHolder(accessPayload: AccessPayload) {
+        SecurityContextHolder.getContext().authentication =
+            UsernamePasswordAuthenticationToken(
+                accessPayload.id,
+                null,
+                accessPayload.roles.map { SimpleGrantedAuthority("ROLE_$it") },
             )
-            return
-        }
-
-        filterChain.doFilter(request, response)
     }
 
     private fun getJwtFromRequest(request: HttpServletRequest): String? = request.getHeader("Authorization")?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_PREFIX.length)
@@ -156,6 +174,13 @@ class JwtTokenFilter(
                     "message" to message,
                 )
             errorResponseCache[cacheKey] = objectMapper.writeValueAsString(errorResponse)
+        }
+    }
+
+    private fun getHandlerMethodFromCache(request: HttpServletRequest): HandlerMethod? {
+        val cacheKey = "${request.method}:${request.requestURI}"
+        return handlerMethodCache.computeIfAbsent(cacheKey) { _ ->
+            (requestMappingHandlerMapping.getHandler(request)?.handler as? HandlerMethod)
         }
     }
 

@@ -4,6 +4,7 @@ import com.example.jobstat.core.base.mongo.ranking.DistributionRankingDocument
 import com.example.jobstat.core.state.BaseDate
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.aggregation.Aggregation.*
@@ -74,7 +75,7 @@ abstract class DistributionRankingRepositoryImpl<
     private val mongoOperations: MongoOperations,
 ) : BaseRankingRepositoryImpl<T, E, ID>(entityInformation, mongoOperations),
     DistributionRankingRepository<T, E, ID> {
-    private val logger = LoggerFactory.getLogger(DistributionRankingRepositoryImpl::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     override fun findByDistributionPattern(
         baseDate: BaseDate,

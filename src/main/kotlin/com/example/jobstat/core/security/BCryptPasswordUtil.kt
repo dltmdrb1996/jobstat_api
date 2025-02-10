@@ -21,5 +21,5 @@ class BCryptPasswordUtil(
     override fun matches(
         rawPassword: String,
         encodedPassword: String,
-    ): Boolean = passwordEncoder.matches(encode(rawPassword), encodedPassword)
+    ): Boolean = passwordEncoder.matches(rawPassword, encodedPassword)
 }

@@ -7,7 +7,7 @@ import com.google.devtools.ksp.getDeclaredProperties
 
 class MongoEntityProcessor(
     private val codeGenerator: CodeGenerator,
-    private val logger: KSPLogger
+    private val log: KSPLogger
 ) : SymbolProcessor {
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
@@ -20,7 +20,7 @@ class MongoEntityProcessor(
             try {
                 processEntity(classDeclaration, resolver)
             } catch (e: Exception) {
-                logger.error("Failed to process ${classDeclaration.simpleName.asString()}: ${e.message}")
+                log.error("Failed to process ${classDeclaration.simpleName.asString()}: ${e.message}")
                 e.printStackTrace()
             }
         }
@@ -171,6 +171,6 @@ class MongoEntityProcessorProvider : SymbolProcessorProvider {
         environment: SymbolProcessorEnvironment
     ): SymbolProcessor = MongoEntityProcessor(
         codeGenerator = environment.codeGenerator,
-        logger = environment.logger
+        log = environment.logger
     )
 }

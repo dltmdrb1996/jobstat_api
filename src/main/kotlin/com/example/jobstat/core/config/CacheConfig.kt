@@ -1,6 +1,7 @@
 package com.example.jobstat.core.config
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
@@ -14,7 +15,7 @@ import java.time.Duration
 @EnableCaching
 @Configuration
 class CacheConfig : CachingConfigurer {
-    private val log = LoggerFactory.getLogger(CacheConfig::class.java) // 로거 추가
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     companion object {
         private const val STATS_CACHE_SIZE = 2000L
@@ -31,7 +32,7 @@ class CacheConfig : CachingConfigurer {
             Caffeine
                 .newBuilder()
                 .maximumSize(STATS_CACHE_SIZE)
-                .expireAfterAccess(EXPIRE_AFTER_ACCESS)
+                .expireAfterWrite(EXPIRE_AFTER_ACCESS)
                 .recordStats()
 
         return CaffeineCacheManager().apply {
@@ -45,7 +46,7 @@ class CacheConfig : CachingConfigurer {
                 Caffeine
                     .newBuilder()
                     .maximumSize(STATS_CACHE_SIZE)
-                    .expireAfterAccess(EXPIRE_AFTER_ACCESS)
+                    .expireAfterWrite(EXPIRE_AFTER_ACCESS)
                     .recordStats()
                     .build()
 

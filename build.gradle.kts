@@ -94,9 +94,10 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.mockito:mockito-core:5.15.2")
+//    testImplementation("org.mockito:mockito-core:5.15.2")
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.0")
+//    testImplementation("io.mockk:mockk:1.13.16")
 
 //    // Testing
 //    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
