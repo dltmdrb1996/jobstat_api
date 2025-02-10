@@ -42,7 +42,6 @@ interface SagaUseCase<Request, Response> {
                 step.compensate(context)
             } catch (e: Exception) {
                 // 보상 단계가 실패해도 다른 보상 단계를 계속 진행
-                println("보상 처리 실패 - 단계 ${step.name}: ${e.message}")
             }
         }
     }

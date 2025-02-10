@@ -29,6 +29,7 @@ enum class ErrorCode(
     VERIFICATION_EXPIRED("C012", "만료된 인증 코드입니다.", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
     INVALID_VERIFICATION_CODE("C013", "잘못된 인증 코드입니다.", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
     ACCOUNT_DISABLED("C014", "비활성화된 계정입니다.", HttpStatus.FORBIDDEN, AppExceptionType.CLIENT_ERROR),
+    INSUFFICIENT_PERMISSION("C015", "권한이 부족합니다.", HttpStatus.FORBIDDEN, AppExceptionType.CLIENT_ERROR),
 
     // 서버 오류
     INTERNAL_ERROR("S001", "내부 서버 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),

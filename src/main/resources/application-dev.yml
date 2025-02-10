@@ -51,14 +51,9 @@ batch:
   job-size: 100
 
 logging:
-  level:
-    root: INFO
-    com.wildrew.batch: DEBUG
-    org.springframework.jdbc.core: TRACE  # SQL 및 파라미터 로깅
-    org.hibernate.SQL: DEBUG             # SQL 로깅
-    org.hibernate.type.descriptor.sql: TRACE  # 파라미터 바인딩 로깅
   file:
     name: logs/application.log
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 30

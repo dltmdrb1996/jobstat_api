@@ -2,6 +2,7 @@ package com.example.jobstat.auth.email.service
 
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.SimpleMailMessage
@@ -14,7 +15,7 @@ class EmailServiceImpl(
     private val emailSender: JavaMailSender,
     @Value("\${spring.mail.username}") private val fromEmail: String,
 ) : EmailService {
-    private val log = LoggerFactory.getLogger(javaClass)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     @Async
     override fun sendVerificationEmail(

@@ -8,6 +8,7 @@ import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.statistics.rankings.model.*
 import com.example.jobstat.statistics.rankings.repository.RankingRepositoryRegistry
 import com.example.jobstat.statistics.stats.service.StatsAnalysisService
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
@@ -74,7 +75,7 @@ class RankingAnalysisServiceImpl(
         private const val PAGE_SIZE = 100
     }
 
-    private val logger = LoggerFactory.getLogger(RankingAnalysisServiceImpl::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     override fun <T : BaseStatsDocument> findStatsWithRanking(
         rankingType: RankingType,

@@ -67,24 +67,24 @@ internal class User private constructor(
         orphanRemoval = true,
         fetch = FetchType.LAZY,
     )
-    private val _userRoles: MutableSet<UserRole> = mutableSetOf()
+    private val userRoles: MutableSet<UserRole> = mutableSetOf()
 
     override val roles: Set<Role>
-        get() = _userRoles.mapNotNull { it.role }.toSet()
+        get() = userRoles.map { it.role }.toSet()
 
     override fun hasRole(roleName: String): Boolean = roles.any { it.name.equals(roleName, ignoreCase = true) }
 
     override fun isAdmin(): Boolean = hasRole("ADMIN")
 
-    fun hasRole(role: Role): Boolean = _userRoles.any { it.role.id == role.id }
+    fun hasRole(role: Role): Boolean = userRoles.any { it.role.id == role.id }
 
-    fun getUserRole(role: Role): UserRole? = _userRoles.find { it.role.id == role.id }
+    fun getUserRole(role: Role): UserRole? = userRoles.find { it.role.id == role.id }
 
     fun addRole(userRole: UserRole) {
         require(userRole.user == this) { "UserRole은 현재 사용자에 속해있어야 합니다" }
         if (hasRole(userRole.role)) return
 
-        _userRoles.add(userRole)
+        userRoles.add(userRole)
     }
 
     fun removeRole(
@@ -93,7 +93,7 @@ internal class User private constructor(
     ) {
         val userRole = getUserRole(role)
         userRole?.let {
-            _userRoles.remove(it)
+            userRoles.remove(it)
             if (removeFromRole) {
                 role.removeUserRole(this, false)
             }

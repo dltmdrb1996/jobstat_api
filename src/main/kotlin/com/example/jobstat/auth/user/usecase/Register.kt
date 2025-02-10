@@ -29,8 +29,9 @@ internal class Register(
                 birthDate = request.birthDate,
             )
 
-        val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, user.getRolesString()))
-        val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, user.getRolesString()))
+        val roles = user.getRolesString()
+        val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, roles))
+        val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, roles))
         tokenService.storeRefreshToken(refreshToken, user.id, jwtTokenGenerator.getRefreshTokenExpiration())
         return Response(accessToken, refreshToken)
     }

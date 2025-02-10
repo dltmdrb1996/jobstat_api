@@ -289,7 +289,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
             testFindVolatileEntities()
             testFindEntitiesWithConsistentRanking()
         }.let { duration ->
-            logger.info("Total test execution time: ${duration.inWholeSeconds} seconds")
+            log.info("Total test execution time: ${duration.inWholeSeconds} seconds")
         }
 
         // 성능 기준 검증

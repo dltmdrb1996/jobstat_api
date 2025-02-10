@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -44,16 +45,16 @@ import kotlin.system.measureTimeMillis
 abstract class BaseIntegrationTest {
     protected fun logTestStart(testName: String) {
         TestUtils.logMemoryUsage()
-        logger.info("=== Starting test: $testName ===")
+        log.info("=== Starting test: $testName ===")
     }
 
     protected fun logTestEnd(testName: String) {
         TestUtils.logMemoryUsage()
-        logger.info("=== Completed test: $testName ===")
+        log.info("=== Completed test: $testName ===")
     }
 
     companion object {
-        private val logger = LoggerFactory.getLogger(BaseIntegrationTest::class.java)
+        private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
     }
 }
 
@@ -74,7 +75,7 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
         }
     }
 
-    protected val logger = LoggerFactory.getLogger(this::class.java)
+    protected val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
     protected val executionTimes = mutableMapOf<String, Double>()
     var testStartTime: Long = 0
 
@@ -87,7 +88,7 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
     @AfterEach
     fun tearDown() {
         val testDuration = (System.currentTimeMillis() - testStartTime) / 1000.0
-        logger.info("Test completed in $testDuration seconds")
+        log.info("Test completed in $testDuration seconds")
         TestUtils.logMemoryUsage()
     }
 
@@ -107,9 +108,9 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
     }
 
     protected fun printExecutionSummary() {
-        logger.info("=== Execution Summary ===")
+        log.info("=== Execution Summary ===")
         executionTimes.forEach { (operation, time) ->
-            logger.info("$operation: $time seconds")
+            log.info("$operation: $time seconds")
         }
         TestUtils.logMemoryUsage()
     }
@@ -131,7 +132,7 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
                 return
             } catch (e: Exception) {
                 lastException = e
-                logger.warn("Attempt $attempt failed: ${e.message}")
+                log.warn("Attempt $attempt failed: ${e.message}")
                 if (attempt < maxAttempts) {
                     Thread.sleep(delayMs)
                 }

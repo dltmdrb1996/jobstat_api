@@ -9,6 +9,7 @@ import com.example.jobstat.auth.user.repository.UserRepository
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.extension.trueOrThrow
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -18,7 +19,7 @@ internal class UserServiceImpl(
     private val userRepository: UserRepository,
     private val roleRepository: RoleRepository,
 ) : UserService {
-    private val logger = LoggerFactory.getLogger(UserServiceImpl::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     override fun createUser(
         username: String,
@@ -36,8 +37,6 @@ internal class UserServiceImpl(
         }
 
         val role = roleRepository.findById(RoleData.USER.id)
-        logger.info("userRole: ${role.name}")
-        logger.info("userRole: ${role.id}")
         val userRole = UserRole.create(user, role)
         user.addRole(userRole)
         role.addUserRole(userRole)
