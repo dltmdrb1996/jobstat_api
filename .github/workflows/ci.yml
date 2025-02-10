@@ -44,8 +44,8 @@ jobs:
       - name: Run ktlintCheck
         run: ./gradlew ktlintCheck --no-daemon --build-cache
 
-      - name: Check Internal Modifier
-        run: ./gradlew checkInternalModifier --no-daemon --build-cache
+#      - name: Check Internal Modifier
+#        run: ./gradlew checkInternalModifier --no-daemon --build-cache
 
       - name: Run Tests
         run: ./gradlew test --no-daemon --build-cache

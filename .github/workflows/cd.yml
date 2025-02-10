@@ -74,7 +74,7 @@ jobs:
         uses: haythem/public-ip@v1.2
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2  # v1 -> v2로 업데이트 필요
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -86,7 +86,8 @@ jobs:
             --group-id ${{ secrets.AWS_SG_ID }} \
             --protocol tcp \
             --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
+            --region ap-northeast-2
 
       - name: Copy configuration files to EC2
         uses: appleboy/scp-action@master
