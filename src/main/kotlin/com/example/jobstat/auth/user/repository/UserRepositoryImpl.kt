@@ -16,7 +16,7 @@ internal interface UserJpaRepository : JpaRepository<User, Long> {
 
     fun existsByEmail(email: String): Boolean
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u._userRoles ur LEFT JOIN FETCH ur.role WHERE u.id = :id")
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role WHERE u.id = :id")
     fun findByIdWithRoles(id: Long): Optional<User>
 }
 

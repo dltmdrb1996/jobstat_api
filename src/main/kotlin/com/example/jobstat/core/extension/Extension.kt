@@ -1,6 +1,8 @@
 package com.example.jobstat.core.extension
 
 import kotlinx.coroutines.delay
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.web.servlet.function.ServerRequest
@@ -12,6 +14,8 @@ import java.time.temporal.ChronoField
 import java.util.*
 import java.util.stream.Collectors
 import java.util.stream.IntStream
+
+inline fun <reified T> T.logger(): Logger = LoggerFactory.getLogger(T::class.java)
 
 fun Map<*, *>.toJsonString(): String {
     val sb = StringBuilder()

@@ -5,6 +5,8 @@ import io.sentry.Sentry
 import io.sentry.SentryEvent
 import io.sentry.SentryLevel
 import io.sentry.protocol.Message
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 class GlobalExceptionHandler(
     private val environment: Environment,
 ) {
-    private val logger = StructuredLogger(this::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
     private val isProd = environment.activeProfiles.contains("prod")
 
     @ExceptionHandler(Exception::class)
@@ -24,13 +26,14 @@ class GlobalExceptionHandler(
                 is AppException -> ex
                 else -> {
                     val appException = ExceptionHandlers.handle(ex)
-                    logger.error(appException.message, appException, appException.detailInfo())
+                    log.error(appException.message, appException, appException.detailInfo())
                     appException
                 }
             }
 
+        ex.printStackTrace()
         if (appException.isServerError()) {
-            logger.error("Capture event ${appException.detailInfo()}")
+            log.error("Capture event ${appException.detailInfo()}")
             if (isProd) captureEvent(appException)
         }
 

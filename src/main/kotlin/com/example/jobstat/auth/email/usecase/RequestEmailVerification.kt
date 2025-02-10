@@ -23,9 +23,9 @@ internal class RequestEmailVerification(
     @Transactional
     override fun execute(request: Request) {
         // 1. 이메일 중복 체크
-        if (!userService.isEmailAvailable(request.email)) {
-            throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 이메일입니다.")
-        }
+//        if (!userService.isEmailAvailable(request.email)) {
+//            throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 이메일입니다.")
+//        }
 
         // 2. 이전 인증 코드 체크
         emailVerificationService.findLatestByEmail(request.email)?.let { verification ->

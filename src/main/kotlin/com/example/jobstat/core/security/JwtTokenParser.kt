@@ -2,10 +2,11 @@ package com.example.jobstat.core.security
 
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.error.StructuredLogger
 import io.jsonwebtoken.*
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SignatureException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import javax.crypto.SecretKey
@@ -15,7 +16,7 @@ class JwtTokenParser(
     @Value("\${jwt.secret}") private val secret: String,
 ) {
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
-    private val log = StructuredLogger(this::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     private val jwtParser =
         Jwts
@@ -27,6 +28,7 @@ class JwtTokenParser(
     fun validateToken(token: String): AccessPayload =
         try {
             val claims = jwtParser.parseClaimsJws(token).body
+
             val id = (claims["userId"] as Int).toLong()
             val roles = (claims["roles"] as ArrayList<String>)
             log.info("권한: ${roles.joinToString(", ")}")

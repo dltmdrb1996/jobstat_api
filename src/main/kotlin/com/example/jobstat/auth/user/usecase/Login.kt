@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -25,7 +26,7 @@ internal class Login(
     private val loginAttemptService: LoginAttemptService,
     validator: Validator,
 ) : ValidUseCase<Login.Request, Login.Response>(validator) {
-    private val logger = LoggerFactory.getLogger(this::class.java)
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     @Transactional
     override fun execute(request: Request): Response {
@@ -63,7 +64,7 @@ internal class Login(
             loginAttemptService.recordFailedAttempt(request.email)
             throw AppException.fromErrorCode(
                 ErrorCode.AUTHENTICATION_FAILURE,
-                "인증에 실패했습니다",
+                "유저정보가 일치하지 않습니다.",
             )
         }
 
@@ -72,7 +73,7 @@ internal class Login(
 
         // 4. 토큰 생성
         val roles = userService.getUserRoles(user.id)
-        logger.info("사용자 ${user.id}가 다음 권한으로 로그인했습니다: ${roles.joinToString(", ")}")
+        log.info("사용자 ${user.id}가 다음 권한으로 로그인했습니다: ${roles.joinToString(", ")}")
         val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, roles))
         val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, roles))
 

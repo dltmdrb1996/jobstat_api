@@ -1,10 +1,12 @@
 package com.example.jobstat
 
-import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.security.annotation.AdminAuth
 import com.example.jobstat.core.security.annotation.Public
+import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
+import com.example.jobstat.core.utils.SecurityUtils
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,8 +15,10 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @Profile("dev") // dev 프로파일에서만 활성화
-internal class IndexController {
-    private val logger = LoggerFactory.getLogger(this::class.java)
+internal class IndexController(
+    private val securityUtils: SecurityUtils,
+) {
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     @Public
     @GetMapping(value = ["/", "/test"])
@@ -23,8 +27,18 @@ internal class IndexController {
     @Public
     @GetMapping("/err")
     fun error() {
-        logger.error("Test error")
+        log.error("Test error")
         throw AppException.fromErrorCode(ErrorCode.INTERNAL_ERROR, "Test error", "Test error detail")
+    }
+
+    @PublicWithTokenCheck
+    @GetMapping("/api/test/public/check")
+    fun apiTestTokenCheck(): String {
+        val isAuthenticated = securityUtils.isAuthenticated()
+        val userId = securityUtils.getCurrentUserId()
+        val role = securityUtils.getCurrentUserRoles()
+        val highRole = securityUtils.getHighestRole()
+        return "apiTestTokenCheck: isAuthenticated=$isAuthenticated userId=$userId, role=$role, highRole=$highRole"
     }
 
     @AdminAuth
@@ -35,7 +49,7 @@ internal class IndexController {
     fun apiTestToken() = "apiTest"
 
     @Public
-    @GetMapping("/api/${RestConstants.Versions.V1}/test")
+    @GetMapping("api/test/public")
     fun apiTest() = "apiTest!"
 
     @Public
