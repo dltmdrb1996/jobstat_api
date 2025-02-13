@@ -80,6 +80,9 @@ services:
       - GMAIL_PASSWORD=${GMAIL_PASSWORD}
       - LOGGING_LEVEL_ROOT=DEBUG
       - LOGGING_LEVEL_COM_EXAMPLE_JOBSTAT=DEBUG
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      -
     networks:
       - public
       - internal
