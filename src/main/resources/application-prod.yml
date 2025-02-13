@@ -20,7 +20,7 @@ spring:
       minimum-idle: 5
       idle-timeout: 30000
       connection-timeout: 20000
-      connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"  # 추가된 설정
+      connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
       cache-prepared-statements: true
       prepared-statement-cache-size: 250
       prepared-statement-cache-sql-limit: 2048
