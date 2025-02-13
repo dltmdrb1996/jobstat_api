@@ -2,10 +2,12 @@ package com.example.jobstat.statistics.rankings.usecase
 
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.usecase.UseCase
-import com.example.jobstat.statistics.rankings.model.RankingType
 import com.example.jobstat.statistics.rankings.model.RankingWithStats
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.SkillRankingType
 import com.example.jobstat.statistics.rankings.service.RankingAnalysisService
 import com.example.jobstat.statistics.stats.document.SkillStatsDocument
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.transaction.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
@@ -45,13 +47,13 @@ class GetSkillRankingWithStats(
     fun execute(request: Request): Response {
         val result =
             rankingAnalysisService.findStatsWithRanking<SkillStatsDocument>(
-                rankingType = request.rankingType,
+                rankingType = request.rankingType.toDomain(),
                 baseDate = request.baseDate,
                 page = request.page,
             )
 
         return Response(
-            rankingType = request.rankingType,
+            rankingType = request.rankingType.toDomain(),
             totalCount = result.totalCount,
             hasNextPage = result.hasNextPage,
             items = result.items,
@@ -59,15 +61,20 @@ class GetSkillRankingWithStats(
     }
 
     data class Request(
-        @field:NotNull val rankingType: RankingType,
+        @field:NotNull val rankingType: SkillRankingType,
         @field:NotNull val baseDate: BaseDate,
         val page: Int? = null,
     )
 
+    @Schema(name = "GetSkillRankingWithStatsResponse", description = "기술 순위 조회 응답")
     data class Response(
+        @Schema(description = "순위 타입", example = "SKILL_SALARY")
         val rankingType: RankingType,
+        @Schema(description = "총 데이터 수", example = "100")
         val totalCount: Int,
+        @Schema(description = "다음 페이지 존재 여부", example = "true")
         val hasNextPage: Boolean,
+        @Schema(description = "순위 및 통계 데이터 목록")
         val items: List<RankingWithStats<SkillStatsDocument>>,
     )
 }

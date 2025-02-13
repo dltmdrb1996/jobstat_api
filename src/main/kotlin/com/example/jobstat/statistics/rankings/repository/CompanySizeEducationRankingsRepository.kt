@@ -3,7 +3,7 @@ package com.example.jobstat.statistics.rankings.repository
 import com.example.jobstat.core.base.repository.DistributionRankingRepository
 import com.example.jobstat.core.base.repository.DistributionRankingRepositoryImpl
 import com.example.jobstat.statistics.rankings.document.CompanySizeEducationRankingsDocument
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.*
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations

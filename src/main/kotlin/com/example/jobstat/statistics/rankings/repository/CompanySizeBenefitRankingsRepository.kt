@@ -4,7 +4,7 @@ import com.example.jobstat.core.base.repository.DistributionRankingRepository
 import com.example.jobstat.core.base.repository.DistributionRankingRepositoryImpl
 import com.example.jobstat.core.state.CompanySize
 import com.example.jobstat.statistics.rankings.document.CompanySizeBenefitRankingsDocument
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters

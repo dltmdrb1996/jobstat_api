@@ -7,7 +7,7 @@ import com.example.jobstat.core.base.mongo.stats.CommonStats
 import com.example.jobstat.core.base.mongo.stats.RankingInfo
 import com.example.jobstat.core.base.mongo.stats.RankingScore
 import com.example.jobstat.core.state.CompanySize
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import java.io.Serializable
@@ -41,8 +41,6 @@ class BenefitStatsDocument(
     val costMetrics: BenefitCostMetrics,
     @Field("rankings")
     override val rankings: Map<RankingType, BenefitRankingInfo>,
-    @Field("type")
-    val type: String, // "FULL_TIME", "CONTRACT", "FREELANCE", "INTERN" -> "정규직", "계약직", "프리랜서", "인턴"
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class BenefitStats(
         @Field("posting_count")
@@ -256,7 +254,6 @@ class BenefitStatsDocument(
         employeeSatisfaction: BenefitSatisfactionMetrics = this.employeeSatisfaction,
         costMetrics: BenefitCostMetrics = this.costMetrics,
         rankings: Map<RankingType, BenefitRankingInfo> = this.rankings,
-        type: String = this.type,
     ) = BenefitStatsDocument(
         id = this.id,
         entityId = entityId,
@@ -273,6 +270,5 @@ class BenefitStatsDocument(
         employeeSatisfaction = employeeSatisfaction,
         costMetrics = costMetrics,
         rankings = rankings,
-        type = type,
     )
 }
