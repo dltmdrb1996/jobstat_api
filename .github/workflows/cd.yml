@@ -126,13 +126,16 @@ jobs:
             DDNS_DOMAIN=${{ secrets.DDNS_DOMAIN }}
             GMAIL_ID=${{ secrets.GMAIL_ID }}
             GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}
+            ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             EOL
             
             chmod 600 .env
             
             docker-compose pull
             docker-compose up -d
-            docker system prune -af
+            docker image prune -f
+            docker container prune -f
 
       - name: Remove Github Actions IP from Security group
         if: always()
