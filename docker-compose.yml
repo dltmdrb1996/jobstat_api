@@ -39,6 +39,12 @@ services:
   spring-app:
     container_name: spring-app
     image: ${DOCKERHUB_USERNAME}/jobstat-app:${BACKEND_TAG}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://spring-app:8081/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     deploy:
       resources:
         limits:
@@ -47,12 +53,6 @@ services:
         reservations:
           cpus: '0.5'
           memory: '512M'
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 40s
     environment:
       - SERVER_PORT=8081
       - SPRING_PROFILES_ACTIVE=prod
