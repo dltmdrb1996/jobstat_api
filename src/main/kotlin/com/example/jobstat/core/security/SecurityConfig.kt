@@ -36,7 +36,9 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .exceptionHandling { it.authenticationEntryPoint(jwtAuthenticationEntryPoint) }
             .authorizeHttpRequests {
-                it.anyRequest().permitAll() // 실제 인증은 JwtTokenFilter에서 처리
+                it
+                    .anyRequest()
+                    .permitAll() // 실제 인증은 JwtTokenFilter에서 처리
             }.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
             .headers { headers ->
                 headers

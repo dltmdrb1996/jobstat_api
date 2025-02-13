@@ -3,7 +3,7 @@ package com.example.jobstat.core.base.repository
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.stats.*
 import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics.stats.document.SkillStatsDocument
 import com.example.jobstat.statistics.stats.repository.SkillStatsRepository
 import com.example.jobstat.utils.base.BatchOperationTestSupport

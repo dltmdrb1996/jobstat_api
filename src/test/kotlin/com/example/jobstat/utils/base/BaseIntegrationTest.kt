@@ -40,6 +40,9 @@ import kotlin.system.measureTimeMillis
         "ddns.domain=http://localhost:8080", // 테스트용 도메인 추가
         "spring.mail.username=test@gamil.com",
         "spring.mail.password=test-password",
+        "ADMIN_USERNAME=admin",
+        "ADMIN_PASSWORD=admin",
+        "app.server.url=http://localhost:8081",
     ],
 )
 abstract class BaseIntegrationTest {
