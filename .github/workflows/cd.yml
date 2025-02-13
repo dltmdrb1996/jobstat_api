@@ -134,8 +134,7 @@ jobs:
             
             docker-compose pull
             docker-compose up -d
-            docker image prune -f
-            docker container prune -f
+            docker system prune -af
 
       - name: Remove Github Actions IP from Security group
         if: always()
