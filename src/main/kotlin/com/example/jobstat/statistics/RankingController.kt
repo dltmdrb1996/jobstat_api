@@ -4,7 +4,6 @@ import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.wrapper.ApiResponse
-import com.example.jobstat.core.wrapper.ApiResponseWithType
 import com.example.jobstat.statistics.rankings.model.rankingtype.BenefitRankingType
 import com.example.jobstat.statistics.rankings.model.rankingtype.IndustryRankingType
 import com.example.jobstat.statistics.rankings.model.rankingtype.JobCategoryRankingType
@@ -19,10 +18,10 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 
 @RestController
 @RequestMapping("/api/${RestConstants.Versions.V1}/rankings")
@@ -34,7 +33,6 @@ class RankingController(
     private val getLocationRankingWithStats: GetLocationRankingWithStats,
     private val getBenefitRankingWithStats: GetBenefitRankingWithStats,
 ) {
-
     @Public
     @GetMapping("/skills/{rankingType}/{baseDate}/stats")
     fun getSkillRankings(
@@ -42,16 +40,17 @@ class RankingController(
         @Parameter(
             description = "기준 날짜 (YYYYMM)",
             schema = Schema(defaultValue = "202501", type = "string"),
-            example = "202501"
+            example = "202501",
         )
         @PathVariable baseDate: String,
         @RequestParam(required = false) page: Int?,
     ): ResponseEntity<ApiResponse<GetSkillRankingWithStats.Response>> {
-        val req = GetSkillRankingWithStats.Request(
-            rankingType = rankingType,
-            baseDate = BaseDate(baseDate),
-            page = page,
-        )
+        val req =
+            GetSkillRankingWithStats.Request(
+                rankingType = rankingType,
+                baseDate = BaseDate(baseDate),
+                page = page,
+            )
         return ApiResponse.ok(getSkillRankingWithStats(req))
     }
 
@@ -64,28 +63,31 @@ class RankingController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "성공",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GetJobCategoryRankingWithStats.Response::class)
-                )]
-            )
-        ]
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = GetJobCategoryRankingWithStats.Response::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun getJobCategoryRankings(
         @PathVariable rankingType: JobCategoryRankingType,
         @Parameter(
             description = "기준 날짜 (YYYYMM)",
             schema = Schema(defaultValue = "202501", type = "string"),
-            example = "202501"
+            example = "202501",
         )
         @PathVariable baseDate: String,
         @RequestParam(required = false) page: Int?,
     ): ResponseEntity<ApiResponse<GetJobCategoryRankingWithStats.Response>> {
-        val req = GetJobCategoryRankingWithStats.Request(
-            rankingType = rankingType,
-            baseDate = BaseDate(baseDate),
-            page = page,
-        )
+        val req =
+            GetJobCategoryRankingWithStats.Request(
+                rankingType = rankingType,
+                baseDate = BaseDate(baseDate),
+                page = page,
+            )
         return ApiResponse.ok(getJobCategoryRankingWithStats(req))
     }
 
@@ -98,28 +100,31 @@ class RankingController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "성공",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GetIndustryRankingWithStats.Response::class)
-                )]
-            )
-        ]
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = GetIndustryRankingWithStats.Response::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun getIndustryRankings(
         @PathVariable rankingType: IndustryRankingType,
         @Parameter(
             description = "기준 날짜 (YYYYMM)",
             schema = Schema(defaultValue = "202501", type = "string"),
-            example = "202501"
+            example = "202501",
         )
         @PathVariable baseDate: String,
         @RequestParam(required = false) page: Int?,
     ): ResponseEntity<ApiResponse<GetIndustryRankingWithStats.Response>> {
-        val req = GetIndustryRankingWithStats.Request(
-            rankingType = rankingType,
-            baseDate = BaseDate(baseDate),
-            page = page,
-        )
+        val req =
+            GetIndustryRankingWithStats.Request(
+                rankingType = rankingType,
+                baseDate = BaseDate(baseDate),
+                page = page,
+            )
         return ApiResponse.ok(getIndustryRankingWithStats(req))
     }
 
@@ -132,28 +137,31 @@ class RankingController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "성공",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GetLocationRankingWithStats.Response::class)
-                )]
-            )
-        ]
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = GetLocationRankingWithStats.Response::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun getLocationRankings(
         @PathVariable rankingType: LocationRankingType,
         @Parameter(
             description = "기준 날짜 (YYYYMM)",
             schema = Schema(defaultValue = "202501", type = "string"),
-            example = "202501"
+            example = "202501",
         )
         @PathVariable baseDate: String,
         @RequestParam(required = false) page: Int?,
     ): ResponseEntity<ApiResponse<GetLocationRankingWithStats.Response>> {
-        val req = GetLocationRankingWithStats.Request(
-            rankingType = rankingType,
-            baseDate = BaseDate(baseDate),
-            page = page,
-        )
+        val req =
+            GetLocationRankingWithStats.Request(
+                rankingType = rankingType,
+                baseDate = BaseDate(baseDate),
+                page = page,
+            )
         return ApiResponse.ok(getLocationRankingWithStats(req))
     }
 
@@ -166,28 +174,31 @@ class RankingController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "성공",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GetBenefitRankingWithStats.Response::class)
-                )]
-            )
-        ]
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = GetBenefitRankingWithStats.Response::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun getBenefitRankings(
         @PathVariable rankingType: BenefitRankingType,
         @Parameter(
             description = "기준 날짜 (YYYYMM)",
             schema = Schema(defaultValue = "202501", type = "string"),
-            example = "202501"
+            example = "202501",
         )
         @PathVariable baseDate: String,
         @RequestParam(required = false) page: Int?,
     ): ResponseEntity<ApiResponse<GetBenefitRankingWithStats.Response>> {
-        val req = GetBenefitRankingWithStats.Request(
-            rankingType = rankingType,
-            baseDate = BaseDate(baseDate),
-            page = page,
-        )
+        val req =
+            GetBenefitRankingWithStats.Request(
+                rankingType = rankingType,
+                baseDate = BaseDate(baseDate),
+                page = page,
+            )
         return ApiResponse.ok(getBenefitRankingWithStats(req))
     }
 }

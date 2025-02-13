@@ -26,7 +26,7 @@ enum class SkillRankingType(
 enum class JobCategoryRankingType(
     val domain: RankingType,
 ) {
-//    @Schema(description = "직무별 기술 선호도")
+    //    @Schema(description = "직무별 기술 선호도")
 //    JOB_CATEGORY_SKILL(RankingType.JOB_CATEGORY_SKILL),
 //
 //    @Schema(description = "직무 지원율")
@@ -49,7 +49,7 @@ enum class JobCategoryRankingType(
 enum class IndustryRankingType(
     val domain: RankingType,
 ) {
-//    @Schema(description = "업종별 기술 선호도")
+    //    @Schema(description = "업종별 기술 선호도")
 //    INDUSTRY_SKILL(RankingType.INDUSTRY_SKILL),
 
     @Schema(description = "채용 성장 TOP 산업")

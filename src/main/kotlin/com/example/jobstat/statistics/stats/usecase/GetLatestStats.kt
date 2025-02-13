@@ -4,7 +4,6 @@ import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.statistics.stats.registry.StatsType
 import com.example.jobstat.statistics.stats.service.StatsAnalysisService
-import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.transaction.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Min

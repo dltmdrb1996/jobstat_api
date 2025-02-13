@@ -13,9 +13,9 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 
 @RestController
 @RequestMapping("/api/${RestConstants.Versions.V1}/stats")
@@ -25,7 +25,6 @@ class StatsController(
     private val getLatestStats: GetLatestStats,
     private val getStatsByEntityIdAndBaseDate: GetStatsByEntityIdAndBaseDate,
 ) {
-
     @Public
     @GetMapping("/{statsType}/entity/{entityId}")
     @Operation(
@@ -35,21 +34,24 @@ class StatsController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "성공",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GetStatsByEntityId.Response::class)
-                )]
-            )
-        ]
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = GetStatsByEntityId.Response::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun getStatsByEntityId(
         @PathVariable statsType: StatsType,
         @PathVariable entityId: Long,
     ): ResponseEntity<ApiResponse<GetStatsByEntityId.Response<*>>> {
-        val req = GetStatsByEntityId.Request(
-            statsType = statsType,
-            entityId = entityId,
-        )
+        val req =
+            GetStatsByEntityId.Request(
+                statsType = statsType,
+                entityId = entityId,
+            )
         return ApiResponse.ok(getStatsByEntityId(req))
     }
 
@@ -62,28 +64,31 @@ class StatsController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "성공",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GetStatsByEntityIds.Response::class)
-                )]
-            )
-        ]
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = GetStatsByEntityIds.Response::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun getStatsByEntityIds(
         @PathVariable statsType: StatsType,
         @Parameter(
             description = "기준 날짜 (YYYYMM)",
             schema = Schema(defaultValue = "202501", type = "string"),
-            example = "202501"
+            example = "202501",
         )
         @PathVariable baseDate: String,
         @RequestBody entityIds: List<Long>,
     ): ResponseEntity<ApiResponse<GetStatsByEntityIds.Response<*>>> {
-        val req = GetStatsByEntityIds.Request(
-            statsType = statsType,
-            baseDate = BaseDate(baseDate),
-            entityIds = entityIds,
-        )
+        val req =
+            GetStatsByEntityIds.Request(
+                statsType = statsType,
+                baseDate = BaseDate(baseDate),
+                entityIds = entityIds,
+            )
         return ApiResponse.ok(getStatsByEntityIds(req))
     }
 
@@ -96,21 +101,24 @@ class StatsController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "성공",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GetLatestStats.Response::class)
-                )]
-            )
-        ]
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = GetLatestStats.Response::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun getLatestStats(
         @PathVariable statsType: StatsType,
         @PathVariable entityId: Long,
     ): ResponseEntity<ApiResponse<GetLatestStats.Response<*>>> {
-        val req = GetLatestStats.Request(
-            statsType = statsType,
-            entityId = entityId,
-        )
+        val req =
+            GetLatestStats.Request(
+                statsType = statsType,
+                entityId = entityId,
+            )
         return ApiResponse.ok(getLatestStats(req))
     }
 
@@ -123,28 +131,31 @@ class StatsController(
             SwaggerApiResponse(
                 responseCode = "200",
                 description = "성공",
-                content = [Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = GetStatsByEntityIdAndBaseDate.Response::class)
-                )]
-            )
-        ]
+                content = [
+                    Content(
+                        mediaType = "application/json",
+                        schema = Schema(implementation = GetStatsByEntityIdAndBaseDate.Response::class),
+                    ),
+                ],
+            ),
+        ],
     )
     fun getStatsByEntityIdAndBaseDate(
         @PathVariable statsType: StatsType,
         @Parameter(
             description = "기준 날짜 (YYYYMM)",
             schema = Schema(defaultValue = "202501", type = "string"),
-            example = "202501"
+            example = "202501",
         )
         @PathVariable baseDate: String,
         @PathVariable entityId: Long,
     ): ResponseEntity<ApiResponse<GetStatsByEntityIdAndBaseDate.Response<*>>> {
-        val req = GetStatsByEntityIdAndBaseDate.Request(
-            statsType = statsType,
-            baseDate = BaseDate(baseDate),
-            entityId = entityId,
-        )
+        val req =
+            GetStatsByEntityIdAndBaseDate.Request(
+                statsType = statsType,
+                baseDate = BaseDate(baseDate),
+                entityId = entityId,
+            )
         return ApiResponse.ok(getStatsByEntityIdAndBaseDate(req))
     }
 }

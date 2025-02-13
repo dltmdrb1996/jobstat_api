@@ -1,31 +1,28 @@
-package com.example.jobstat.core.config
+package com.example.jobstat.core.converter
 
 import io.swagger.v3.core.converter.AnnotatedType
 import io.swagger.v3.core.converter.ModelConverter
 import io.swagger.v3.core.converter.ModelConverterContext
-import io.swagger.v3.core.converter.ResolvedSchema
 import io.swagger.v3.oas.models.media.Schema
 import org.slf4j.LoggerFactory
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
-import java.util.*
 
-/**
- * 예: "ApiResponse<T>"를 인식해, "ApiResponseOfXxx" 라는 별도 스키마를 자동 생성하는 컨버터 예시
- */
 class CustomModelConverter : ModelConverter {
-
     private val log = LoggerFactory.getLogger(this::class.java)
 
     override fun resolve(
         annotatedType: AnnotatedType,
         context: ModelConverterContext,
-        chain: Iterator<ModelConverter>
+        chain: Iterator<ModelConverter>,
     ): Schema<*>? {
         // 1) 체인에서 다른 컨버터 우선 적용
-        val resolvedSchema = if (chain.hasNext()) {
-            chain.next().resolve(annotatedType, context, chain)
-        } else null
+        val resolvedSchema =
+            if (chain.hasNext()) {
+                chain.next().resolve(annotatedType, context, chain)
+            } else {
+                null
+            }
 
         // 2) 타입이 "ApiResponse<T>"인지 판별
         val type = annotatedType.type
@@ -59,35 +56,36 @@ class CustomModelConverter : ModelConverter {
         val codeSchema = Schema<Any>()
         codeSchema.type = "integer"
         codeSchema.description = "응답 코드"
-        wrapperSchema.addProperties("code", codeSchema)
+        wrapperSchema.properties["code"] = codeSchema
 
         // status
         val statusSchema = Schema<Any>()
         statusSchema.type = "string"
         statusSchema.description = "HTTP 상태"
-        wrapperSchema.addProperties("status", statusSchema)
+        wrapperSchema.properties["status"] = statusSchema
 
         // message
         val msgSchema = Schema<Any>()
         msgSchema.type = "string"
         msgSchema.description = "응답 메시지"
-        wrapperSchema.addProperties("message", msgSchema)
+        wrapperSchema.properties["message"] = msgSchema
 
         // data -> T
         val dataSchema = resolveTypeRef(context, innerType)
-        wrapperSchema.addProperties("data", dataSchema)
+        wrapperSchema.properties["data"] = dataSchema
 
         // 5) 스키마 등록
         context.defineModel(modelName, wrapperSchema)
         return wrapperSchema
     }
 
-    private fun buildModelName(wrapperName: String, innerType: Type): String {
-        return wrapperName + "Of" + extractClassName(innerType)
-    }
+    private fun buildModelName(
+        wrapperName: String,
+        innerType: Type,
+    ): String = wrapperName + "Of" + extractClassName(innerType)
 
-    private fun extractClassName(t: Type): String {
-        return when (t) {
+    private fun extractClassName(t: Type): String =
+        when (t) {
             is Class<*> -> t.simpleName
             is ParameterizedType -> {
                 val raw = t.rawType as? Class<*>
@@ -98,9 +96,11 @@ class CustomModelConverter : ModelConverter {
             }
             else -> "UnknownType"
         }
-    }
 
-    private fun resolveTypeRef(context: ModelConverterContext, type: Type): Schema<*> {
+    private fun resolveTypeRef(
+        context: ModelConverterContext,
+        type: Type,
+    ): Schema<*> {
         val annotated = AnnotatedType(type).resolveAsRef(true)
         val resolved = context.resolve(annotated)
         return resolved ?: Schema<Any>().apply {
