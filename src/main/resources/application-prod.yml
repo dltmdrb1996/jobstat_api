@@ -36,7 +36,15 @@ spring:
       port: ${REDIS_PORT:6379}
       database: ${REDIS_DB:1}
       password: ${REDIS_PASSWORD}
-      username: ${REDIS_USERNAME:default}
+      username: default
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: -1ms
+      client-type: lettuce
+      connect-timeout: 5000
   batch:
     jdbc:
       initialize-schema: always
