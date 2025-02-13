@@ -1,3 +1,7 @@
+app:
+  server:
+    url: http://localhost:8081
+
 spring:
   config:
     activate:
@@ -20,6 +24,7 @@ spring:
       cache-prepared-statements: true
       prepared-statement-cache-size: 250
       prepared-statement-cache-sql-limit: 2048
+
 
   data:
     mongodb:

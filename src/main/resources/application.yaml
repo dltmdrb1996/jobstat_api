@@ -46,6 +46,8 @@ logging:
     root: INFO
     com.example: DEBUG
     org:
+      springframework:
+        security=DEBUG:
       hibernate:
         SQL: DEBUG
         type:
@@ -105,3 +107,8 @@ app:
     ttl: ${CACHE_TTL:600}
   mongodb:
     page-size: ${MONGODB_PAGE_SIZE:20}
+
+
+admin:
+  username: ${ADMIN_USERNAME}
+  password: ${ADMIN_PASSWORD}

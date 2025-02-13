@@ -1,6 +1,7 @@
 package com.example.jobstat.statistics.rankings.model
 
 import com.example.jobstat.core.base.mongo.ranking.RankingEntry
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import java.io.Serializable
 
 data class RankingPage(

@@ -6,7 +6,7 @@ import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.base.mongo.stats.CommonStats
 import com.example.jobstat.core.base.mongo.stats.RankingInfo
 import com.example.jobstat.core.base.mongo.stats.RankingScore
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 

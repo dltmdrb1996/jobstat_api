@@ -1,4 +1,4 @@
-package com.example.jobstat.statistics.rankings.model
+package com.example.jobstat.statistics.rankings.model.rankingtype
 
 import com.example.jobstat.statistics.stats.registry.StatsType
 import java.io.Serializable

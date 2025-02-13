@@ -70,16 +70,14 @@
     </springProfile>
 
     <springProfile name="dev">
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="CONSOLE"/>
         </root>
-        <!-- 애플리케이션 로그 -->
         <logger name="com.example.jobstat" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="ASYNC"/>
             <appender-ref ref="ERROR_FILE"/>
         </logger>
-        <!-- SQL 로깅은 콘솔에만 출력 -->
         <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>

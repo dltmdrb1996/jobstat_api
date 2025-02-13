@@ -31,7 +31,6 @@ class JwtTokenParser(
 
             val id = (claims["userId"] as Int).toLong()
             val roles = (claims["roles"] as ArrayList<String>)
-            log.info("권한: ${roles.joinToString(", ")}")
             val tokenType = TokenType.fromValue(claims["tokenType"] as Int)
             AccessPayload(
                 id = id,
@@ -43,21 +42,21 @@ class JwtTokenParser(
                 when (ex) {
                     is SignatureException ->
                         AppException.fromErrorCode(
-                            ErrorCode.AUTHENTICATION_FAILURE,
+                            ErrorCode.TOKEN_INVALID,
                             message = "JWT 서명이 유효하지 않습니다",
                             detailInfo = "잘못된 JWT 서명",
                         )
 
                     is MalformedJwtException ->
                         AppException.fromErrorCode(
-                            ErrorCode.AUTHENTICATION_FAILURE,
+                            ErrorCode.TOKEN_INVALID,
                             message = "JWT 토큰의 형식이 올바르지 않습니다",
                             detailInfo = "잘못된 JWT 토큰 형식",
                         )
 
                     is ExpiredJwtException ->
                         AppException.fromErrorCode(
-                            ErrorCode.AUTHENTICATION_FAILURE,
+                            ErrorCode.TOKEN_INVALID,
                             message = "JWT 토큰이 만료되었습니다",
                             detailInfo = "만료된 JWT 토큰",
                         )

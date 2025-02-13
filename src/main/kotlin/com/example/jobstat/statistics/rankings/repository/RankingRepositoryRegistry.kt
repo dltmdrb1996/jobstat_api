@@ -2,7 +2,7 @@ package com.example.jobstat.statistics.rankings.repository
 
 import com.example.jobstat.core.base.mongo.ranking.BaseRankingDocument
 import com.example.jobstat.core.base.repository.BaseRankingRepository
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import org.springframework.stereotype.Component
 import kotlin.reflect.full.findAnnotation
 

@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    id("org.springframework.boot") version "3.3.3"
+    id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.5"
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.spring") version "2.1.0"
@@ -80,6 +80,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j")
+
+    // swagger
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4")
+//    implementation("org.springdoc:springdoc-openapi-starter-common:2.8.4")
+
+//    implementation("org.springdoc:springdoc-openapi-kotlin:2.8.4")
 
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

@@ -8,7 +8,7 @@ import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.base.repository.BaseRankingRepository
 import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics.rankings.repository.RankingRepositoryRegistry
 import com.example.jobstat.statistics.rankings.service.RankingAnalysisServiceImpl
 import com.example.jobstat.statistics.stats.service.StatsAnalysisService
@@ -351,7 +351,11 @@ class RankingAnalysisServiceTest {
         @DisplayName("잘못된 랭킹 유형 요청 시 예외가 발생한다")
         fun handleInvalidRankingType() {
             // given
-            doThrow(IllegalArgumentException()).whenever(mockRepositoryRegistry).getRepository<BaseRankingDocument<*>>(eq(RankingType.COMPANY_GROWTH))
+            doThrow(IllegalArgumentException()).whenever(mockRepositoryRegistry).getRepository<BaseRankingDocument<*>>(
+                eq(
+                    RankingType.COMPANY_GROWTH,
+                ),
+            )
 
             // when & then
             assertFailsWith<IllegalArgumentException> {
