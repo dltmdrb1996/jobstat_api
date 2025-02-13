@@ -38,4 +38,5 @@ class GetRankingPage(
         @Schema(description = "순위 페이지 정보")
         val page: RankingPage,
     )
+
 }
