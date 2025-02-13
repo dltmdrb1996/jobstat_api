@@ -82,6 +82,7 @@ services:
       - LOGGING_LEVEL_COM_EXAMPLE_JOBSTAT=DEBUG
       - ADMIN_USERNAME=${ADMIN_USERNAME}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     networks:
       - public
       - internal
