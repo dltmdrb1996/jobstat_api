@@ -32,7 +32,8 @@ services:
       - public     # 외부와 통신
       - internal   # 내부 서비스와 통신
     depends_on:
-      - spring-app
+      spring-app:
+        condition: service_healthy
     restart: always
 
   spring-app:
@@ -46,6 +47,12 @@ services:
         reservations:
           cpus: '0.5'
           memory: '512M'
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
     environment:
       - SERVER_PORT=8081
       - SPRING_PROFILES_ACTIVE=prod
