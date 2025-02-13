@@ -129,6 +129,7 @@ jobs:
             ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
             ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
             EOL
             
             chmod 600 .env

@@ -36,6 +36,7 @@ spring:
       port: ${REDIS_PORT:6379}
       database: ${REDIS_DB:1}
       password: ${REDIS_PASSWORD}
+      username: ${REDIS_USERNAME:default}
   batch:
     jdbc:
       initialize-schema: always
