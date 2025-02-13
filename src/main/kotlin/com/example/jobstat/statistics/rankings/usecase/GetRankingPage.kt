@@ -3,8 +3,9 @@ package com.example.jobstat.statistics.rankings.usecase
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.statistics.rankings.model.RankingPage
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics.rankings.service.RankingAnalysisService
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.transaction.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
@@ -32,7 +33,9 @@ class GetRankingPage(
         val page: Int? = null,
     )
 
+    @Schema(name = "GetRankingPageResponse", description = "순위 페이지 조회 응답")
     data class Response(
+        @Schema(description = "순위 페이지 정보")
         val page: RankingPage,
     )
 }

@@ -1,5 +1,6 @@
 package com.example.jobstat.auth
 
+import com.example.jobstat.community.internal.repository.BoardRepository
 import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.wrapper.ApiResponse
@@ -11,9 +12,10 @@ import java.util.*
 
 @RestController
 @RequestMapping("/api/${RestConstants.Versions.V1}/test/users")
-@Profile("dev")
 @Public
-internal class TestUserController {
+internal class TestUserController(
+    private val boardRepository: BoardRepository
+) {
     private val random = Random()
 
     @GetMapping("/{userId}/profile")
@@ -35,13 +37,14 @@ internal class TestUserController {
     fun getUserPosts(
         @PathVariable userId: Long,
     ): ResponseEntity<ApiResponse<List<Post>>> {
+        val board = boardRepository.findById(5)
         val posts =
             (1..5).map {
                 Post(
                     id = random.nextLong(),
                     userId = userId,
-                    title = "테스트 게시물_${random.nextInt(100)}",
-                    content = "테스트 내용_${random.nextInt(100)}",
+                    title = board.title,
+                    content = board.content,
                     createdAt = LocalDateTime.now().minusDays(random.nextLong(30)),
                 )
             }

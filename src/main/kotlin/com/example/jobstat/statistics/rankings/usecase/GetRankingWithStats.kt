@@ -3,12 +3,13 @@ package com.example.jobstat.statistics.rankings.usecase
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.usecase.UseCase
-import com.example.jobstat.statistics.rankings.model.RankingType
 import com.example.jobstat.statistics.rankings.model.RankingWithStats
-import com.example.jobstat.statistics.rankings.model.toStatsType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.toStatsType
 import com.example.jobstat.statistics.rankings.service.RankingAnalysisService
 import com.example.jobstat.statistics.stats.document.*
 import com.example.jobstat.statistics.stats.registry.StatsType
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.transaction.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
@@ -75,11 +76,17 @@ class GetRankingWithStats(
         val page: Int? = null,
     )
 
+    @Schema(name = "GetRankingWithStatsResponse", description = "순위 및 통계 조회 응답")
     data class Response<T : BaseStatsDocument>(
+        @Schema(description = "통계 타입", example = "SKILL")
         val statType: StatsType,
+        @Schema(description = "순위 타입", example = "SKILL_SALARY")
         val rankingType: RankingType,
+        @Schema(description = "총 데이터 수", example = "100")
         val totalCount: Int,
+        @Schema(description = "다음 페이지 존재 여부", example = "true")
         val hasNextPage: Boolean,
+        @Schema(description = "순위 및 통계 데이터 목록")
         val items: List<RankingWithStats<T>>,
     )
 }

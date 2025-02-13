@@ -41,7 +41,7 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew bootJar
         env:
-          SPRING_PROFILES_ACTIVE: dev
+          SPRING_PROFILES_ACTIVE: prod
 
       - name: Login to DockerHub
         uses: docker/login-action@v3
@@ -126,6 +126,10 @@ jobs:
             DDNS_DOMAIN=${{ secrets.DDNS_DOMAIN }}
             GMAIL_ID=${{ secrets.GMAIL_ID }}
             GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}
+            ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+            REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
             EOL
             
             chmod 600 .env

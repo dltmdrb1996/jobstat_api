@@ -6,6 +6,8 @@ import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.statistics.rankings.model.*
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.toStatsType
 import com.example.jobstat.statistics.rankings.repository.RankingRepositoryRegistry
 import com.example.jobstat.statistics.stats.service.StatsAnalysisService
 import org.slf4j.Logger

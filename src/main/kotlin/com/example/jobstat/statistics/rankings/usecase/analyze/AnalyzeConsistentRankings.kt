@@ -2,7 +2,7 @@ package com.example.jobstat.statistics.rankings.usecase.analyze
 
 import com.example.jobstat.core.base.mongo.ranking.RankingEntry
 import com.example.jobstat.core.usecase.impl.ValidUseCase
-import com.example.jobstat.statistics.rankings.model.RankingType
+import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics.rankings.service.RankingAnalysisService
 import jakarta.transaction.Transactional
 import jakarta.validation.Validator

@@ -1,13 +1,14 @@
 package com.example.jobstat.core.security
 
 import com.example.jobstat.auth.user.entity.RoleData
-import com.example.jobstat.auth.user.service.UserService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.security.annotation.AdminAuth
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
+import com.example.jobstat.core.wrapper.ApiResponse
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.benmanes.caffeine.cache.Caffeine
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -20,121 +21,140 @@ import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 
 @Component
 class JwtTokenFilter(
     private val jwtTokenParser: JwtTokenParser,
     private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
     private val objectMapper: ObjectMapper,
-    private val userService: UserService,
 ) : OncePerRequestFilter() {
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
-    private val errorResponseCache = ConcurrentHashMap<String, String>()
-    private val shouldNotFilterCache = ConcurrentHashMap<String, Boolean>()
-    private val handlerMethodCache = ConcurrentHashMap<String, HandlerMethod?>()
-    private val publicWithTokenCheckCache = ConcurrentHashMap<String, Boolean>()
-    private val adminCheckCache = ConcurrentHashMap<String, Boolean>()
+
+    private val requestCache =
+        Caffeine
+            .newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .recordStats()
+            .build<String, RequestCacheData>()
 
     companion object {
         private const val BEARER_PREFIX = "Bearer "
-        private const val JWT_TOKEN_MISSING = "인증 토큰이 필요합니다"
-        private const val JWT_TOKEN_VALIDATION_ERROR = "인증 토큰 검증에 실패했습니다"
-        private const val JWT_ADMIN_AUTH_ERROR = "관리자 권한이 필요합니다"
+        private val EXCLUDED_PREFIXES = listOf("/swagger-ui", "/v3/api-docs", "/swagger-resources", "/webjars", "/admin", "/actuator/health")
+        private val EXCLUDED_PATHS = setOf("/swagger-ui.html", "/favicon.ico")
+
+        private val ERROR_MESSAGES =
+            mapOf(
+                ErrorCode.AUTHENTICATION_FAILURE to "인증 토큰이 필요합니다",
+                ErrorCode.ADMIN_ACCESS_REQUIRED to "관리자 권한이 필요합니다",
+                ErrorCode.TOKEN_INVALID to "인증 토큰 검증에 실패했습니다",
+            )
     }
 
-    init {
-        // 알려진 에러 케이스들을 미리 캐시
-        cacheErrorResponse(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_MISSING)
-        cacheErrorResponse(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_VALIDATION_ERROR)
-        cacheErrorResponse(ErrorCode.AUTHENTICATION_FAILURE, JWT_ADMIN_AUTH_ERROR)
-    }
-
-    override fun shouldNotFilter(request: HttpServletRequest): Boolean =
-        shouldNotFilterCache.computeIfAbsent("${request.method}:${request.requestURI}") { _ ->
-            val handlerMethod = getHandlerMethodFromCache(request)
-            when {
-                handlerMethod == null -> false
-                handlerMethod.hasMethodAnnotation(Public::class.java) -> true
-                handlerMethod.beanType.isAnnotationPresent(Public::class.java) -> true
-                else -> false
-            }
+    override fun shouldNotFilter(request: HttpServletRequest): Boolean {
+        val uri = request.requestURI
+        return when {
+            EXCLUDED_PATHS.contains(uri) -> true
+            EXCLUDED_PREFIXES.any { uri.startsWith(it) } -> true
+            else -> getCachedRequestData(request).shouldNotFilter
         }
+    }
 
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        log.info("JWT 필터 처리 시작: ${request.requestURI}, ${shouldNotFilter(request)}")
-        if (shouldNotFilter(request)) {
+        if (log.isDebugEnabled) {
+            log.debug(
+                "JWT 필터 처리: {}, shouldNotFilter: {}, cache stats: {}",
+                request.requestURI,
+                shouldNotFilter(request),
+                requestCache.stats(),
+            )
+        }
+
+        val requestData = getCachedRequestData(request)
+        if (requestData.shouldNotFilter) {
             filterChain.doFilter(request, response)
             return
         }
 
-        val isPublicWithTokenCheck = isPublicWithTokenCheck(request)
-
         try {
             getJwtFromRequest(request)?.let { jwt ->
                 val accessPayload = jwtTokenParser.validateToken(jwt)
-                if (checkAdminAuth(request)) {
+                if (requestData.requiresAdminAuth) {
                     handleAdminAuth(accessPayload)
                 } else {
                     setSecurityContextHolder(accessPayload)
                 }
             } ?: run {
-                if (!isPublicWithTokenCheck) {
-                    throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_MISSING)
+                if (!requestData.isPublicWithTokenCheck) {
+                    sendErrorResponse(response, ErrorCode.AUTHENTICATION_FAILURE)
+                    return
                 }
             }
         } catch (ex: AppException) {
-            sendErrorResponse(response, ex)
-            return
-        } catch (ex: Exception) {
-            sendErrorResponse(
-                response,
-                AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_TOKEN_VALIDATION_ERROR),
-            )
+            sendErrorResponse(response, ex.errorCode)
             return
         }
 
         filterChain.doFilter(request, response)
     }
 
-    private fun isPublicWithTokenCheck(request: HttpServletRequest): Boolean =
-        publicWithTokenCheckCache.computeIfAbsent("${request.method}:${request.requestURI}") { _ ->
-            try {
-                when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
-                    null -> false
-                    is HandlerMethod ->
-                        handler.hasMethodAnnotation(PublicWithTokenCheck::class.java) ||
-                            handler.beanType.isAnnotationPresent(PublicWithTokenCheck::class.java)
-                    else -> false
-                }
-            } catch (ex: Exception) {
-                false
-            }
+    private fun getCachedRequestData(request: HttpServletRequest): RequestCacheData {
+        val cacheKey = "${request.method}:${request.requestURI}"
+        return requestCache.get(cacheKey) { key ->
+            val handlerMethod = getHandlerMethod(request)
+            RequestCacheData(
+                handlerMethod = handlerMethod,
+                shouldNotFilter = computeShouldNotFilter(handlerMethod),
+                isPublicWithTokenCheck = computeIsPublicWithTokenCheck(handlerMethod),
+                requiresAdminAuth = computeRequiresAdminAuth(handlerMethod),
+            )
+        }
+    }
+
+    private fun getHandlerMethod(request: HttpServletRequest): HandlerMethod? = requestMappingHandlerMapping.getHandler(request)?.handler as? HandlerMethod
+
+    private fun computeShouldNotFilter(handlerMethod: HandlerMethod?): Boolean =
+        when {
+            handlerMethod == null -> false
+            handlerMethod.hasMethodAnnotation(Public::class.java) -> true
+            handlerMethod.beanType.isAnnotationPresent(Public::class.java) -> true
+            else -> false
         }
 
-    private fun checkAdminAuth(request: HttpServletRequest): Boolean =
-        adminCheckCache.computeIfAbsent("${request.method}:${request.requestURI}") { _ ->
-            try {
-                when (val handler = requestMappingHandlerMapping.getHandler(request)?.handler) {
-                    null -> false
-                    is HandlerMethod ->
-                        handler.hasMethodAnnotation(AdminAuth::class.java) ||
-                            handler.beanType.isAnnotationPresent(AdminAuth::class.java)
-
-                    else -> false
-                }
-            } catch (ex: Exception) {
-                false
-            }
+    private fun computeIsPublicWithTokenCheck(handlerMethod: HandlerMethod?): Boolean =
+        when {
+            handlerMethod == null -> false
+            handlerMethod.hasMethodAnnotation(PublicWithTokenCheck::class.java) -> true
+            handlerMethod.beanType.isAnnotationPresent(PublicWithTokenCheck::class.java) -> true
+            else -> false
         }
+
+    private fun computeRequiresAdminAuth(handlerMethod: HandlerMethod?): Boolean =
+        when {
+            handlerMethod == null -> false
+            handlerMethod.hasMethodAnnotation(AdminAuth::class.java) -> true
+            handlerMethod.beanType.isAnnotationPresent(AdminAuth::class.java) -> true
+            else -> false
+        }
+
+    private fun getJwtFromRequest(request: HttpServletRequest): String? {
+        val authHeader = request.getHeader("Authorization") ?: return null
+        return if (authHeader.startsWith(BEARER_PREFIX)) {
+            authHeader.substring(BEARER_PREFIX.length)
+        } else {
+            null
+        }
+    }
 
     private fun handleAdminAuth(accessPayload: AccessPayload) {
-        val isAdmin = accessPayload.roles.contains(RoleData.ADMIN.name)
-        if (!isAdmin) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, JWT_ADMIN_AUTH_ERROR)
+        if (!accessPayload.roles.contains(RoleData.ADMIN.name)) {
+            throw AppException.fromErrorCode(ErrorCode.ADMIN_ACCESS_REQUIRED)
+        }
         setSecurityContextHolder(accessPayload)
     }
 
@@ -147,58 +167,29 @@ class JwtTokenFilter(
             )
     }
 
-    private fun getJwtFromRequest(request: HttpServletRequest): String? = request.getHeader("Authorization")?.takeIf { it.startsWith(BEARER_PREFIX) }?.substring(BEARER_PREFIX.length)
-
     private fun sendErrorResponse(
         response: HttpServletResponse,
-        appException: AppException,
+        errorCode: ErrorCode,
     ) {
+        val apiResponse =
+            ApiResponse<Unit>(
+                code = errorCode.defaultHttpStatus.value(),
+                status = errorCode.defaultHttpStatus,
+                message = ERROR_MESSAGES[errorCode] ?: "인증 처리 중 오류가 발생했습니다",
+            )
+
         response.apply {
             characterEncoding = "UTF-8"
-            status = appException.httpStatus.value()
+            status = errorCode.defaultHttpStatus.value()
             contentType = "application/json; charset=UTF-8"
-            writer.write(getErrorResponse(appException))
+            writer.write(objectMapper.writeValueAsString(apiResponse))
         }
     }
 
-    private fun cacheErrorResponse(
-        errorCode: ErrorCode,
-        message: String,
-    ) {
-        val cacheKey = createCacheKey(errorCode, message)
-        if (!errorResponseCache.containsKey(cacheKey)) {
-            val errorResponse =
-                mapOf(
-                    "code" to errorCode.code,
-                    "status" to errorCode.defaultHttpStatus.value(),
-                    "message" to message,
-                )
-            errorResponseCache[cacheKey] = objectMapper.writeValueAsString(errorResponse)
-        }
-    }
-
-    private fun getHandlerMethodFromCache(request: HttpServletRequest): HandlerMethod? {
-        val cacheKey = "${request.method}:${request.requestURI}"
-        return handlerMethodCache.computeIfAbsent(cacheKey) { _ ->
-            (requestMappingHandlerMapping.getHandler(request)?.handler as? HandlerMethod)
-        }
-    }
-
-    private fun getErrorResponse(appException: AppException): String {
-        val cacheKey = createCacheKey(appException.errorCode, appException.message)
-        return errorResponseCache.getOrPut(cacheKey) {
-            val errorResponse =
-                mapOf(
-                    "code" to appException.httpStatus.value(),
-                    "status" to appException.httpStatus.name,
-                    "message" to appException.message,
-                )
-            objectMapper.writeValueAsString(errorResponse)
-        }
-    }
-
-    private fun createCacheKey(
-        errorCode: ErrorCode,
-        message: String,
-    ): String = "${errorCode.name}:$message"
+    data class RequestCacheData(
+        val handlerMethod: HandlerMethod?,
+        val shouldNotFilter: Boolean,
+        val isPublicWithTokenCheck: Boolean,
+        val requiresAdminAuth: Boolean,
+    )
 }

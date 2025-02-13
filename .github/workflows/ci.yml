@@ -66,3 +66,7 @@ jobs:
           DDNS_DOMAIN: ${{ secrets.DDNS_DOMAIN }}
           GMAIL_ID: ${{ secrets.GMAIL_ID }}
           GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+          REDIS_USERNAME: ${{ secrets.REDIS_USERNAME }}
