@@ -78,6 +78,12 @@ management:
 
 SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
 
+monitoring:
+  cpu:
+    threshold: 80.0
+    check-interval: 30000
+    debug-duration: 1800000  # 30분
+
 jwt:
   secret: ${JWT_SECRET}
   accessTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION:999999}
