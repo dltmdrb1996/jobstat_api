@@ -572,7 +572,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
             )
         }
 
-        log.info("Performance test metrics: $performanceMetrics")
+        log.debug("Performance test metrics: $performanceMetrics")
     }
 
     private fun measureOperation(
@@ -584,7 +584,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
             operation()
             val end = System.currentTimeMillis()
             val duration = (end - start) / 1000.0
-            log.info("$name completed in $duration seconds")
+            log.debug("$name completed in $duration seconds")
             return duration
         } catch (e: Exception) {
             log.error("Error during $name: ${e.message}")

@@ -31,7 +31,7 @@ class EmailServiceImpl(
                     setText("인증 코드: $code\n30분 안에 인증을 완료해주세요.")
                 }
             emailSender.send(message)
-            log.info("인증 이메일 발송 완료: $to")
+            log.debug("인증 이메일 발송 완료: $to")
         } catch (e: Exception) {
             log.error("인증 이메일 발송 실패: $to", e)
             throw AppException.fromErrorCode(

@@ -117,7 +117,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk insert execution time: $timeSeconds seconds")
+        log.debug("Bulk insert execution time: $timeSeconds seconds")
         performanceMetrics["bulk_insert"] = timeSeconds
     }
 
@@ -145,7 +145,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find by base date execution time: $timeSeconds seconds")
+        log.debug("Find by base date execution time: $timeSeconds seconds")
         performanceMetrics["find_by_base_date"] = timeSeconds
     }
 
@@ -170,7 +170,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find by date range execution time: $timeSeconds seconds")
+        log.debug("Find by date range execution time: $timeSeconds seconds")
         performanceMetrics["find_by_date_range"] = timeSeconds
     }
 
@@ -197,7 +197,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find latest execution time: $timeSeconds seconds")
+        log.debug("Find latest execution time: $timeSeconds seconds")
         performanceMetrics["find_latest"] = timeSeconds
     }
 
@@ -223,7 +223,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find latest N execution time: $timeSeconds seconds")
+        log.debug("Find latest N execution time: $timeSeconds seconds")
         performanceMetrics["find_latest_n"] = timeSeconds
     }
 
@@ -246,7 +246,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk delete execution time: $timeSeconds seconds")
+        log.debug("Bulk delete execution time: $timeSeconds seconds")
         performanceMetrics["bulk_delete"] = timeSeconds
     }
 }

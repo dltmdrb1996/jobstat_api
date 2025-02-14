@@ -37,6 +37,8 @@ import kotlin.system.measureTimeMillis
         "spring.jpa.hibernate.ddl-auto=create",
         "spring.jpa.show-sql=true",
         "spring.jpa.properties.hibernate.format_sql=true",
+        "spring.data.redis.username=default",
+        "spring.data.redis.password=default",
         "ddns.domain=http://localhost:8080", // 테스트용 도메인 추가
         "spring.mail.username=test@gamil.com",
         "spring.mail.password=test-password",
@@ -48,12 +50,12 @@ import kotlin.system.measureTimeMillis
 abstract class BaseIntegrationTest {
     protected fun logTestStart(testName: String) {
         TestUtils.logMemoryUsage()
-        log.info("=== Starting test: $testName ===")
+        log.debug("=== Starting test: $testName ===")
     }
 
     protected fun logTestEnd(testName: String) {
         TestUtils.logMemoryUsage()
-        log.info("=== Completed test: $testName ===")
+        log.debug("=== Completed test: $testName ===")
     }
 
     companion object {
@@ -91,7 +93,7 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
     @AfterEach
     fun tearDown() {
         val testDuration = (System.currentTimeMillis() - testStartTime) / 1000.0
-        log.info("Test completed in $testDuration seconds")
+        log.debug("Test completed in $testDuration seconds")
         TestUtils.logMemoryUsage()
     }
 
@@ -111,9 +113,9 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
     }
 
     protected fun printExecutionSummary() {
-        log.info("=== Execution Summary ===")
+        log.debug("=== Execution Summary ===")
         executionTimes.forEach { (operation, time) ->
-            log.info("$operation: $time seconds")
+            log.debug("$operation: $time seconds")
         }
         TestUtils.logMemoryUsage()
     }

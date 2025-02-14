@@ -39,6 +39,8 @@ services:
   spring-app:
     container_name: spring-app
     image: ${DOCKERHUB_USERNAME}/jobstat-app:${BACKEND_TAG}
+    volumes:
+      - /home/ubuntu/jobstat/logs:/app/logs
     healthcheck:
       test: [ "CMD-SHELL", "wget --spider -q http://localhost:8081/actuator/health || exit 1" ]
       interval: 30s

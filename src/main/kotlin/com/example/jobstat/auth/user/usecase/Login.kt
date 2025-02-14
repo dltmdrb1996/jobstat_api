@@ -73,7 +73,7 @@ internal class Login(
 
         // 4. 토큰 생성
         val roles = userService.getUserRoles(user.id)
-        log.info("사용자 ${user.id}가 다음 권한으로 로그인했습니다: ${roles.joinToString(", ")}")
+        log.debug("사용자 ${user.id}가 다음 권한으로 로그인했습니다: ${roles.joinToString(", ")}")
         val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, roles))
         val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, roles))
 
