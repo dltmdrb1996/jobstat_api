@@ -13,7 +13,7 @@ object TestUtils {
         val runtime = Runtime.getRuntime()
         val usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / 1024 / 1024
         val totalMemory = runtime.totalMemory() / 1024 / 1024
-        log.info("Memory Usage: Used=${usedMemory}MB, Total=${totalMemory}MB")
+        log.debug("Memory Usage: Used=${usedMemory}MB, Total=${totalMemory}MB")
     }
 
     fun <T> measureTimeAndLog(
@@ -28,7 +28,7 @@ object TestUtils {
             }
         val endTime = LocalDateTime.now()
 
-        log.info(
+        log.debug(
             """
             Operation '$operation' completed:
             - Execution time: ${executionTime / 1000.0} seconds

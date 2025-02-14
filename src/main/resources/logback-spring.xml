@@ -2,7 +2,6 @@
 <configuration>
     <!-- 공통 속성 -->
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-}] %-5level %logger{36} - %msg%n"/>
-    <property name="LOG_FILE_PATH" value="logs"/>
     <property name="LOG_FILE_NAME" value="application"/>
 
     <!-- 콘솔 어펜더: 모든 로그 출력 -->
@@ -70,6 +69,7 @@
     </springProfile>
 
     <springProfile name="dev">
+        <property name="LOG_FILE_PATH" value="logs"/>
         <root level="DEBUG">
             <appender-ref ref="CONSOLE"/>
         </root>
@@ -87,17 +87,30 @@
     </springProfile>
 
     <springProfile name="prod">
-        <root level="DEBUG">
-            <appender-ref ref="CONSOLE"/>
+        <!-- 루트 로거는 INFO 레벨로 설정 -->
+        <property name="LOG_FILE_PATH" value="/app/logs"/>
+        <root level="INFO">
+            <appender-ref ref="ASYNC"/>
+            <appender-ref ref="ERROR_FILE"/>
         </root>
+
+        <!-- 애플리케이션 로거 -->
         <logger name="com.example.jobstat" level="INFO" additivity="false">
-            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNC"/>
+            <appender-ref ref="ERROR_FILE"/>
         </logger>
+
+        <!-- 외부 라이브러리 로깅 제한 -->
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="org.apache" level="WARN"/>
+        <logger name="io.lettuce" level="WARN"/>
+        <logger name="com.zaxxer.hikari" level="WARN"/>
+
+        <!-- 보안 관련 로깅 -->
+        <logger name="org.springframework.security" level="INFO"/>
+
+        <!-- 성능 모니터링을 위한 설정 -->
+        <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="INFO"/>
     </springProfile>
-    <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
-    <logger name="org.hibernate.type.descriptor.sql" level="TRACE" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-    </logger>
 </configuration>

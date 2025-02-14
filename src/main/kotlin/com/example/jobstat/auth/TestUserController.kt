@@ -4,7 +4,6 @@ import com.example.jobstat.community.internal.repository.BoardRepository
 import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.wrapper.ApiResponse
-import org.springframework.context.annotation.Profile
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
@@ -14,7 +13,7 @@ import java.util.*
 @RequestMapping("/api/${RestConstants.Versions.V1}/test/users")
 @Public
 internal class TestUserController(
-    private val boardRepository: BoardRepository
+    private val boardRepository: BoardRepository,
 ) {
     private val random = Random()
 

@@ -22,14 +22,14 @@ class UseCaseLoggingAspect {
         val useCaseName = joinPoint.signature.declaringType.simpleName
         val request = joinPoint.args.firstOrNull()
 
-        log.info("유스케이스 실행 중: $useCaseName, 요청 내용: $request")
+        log.debug("유스케이스 실행 중: $useCaseName, 요청 내용: $request")
 
         return try {
             val (response, duration) =
                 measureTimedValue {
                     joinPoint.proceed()
                 }
-            log.info("유스케이스: $useCaseName 완료, 소요 시간: ${duration.inWholeMilliseconds}ms")
+            log.debug("유스케이스: $useCaseName 완료, 소요 시간: ${duration.inWholeMilliseconds}ms")
             response
         } catch (e: Exception) {
             log.error("유스케이스 실행 중 오류 발생: $useCaseName", e)

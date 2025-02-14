@@ -68,7 +68,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk insert execution time: $timeSeconds seconds")
+        log.debug("Bulk insert execution time: $timeSeconds seconds")
         performanceMetrics["bulk_insert"] = timeSeconds
     }
 
@@ -83,16 +83,16 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
         val records = recordRepository.findAllByQuery(query)
         allRecords.addAll(records)
 
-        log.info("Total records in DB: ${allRecords.size}")
-        log.info("Sample record: ${allRecords.first()}")
-        log.info("Found ${records.size} records")
-        log.info("Sample record: ${records.first()}")
+        log.debug("Total records in DB: ${allRecords.size}")
+        log.debug("Sample record: ${allRecords.first()}")
+        log.debug("Found ${records.size} records")
+        log.debug("Sample record: ${records.first()}")
 
         Assertions.assertEquals(totalRecords, records.size)
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find all by query execution time: $timeSeconds seconds")
+        log.debug("Find all by query execution time: $timeSeconds seconds")
         performanceMetrics["find_all_by_query"] = timeSeconds
     }
 
@@ -103,22 +103,22 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
 
         val recordIds = allRecords.mapNotNull { it.id }
-        log.info("Attempting to find ${recordIds.size} records")
+        log.debug("Attempting to find ${recordIds.size} records")
 
 //        val foundRecords = recordRepository.findAllFast()
         var totalFound = 0
         for (batch in recordIds.chunked(batchSize)) {
             val foundRecords = recordRepository.bulkFindByIds(batch)
             totalFound += foundRecords.size
-//            log.info("Found ${foundRecords.size} records in current batch")
+//            log.debug("Found ${foundRecords.size} records in current batch")
         }
 
-        log.info("Total records found: $totalFound")
+        log.debug("Total records found: $totalFound")
         Assertions.assertEquals(totalRecords, totalFound, "Records count mismatch")
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk find by IDs execution time: $timeSeconds seconds")
+        log.debug("Bulk find by IDs execution time: $timeSeconds seconds")
         performanceMetrics["bulk_find_byids"] = timeSeconds
     }
 
@@ -138,14 +138,14 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
                     oldestRecord.createdAt,
                     newestRecord.createdAt,
                 )
-            log.info("Found ${records.size} records")
-            log.info("Sample record: ${records.first()}")
+            log.debug("Found ${records.size} records")
+            log.debug("Sample record: ${records.first()}")
             Assertions.assertEquals(totalRecords, records.size)
         }
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find by date range execution time: $timeSeconds seconds")
+        log.debug("Find by date range execution time: $timeSeconds seconds")
         performanceMetrics["find_by_date_range"] = timeSeconds
     }
 
@@ -175,7 +175,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk update execution time: $timeSeconds seconds")
+        log.debug("Bulk update execution time: $timeSeconds seconds")
         performanceMetrics["bulk_update"] = timeSeconds
     }
 
@@ -187,7 +187,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
         // 현재 DB의 전체 레코드 수 확인
         val beforeCount = recordRepository.findAllByQuery(Query()).size
-        log.info("Records before upsert: $beforeCount")
+        log.debug("Records before upsert: $beforeCount")
 
         // 기존 레코드만 업데이트 (새 레코드 생성 없음)
         val recordsToUpsert =
@@ -207,7 +207,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
         for (batch in recordsToUpsert.chunked(batchSize)) {
             val result = recordRepository.bulkUpsert(batch)
             totalModified += result.modifiedCount
-            log.info("Upserted batch - Modified: ${result.modifiedCount}, Upserts: ${result.upserts.size}")
+            log.debug("Upserted batch - Modified: ${result.modifiedCount}, Upserts: ${result.upserts.size}")
 
             // 새로운 레코드가 생성되지 않았는지 확인
             Assertions.assertEquals(
@@ -219,7 +219,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
         // 최종 DB의 전체 레코드 수 확인
         val afterCount = recordRepository.findAllByQuery(Query()).size
-        log.info("Records after upsert: $afterCount")
+        log.debug("Records after upsert: $afterCount")
 
         // 검증
         Assertions.assertEquals(
@@ -246,7 +246,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk upsert (update-only) execution time: $timeSeconds seconds")
+        log.debug("Bulk upsert (update-only) execution time: $timeSeconds seconds")
         performanceMetrics["bulk_upsert"] = timeSeconds
     }
 
@@ -256,28 +256,28 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
     fun testBulkDelete() {
         startTime = System.currentTimeMillis()
 
-        log.info(allRecords.first().toString())
+        log.debug(allRecords.first().toString())
         val recordIds = allRecords.mapNotNull { it.id }
-        log.info("Attempting to delete ${recordIds.size} records")
+        log.debug("Attempting to delete ${recordIds.size} records")
 
         var totalDeleted = 0
         for (batch in recordIds.chunked(batchSize)) {
             val deletedCount = recordRepository.bulkDelete(batch)
             totalDeleted += deletedCount
-            log.info("Deleted $deletedCount records in current batch")
+            log.debug("Deleted $deletedCount records in current batch")
         }
 
-        log.info("Total records deleted: $totalDeleted")
+        log.debug("Total records deleted: $totalDeleted")
         Assertions.assertTrue(totalDeleted > 0, "No records were deleted")
 
         // Verify deletion
         val remainingRecords = recordRepository.findAllByQuery(Query())
-        log.info("Remaining records after deletion: ${remainingRecords.size}")
+        log.debug("Remaining records after deletion: ${remainingRecords.size}")
         Assertions.assertTrue(remainingRecords.isEmpty(), "Some records still exist after deletion")
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk delete execution time: $timeSeconds seconds")
+        log.debug("Bulk delete execution time: $timeSeconds seconds")
         performanceMetrics["bulk_delete"] = timeSeconds
     }
 

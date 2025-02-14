@@ -278,7 +278,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                 val result = skillStatsRepository.bulkInsert(records)
                 totalInserted += result.size
                 allRecords.addAll(result)
-                log.info("Inserted ${result.size} records for $baseDate")
+                log.debug("Inserted ${result.size} records for $baseDate")
             } catch (e: Exception) {
                 log.error("Error inserting records for $baseDate", e)
                 throw e
@@ -289,7 +289,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk insert execution time: $timeSeconds seconds")
+        log.debug("Bulk insert execution time: $timeSeconds seconds")
         performanceMetrics["bulk_insert"] = timeSeconds
     }
 
@@ -305,7 +305,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         Assertions.assertTrue(results.isNotEmpty())
         Assertions.assertTrue(results.all { it.entityId == entityId })
         // Verify results are ordered by date descending
-        log.info("results: ${results.first()}")
+        log.debug("results: ${results.first()}")
         Assertions.assertEquals(
             results.map { it.baseDate },
             results.map { it.baseDate },
@@ -313,7 +313,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find by entity ID execution time: $timeSeconds seconds")
+        log.debug("Find by entity ID execution time: $timeSeconds seconds")
         performanceMetrics["find_by_entity_id"] = timeSeconds
     }
 
@@ -335,7 +335,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find by entity ID and base date execution time: $timeSeconds seconds")
+        log.debug("Find by entity ID and base date execution time: $timeSeconds seconds")
         performanceMetrics["find_by_entity_and_date"] = timeSeconds
     }
 
@@ -356,7 +356,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find by base date and entity IDs execution time: $timeSeconds seconds")
+        log.debug("Find by base date and entity IDs execution time: $timeSeconds seconds")
         performanceMetrics["find_by_date_and_entities"] = timeSeconds
     }
 
@@ -392,7 +392,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find by date range and entity ID execution time: $timeSeconds seconds")
+        log.debug("Find by date range and entity ID execution time: $timeSeconds seconds")
         performanceMetrics["find_by_date_range_and_entity"] = timeSeconds
     }
 
@@ -404,7 +404,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val entityId = allRecords.first().entityId
         val result = skillStatsRepository.findLatestStatsByEntityId(entityId)
-        log.info("results: $result")
+        log.debug("results: $result")
 
         Assertions.assertNotNull(result)
         result?.let {
@@ -414,7 +414,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find latest stats by entity ID execution time: $timeSeconds seconds")
+        log.debug("Find latest stats by entity ID execution time: $timeSeconds seconds")
         performanceMetrics["find_latest_stats"] = timeSeconds
     }
 
@@ -429,7 +429,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         val limit = 5
         val results = skillStatsRepository.findTopGrowthSkills(startDate, endDate, limit)
 
-        log.info("results: ${results.joinToString { it.toString() }}")
+        log.debug("results: ${results.joinToString { it.toString() }}")
         Assertions.assertTrue(results.isNotEmpty())
         Assertions.assertTrue(results.size <= limit)
         // Verify growth rates are in descending order
@@ -438,7 +438,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find top growth skills execution time: $timeSeconds seconds")
+        log.debug("Find top growth skills execution time: $timeSeconds seconds")
         performanceMetrics["find_top_growth_skills"] = timeSeconds
     }
 
@@ -463,7 +463,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find top skills by industry execution time: $timeSeconds seconds")
+        log.debug("Find top skills by industry execution time: $timeSeconds seconds")
         performanceMetrics["find_top_skills_by_industry"] = timeSeconds
     }
 
@@ -478,7 +478,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         val limit = 5
         val results = skillStatsRepository.findTopSkillsByCompanySize(companySize, baseDate, limit)
 
-        log.info("results: ${results.joinToString { it.toString() }}")
+        log.debug("results: ${results.joinToString { it.toString() }}")
         Assertions.assertTrue(results.isNotEmpty())
         Assertions.assertTrue(results.size <= limit)
         Assertions.assertTrue(
@@ -489,7 +489,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find top skills by company size execution time: $timeSeconds seconds")
+        log.debug("Find top skills by company size execution time: $timeSeconds seconds")
         performanceMetrics["find_top_skills_by_company_size"] = timeSeconds
     }
 
@@ -520,7 +520,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find top skills by job category execution time: $timeSeconds seconds")
+        log.debug("Find top skills by job category execution time: $timeSeconds seconds")
         performanceMetrics["find_top_skills_by_job_category"] = timeSeconds
     }
 
@@ -544,7 +544,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find multi-industry growth skills execution time: $timeSeconds seconds")
+        log.debug("Find multi-industry growth skills execution time: $timeSeconds seconds")
         performanceMetrics["find_multi_industry_growth"] = timeSeconds
     }
 
@@ -573,7 +573,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Find emerging skills by industry execution time: $timeSeconds seconds")
+        log.debug("Find emerging skills by industry execution time: $timeSeconds seconds")
         performanceMetrics["find_emerging_skills"] = timeSeconds
     }
 
@@ -596,7 +596,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val endTime = System.currentTimeMillis()
         val timeSeconds = (endTime - startTime) / 1000.0
-        log.info("Bulk delete execution time: $timeSeconds seconds")
+        log.debug("Bulk delete execution time: $timeSeconds seconds")
         performanceMetrics["bulk_delete"] = timeSeconds
     }
 }
