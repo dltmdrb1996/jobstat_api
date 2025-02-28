@@ -1338,3 +1338,94 @@ classDiagram
     ReferenceMongoRepository <.. ReferenceMongoRepositoryImpl
     StatsMongoRepository <.. StatsMongoRepositoryImpl
 ```
+# Batch 과정
+```mermaid
+flowchart TD
+    classDef crawlingClass fill:#d4f1f9,stroke:#05a,stroke-width:1px
+    classDef processingClass fill:#ffebcc,stroke:#c63,stroke-width:1px
+    classDef enrichmentClass fill:#e6f5d0,stroke:#383,stroke-width:1px
+    classDef statisticsClass fill:#f9d5e5,stroke:#934,stroke-width:1px
+    classDef utilityClass fill:#e8e8e8,stroke:#666,stroke-width:1px
+
+    subgraph "1. Data Collection"
+        A1[MultipleSiteCrawlerService] -->|Scheduled Crawling| A2[UrlCrawler]
+        A2 -->|Web Scraping| A3[UrlDataSource]
+        A3 -->|Parse HTML| A4[WebPageParser]
+        A4 -->|Extract Listings| A5[JobListing Objects]
+        A5 -->|Convert to DB Entities| A6[CrawlingTarget]
+        A6 -->|Store| A7[CrawlingTargetService]
+        A2 -->|Update State| A8[RedisCrawlingRepository]
+        A2 -->|Log Errors| A9[CrawlingErrorRepository]
+    end
+
+    subgraph "2. Data Processing"
+        B1[JobQueueBatchConfig] -->|Configuration| B2[SingleJobQueueReader]
+        B2 -->|Read Queue Items| B3[JobQueue with status=PENDING]
+        B3 -->|Process Item| B4[SingleJobQueueProcessor]
+        B4 -->|Extract Metadata| B5[PreProcessedJobQueue]
+        B5 -->|Write Results| B6[SingleJobQueueWriter]
+        B6 -->|Create Company| B7[CompanyService]
+        B6 -->|Create Job Posting| B8[JobPostingService]
+        B6 -->|Create Mappings| B9[Various Mapping Services]
+    end
+
+    subgraph "3. Data Enrichment"
+        C1[SingleJobQueueProcessingUtils] -->|Skills Processing| C2[Process Skills with Keywords]
+        C1 -->|Job Categories Processing| C3[Process Categories from Title/Skills]
+        C1 -->|Location Processing| C4[Process Location with Synonyms]
+        C1 -->|Benefits Processing| C5[Process Benefits]
+        C1 -->|Certifications Processing| C6[Process Certifications]
+        C1 -->|Company Data Preparation| C7[Prepare Company Data]
+        C1 -->|Job Posting Data Preparation| C8[Prepare Job Posting Data]
+        C1 -->|Date/Salary Processing| C9[Extract Experience/Salary/Dates]
+        C1 -->|Employment Type Processing| C10[Map Contract/Remote Types]
+    end
+
+    subgraph "4. Statistics Generation"
+        D1[StatisticsBatchConfig] -->|Config Job| D2[StatisticsReader]
+        D2 -->|Read Processing Target| D3[StatisticsProcessor]
+        D3 -->|Process Entity Stats| D4[StatisticsCalculatorFacade]
+        D4 -->|Accumulate Data| D5[Various Calculators]
+        D5 -->|Store in Memory| D6[AbstractAccumulatedData Objects]
+        D3 -->|Process Rankings| D7[RankingService]
+        D7 -->|Update Rankings| D8[RankingManager]
+        D8 -->|Manage Score Types| D9[ScoreType COUNT/AVERAGE/LATEST]
+        D2 -->|Generate Final Stats| D10[StatisticsTasklet]
+        D10 -->|Generate Documents| D11[RankingDocumentGeneratorManager]
+        D11 -->|Create Score Objects| D12[RankingScoreFactory]
+        D10 -->|Save to MongoDB| D13[StatisticsService]
+        D4 -->|Calculate Growth| D14[StatisticsCalculationUtil]
+    end
+
+    subgraph "5. Statistics Access"
+        E1[RankingStatisticsFacade] -->|Access Company Stats| E2[Company Rankings Repositories]
+        E1 -->|Access Industry Stats| E3[Industry Rankings Repositories]
+        E1 -->|Access Job Category Stats| E4[Job Category Rankings Repositories]
+        E1 -->|Access Location Stats| E5[Location Rankings Repositories]
+        E1 -->|Access Skills Stats| E6[Skills Rankings Repositories]
+        E1 -->|Access Benefits Stats| E7[Benefits & Education Repositories]
+        E1 -->|Retrieve Time Series| E8[Latest Rankings Data]
+        E8 -->|Provide to API| E9[Final Statistics Data Access]
+    end
+
+    %% Cross-module connections
+    A7 --> B3
+    B6 --> D2
+    C2 --> B4
+    C3 --> B4
+    C4 --> B4
+    C5 --> B4
+    C6 --> B4
+    C7 --> B4
+    C8 --> B4
+    C9 --> B4
+    C10 --> B4
+    D13 --> E1
+
+    %% Apply styles
+    class A1,A2,A3,A4,A5,A6,A7,A8,A9 crawlingClass
+    class B1,B2,B3,B4,B5,B6,B7,B8,B9 processingClass
+    class C1,C2,C3,C4,C5,C6,C7,C8,C9,C10 enrichmentClass
+    class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11,D12,D13,D14 statisticsClass
+    class E1,E2,E3,E4,E5,E6,E7,E8,E9 utilityClass
+```
