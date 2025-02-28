@@ -1,9 +1,9 @@
 package com.example.jobstat.auth.user.service
 
 interface LoginAttemptService {
-    fun recordFailedAttempt(username: String)
+    fun incrementFailedAttempts(username: String)
 
-    fun isBlocked(username: String): Boolean
+    fun isAccountLocked(username: String): Boolean
 
-    fun clearAttempts(username: String)
+    fun resetAttempts(username: String)
 }

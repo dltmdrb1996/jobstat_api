@@ -1,10 +1,11 @@
 package com.example.jobstat.community.usecase
 
+import com.example.jobstat.community.board.entity.BoardCategory
+import com.example.jobstat.community.board.service.BoardServiceImpl
+import com.example.jobstat.community.board.usecase.CreateBoard
 import com.example.jobstat.community.fake.CategoryFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-import com.example.jobstat.community.internal.entity.BoardCategory
-import com.example.jobstat.community.internal.service.BoardServiceImpl
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.utils.SecurityUtils
@@ -142,15 +143,15 @@ class CreateBoardTest {
         }
 
         @Test
-        @DisplayName("비밀번호가 10자 초과면 실패한다")
+        @DisplayName("비밀번호가 15자 초과면 실패한다")
         fun passwordTooLongFails() {
             val request =
                 CreateBoard.Request(
                     title = "제목",
-                    content = "열글자이상의내용입니다",
+                    content = "열다섯글자이상의내용입니다",
                     author = "작성자",
                     categoryId = testCategory.id,
-                    password = "12345678901",
+                    password = "1234567890134534",
                 )
 
             assertFailsWith<ConstraintViolationException> {

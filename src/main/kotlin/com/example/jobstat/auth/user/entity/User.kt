@@ -1,8 +1,8 @@
 package com.example.jobstat.auth.user.entity
 
+import com.example.jobstat.auth.user.UserConstants
 import com.example.jobstat.core.base.Address
 import com.example.jobstat.core.base.SoftDeleteBaseEntity
-import com.example.jobstat.core.utils.RegexPatterns
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -37,20 +37,34 @@ internal class User private constructor(
     birthDate: LocalDate,
 ) : SoftDeleteBaseEntity(),
     ReadUser {
-    @Column(name = "username", nullable = false, unique = true, length = 15)
+    @Column(
+        name = "username",
+        nullable = false,
+        unique = true,
+        length = UserConstants.MAX_USERNAME_LENGTH,
+    )
     override var username: String = username
+        protected set
+
+    @Column(
+        name = "email",
+        nullable = false,
+        unique = true,
+        length = UserConstants.MAX_EMAIL_LENGTH,
+    )
+    override var email: String = email
+        protected set
+
+    @Column(
+        name = "password",
+        nullable = false,
+        length = UserConstants.MAX_PASSWORD_LENGTH,
+    )
+    override var password: String = password
         protected set
 
     @Column(name = "birth_date", nullable = false)
     override var birthDate: LocalDate = birthDate
-        protected set
-
-    @Column(name = "email", nullable = false, unique = true)
-    override var email: String = email
-        protected set
-
-    @Column(name = "password", nullable = false)
-    override var password: String = password
         protected set
 
     @Embedded
@@ -80,14 +94,13 @@ internal class User private constructor(
 
     fun getUserRole(role: Role): UserRole? = userRoles.find { it.role.id == role.id }
 
-    fun addRole(userRole: UserRole) {
-        require(userRole.user == this) { "UserRole은 현재 사용자에 속해있어야 합니다" }
+    fun assignRole(userRole: UserRole) {
+        require(userRole.user == this) { UserConstants.ErrorMessages.INVALID_ROLE }
         if (hasRole(userRole.role)) return
-
         userRoles.add(userRole)
     }
 
-    fun removeRole(
+    fun revokeRole(
         role: Role,
         removeFromRole: Boolean = true,
     ) {
@@ -95,7 +108,7 @@ internal class User private constructor(
         userRole?.let {
             userRoles.remove(it)
             if (removeFromRole) {
-                role.removeUserRole(this, false)
+                role.revokeRole(this, false)
             }
         }
     }
@@ -103,17 +116,19 @@ internal class User private constructor(
     fun clearRoles() {
         val currentRoles = roles.toSet() // 복사본 생성
         currentRoles.forEach { role ->
-            removeRole(role)
+            revokeRole(role)
         }
     }
 
     fun updatePassword(newPassword: String) {
-        require(newPassword.isNotBlank()) { "패스워드는 필수 값입니다." }
+        require(newPassword.isNotBlank()) { UserConstants.ErrorMessages.PASSWORD_REQUIRED }
         this.password = newPassword
     }
 
     fun updateEmail(newEmail: String) {
-        require(newEmail.matches(RegexPatterns.EMAIL)) { "유효하지 않은 이메일 주소입니다." }
+        require(newEmail.matches(Regex(UserConstants.Patterns.EMAIL_PATTERN))) {
+            UserConstants.ErrorMessages.INVALID_EMAIL
+        }
         this.email = newEmail
     }
 
@@ -121,17 +136,17 @@ internal class User private constructor(
         this.address = newAddress
     }
 
-    fun activate() {
+    fun enableAccount() {
         isActive = true
     }
 
-    fun deactivate() {
+    fun disableAccount() {
         isActive = false
     }
 
     override fun restore() {
         super.restore()
-        activate()
+        enableAccount()
     }
 
     companion object {
@@ -141,10 +156,16 @@ internal class User private constructor(
             password: String,
             birthDate: LocalDate,
         ): User {
-            require(username.matches(RegexPatterns.USERNAME)) { "유효하지 않은 사용자 이름입니다" }
-            require(email.matches(RegexPatterns.EMAIL)) { "유효하지 않은 이메일 주소입니다" }
-            require(birthDate.isBefore(LocalDate.now().minusDays(1))) { "유효하지 않은 생년월일입니다" }
-            require(password.isNotBlank()) { "패스워드는 필수 값입니다" }
+            require(username.matches(Regex(UserConstants.Patterns.USERNAME_PATTERN))) {
+                UserConstants.ErrorMessages.INVALID_USERNAME
+            }
+            require(email.matches(Regex(UserConstants.Patterns.EMAIL_PATTERN))) {
+                UserConstants.ErrorMessages.INVALID_EMAIL
+            }
+            require(birthDate.isBefore(LocalDate.now().minusDays(1))) {
+                UserConstants.ErrorMessages.INVALID_BIRTH_DATE
+            }
+            require(password.isNotBlank()) { UserConstants.ErrorMessages.PASSWORD_REQUIRED }
 
             return User(username, email, password, birthDate)
         }

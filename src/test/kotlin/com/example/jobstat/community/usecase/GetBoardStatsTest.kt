@@ -1,14 +1,15 @@
 package com.example.jobstat.community.usecase
 
+import com.example.jobstat.community.board.service.BoardService
+import com.example.jobstat.community.board.service.BoardServiceImpl
+import com.example.jobstat.community.board.usecase.GetBoardStats
+import com.example.jobstat.community.comment.service.CommentService
+import com.example.jobstat.community.comment.service.CommentServiceImpl
 import com.example.jobstat.community.fake.BoardFixture
 import com.example.jobstat.community.fake.CategoryFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCategoryRepository
 import com.example.jobstat.community.fake.repository.FakeCommentRepository
-import com.example.jobstat.community.internal.service.BoardService
-import com.example.jobstat.community.internal.service.BoardServiceImpl
-import com.example.jobstat.community.internal.service.CommentService
-import com.example.jobstat.community.internal.service.CommentServiceImpl
 import jakarta.validation.Validation
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -74,7 +75,7 @@ class GetBoardStatsTest {
         val request = GetBoardStats.Request(author = "authorStats", boardId = testBoardId)
         val response = getBoardStats(request)
         // authorStats 총 게시글 수 = 3, 댓글 존재 여부 = true
-        assertEquals(3, response.totalBoards)
-        assertTrue(response.hasCommentOnBoard)
+        assertEquals(3, response.totalBoardCount)
+        assertTrue(response.hasCommentedOnBoard)
     }
 }

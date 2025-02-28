@@ -1,8 +1,8 @@
 package com.example.jobstat.community.fake.repository
 
+import com.example.jobstat.community.comment.entity.Comment
+import com.example.jobstat.community.comment.repository.CommentRepository
 import com.example.jobstat.community.fake.CommentFixture
-import com.example.jobstat.community.internal.entity.Comment
-import com.example.jobstat.community.internal.repository.CommentRepository
 import com.example.jobstat.utils.base.BaseFakeRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl

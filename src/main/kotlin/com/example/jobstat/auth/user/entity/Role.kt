@@ -1,5 +1,6 @@
 package com.example.jobstat.auth.user.entity
 
+import com.example.jobstat.auth.user.UserConstants
 import com.example.jobstat.core.base.BaseEntity
 import jakarta.persistence.*
 
@@ -20,7 +21,7 @@ internal class Role private constructor(
     name: String,
 ) : BaseEntity(),
     ReadRole {
-    @Column(nullable = false, unique = true, length = 50)
+    @Column(nullable = false, unique = true, length = UserConstants.MAX_ROLE_NAME_LENGTH)
     override var name: String = name
         protected set
 
@@ -37,14 +38,13 @@ internal class Role private constructor(
 
     fun getUserRole(user: User): UserRole? = _userRoles.find { it.user.id == user.id }
 
-    fun addUserRole(userRole: UserRole) {
-        require(userRole.role == this) { "UserRole은 현재 역할에 속해있어야 합니다" }
+    fun assignRole(userRole: UserRole) {
+        require(userRole.role == this) { UserConstants.ErrorMessages.INVALID_ROLE }
         if (getUserRole(userRole.user) != null) return
-
         _userRoles.add(userRole)
     }
 
-    fun removeUserRole(
+    fun revokeRole(
         user: User,
         removeFromUser: Boolean = true,
     ) {
@@ -52,15 +52,8 @@ internal class Role private constructor(
         userRole?.let {
             _userRoles.remove(it)
             if (removeFromUser) {
-                user.removeRole(this, false)
+                user.revokeRole(this, false)
             }
-        }
-    }
-
-    fun clearUserRoles() {
-        val users = _userRoles.map { it.user }.toSet()
-        users.forEach { user ->
-            removeUserRole(user)
         }
     }
 
@@ -69,7 +62,7 @@ internal class Role private constructor(
             name: String,
             id: Long = 0L,
         ): Role {
-            require(name.isNotBlank()) { "역할 이름은 비어있을 수 없습니다" }
+            require(name.isNotBlank()) { UserConstants.ErrorMessages.INVALID_ROLE }
             return Role(name)
         }
     }

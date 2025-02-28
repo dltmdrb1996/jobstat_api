@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class SecurityUtils {
-    companion object {
-        private const val ROLE_PREFIX = "ROLE_"
-        private const val ANONYMOUS_USER = "anonymousUser"
+    private object Constants {
+        const val ROLE_PREFIX = "ROLE_"
+        const val ANONYMOUS_USER = "anonymousUser"
     }
 
     /**
@@ -17,7 +17,7 @@ class SecurityUtils {
     fun isAuthenticated(): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
         return authentication?.principal != null &&
-            authentication.principal != ANONYMOUS_USER &&
+            authentication.principal != Constants.ANONYMOUS_USER &&
             authentication.principal is Long
     }
 
@@ -26,8 +26,8 @@ class SecurityUtils {
      */
     fun getCurrentUserId(): Long? {
         val authentication = SecurityContextHolder.getContext().authentication
-        return when (authentication?.principal) {
-            is Long -> authentication.principal as Long
+        return when (val principal = authentication?.principal) {
+            is Long -> principal
             else -> null
         }
     }
@@ -37,8 +37,8 @@ class SecurityUtils {
      */
     fun getCurrentUserRoles(): List<String> {
         val authentication = SecurityContextHolder.getContext().authentication
-        return if (authentication?.principal != ANONYMOUS_USER) {
-            authentication?.authorities?.map { it.authority.removePrefix(ROLE_PREFIX) } ?: emptyList()
+        return if (authentication?.principal != Constants.ANONYMOUS_USER) {
+            authentication?.authorities?.map { it.authority.removePrefix(Constants.ROLE_PREFIX) } ?: emptyList()
         } else {
             emptyList()
         }
@@ -49,8 +49,8 @@ class SecurityUtils {
      */
     fun hasRole(role: String): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
-        return authentication?.principal != ANONYMOUS_USER &&
-            (authentication?.authorities?.any { it.authority == "$ROLE_PREFIX$role" } ?: false)
+        return authentication?.principal != Constants.ANONYMOUS_USER &&
+            (authentication?.authorities?.any { it.authority == "${Constants.ROLE_PREFIX}$role" } ?: false)
     }
 
     /**
@@ -58,9 +58,9 @@ class SecurityUtils {
      */
     fun hasAnyRole(vararg roles: String): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
-        return authentication?.principal != ANONYMOUS_USER &&
+        return authentication?.principal != Constants.ANONYMOUS_USER &&
             roles.any { role ->
-                authentication?.authorities?.any { it.authority == "$ROLE_PREFIX$role" } ?: false
+                authentication?.authorities?.any { it.authority == "${Constants.ROLE_PREFIX}$role" } ?: false
             }
     }
 
@@ -69,9 +69,9 @@ class SecurityUtils {
      */
     fun hasAllRoles(vararg roles: String): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
-        return authentication?.principal != ANONYMOUS_USER &&
+        return authentication?.principal != Constants.ANONYMOUS_USER &&
             roles.all { role ->
-                authentication?.authorities?.any { it.authority == "$ROLE_PREFIX$role" } ?: false
+                authentication?.authorities?.any { it.authority == "${Constants.ROLE_PREFIX}$role" } ?: false
             }
     }
 
@@ -80,7 +80,7 @@ class SecurityUtils {
      */
     fun isAdmin(): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
-        return authentication?.principal != ANONYMOUS_USER &&
+        return authentication?.principal != Constants.ANONYMOUS_USER &&
             hasRole(RoleData.ADMIN.name)
     }
 
@@ -89,7 +89,7 @@ class SecurityUtils {
      */
     fun canAccess(resourceUserId: Long): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication?.principal == ANONYMOUS_USER) return false
+        if (authentication?.principal == Constants.ANONYMOUS_USER) return false
 
         return isAdmin() || getCurrentUserId() == resourceUserId
     }
@@ -99,7 +99,7 @@ class SecurityUtils {
      */
     fun getHighestRole(): String? {
         val authentication = SecurityContextHolder.getContext().authentication
-        if (authentication?.principal == ANONYMOUS_USER) return null
+        if (authentication?.principal == Constants.ANONYMOUS_USER) return null
 
         val roles = getCurrentUserRoles()
         return when {

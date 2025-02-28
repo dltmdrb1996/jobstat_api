@@ -41,7 +41,6 @@ class RoleRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             userRepository.deleteAll()
 
             roleRepository.findAll().forEach { role ->
-                role.clearUserRoles()
                 roleRepository.save(role)
             }
             roleRepository.deleteAll()
@@ -158,8 +157,8 @@ class RoleRepositoryIntegrationTest : JpaIntegrationTestSupport() {
 
             // UserRole 생성 (양방향 연관관계)
             val useRole = UserRole.create(user = savedUser, role = savedRole)
-            savedUser.addRole(useRole)
-            savedRole.addUserRole(useRole)
+            savedUser.assignRole(useRole)
+            savedRole.assignRole(useRole)
             flushAndClear()
 
             // When

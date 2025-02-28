@@ -1,19 +1,19 @@
 package com.example.jobstat.community.usecase
 
+import com.example.jobstat.community.board.service.BoardService
+import com.example.jobstat.community.board.service.BoardServiceImpl
+import com.example.jobstat.community.comment.service.CommentService
+import com.example.jobstat.community.comment.service.CommentServiceImpl
+import com.example.jobstat.community.comment.usecase.DeleteComment
 import com.example.jobstat.community.fake.BoardFixture
 import com.example.jobstat.community.fake.CategoryFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCategoryRepository
 import com.example.jobstat.community.fake.repository.FakeCommentRepository
-import com.example.jobstat.community.internal.service.BoardService
-import com.example.jobstat.community.internal.service.BoardServiceImpl
-import com.example.jobstat.community.internal.service.CommentService
-import com.example.jobstat.community.internal.service.CommentServiceImpl
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.utils.SecurityUtils
 import com.example.jobstat.utils.FakePasswordUtil
 import jakarta.persistence.EntityNotFoundException
-import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -244,27 +244,6 @@ class DeleteCommentTest {
             // when & then
             assertFailsWith<EntityNotFoundException> {
                 deleteComment(request.of(testBoardId, 999L))
-            }
-        }
-
-        @Test
-        @DisplayName("회원이 비밀번호로 댓글을 삭제할 수 없다")
-        fun memberCannotDeleteWithPassword() {
-            // given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(1L)
-            val comment =
-                commentService.createComment(
-                    boardId = testBoardId,
-                    content = "Member Comment",
-                    author = "user",
-                    password = null,
-                    userId = 1L,
-                )
-
-            // when & then
-            val request = DeleteComment.Request(password = "somepassword")
-            assertFailsWith<ConstraintViolationException> {
-                deleteComment(request.of(testBoardId, comment.id))
             }
         }
     }

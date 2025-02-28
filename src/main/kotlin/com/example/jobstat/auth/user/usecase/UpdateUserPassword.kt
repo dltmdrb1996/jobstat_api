@@ -1,5 +1,6 @@
 package com.example.jobstat.auth.user.usecase
 
+import com.example.jobstat.auth.user.UserConstants
 import com.example.jobstat.auth.user.service.UserService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
@@ -21,11 +22,10 @@ internal class UpdateUserPassword(
     override fun execute(request: Request) {
         val user = userService.getUserById(request.userId)
 
-        // 현재 패스워드 확인
         if (!bcryptPasswordUtil.matches(request.currentPassword, user.password)) {
             throw AppException.fromErrorCode(
                 ErrorCode.AUTHENTICATION_FAILURE,
-                "현재 비밀번호가 일치하지 않습니다.",
+                UserConstants.ErrorMessages.CURRENT_PASSWORD_MISMATCH,
             )
         }
 
@@ -39,12 +39,12 @@ internal class UpdateUserPassword(
 
     data class Request(
         val userId: Long,
-        @field:NotBlank
+        @field:NotBlank(message = UserConstants.ErrorMessages.PASSWORD_REQUIRED)
         val currentPassword: String,
-        @field:NotBlank
+        @field:NotBlank(message = UserConstants.ErrorMessages.PASSWORD_REQUIRED)
         @field:Pattern(
-            regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$",
-            message = "비밀번호는 최소 8자 이상이며, 문자, 숫자, 특수문자를 포함해야 합니다.",
+            regexp = UserConstants.Patterns.PASSWORD_PATTERN,
+            message = UserConstants.ErrorMessages.INVALID_PASSWORD,
         )
         val newPassword: String,
     )

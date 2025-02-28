@@ -17,17 +17,25 @@ class AdminPageConfig(
     @Value("\${admin.password}") private val adminPassword: String,
     private val passwordUtil: PasswordUtil,
 ) {
-    @Bean
-    fun adminSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http
-            .securityMatcher("/admin/**", "/api/admin/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**")
-            .httpBasic(Customizer.withDefaults())
-            .authorizeHttpRequests {
-                it.anyRequest().authenticated()
-            }.csrf { it.disable() }
-
-        return http.build()
+    companion object {
+        private val SECURED_PATHS =
+            arrayOf(
+                "/admin/**",
+                "/api/admin/**",
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+            )
     }
+
+    @Bean
+    fun adminSecurityFilterChain(http: HttpSecurity): SecurityFilterChain =
+        http
+            .securityMatcher(*SECURED_PATHS)
+            .httpBasic(Customizer.withDefaults())
+            .authorizeHttpRequests { it.anyRequest().authenticated() }
+            .csrf { it.disable() }
+            .build()
 
     @Bean
     fun adminUserDetailsService(): UserDetailsService {
