@@ -476,9 +476,301 @@
 # Mongo 도큐먼트 구조
 
 ### Stats 도큐먼트
+```mermaid
+classDiagram
+    %% [1] 기본/공통 클래스 및 인터페이스
+    class BaseDocument {
+      +id: String?
+    }
+    class BaseTimeSeriesDocument {
+      +baseDate: String
+      +period: SnapshotPeriod
+    }
+    BaseDocument <|-- BaseTimeSeriesDocument
 
+    class SnapshotPeriod {
+      +startDate: Instant
+      +endDate: Instant
+      +durationInDays: Long
+    }
 
-### RankingS 도큐먼트
+    class RankingInfo {
+      <<interface>>
+      +currentRank: int
+      +previousRank: Integer?
+      +rankChange: Integer?
+      +percentile: Double?
+      +rankingScore: RankingScore
+    }
+    class RankingScore {
+      <<interface>>
+      +value: double
+    }
+    class PostingCountScore {
+      +value: double
+      +totalPostings: int
+      +activePostings: int
+    }
+    RankingScore <|-- PostingCountScore
+
+    class BaseStats {
+      <<interface>>
+      +postingCount: int
+      +activePostingCount: int
+      +avgSalary: long
+      +growthRate: double
+      +yearOverYearGrowth: Double?
+      +monthOverMonthChange: Double?
+      +demandTrend: String
+    }
+    class CommonStats {
+      +postingCount: int
+      +activePostingCount: int
+      +avgSalary: long
+      +growthRate: double
+      +yearOverYearGrowth: Double?
+      +monthOverMonthChange: Double?
+      +demandTrend: String
+    }
+    BaseStats <|-- CommonStats
+
+    class Distribution {
+      <<interface>>
+      +count: int
+      +ratio: double
+      +avgSalary: Long?
+    }
+    class CommonDistribution {
+      +count: int
+      +ratio: double
+      +avgSalary: Long?
+    }
+    Distribution <|-- CommonDistribution
+
+    %% [3] 통계(Stats) 도큐먼트 베이스 및 기존 구현
+    class BaseStatsDocument {
+      +entityId: Long
+      +stats: BaseStats
+      +rankings: Map~RankingType,RankingInfo~
+    }
+    BaseTimeSeriesDocument <|-- BaseStatsDocument
+
+    class BenefitStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +name: String
+      +stats: BenefitStats
+      +industryDistribution: List~BenefitIndustry~
+      +jobCategoryDistribution: List~BenefitJobCategory~
+      +companySizeDistribution: List~BenefitCompanySize~
+      +locationDistribution: List~BenefitLocation~
+      +experienceDistribution: List~BenefitExperience~
+      +compensationImpact: BenefitCompensationImpact
+      +employeeSatisfaction: BenefitSatisfactionMetrics
+      +costMetrics: BenefitCostMetrics
+      +rankings: Map~RankingType,BenefitRankingInfo~
+    }
+    BaseStatsDocument <|-- BenefitStatsDocument
+
+    class CertificationStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +name: String
+      +stats: CertificationStats
+      +jobCategoryDistribution: List~CertificationJobCategory~
+      +industryDistribution: List~CertificationIndustry~
+      +skillCorrelations: List~CertificationSkill~
+      +experienceDistribution: List~CertificationExperience~
+      +companyDistribution: List~CertificationCompany~
+      +locationDistribution: List~CertificationLocation~
+      +examMetrics: CertificationExamMetrics
+      +careerImpact: CertificationCareerImpact
+      +investmentMetrics: CertificationInvestmentMetrics
+      +rankings: Map~RankingType,CertificationRankingInfo~
+      +type: String
+    }
+    BaseStatsDocument <|-- CertificationStatsDocument
+
+    class CompanyStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +name: String
+      +stats: CompanyStats
+      +size: CompanySize
+      +industryId: Long
+      +jobCategories: List~CompanyJobCategory~
+      +skills: List~CompanySkill~
+      +benefits: List~CompanyBenefit~
+      +experienceDistribution: List~CompanyExperienceDistribution~
+      +educationDistribution: List~CompanyEducationDistribution~
+      +locationDistribution: List~CompanyLocationDistribution~
+      +hiringTrends: CompanyHiringTrends
+      +remoteWorkRatio: double
+      +contractTypeDistribution: List~ContractTypeDistribution~
+      +employeeSatisfaction: CompanyEmployeeSatisfaction
+      +rankings: Map~RankingType,CompanyRankingInfo~
+    }
+    BaseStatsDocument <|-- CompanyStatsDocument
+
+    class ContractTypeStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +type: String
+      +stats: ContractTypeStats
+      +industryDistribution: List~ContractTypeIndustry~
+      +jobCategoryDistribution: List~ContractTypeJobCategory~
+      +companySizeDistribution: List~ContractTypeCompanySize~
+      +locationDistribution: List~ContractTypeLocation~
+      +experienceDistribution: List~ContractTypeExperience~
+      +skillDistribution: List~ContractTypeSkill~
+      +compensationMetrics: ContractTypeCompensation
+      +employmentMetrics: ContractTypeEmployment
+      +conversionMetrics: ContractTypeConversion
+      +rankings: Map~RankingType,ContractTypeRankingInfo~
+    }
+    BaseStatsDocument <|-- ContractTypeStatsDocument
+
+    class EducationStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +level: String
+      +stats: EducationStats
+      +industryDistribution: List~EducationIndustry~
+      +jobCategoryDistribution: List~EducationJobCategory~
+      +companySizeDistribution: List~EducationCompanySize~
+      +locationDistribution: List~EducationLocation~
+      +skillRequirements: List~EducationSkill~
+      +careerMetrics: EducationCareerMetrics
+      +roiMetrics: EducationRoiMetrics
+      +marketDemand: EducationMarketDemand
+      +rankings: Map~RankingType,EducationRankingInfo~
+    }
+    BaseStatsDocument <|-- EducationStatsDocument
+
+    %% [4] 추가 통계(Stats) 구현 도큐먼트
+    class ExperienceStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +range: String
+      +stats: ExperienceStats
+      +industryDistribution: List~ExperienceIndustry~
+      +jobCategoryDistribution: List~ExperienceJobCategory~
+      +companySizeDistribution: List~ExperienceCompanySize~
+      +locationDistribution: List~ExperienceLocation~
+      +skillRequirements: List~ExperienceSkill~
+      +careerProgression: ExperienceCareerProgression
+      +salaryMetrics: ExperienceSalaryMetrics
+      +marketValue: ExperienceMarketValue
+      +employmentTypeDistribution: List~ExperienceEmploymentType~
+      +rankings: Map~RankingType,ExperienceRankingInfo~
+    }
+    BaseStatsDocument <|-- ExperienceStatsDocument
+
+    class LocationStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +name: String
+      +stats: LocationStats
+      +industryDistribution: List~LocationIndustry~
+      +jobCategoryDistribution: List~LocationJobCategory~
+      +companyDistribution: List~LocationCompany~
+      +skillDistribution: List~LocationSkill~
+      +experienceDistribution: List~LocationExperience~
+      +educationDistribution: List~LocationEducation~
+      +employmentMetrics: LocationEmploymentMetrics
+      +livingMetrics: LocationLivingMetrics
+      +remoteWorkStats: LocationRemoteWorkStats
+      +rankings: Map~RankingType,LocationRankingInfo~
+    }
+    BaseStatsDocument <|-- LocationStatsDocument
+
+    class RemoteWorkStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +type: String
+      +stats: RemoteWorkStats
+      +industryDistribution: List~RemoteWorkIndustry~
+      +jobCategoryDistribution: List~RemoteWorkJobCategory~
+      +companySizeDistribution: List~RemoteWorkCompanySize~
+      +locationDistribution: List~RemoteWorkLocation~
+      +skillDistribution: List~RemoteWorkSkill~
+      +experienceDistribution: List~RemoteWorkExperience~
+      +productivityMetrics: RemoteWorkProductivity
+      +collaborationMetrics: RemoteWorkCollaboration
+      +infrastructureMetrics: RemoteWorkInfrastructure
+      +satisfactionMetrics: RemoteWorkSatisfaction
+      +rankings: Map~RankingType,RemoteWorkRankingInfo~
+    }
+    BaseStatsDocument <|-- RemoteWorkStatsDocument
+
+    class IndustryStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +name: String
+      +stats: IndustryStats
+      +jobCategories: List~IndustryJobCategory~
+      +skills: List~IndustrySkill~
+      +companies: List~IndustryCompany~
+      +experienceDistribution: List~ExperienceDistribution~
+      +educationDistribution: List~EducationDistribution~
+      +locationDistribution: List~LocationDistribution~
+      +salaryRangeDistribution: List~SalaryRangeDistribution~
+      +companySizeDistribution: List~CompanySizeDistribution~
+      +remoteWorkRatio: Double
+      +contractTypeDistribution: List~ContractTypeDistribution~
+      +rankings: Map~RankingType,IndustryRankingInfo~
+    }
+    BaseStatsDocument <|-- IndustryStatsDocument
+
+    class JobCategoryStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +name: String
+      +stats: JobCategoryStats
+      +skills: List~JobCategorySkill~
+      +certifications: List~JobCategoryCertification~
+      +experienceDistribution: List~ExperienceDistribution~
+      +educationDistribution: List~EducationDistribution~
+      +salaryRangeDistribution: List~SalaryRangeDistribution~
+      +companySizeDistribution: List~CompanySizeDistribution~
+      +industryDistribution: List~IndustryDistribution~
+      +locationDistribution: List~LocationDistribution~
+      +benefitsDistribution: List~BenefitDistribution~
+      +remoteWorkRatio: Double
+      +contractTypeDistribution: List~ContractTypeDistribution~
+      +transitionPaths: List~CareerTransitionPath~
+      +rankings: Map~RankingType,JobCategoryRankingInfo~
+    }
+    BaseStatsDocument <|-- JobCategoryStatsDocument
+
+    class SkillStatsDocument {
+      +entityId: Long
+      +baseDate: String
+      +period: SnapshotPeriod
+      +name: String
+      +stats: SkillStats
+      +experienceLevels: List~SkillExperienceLevel~
+      +companySizeDistribution: List~CompanySizeDistribution~
+      +industryDistribution: List~IndustryDistribution~
+      +isSoftSkill: Boolean
+      +isEmergingSkill: Boolean
+      +relatedJobCategories: List~RelatedJobCategory~
+      +rankings: Map~RankingType,SkillRankingInfo~
+    }
+    BaseStatsDocument <|-- SkillStatsDocument
+```
+
+### Ranking 도큐먼트
 ```mermaid
 %%{init: {'theme':'default', 'flowchart': {'curve': 'basis', 'nodeSpacing': 40, 'rankSpacing': 30}}}%%
 classDiagram
