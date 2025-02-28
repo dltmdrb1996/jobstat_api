@@ -1123,4 +1123,218 @@ classDiagram
     }
     DistributionRankingDocument <|-- CompanySizeEducationRankingsDocument
 ```
+### Mongo Repository 상속구조
+```mermaid
+classDiagram
+    %% 인터페이스 정의
+    class MongoRepository {
+        <<interface>>
+    }
+    class BaseMongoRepository {
+        <<interface>>
+        +findByCreatedAtBetween(start, end)
+        +findAllByQuery(query)
+        +bulkFindByIds(ids)
+        +bulkInsert(entities)
+        +bulkUpdate(entities)
+        +bulkDelete(ids)
+        +bulkUpsert(entities)
+    }
+    class BaseTimeSeriesRepository {
+        <<interface>>
+        +findByBaseDate(baseDate)
+        +findByBaseDateBetween(startDate, endDate)
+        +findLatest()
+        +findLatestN(n)
+    }
+    class BaseRankingRepository {
+        <<interface>>
+        +findByPage(baseDate, page)
+        +findAllPages(baseDate)
+        +findTopN(baseDate, limit)
+        +findByRankRange(baseDate, startRank, endRank)
+        +findByEntityId(baseDate, entityId)
+        +findTopMovers(startDate, endDate, limit)
+        +findTopLosers(startDate, endDate, limit)
+        +findStableEntities(months, maxRankChange)
+        +findVolatileEntities(months, minRankChange)
+        +findEntitiesWithConsistentRanking(months, maxRank)
+    }
+    class SimpleRankingRepository {
+        <<interface>>
+        +findByValueRange(baseDate, minValue, maxValue)
+        +findRisingStars(months, minRankImprovement)
+        +findByEntityIdAndBaseDate(entityId, baseDate)
+    }
+    class RelationshipRankingRepository {
+        <<interface>>
+        +findByPrimaryEntityId(primaryEntityId, baseDate)
+        +findTopNRelatedEntities(primaryEntityId, baseDate, limit)
+        +findByRelatedEntityId(relatedEntityId, baseDate)
+        +findStrongRelationships(baseDate, minScore)
+        +findStrongestPairs(baseDate, limit)
+        +findCommonRelationships(primaryEntityId1, primaryEntityId2, baseDate)
+    }
+    class DistributionRankingRepository {
+        <<interface>>
+        +findByDistributionPattern(baseDate, pattern, threshold)
+        +findByDominantCategory(baseDate, category)
+        +findDistributionTrends(entityId, months)
+        +findSignificantDistributionChanges(startDate, endDate)
+        +findSimilarDistributions(entityId, baseDate, similarity)
+        +findUniformDistributions(baseDate, maxVariance)
+        +findSkewedDistributions(baseDate, minSkewness)
+        +findDistributionChanges(entityId, months)
+        +findCategoryDominance(baseDate, category, minPercentage)
+    }
+    class ReferenceMongoRepository {
+        <<interface>>
+        +findByReferenceId(referenceId)
+        +findByReferenceIds(referenceIds)
+        +findByEntityType(entityType)
+        +findByEntityTypeAndStatus(entityType, status)
+        +findByReferenceIdAndEntityType(referenceId, entityType)
+        +updateStatus(referenceId, status)
+    }
+    class StatsMongoRepository {
+        <<interface>>
+        +getCollectionName()
+        +findByEntityId(entityId)
+        +findByEntityIdAndBaseDate(entityId, baseDate)
+        +findByBaseDateAndEntityIds(baseDate, entityIds)
+        +findStatsByEntityIdsBatch(baseDate, entityIds, batchSize)
+        +findByBaseDateBetweenAndEntityId(startDate, endDate, entityId)
+        +findLatestStatsByEntityId(entityId)
+        +findTopGrowthSkills(startDate, endDate, limit)
+        +findTopSkillsByIndustry(industryId, baseDate, limit)
+        +findTopSkillsByCompanySize(companySize, baseDate, limit)
+        +findTopSkillsByJobCategory(jobCategoryId, baseDate, limit)
+        +findEmergingSkillsByIndustry(industryId, baseDate, minGrowthRate)
+        +findSkillsWithMultiIndustryGrowth(baseDate, minIndustryCount, minGrowthRate)
+    }
 
+    %% 구현 클래스 정의
+    class SimpleMongoRepository {
+        <<abstract>>
+    }
+    class BaseMongoRepositoryImpl {
+        <<abstract>>
+        -OPTIMAL_BATCH_SIZE: int
+        -UNORDERED_BULK_OPTIONS: BulkWriteOptions
+        +findByCreatedAtBetween(start, end)
+        +findAllByQuery(query)
+        +bulkFindByIds(ids)
+        +bulkInsert(entities)
+        +bulkUpdate(entities)
+        +bulkDelete(ids)
+        +bulkUpsert(entities)
+        -queryToFilter(query)
+        -queryToSort(query)
+    }
+    class BaseTimeSeriesRepositoryImpl {
+        <<abstract>>
+        +findByBaseDate(baseDate)
+        +findByBaseDateBetween(startDate, endDate)
+        +findLatest()
+        +findLatestN(n)
+    }
+    class BaseRankingRepositoryImpl {
+        <<abstract>>
+        +findByPage(baseDate, page)
+        +findAllPages(baseDate)
+        +findTopN(baseDate, limit)
+        +findByRankRange(baseDate, startRank, endRank)
+        +findByEntityId(baseDate, entityId)
+        +findTopMovers(startDate, endDate, limit)
+        +findTopLosers(startDate, endDate, limit)
+        +findStableEntities(months, maxRankChange)
+        +findVolatileEntities(months, minRankChange)
+        +findEntitiesWithConsistentRanking(months, maxRank)
+    }
+    class SimpleRankingRepositoryImpl {
+        <<abstract>>
+        +findByValueRange(baseDate, minValue, maxValue)
+        +findRisingStars(months, minRankImprovement)
+        +findByEntityIdAndBaseDate(entityId, baseDate)
+    }
+    class RelationshipRankingRepositoryImpl {
+        <<abstract>>
+        +findByPrimaryEntityId(primaryEntityId, baseDate)
+        +findTopNRelatedEntities(primaryEntityId, baseDate, limit)
+        +findByRelatedEntityId(relatedEntityId, baseDate)
+        +findStrongRelationships(baseDate, minScore)
+        +findStrongestPairs(baseDate, limit)
+        +findCommonRelationships(primaryEntityId1, primaryEntityId2, baseDate)
+    }
+    class DistributionRankingRepositoryImpl {
+        <<abstract>>
+        +findByDistributionPattern(baseDate, pattern, threshold)
+        +findByDominantCategory(baseDate, category)
+        +findDistributionTrends(entityId, months)
+        +findSignificantDistributionChanges(startDate, endDate)
+        +findSimilarDistributions(entityId, baseDate, similarity)
+        +findUniformDistributions(baseDate, maxVariance)
+        +findSkewedDistributions(baseDate, minSkewness)
+        +findDistributionChanges(entityId, months)
+        +findCategoryDominance(baseDate, category, minPercentage)
+        -calculateSimilarity(dist1, dist2)
+        -calculateDistributionChange(dist1, dist2)
+        -calculateCosineSimilarity(dist1, dist2)
+    }
+    class ReferenceMongoRepositoryImpl {
+        <<abstract>>
+        +findByReferenceId(referenceId)
+        +findByReferenceIds(referenceIds)
+        +findByEntityType(entityType)
+        +findByEntityTypeAndStatus(entityType, status)
+        +findByReferenceIdAndEntityType(referenceId, entityType)
+        +updateStatus(referenceId, status)
+    }
+    class StatsMongoRepositoryImpl {
+        <<abstract>>
+        -collection
+        +getCollectionName()
+        +findByEntityId(entityId)
+        +findByEntityIdAndBaseDate(entityId, baseDate)
+        +findByBaseDateAndEntityIds(baseDate, entityIds)
+        +findStatsByEntityIdsBatch(baseDate, entityIds, batchSize)
+        +findByBaseDateBetweenAndEntityId(startDate, endDate, entityId)
+        +findLatestStatsByEntityId(entityId)
+        +findTopGrowthSkills(startDate, endDate, limit)
+        +findTopSkillsByIndustry(industryId, baseDate, limit)
+        +findTopSkillsByCompanySize(companySize, baseDate, limit)
+        +findTopSkillsByJobCategory(jobCategoryId, baseDate, limit)
+        +findEmergingSkillsByIndustry(industryId, baseDate, minGrowthRate)
+        +findSkillsWithMultiIndustryGrowth(baseDate, minIndustryCount, minGrowthRate)
+    }
+
+    %% 인터페이스 상속 관계
+    MongoRepository <|-- BaseMongoRepository
+    BaseMongoRepository <|-- BaseTimeSeriesRepository
+    BaseTimeSeriesRepository <|-- BaseRankingRepository
+    BaseTimeSeriesRepository <|-- StatsMongoRepository
+    BaseMongoRepository <|-- ReferenceMongoRepository
+    BaseRankingRepository <|-- SimpleRankingRepository
+    BaseRankingRepository <|-- RelationshipRankingRepository
+    BaseRankingRepository <|-- DistributionRankingRepository
+
+    %% 구현 클래스 관계
+    SimpleMongoRepository <|-- BaseMongoRepositoryImpl
+    BaseMongoRepositoryImpl <|-- BaseTimeSeriesRepositoryImpl
+    BaseTimeSeriesRepositoryImpl <|-- BaseRankingRepositoryImpl
+    BaseTimeSeriesRepositoryImpl <|-- StatsMongoRepositoryImpl
+    BaseMongoRepositoryImpl <|-- ReferenceMongoRepositoryImpl
+    BaseRankingRepositoryImpl <|-- SimpleRankingRepositoryImpl
+    BaseRankingRepositoryImpl <|-- RelationshipRankingRepositoryImpl
+    BaseRankingRepositoryImpl <|-- DistributionRankingRepositoryImpl
+
+    %% 인터페이스-구현 관계
+    BaseMongoRepository <.. BaseMongoRepositoryImpl
+    BaseTimeSeriesRepository <.. BaseTimeSeriesRepositoryImpl
+    BaseRankingRepository <.. BaseRankingRepositoryImpl
+    SimpleRankingRepository <.. SimpleRankingRepositoryImpl
+    RelationshipRankingRepository <.. RelationshipRankingRepositoryImpl
+    DistributionRankingRepository <.. DistributionRankingRepositoryImpl
+    ReferenceMongoRepository <.. ReferenceMongoRepositoryImpl
+    StatsMongoRepository <.. StatsMongoRepositoryImpl
+```
