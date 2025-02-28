@@ -26,7 +26,7 @@ class TokenServiceTest {
             val userId = 1L
             val expiration = 3600L
 
-            tokenService.storeRefreshToken(refreshToken, userId, expiration)
+            tokenService.saveToken(refreshToken, userId, expiration)
 
             val storedToken = stringRedisTemplate.opsForValue().get("refresh_token:$userId")
             assertEquals(refreshToken, storedToken)
@@ -40,8 +40,8 @@ class TokenServiceTest {
             val newToken = "new_token"
             val expiration = 3600L
 
-            tokenService.storeRefreshToken(oldToken, userId, expiration)
-            tokenService.storeRefreshToken(newToken, userId, expiration)
+            tokenService.saveToken(oldToken, userId, expiration)
+            tokenService.saveToken(newToken, userId, expiration)
 
             val storedToken = stringRedisTemplate.opsForValue().get("refresh_token:$userId")
             assertEquals(newToken, storedToken)
@@ -54,7 +54,7 @@ class TokenServiceTest {
             val userId = 1L
             val expiration = 3600L
 
-            tokenService.storeRefreshToken(refreshToken, userId, expiration)
+            tokenService.saveToken(refreshToken, userId, expiration)
 
             val remainingTime = stringRedisTemplate.getExpire("refresh_token:$userId")
             assertTrue(remainingTime > 0 && remainingTime <= expiration)
@@ -71,8 +71,8 @@ class TokenServiceTest {
             val userId = 1L
             val expiration = 3600L
 
-            tokenService.storeRefreshToken(refreshToken, userId, expiration)
-            val retrievedUserId = tokenService.validateRefreshTokenAndReturnUserId(refreshToken)
+            tokenService.saveToken(refreshToken, userId, expiration)
+            val retrievedUserId = tokenService.getUserIdFromToken(refreshToken)
 
             assertEquals(userId, retrievedUserId)
         }
@@ -83,7 +83,7 @@ class TokenServiceTest {
             val invalidToken = "유효하지_않은_토큰"
 
             assertThrows<AppException> {
-                tokenService.validateRefreshTokenAndReturnUserId(invalidToken)
+                tokenService.getUserIdFromToken(invalidToken)
             }.also { exception ->
                 assertEquals(ErrorCode.AUTHENTICATION_FAILURE, exception.errorCode)
             }
@@ -96,11 +96,11 @@ class TokenServiceTest {
             val userId = 1L
             val expiration = 1L // 1초 후 만료
 
-            tokenService.storeRefreshToken(refreshToken, userId, expiration)
+            tokenService.saveToken(refreshToken, userId, expiration)
             Thread.sleep(1100) // 만료 대기
 
             assertThrows<AppException> {
-                tokenService.validateRefreshTokenAndReturnUserId(refreshToken)
+                tokenService.getUserIdFromToken(refreshToken)
             }
         }
     }
@@ -115,7 +115,7 @@ class TokenServiceTest {
             val userId = 1L
             val expiration = 3600L
 
-            tokenService.storeRefreshToken(refreshToken, userId, expiration)
+            tokenService.saveToken(refreshToken, userId, expiration)
             tokenService.removeToken(userId)
 
             assertNull(stringRedisTemplate.opsForValue().get("refresh_token:$userId"))
@@ -128,7 +128,7 @@ class TokenServiceTest {
             val userId = 1L
             val expiration = 3600L
 
-            tokenService.storeRefreshToken(refreshToken, userId, expiration)
+            tokenService.saveToken(refreshToken, userId, expiration)
             tokenService.invalidateRefreshToken(refreshToken)
 
             assertNull(stringRedisTemplate.opsForValue().get("refresh_token:$userId"))

@@ -11,7 +11,6 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 import org.springframework.stereotype.Service
 
-// 이메일 인증 확인 유스케이스
 @Service
 internal class VerifyEmail(
     private val emailVerificationService: EmailVerificationService,

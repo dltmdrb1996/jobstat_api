@@ -146,7 +146,7 @@ class LoginTest {
             // given
             val user =
                 fakeUserRepository.save(UserFixture.anInactiveUser()).apply {
-                    deactivate()
+                    disableAccount()
                 }
 
             // when & then
@@ -180,7 +180,7 @@ class LoginTest {
                     login(Login.Request(user.email, "testPassword123!"))
                 }
             assertEquals(ErrorCode.TOO_MANY_REQUESTS, exception.errorCode)
-            assertTrue(loginAttemptService.isBlocked(user.email))
+            assertTrue(loginAttemptService.isAccountLocked(user.email))
         }
 
         @Test
@@ -206,7 +206,7 @@ class LoginTest {
             assertFailsWith<AppException> {
                 login(Login.Request(user.email, "wrongPassword123!"))
             }
-            assertFalse(loginAttemptService.isBlocked(user.email))
+            assertFalse(loginAttemptService.isAccountLocked(user.email))
         }
 
         @Test
@@ -239,8 +239,8 @@ class LoginTest {
             }
 
             // then
-            assertTrue(loginAttemptService.isBlocked(user1.email))
-            assertFalse(loginAttemptService.isBlocked(user2.email))
+            assertTrue(loginAttemptService.isAccountLocked(user1.email))
+            assertFalse(loginAttemptService.isAccountLocked(user2.email))
 
             // user2는 여전히 로그인 가능
             val response = login(Login.Request(user2.email, "testPassword123!"))

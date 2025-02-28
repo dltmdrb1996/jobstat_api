@@ -1,10 +1,11 @@
 package com.example.jobstat.community.usecase
 
+import com.example.jobstat.community.board.service.BoardService
+import com.example.jobstat.community.board.service.BoardServiceImpl
+import com.example.jobstat.community.board.usecase.LikeBoard
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCategoryRepository
 import com.example.jobstat.community.fake.repository.FakeCommentRepository
-import com.example.jobstat.community.internal.service.BoardService
-import com.example.jobstat.community.internal.service.BoardServiceImpl
 import jakarta.validation.Validation
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

@@ -1,8 +1,8 @@
 package com.example.jobstat.community.fake.repository
 
+import com.example.jobstat.community.board.entity.BoardCategory
+import com.example.jobstat.community.board.repository.CategoryRepository
 import com.example.jobstat.community.fake.CategoryFixture
-import com.example.jobstat.community.internal.entity.BoardCategory
-import com.example.jobstat.community.internal.repository.CategoryRepository
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.utils.IndexManager

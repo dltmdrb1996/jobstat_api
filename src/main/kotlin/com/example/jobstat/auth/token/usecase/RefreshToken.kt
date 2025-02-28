@@ -20,11 +20,11 @@ internal class RefreshToken(
 ) : ValidUseCase<RefreshToken.Request, RefreshToken.Response>(validator) {
     @Transactional
     override fun execute(request: Request): Response {
-        val id = tokenService.validateRefreshTokenAndReturnUserId(request.refreshToken)
+        val id = tokenService.getUserIdFromToken(request.refreshToken)
         val user = userService.getUserWithRoles(id)
         val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, user.getRolesString()))
         val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, user.getRolesString()))
-        tokenService.storeRefreshToken(refreshToken, id, jwtTokenGenerator.getRefreshTokenExpiration())
+        tokenService.saveToken(refreshToken, id, jwtTokenGenerator.getRefreshTokenExpiration())
         return Response(accessToken, refreshToken)
     }
 

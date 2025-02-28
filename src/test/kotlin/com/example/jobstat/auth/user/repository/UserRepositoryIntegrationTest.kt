@@ -198,13 +198,13 @@ class UserRepositoryIntegrationTest : JpaIntegrationTestSupport() {
 
         @Test
         @DisplayName("사용자를 비활성화할 수 있다")
-        fun deactivateUserSuccess() {
+        fun disableAccountUserSuccess() {
             // Given
             val savedUser = saveAndGetAfterCommit(testUser) { userRepository.save(it) }
 
             // When
             val foundUser = userRepository.findById(savedUser.id)
-            foundUser.deactivate()
+            foundUser.disableAccount()
             val updatedUser = saveAndGetAfterCommit(foundUser) { userRepository.save(it) }
 
             // Then
@@ -216,12 +216,12 @@ class UserRepositoryIntegrationTest : JpaIntegrationTestSupport() {
         @DisplayName("비활성화된 사용자를 다시 활성화할 수 있다")
         fun activateInactiveUserSuccess() {
             // Given
-            testUser.deactivate()
+            testUser.disableAccount()
             val savedUser = saveAndGetAfterCommit(testUser) { userRepository.save(it) }
 
             // When
             val foundUser = userRepository.findById(savedUser.id)
-            foundUser.activate()
+            foundUser.enableAccount()
             val updatedUser = saveAndGetAfterCommit(foundUser) { userRepository.save(it) }
 
             // Then

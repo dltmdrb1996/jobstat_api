@@ -1,11 +1,11 @@
 package com.example.jobstat.community.service
 
+import com.example.jobstat.community.board.entity.Board
+import com.example.jobstat.community.comment.service.CommentService
+import com.example.jobstat.community.comment.service.CommentServiceImpl
 import com.example.jobstat.community.fake.BoardFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCommentRepository
-import com.example.jobstat.community.internal.entity.Board
-import com.example.jobstat.community.internal.service.CommentService
-import com.example.jobstat.community.internal.service.CommentServiceImpl
 import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

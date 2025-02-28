@@ -1,9 +1,9 @@
 package com.example.jobstat.auth.user.service
 
+import com.example.jobstat.auth.user.UserConstants
 import org.springframework.cache.Cache
 import org.springframework.cache.CacheManager
 import org.springframework.stereotype.Component
-import java.time.Duration
 import java.time.Instant
 
 @Component
@@ -11,23 +11,18 @@ internal class LoginAttemptServiceImpl(
     cacheManager: CacheManager,
 ) : LoginAttemptService {
     val cache: Cache =
-        cacheManager.getCache("loginAttempts")
-            ?: throw IllegalStateException("Cache 'loginAttempts' not found")
+        cacheManager.getCache(UserConstants.LOGIN_ATTEMPTS_CACHE_NAME)
+            ?: throw IllegalStateException("Cache '${UserConstants.LOGIN_ATTEMPTS_CACHE_NAME}' not found")
 
-    companion object {
-        private const val MAX_ATTEMPTS = 5
-        private val BLOCK_DURATION = Duration.ofMinutes(30)
-    }
-
-    override fun recordFailedAttempt(username: String) {
+    override fun incrementFailedAttempts(username: String) {
         val attempts = getAttempts(username)
         val attemptInfo =
             LoginAttemptInfo(
                 count = attempts.count + 1,
                 lastFailedAt = Instant.now(),
                 blockedUntil =
-                    if (attempts.count + 1 >= MAX_ATTEMPTS) {
-                        Instant.now().plus(BLOCK_DURATION)
+                    if (attempts.count + 1 >= UserConstants.MAX_LOGIN_ATTEMPTS) {
+                        Instant.now().plusSeconds(UserConstants.LOGIN_LOCK_DURATION_MINUTES.toLong() * 60)
                     } else {
                         null
                     },
@@ -35,19 +30,19 @@ internal class LoginAttemptServiceImpl(
         cache.put(username, attemptInfo)
     }
 
-    override fun isBlocked(username: String): Boolean {
+    override fun isAccountLocked(username: String): Boolean {
         val attempts = getAttempts(username)
         return when {
             attempts.blockedUntil == null -> false
             attempts.blockedUntil.isBefore(Instant.now()) -> {
-                clearAttempts(username)
+                resetAttempts(username)
                 false
             }
             else -> true
         }
     }
 
-    override fun clearAttempts(username: String) {
+    override fun resetAttempts(username: String) {
         cache.evict(username)
     }
 

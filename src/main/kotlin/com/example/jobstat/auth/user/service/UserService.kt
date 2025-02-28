@@ -11,6 +11,9 @@ interface UserService {
         birthDate: LocalDate,
     ): ReadUser
 
+    fun deleteUser(id: Long)
+
+    // 유저 정보 조회
     fun getUserById(id: Long): ReadUser
 
     fun getUserByUsername(username: String): ReadUser
@@ -19,31 +22,31 @@ interface UserService {
 
     fun getAllUsers(): List<ReadUser>
 
-    fun updateUser(command: Map<String, Any>): ReadUser
-
-    fun deleteUser(id: Long)
-
-    fun isUsernameAvailable(username: String): Boolean
-
-    fun isEmailAvailable(email: String): Boolean
-
-    fun isActivated(id: Long): Boolean
-
     fun getUserWithRoles(id: Long): ReadUser
 
     fun getUserRoles(id: Long): List<String>
 
-    fun activateUser(id: Long)
+    // 정보 검증
+    fun validateUsername(username: String): Boolean
 
-    fun deactivateUser(id: Long)
+    fun validateEmail(email: String): Boolean
 
-    fun updatePassword(
+    fun isAccountEnabled(id: Long): Boolean
+
+    // 업데이트
+    fun enableUser(id: Long)
+
+    fun disableUser(id: Long)
+
+    fun updateUserPassword(
         userId: Long,
         newPassword: String,
     )
 
-    fun updateEmail(
+    fun updateUserEmail(
         userId: Long,
         newEmail: String,
     )
+
+    fun updateUser(command: Map<String, Any>): ReadUser
 }

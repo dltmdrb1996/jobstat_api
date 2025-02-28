@@ -30,11 +30,11 @@ internal class UserFixture private constructor(
                 birthDate = birthDate,
             ).apply {
                 address?.let { updateAddress(it) }
-                if (!isActive) deactivate()
+                if (!isActive) disableAccount()
                 roles.forEach { role ->
                     val userRole = UserRole.create(this, role)
-                    addRole(userRole)
-                    role.addUserRole(userRole)
+                    assignRole(userRole)
+                    role.assignRole(userRole)
                 }
             }
 

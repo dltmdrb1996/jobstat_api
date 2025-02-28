@@ -29,10 +29,10 @@ class LoginAttemptServiceTest {
         @DisplayName("실패한 로그인 시도를 기록할 수 있다")
         fun recordFailedAttempt() {
             // 실행
-            loginAttemptService.recordFailedAttempt("test@example.com")
+            loginAttemptService.incrementFailedAttempts("test@example.com")
 
             // 검증
-            assertFalse(loginAttemptService.isBlocked("test@example.com"))
+            assertFalse(loginAttemptService.isAccountLocked("test@example.com"))
         }
 
         @Test
@@ -40,11 +40,11 @@ class LoginAttemptServiceTest {
         fun blockAfterMaxAttempts() {
             // 실행
             repeat(5) {
-                loginAttemptService.recordFailedAttempt("test@example.com")
+                loginAttemptService.incrementFailedAttempts("test@example.com")
             }
 
             // 검증
-            assertTrue(loginAttemptService.isBlocked("test@example.com"))
+            assertTrue(loginAttemptService.isAccountLocked("test@example.com"))
         }
 
         @Test
@@ -52,11 +52,11 @@ class LoginAttemptServiceTest {
         fun noBlockBeforeMaxAttempts() {
             // When
             repeat(4) {
-                loginAttemptService.recordFailedAttempt("test@example.com")
+                loginAttemptService.incrementFailedAttempts("test@example.com")
             }
 
             // Then
-            assertFalse(loginAttemptService.isBlocked("test@example.com"))
+            assertFalse(loginAttemptService.isAccountLocked("test@example.com"))
         }
     }
 
@@ -68,16 +68,16 @@ class LoginAttemptServiceTest {
         fun clearLoginAttempts() {
             // Given
             repeat(3) {
-                loginAttemptService.recordFailedAttempt("test@example.com")
+                loginAttemptService.incrementFailedAttempts("test@example.com")
             }
 
             // When
-            loginAttemptService.clearAttempts("test@example.com")
+            loginAttemptService.resetAttempts("test@example.com")
 
             // Then
             // 초기화 후 다시 시도 -> 첫 시도처럼 처리
-            loginAttemptService.recordFailedAttempt("test@example.com")
-            assertFalse(loginAttemptService.isBlocked("test@example.com"))
+            loginAttemptService.incrementFailedAttempts("test@example.com")
+            assertFalse(loginAttemptService.isAccountLocked("test@example.com"))
         }
 
         @Test
@@ -85,15 +85,15 @@ class LoginAttemptServiceTest {
         fun clearBlockedAccount() {
             // Given
             repeat(5) {
-                loginAttemptService.recordFailedAttempt("test@example.com")
+                loginAttemptService.incrementFailedAttempts("test@example.com")
             }
-            assertTrue(loginAttemptService.isBlocked("test@example.com"))
+            assertTrue(loginAttemptService.isAccountLocked("test@example.com"))
 
             // When
-            loginAttemptService.clearAttempts("test@example.com")
+            loginAttemptService.resetAttempts("test@example.com")
 
             // Then
-            assertFalse(loginAttemptService.isBlocked("test@example.com"))
+            assertFalse(loginAttemptService.isAccountLocked("test@example.com"))
         }
     }
 
@@ -105,16 +105,16 @@ class LoginAttemptServiceTest {
         fun recordFailedAttemptWhileBlocked() {
             // Given
             repeat(5) {
-                loginAttemptService.recordFailedAttempt("blocked@example.com")
+                loginAttemptService.incrementFailedAttempts("blocked@example.com")
             }
-            assertTrue(loginAttemptService.isBlocked("blocked@example.com"))
+            assertTrue(loginAttemptService.isAccountLocked("blocked@example.com"))
 
             // When (이미 blocked 상태에서 다시 실패)
-            loginAttemptService.recordFailedAttempt("blocked@example.com")
+            loginAttemptService.incrementFailedAttempts("blocked@example.com")
 
             // Then
             // 여전히 잠금
-            assertTrue(loginAttemptService.isBlocked("blocked@example.com"))
+            assertTrue(loginAttemptService.isAccountLocked("blocked@example.com"))
         }
 
         @Test
@@ -123,16 +123,16 @@ class LoginAttemptServiceTest {
             // Given
             // 첫 사용자: 5번 실패 -> 잠김
             repeat(5) {
-                loginAttemptService.recordFailedAttempt("user1@example.com")
+                loginAttemptService.incrementFailedAttempts("user1@example.com")
             }
             // 두 번째 사용자: 2번 실패 -> 잠기지 않음
             repeat(2) {
-                loginAttemptService.recordFailedAttempt("user2@example.com")
+                loginAttemptService.incrementFailedAttempts("user2@example.com")
             }
 
             // Then
-            assertTrue(loginAttemptService.isBlocked("user1@example.com"))
-            assertFalse(loginAttemptService.isBlocked("user2@example.com"))
+            assertTrue(loginAttemptService.isAccountLocked("user1@example.com"))
+            assertFalse(loginAttemptService.isAccountLocked("user2@example.com"))
         }
     }
 }

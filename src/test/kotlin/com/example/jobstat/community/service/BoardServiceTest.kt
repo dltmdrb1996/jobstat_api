@@ -1,13 +1,13 @@
 package com.example.jobstat.community.service
 
+import com.example.jobstat.community.board.entity.Board
+import com.example.jobstat.community.board.entity.BoardCategory
+import com.example.jobstat.community.board.service.BoardService
+import com.example.jobstat.community.board.service.BoardServiceImpl
 import com.example.jobstat.community.fake.CategoryFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCategoryRepository
 import com.example.jobstat.community.fake.repository.FakeCommentRepository
-import com.example.jobstat.community.internal.entity.Board
-import com.example.jobstat.community.internal.entity.BoardCategory
-import com.example.jobstat.community.internal.service.BoardService
-import com.example.jobstat.community.internal.service.BoardServiceImpl
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import jakarta.persistence.EntityNotFoundException
@@ -76,12 +76,12 @@ class BoardServiceTest {
                     content = "비밀 내용",
                     author = "테스트사용자",
                     categoryId = testCategory.id,
-                    password = "testpassword123!",
+                    password = "test123!",
                 )
 
             assertEquals("비밀 게시글", createdBoard.title)
             assertNotNull(createdBoard.password)
-            assertEquals("testpassword123!", createdBoard.password)
+            assertEquals("test123!", createdBoard.password)
         }
 
         @Test

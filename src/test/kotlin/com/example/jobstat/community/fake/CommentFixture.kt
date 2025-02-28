@@ -1,7 +1,7 @@
 package com.example.jobstat.community.fake
 
-import com.example.jobstat.community.internal.entity.Board
-import com.example.jobstat.community.internal.entity.Comment
+import com.example.jobstat.community.board.entity.Board
+import com.example.jobstat.community.comment.entity.Comment
 import com.example.jobstat.utils.IdFixture
 import java.time.LocalDateTime
 

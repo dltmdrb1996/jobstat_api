@@ -32,6 +32,8 @@ internal class UserRole private constructor(
             }
 
             val userRole = UserRole(user, role)
+            user.assignRole(userRole)
+            role.assignRole(userRole)
             return userRole
         }
     }

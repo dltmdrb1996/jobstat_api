@@ -13,20 +13,24 @@ data class ApiResponse<T>(
     val data: T? = null,
 ) {
     companion object {
-        private const val SUCCESS_MESSAGE = "Success"
-        private const val CREATED_MESSAGE = "Created"
+        enum class ResponseMessage(
+            val message: String,
+        ) {
+            SUCCESS("Success"),
+            CREATED("Created"),
+        }
 
         fun <T> ok(
             data: T,
-            message: String = SUCCESS_MESSAGE,
+            message: String = ResponseMessage.SUCCESS.message,
         ): ResponseEntity<ApiResponse<T>> = createResponse(HttpStatus.OK, data, message)
 
         fun <T> ok(
             page: Page<T>,
-            message: String = SUCCESS_MESSAGE,
+            message: String = ResponseMessage.SUCCESS.message,
         ): ResponseEntity<ApiResponse<Page<T>>> = createResponse(HttpStatus.OK, page, message)
 
-        fun ok(message: String = SUCCESS_MESSAGE): ResponseEntity<ApiResponse<Unit>> =
+        fun ok(message: String = ResponseMessage.SUCCESS.message): ResponseEntity<ApiResponse<Unit>> =
             createResponse(
                 HttpStatus.OK,
                 message = message,
@@ -34,10 +38,10 @@ data class ApiResponse<T>(
 
         fun <T> create(
             data: T,
-            message: String = CREATED_MESSAGE,
+            message: String = ResponseMessage.CREATED.message,
         ): ResponseEntity<ApiResponse<T>> = createResponse(HttpStatus.CREATED, data, message)
 
-        fun create(message: String = CREATED_MESSAGE): ResponseEntity<ApiResponse<Unit>> = createResponse(HttpStatus.CREATED, message = message)
+        fun create(message: String = ResponseMessage.CREATED.message): ResponseEntity<ApiResponse<Unit>> = createResponse(HttpStatus.CREATED, message = message)
 
         fun fail(
             httpStatus: HttpStatus,

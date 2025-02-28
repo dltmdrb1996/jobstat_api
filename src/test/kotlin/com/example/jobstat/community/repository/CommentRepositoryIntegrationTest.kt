@@ -1,11 +1,11 @@
 package com.example.jobstat.community.repository
 
-import com.example.jobstat.community.internal.entity.Board
-import com.example.jobstat.community.internal.entity.BoardCategory
-import com.example.jobstat.community.internal.entity.Comment
-import com.example.jobstat.community.internal.repository.BoardRepository
-import com.example.jobstat.community.internal.repository.CategoryRepository
-import com.example.jobstat.community.internal.repository.CommentRepository
+import com.example.jobstat.community.board.entity.Board
+import com.example.jobstat.community.board.entity.BoardCategory
+import com.example.jobstat.community.board.repository.BoardRepository
+import com.example.jobstat.community.board.repository.CategoryRepository
+import com.example.jobstat.community.comment.entity.Comment
+import com.example.jobstat.community.comment.repository.CommentRepository
 import com.example.jobstat.utils.base.JpaIntegrationTestSupport
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach

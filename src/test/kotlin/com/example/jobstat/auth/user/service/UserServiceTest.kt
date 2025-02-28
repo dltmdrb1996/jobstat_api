@@ -317,7 +317,7 @@ class UserServiceTest {
 
             // when
             val newPassword = "newPass123!"
-            userService.updatePassword(user.id, newPassword)
+            userService.updateUserPassword(user.id, newPassword)
 
             // then
             val updatedUser = userService.getUserById(user.id)
@@ -326,7 +326,7 @@ class UserServiceTest {
 
         @Test
         @DisplayName("사용자를 비활성화할 수 있다")
-        fun deactivateUser() {
+        fun disableAccountUser() {
             // given
             val user =
                 userService.createUser(
@@ -338,7 +338,7 @@ class UserServiceTest {
             assertTrue(userService.getUserById(user.id).isActive)
 
             // when
-            userService.deactivateUser(user.id)
+            userService.disableUser(user.id)
 
             // then
             val deactivatedUser = userService.getUserById(user.id)
@@ -357,10 +357,10 @@ class UserServiceTest {
                     birthDate = LocalDate.now().minusYears(20),
                 )
             // 먼저 비활성화
-            userService.deactivateUser(user.id)
+            userService.disableUser(user.id)
 
             // when
-            userService.activateUser(user.id)
+            userService.enableUser(user.id)
 
             // then
             val activatedUser = userService.getUserById(user.id)
@@ -451,8 +451,8 @@ class UserServiceTest {
                 )
 
             // when & then
-            assertTrue(userService.isUsernameAvailable("newName123"))
-            assertFalse(userService.isUsernameAvailable("existingName123"))
+            assertTrue(userService.validateUsername("newName123"))
+            assertFalse(userService.validateUsername("existingName123"))
         }
 
         @Test
@@ -468,8 +468,8 @@ class UserServiceTest {
                 )
 
             // when & then
-            assertTrue(userService.isEmailAvailable("new@example.com"))
-            assertFalse(userService.isEmailAvailable("existing@example.com"))
+            assertTrue(userService.validateEmail("new@example.com"))
+            assertFalse(userService.validateEmail("existing@example.com"))
         }
 
         @Test
@@ -485,7 +485,7 @@ class UserServiceTest {
                 )
 
             // when & then
-            assertTrue(userService.isActivated(user.id))
+            assertTrue(userService.isAccountEnabled(user.id))
         }
     }
     //endregion
@@ -496,7 +496,7 @@ class UserServiceTest {
     inner class UserActivation {
         @Test
         @DisplayName("사용자를 비활성화할 수 있다")
-        fun deactivateUser() {
+        fun disableAccountUser() {
             // given
             val user =
                 userService.createUser(
@@ -505,13 +505,13 @@ class UserServiceTest {
                     password = "somepass123",
                     birthDate = LocalDate.now().minusYears(20),
                 )
-            assertTrue(userService.isActivated(user.id))
+            assertTrue(userService.isAccountEnabled(user.id))
 
             // when
-            userService.deactivateUser(user.id)
+            userService.disableUser(user.id)
 
             // then
-            assertFalse(userService.isActivated(user.id))
+            assertFalse(userService.isAccountEnabled(user.id))
         }
 
         @Test
@@ -525,14 +525,14 @@ class UserServiceTest {
                     password = "pass1234",
                     birthDate = LocalDate.now().minusYears(20),
                 )
-            userService.deactivateUser(user.id)
-            assertFalse(userService.isActivated(user.id))
+            userService.disableUser(user.id)
+            assertFalse(userService.isAccountEnabled(user.id))
 
             // when
-            userService.activateUser(user.id)
+            userService.enableUser(user.id)
 
             // then
-            assertTrue(userService.isActivated(user.id))
+            assertTrue(userService.isAccountEnabled(user.id))
         }
     }
 
