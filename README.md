@@ -469,3 +469,6 @@
 - **ADMIN_PASSWORD**: `<YOUR_ADMIN_PASSWORD>`
 - **REDIS_PASSWORD**: `<YOUR_REDIS_PASSWORD>`
 - **REDIS_USERNAME**: `<YOUR_REDIS_USERNAME>`
+
+# Mysql 테이블
+![mysql](https://github.com/user-attachments/assets/86c8795f-f0bf-4742-914d-9de97a57457b)
