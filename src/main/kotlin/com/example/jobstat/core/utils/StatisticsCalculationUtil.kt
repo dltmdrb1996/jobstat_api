@@ -44,3 +44,11 @@ object StatisticsCalculationUtil {
             .minusYears(1)
             .format(YEAR_MONTH_FORMAT)
 }
+
+object DateCalculation {
+    private val YEAR_MONTH_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM")
+
+    fun getLastMonthDate(): String = YearMonth.now().minusMonths(1).format(YEAR_MONTH_FORMAT)
+
+    fun getLastYearDate(): String = YearMonth.now().minusYears(1).format(YEAR_MONTH_FORMAT)
+}

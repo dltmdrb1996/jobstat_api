@@ -119,7 +119,7 @@ internal class FakeUserRepository : UserRepository {
      */
     override fun delete(user: User) {
         user.delete()
-        user.deactivate()
+        user.disableAccount()
 
         usernameIndex.remove(user.username)
         emailIndex.remove(user.email)

@@ -1,5 +1,6 @@
 package com.example.jobstat.auth.user.service
 
+import com.example.jobstat.auth.user.UserConstants
 import com.example.jobstat.auth.user.entity.ReadUser
 import com.example.jobstat.auth.user.entity.RoleData
 import com.example.jobstat.auth.user.entity.User
@@ -29,17 +30,21 @@ internal class UserServiceImpl(
     ): User {
         val user = User.create(username, email, password, birthDate)
 
-        isEmailAvailable(user.email).trueOrThrow {
-            AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 이메일입니다.")
+        validateEmail(user.email).trueOrThrow {
+            AppException.fromErrorCode(
+                ErrorCode.DUPLICATE_RESOURCE,
+                UserConstants.ErrorMessages.DUPLICATE_EMAIL,
+            )
         }
-        isUsernameAvailable(user.username).trueOrThrow {
-            AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 아이디입니다.")
+        validateUsername(user.username).trueOrThrow {
+            AppException.fromErrorCode(
+                ErrorCode.DUPLICATE_RESOURCE,
+                UserConstants.ErrorMessages.DUPLICATE_USERNAME,
+            )
         }
 
         val role = roleRepository.findById(RoleData.USER.id)
-        val userRole = UserRole.create(user, role)
-        user.addRole(userRole)
-        role.addUserRole(userRole)
+        UserRole.create(user, role)
         return userRepository.save(user)
     }
 
@@ -53,11 +58,27 @@ internal class UserServiceImpl(
 
     override fun deleteUser(id: Long) = userRepository.deleteById(id)
 
-    override fun isUsernameAvailable(username: String): Boolean = !userRepository.existsByUsername(username)
+    override fun validateUsername(username: String): Boolean {
+        if (!username.matches(Regex(UserConstants.Patterns.USERNAME_PATTERN))) {
+            throw AppException.fromErrorCode(
+                ErrorCode.INVALID_ARGUMENT,
+                UserConstants.ErrorMessages.INVALID_USERNAME,
+            )
+        }
+        return !userRepository.existsByUsername(username)
+    }
 
-    override fun isEmailAvailable(email: String): Boolean = !userRepository.existsByEmail(email)
+    override fun validateEmail(email: String): Boolean {
+        if (!email.matches(Regex(UserConstants.Patterns.EMAIL_PATTERN))) {
+            throw AppException.fromErrorCode(
+                ErrorCode.INVALID_ARGUMENT,
+                UserConstants.ErrorMessages.INVALID_EMAIL,
+            )
+        }
+        return !userRepository.existsByEmail(email)
+    }
 
-    override fun isActivated(id: Long): Boolean = userRepository.findById(id).isActive
+    override fun isAccountEnabled(id: Long): Boolean = userRepository.findById(id).isActive
 
     override fun getUserWithRoles(id: Long): ReadUser {
         val user = userRepository.findByIdWithRoles(id)
@@ -77,7 +98,7 @@ internal class UserServiceImpl(
             when (key) {
                 "password" -> user.updatePassword(value as String)
                 "email" -> user.updateEmail(value as String)
-                "isActive" -> if (value as Boolean) user.activate() else user.deactivate()
+                "isActive" -> if (value as Boolean) user.enableAccount() else user.disableAccount()
                 // 추가 필드가 있다면 여기에 추가
             }
         }
@@ -85,7 +106,7 @@ internal class UserServiceImpl(
         return userRepository.save(user)
     }
 
-    override fun activateUser(id: Long) {
+    override fun enableUser(id: Long) {
         updateUser(
             mapOf(
                 "id" to id,
@@ -94,7 +115,7 @@ internal class UserServiceImpl(
         )
     }
 
-    override fun deactivateUser(id: Long) {
+    override fun disableUser(id: Long) {
         updateUser(
             mapOf(
                 "id" to id,
@@ -103,10 +124,13 @@ internal class UserServiceImpl(
         )
     }
 
-    override fun updatePassword(
+    override fun updateUserPassword(
         userId: Long,
         newPassword: String,
     ) {
+        require(newPassword.matches(Regex(UserConstants.Patterns.PASSWORD_PATTERN))) {
+            UserConstants.ErrorMessages.INVALID_PASSWORD
+        }
         updateUser(
             mapOf(
                 "id" to userId,
@@ -115,7 +139,7 @@ internal class UserServiceImpl(
         )
     }
 
-    override fun updateEmail(
+    override fun updateUserEmail(
         userId: Long,
         newEmail: String,
     ) {
