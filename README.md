@@ -1,4 +1,4 @@
-![Untitled diagram-2025-02-28-122306](https://github.com/user-attachments/assets/c133f693-5fe7-4998-81f5-48f650eefd25)# 프로젝트 구조
+# 프로젝트 구조
 ```
 📁 main
 ├── 📁 kotlin
