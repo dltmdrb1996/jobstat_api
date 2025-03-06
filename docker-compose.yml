@@ -43,7 +43,7 @@ services:
       - /home/ubuntu/jobstat/logs:/app/logs
     healthcheck:
       test: [ "CMD-SHELL", "wget --spider -q http://localhost:8081/actuator/health || exit 1" ]
-      interval: 30s
+      interval: 60s
       timeout: 10s
       retries: 3
       start_period: 60s
@@ -91,7 +91,7 @@ services:
       - internal
     expose:
       - "8081"
-    restart: always
+    restart: on-failure:3
 
 volumes:
   nginx-logs:
