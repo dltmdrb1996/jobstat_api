@@ -5,7 +5,6 @@ on:
     branches: [ "main", "feat/38-부하테스트-및-ab성능테스트" ]
 
 jobs:
-  # --- create-tag job 제거됨(비활성화) ---
 
   docker-build-and-push:
     runs-on: ubuntu-latest
