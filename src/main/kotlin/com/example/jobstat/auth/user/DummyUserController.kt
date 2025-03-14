@@ -24,8 +24,8 @@ internal class DummyUserController(
         val user =
             User(
                 id = userId,
-                name = "테스트유저_${random.nextInt(100)}",
-                email = "test${random.nextInt(100)}@example.com",
+                name = "부하 테스트유저_${random.nextInt(100)}",
+                email = "부하 test${random.nextInt(100)}@example.com",
                 profileImage = "https://via.placeholder.com/${150 + random.nextInt(50)}",
                 bio = "안녕하세요! 테스트 프로필_${random.nextInt(100)}입니다.",
             )
