@@ -8,7 +8,7 @@ import org.springframework.boot.runApplication
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
-@SpringBootApplication(exclude = [SecurityAutoConfiguration::class])
+@SpringBootApplication
 @EnableAspectJAutoProxy
 @EnableJpaAuditing
 @EnableConfigurationProperties(MongoProperties::class)
