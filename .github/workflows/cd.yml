@@ -2,7 +2,7 @@ name: Backend Deploy
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feat/38-부하테스트-및-ab성능테스트" ]
 
 jobs:
   create-tag:
