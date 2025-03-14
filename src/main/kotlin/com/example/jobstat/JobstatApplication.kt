@@ -2,12 +2,13 @@ package com.example.jobstat
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.mongo.MongoProperties
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing
 
-@SpringBootApplication
+@SpringBootApplication(exclude = [SecurityAutoConfiguration::class])
 @EnableAspectJAutoProxy
 @EnableJpaAuditing
 @EnableConfigurationProperties(MongoProperties::class)
