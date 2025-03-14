@@ -18,7 +18,7 @@ spring:
     hikari:
       idle-timeout: 30000
       connection-timeout: 20000
-      maximum-pool-size: 10
+      maximum-pool-size: 5
       minimum-idle: 2
       initialization-fail-timeout: 30000
       connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
@@ -29,7 +29,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}?maxPoolSize=10&minPoolSize=2&maxIdleTimeMS=30000
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}?maxPoolSize=5&minPoolSize=2&maxIdleTimeMS=30000
       database: ${MONGO_DB:prod_database}
       auto-index-creation: true
     redis:
