@@ -22,7 +22,7 @@ import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 
 @Component
-class JwtTokenFilterNoCaching(
+class JwtTokenFilter(
     private val jwtTokenParser: JwtTokenParser,
     private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
     private val objectMapper: ObjectMapper,
