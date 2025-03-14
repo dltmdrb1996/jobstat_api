@@ -14,14 +14,6 @@ services:
   nginx:
     container_name: nginx
     image: ${DOCKERHUB_USERNAME}/jobstat-nginx:${BACKEND_TAG}
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: '256M'
-        reservations:
-          cpus: '0.25'
-          memory: '128M'
     ports:
       - "80:80"
       - "443:443"
@@ -47,14 +39,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: '1G'
-        reservations:
-          cpus: '0.5'
-          memory: '512M'
     environment:
       - SERVER_PORT=8081
       - SPRING_PROFILES_ACTIVE=prod
