@@ -16,10 +16,9 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
       idle-timeout: 30000
       connection-timeout: 20000
+      initialization-fail-timeout: 30000
       connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
       cache-prepared-statements: true
       prepared-statement-cache-size: 250
@@ -47,7 +46,7 @@ spring:
       connect-timeout: 5000
   batch:
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
     job:
       enabled: false
     chunk-size: 1000
@@ -58,17 +57,21 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
-    show-sql: true
+        format_sql: false
+        connection.provider_disables_autocommit: false
+        acquire_increment: 1
+        acquire_retry_attempts: 3
+        acquire_retry_delay: 5000
+
 
 batch:
   chunk-size: 500
   job-size: 100
 
 logging:
-#  level:
-#    io.lettuce.core: DEBUG
-#    org.springframework.data.redis: DEBUG
+  #  level:
+  #    io.lettuce.core: DEBUG
+  #    org.springframework.data.redis: DEBUG
   file:
     name: logs/application.log
   logback:
