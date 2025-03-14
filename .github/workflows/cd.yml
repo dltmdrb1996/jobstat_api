@@ -5,25 +5,9 @@ on:
     branches: [ "main", "feat/38-부하테스트-및-ab성능테스트" ]
 
 jobs:
-  create-tag:
-    runs-on: ubuntu-latest
-    outputs:
-      new_tag: ${{ steps.tag_version.outputs.new_tag }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: patch
-          release_branches: main
+  # --- create-tag job 제거됨(비활성화) ---
 
   docker-build-and-push:
-    needs: create-tag
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -51,7 +35,8 @@ jobs:
 
       - name: Build and push Docker images
         env:
-          TAG: ${{ needs.create-tag.outputs.new_tag }}
+          # create-tag 관련 레퍼런스 제거하고, 임시로 loadtest 라는 태그를 사용
+          TAG: "loadtest"
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG \
                       -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest .
@@ -64,7 +49,8 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:latest
 
   deploy:
-    needs: [ docker-build-and-push, create-tag ]
+    # create-tag에 대한 의존성 제거
+    needs: docker-build-and-push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -74,7 +60,7 @@ jobs:
         uses: haythem/public-ip@v1.2
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2  # v1 -> v2로 업데이트 필요
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -111,7 +97,7 @@ jobs:
             # Create .env file securely
             cat > .env << EOL
             DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            BACKEND_TAG=${{ needs.create-tag.outputs.new_tag }}
+            BACKEND_TAG=loadtest
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             MONGO_USERNAME=${{ secrets.MONGO_USERNAME }}
