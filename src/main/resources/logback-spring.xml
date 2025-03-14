@@ -100,17 +100,31 @@
             <appender-ref ref="ERROR_FILE"/>
         </logger>
 
-        <!-- 외부 라이브러리 로깅 제한 -->
+        <!-- 외부 라이브러리, DB 관련 로깅 제한 -->
         <logger name="org.springframework" level="WARN"/>
         <logger name="org.hibernate" level="WARN"/>
         <logger name="org.apache" level="WARN"/>
         <logger name="io.lettuce" level="WARN"/>
         <logger name="com.zaxxer.hikari" level="WARN"/>
 
+        <!-- MongoDB 드라이버 로깅 레벨 조정 (추가) -->
+        <logger name="org.mongodb.driver" level="WARN"/>
+
+        <!-- Java 리플렉션 로깅 제한 (추가) -->
+        <logger name="org.springframework.core.io" level="WARN"/>
+        <logger name="org.springframework.beans" level="WARN"/>
+
+        <!-- JPA/Hibernate 상세 로깅 제한 (추가) -->
+        <logger name="org.hibernate.SQL" level="WARN"/>
+        <logger name="org.hibernate.type" level="WARN"/>
+
         <!-- 보안 관련 로깅 -->
         <logger name="org.springframework.security" level="INFO"/>
 
         <!-- 성능 모니터링을 위한 설정 -->
         <logger name="org.springframework.web.filter.CommonsRequestLoggingFilter" level="INFO"/>
+
+        <!-- 요청 처리 관련 로깅 최적화 (추가) -->
+        <logger name="org.springframework.web.servlet.DispatcherServlet" level="WARN"/>
     </springProfile>
 </configuration>
