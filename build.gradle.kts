@@ -50,7 +50,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // Database
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -80,6 +79,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-slf4j")
+
+    // monitoring
+    implementation("io.micrometer:micrometer-registry-prometheus:1.14.5")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
     // swagger
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4")

@@ -17,6 +17,8 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    expose:
+      - "8080"  # 내부 Docker 네트워크에만 노출
     volumes:
       - /etc/nginx/ssl:/etc/nginx/ssl:ro
       - nginx-logs:/var/log/nginx
