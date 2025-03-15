@@ -82,7 +82,7 @@ services:
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:latest
     container_name: nginx-exporter
-    command: --nginx.scrape-uri https://nginx:443/stub_status
+    command: --nginx.scrape-uri https://nginx:443/stub_status --nginx.tls.insecure-skip-verify
     ports:
       - "9113:9113"
     networks:
