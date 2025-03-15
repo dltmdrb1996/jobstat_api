@@ -18,7 +18,7 @@ services:
       - "80:80"
       - "443:443"
     expose:
-      - "8080"  # 내부 Docker 네트워크에만 노출
+      - "8080"
     volumes:
       - /etc/nginx/ssl:/etc/nginx/ssl:ro
       - nginx-logs:/var/log/nginx
@@ -78,6 +78,17 @@ services:
     expose:
       - "8081"
     restart: on-failure:3
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:latest
+    container_name: nginx-exporter
+    command: -nginx.scrape-uri http://nginx:80/stub_status
+    ports:
+      - "9113:9113"
+    networks:
+      - public
+    depends_on:
+      - nginx
 
 volumes:
   nginx-logs:
