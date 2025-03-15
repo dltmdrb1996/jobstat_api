@@ -84,10 +84,13 @@ services:
     container_name: nginx-exporter
     command:
       - "--nginx.scrape-uri=http://nginx:8080/stub_status"
+      - "--web.listen-address=0.0.0.0:9113"
+      - "--web.telemetry-path=/metrics"
     ports:
       - "9113:9113"
     networks:
       - public
+      - internal
     depends_on:
       - nginx
 
