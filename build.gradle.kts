@@ -92,6 +92,7 @@ dependencies {
 
     // Jackson
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.jackson.module:jackson-module-afterburner:2.18.3")
 
     // Spring Boot Mail
     implementation("org.springframework.boot:spring-boot-starter-mail")
