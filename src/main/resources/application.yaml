@@ -3,10 +3,10 @@ ddns.domain: ${DDNS_DOMAIN}
 server:
   tomcat:
     threads:
-      max: 100
-      min-spare: 10
+      max: 50
+      min-spare: 20
     max-connections: 10000
-    accept-count: 100
+    accept-count: 200
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/plain
@@ -49,28 +49,19 @@ spring:
 
 logging:
   level:
-    root: INFO
-    com.example: DEBUG
+    root: WARN
+    com.example: WARN
     org:
       springframework:
-        security=DEBUG:
+        security: WARN
       hibernate:
-        SQL: DEBUG
+        SQL: ERROR
         type:
           descriptor:
             sql:
-              BasicBinder: TRACE
-    org.springframework.boot.autoconfigure: DEBUG
-    org.springframework.data.mongodb.core.MongoTemplate: DEBUG
-  config: classpath:logback-spring.xml
-  file:
-    name: logs/application.log
-  logback:
-    rollingpolicy:
-      max-file-size: 10MB
-      max-history: 30
-  pattern:
-    dateformat: yyyy-MM-dd HH:mm:ss.SSS
+              BasicBinder: ERROR
+    org.springframework.boot.autoconfigure: WARN
+    org.springframework.data.mongodb.core.MongoTemplate: WARN
 
 management:
   endpoints:

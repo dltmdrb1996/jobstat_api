@@ -17,9 +17,9 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       idle-timeout: 30000
-      connection-timeout: 20000
-      maximum-pool-size: 5
-      minimum-idle: 2
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
       initialization-fail-timeout: 30000
       connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
       cache-prepared-statements: true
@@ -29,7 +29,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}?maxPoolSize=5&minPoolSize=2&maxIdleTimeMS=30000
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}?maxPoolSize=20&minPoolSize=5&maxIdleTimeMS=30000
       database: ${MONGO_DB:prod_database}
       auto-index-creation: true
     redis:
@@ -71,12 +71,12 @@ batch:
   job-size: 100
 
 logging:
-  #  level:
-  #    io.lettuce.core: DEBUG
-  #    org.springframework.data.redis: DEBUG
-  file:
-    name: logs/application.log
-  logback:
-    rollingpolicy:
-      max-file-size: 10MB
-      max-history: 30
+  level:
+    root: WARN
+    com.example: WARN
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type: ERROR
+    org.springframework: WARN
+    org.springframework.security: WARN
+    com.example.jobstat.core.security.JwtTokenFilter: ERROR
