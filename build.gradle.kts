@@ -72,6 +72,7 @@ dependencies {
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
     // cache
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
