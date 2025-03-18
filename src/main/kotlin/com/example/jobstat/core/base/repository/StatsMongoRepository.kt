@@ -257,7 +257,7 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
                 ),
             )
             .projection(projection)  // 2) 프로젝션 적용
-            .hintString("snapshot_lookup_idx")
+            .hintString("date_entity_idx")
             .batchSize(OPTIMAL_BATCH_SIZE)
             .map { doc ->
                 // 3) doc에는 위에서 지정한 필드만 들어있음
@@ -316,7 +316,7 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .projection(projection)              // 프로젝션 적용
             .sort(Sorts.descending("base_date"))
             .limit(1)
-            .hintString("snapshot_lookup_idx")
+            .hintString("entity_latest_idx")
             .firstOrNull()
             ?.let { doc ->
                 mongoOperations.converter.read(entityInformation.javaType, doc)
