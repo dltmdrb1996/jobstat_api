@@ -3,9 +3,9 @@ ddns.domain: ${DDNS_DOMAIN}
 server:
   tomcat:
     threads:
-      max: 50
+      max: 150
     max-connections: 10000
-    accept-count: 200
+    accept-count: 300
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/plain
