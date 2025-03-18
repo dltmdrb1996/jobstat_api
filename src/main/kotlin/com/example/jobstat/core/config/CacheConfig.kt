@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.scheduling.annotation.Scheduled
 import java.time.Duration
 
-@EnableScheduling
+//@EnableScheduling
 @EnableCaching
 @Configuration
 class CacheConfig : CachingConfigurer {
@@ -74,23 +74,23 @@ class CacheConfig : CachingConfigurer {
         }
     }
 
-    @Scheduled(fixedRate = 1000)
-    fun logCacheStats() {
-        val cacheManager = cacheManager()
-        cacheManager.cacheNames.forEach { cacheName ->
-            val cache = cacheManager.getCache(cacheName)
-            if (cache is CaffeineCache) {
-                val stats = cache.nativeCache.stats()
-                log.info(
-                    """
-                    캐시 '$cacheName' 통계:
-                    - 히트: ${stats.hitCount()}
-                    - 미스: ${stats.missCount()}
-                    - 히트율: ${String.format("%.2f", stats.hitRate() * 100)}%
-                    - 제거: ${stats.evictionCount()}
-                    """.trimIndent(),
-                )
-            }
-        }
-    }
+//    @Scheduled(fixedRate = 1000)
+//    fun logCacheStats() {
+//        val cacheManager = cacheManager()
+//        cacheManager.cacheNames.forEach { cacheName ->
+//            val cache = cacheManager.getCache(cacheName)
+//            if (cache is CaffeineCache) {
+//                val stats = cache.nativeCache.stats()
+//                log.info(
+//                    """
+//                    캐시 '$cacheName' 통계:
+//                    - 히트: ${stats.hitCount()}
+//                    - 미스: ${stats.missCount()}
+//                    - 히트율: ${String.format("%.2f", stats.hitRate() * 100)}%
+//                    - 제거: ${stats.evictionCount()}
+//                    """.trimIndent(),
+//                )
+//            }
+//        }
+//    }
 }

@@ -22,11 +22,11 @@ class GetRankingWithStats(
     private val rankingAnalysisService: RankingAnalysisService,
     private val validator: Validator,
 ) : UseCase<GetRankingWithStats.Request, GetRankingWithStats.Response<*>> {
-    @Cacheable(
-        cacheNames = ["statsWithRanking"],
-        key = "#request.rankingType + ':' + #request.baseDate + ':' + #request.page",
-        unless = "#result == null",
-    )
+//    @Cacheable(
+//        cacheNames = ["statsWithRanking"],
+//        key = "#request.rankingType + ':' + #request.baseDate + ':' + #request.page",
+//        unless = "#result == null",
+//    )
     override operator fun invoke(request: Request): Response<*> {
         val violations = validator.validate(request)
         if (violations.isNotEmpty()) {
