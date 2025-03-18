@@ -16,7 +16,7 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      idle-timeout: 30000
+      idle-timeout: 60000
       maximum-pool-size: 50
       minimum-idle: 10
       connection-timeout: 30000
@@ -29,7 +29,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}?maxPoolSize=50&minPoolSize=10&maxIdleTimeMS=30000
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}?maxPoolSize=50&minPoolSize=10&maxIdleTimeMS=60000
       database: ${MONGO_DB:prod_database}
       auto-index-creation: true
     redis:

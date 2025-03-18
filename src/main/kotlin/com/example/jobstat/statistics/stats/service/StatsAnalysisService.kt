@@ -76,9 +76,7 @@ class StatsAnalysisServiceImpl(
         baseDate: BaseDate,
         entityId: Long,
     ): T? {
-        log.info("findStatsByEntityIdAndBaseDate: $statsType, $baseDate, $entityId")
         val result = statsRepositoryRegistry.getRepository<T>(statsType).findByEntityIdAndBaseDate(entityId, baseDate)
-        log.info("findStatsByEntityIdAndBaseDate isNull? = ${result == null} result: ${result?.entityId}")
         return result
     }
 }

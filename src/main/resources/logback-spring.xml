@@ -3,20 +3,18 @@
     <!-- 공통 속성 -->
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-}] %-5level %logger{36} - %msg%n"/>
 
-    <!-- 콘솔 어펜더: 모든 로그 출력 -->
+    <!-- 콘솔 어펜더 (local, dev 등에서 사용) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
-    <!-- 프로파일별 설정 -->
     <springProfile name="local">
-        <!-- 로컬 환경 속성 -->
         <property name="LOG_FILE_PATH" value="./logs/local"/>
         <property name="LOG_FILE_NAME" value="local-app"/>
 
-        <!-- 로컬 환경용 파일 어펜더 -->
+        <!-- 로컬 환경 파일 어펜더 (prudent 모드 유지) -->
         <appender name="LOCAL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
@@ -31,7 +29,7 @@
             </rollingPolicy>
         </appender>
 
-        <!-- 로컬 환경용 에러 파일 어펜더 -->
+        <!-- 로컬 환경 에러 파일 어펜더 (prudent 모드 유지) -->
         <appender name="LOCAL_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/local-error.log</file>
@@ -48,7 +46,6 @@
             </filter>
         </appender>
 
-        <!-- 로컬 환경 로깅 설정 -->
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
@@ -69,11 +66,10 @@
     </springProfile>
 
     <springProfile name="dev">
-        <!-- 개발 환경 속성 -->
         <property name="LOG_FILE_PATH" value="./logs/dev"/>
         <property name="LOG_FILE_NAME" value="dev-app"/>
 
-        <!-- 개발 환경용 파일 어펜더 -->
+        <!-- 개발 환경 파일 어펜더 (prudent 모드 유지) -->
         <appender name="DEV_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
@@ -88,7 +84,7 @@
             </rollingPolicy>
         </appender>
 
-        <!-- 개발 환경용 에러 파일 어펜더 -->
+        <!-- 개발 환경 에러 파일 어펜더 (prudent 모드 유지) -->
         <appender name="DEV_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/dev-error.log</file>
@@ -105,7 +101,6 @@
             </filter>
         </appender>
 
-        <!-- 개발 환경 로깅 설정 -->
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
         </root>
@@ -126,13 +121,11 @@
     </springProfile>
 
     <springProfile name="prod">
-        <!-- 프로덕션 환경 속성 -->
         <property name="LOG_FILE_PATH" value="./logs/prod"/>
         <property name="LOG_FILE_NAME" value="prod-app"/>
 
-        <!-- 프로덕션 환경용 파일 어펜더 -->
+        <!-- 프로덕션 환경 파일 어펜더 (prudent 모드 제거) -->
         <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
             <encoder>
                 <pattern>${LOG_PATTERN}</pattern>
@@ -145,9 +138,8 @@
             </rollingPolicy>
         </appender>
 
-        <!-- 프로덕션 환경용 에러 파일 어펜더 -->
+        <!-- 프로덕션 환경 에러 파일 어펜더 (prudent 모드 제거) -->
         <appender name="PROD_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/prod-error.log</file>
             <encoder>
                 <pattern>${LOG_PATTERN}</pattern>
@@ -162,16 +154,14 @@
             </filter>
         </appender>
 
-        <!-- 프로덕션 환경 로깅 설정 -->
+        <!-- 프로덕션 환경 루트 로거: 콘솔 어펜더 제거 -->
         <root level="ERROR">
-            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="PROD_FILE"/>
             <appender-ref ref="PROD_ERROR_FILE"/>
         </root>
 
         <!-- 애플리케이션 로거 -->
         <logger name="com.example.jobstat" level="ERROR" additivity="false">
-            <appender-ref ref="CONSOLE"/>
             <appender-ref ref="PROD_FILE"/>
             <appender-ref ref="PROD_ERROR_FILE"/>
         </logger>
@@ -182,15 +172,9 @@
         <logger name="org.apache" level="OFF"/>
         <logger name="io.lettuce" level="OFF"/>
         <logger name="com.zaxxer.hikari" level="ERROR"/>
-
-        <!-- SQL 로깅 비활성화 -->
         <logger name="org.hibernate.SQL" level="OFF"/>
         <logger name="org.hibernate.type" level="OFF"/>
-
-        <!-- 보안 관련 로깅 -->
         <logger name="org.springframework.security" level="ERROR"/>
-
-        <!-- JwtTokenFilter 로깅 제한 -->
         <logger name="com.example.jobstat.core.security.JwtTokenFilter" level="ERROR"/>
     </springProfile>
 </configuration>
