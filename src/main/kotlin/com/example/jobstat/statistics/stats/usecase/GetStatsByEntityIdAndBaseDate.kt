@@ -3,6 +3,7 @@ package com.example.jobstat.statistics.stats.usecase
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.statistics.stats.document.SkillStatsDocument
 import com.example.jobstat.statistics.stats.registry.StatsType
 import com.example.jobstat.statistics.stats.service.StatsAnalysisService
 import jakarta.transaction.Transactional
@@ -24,7 +25,7 @@ class GetStatsByEntityIdAndBaseDate(
                 baseDate = request.baseDate,
                 entityId = request.entityId,
             )
-        return Response("stats")
+        return Response<SkillStatsDocument>("stats")
     }
 
     data class Request(
