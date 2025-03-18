@@ -30,18 +30,18 @@ internal class Login(
 
     @Transactional
     override fun execute(request: Request): Response {
-        if (loginAttemptService.isAccountLocked(request.email)) {
-            throw AppException.fromErrorCode(
-                ErrorCode.TOO_MANY_REQUESTS,
-                UserConstants.ErrorMessages.ACCOUNT_LOCKED,
-            )
-        }
+//        if (loginAttemptService.isAccountLocked(request.email)) {
+//            throw AppException.fromErrorCode(
+//                ErrorCode.TOO_MANY_REQUESTS,
+//                UserConstants.ErrorMessages.ACCOUNT_LOCKED,
+//            )
+//        }
 
         val user =
             try {
                 userService.getUserByEmail(request.email)
             } catch (e: Exception) {
-                loginAttemptService.incrementFailedAttempts(request.email)
+//                loginAttemptService.incrementFailedAttempts(request.email)
                 throw AppException.fromErrorCode(
                     ErrorCode.AUTHENTICATION_FAILURE,
                     UserConstants.ErrorMessages.AUTHENTICATION_FAILURE,
@@ -49,7 +49,7 @@ internal class Login(
             }
 
         if (!user.isActive) {
-            loginAttemptService.incrementFailedAttempts(request.email)
+//            loginAttemptService.incrementFailedAttempts(request.email)
             throw AppException.fromErrorCode(
                 ErrorCode.ACCOUNT_DISABLED,
                 UserConstants.ErrorMessages.ACCOUNT_DISABLED,
@@ -57,14 +57,14 @@ internal class Login(
         }
 
         if (!bcryptPasswordUtil.matches(request.password, user.password)) {
-            loginAttemptService.incrementFailedAttempts(request.email)
+//            loginAttemptService.incrementFailedAttempts(request.email)
             throw AppException.fromErrorCode(
                 ErrorCode.AUTHENTICATION_FAILURE,
                 "유저정보가 일치하지 않습니다.",
             )
         }
 
-        loginAttemptService.resetAttempts(request.email)
+//        loginAttemptService.resetAttempts(request.email)
 
         val roles = userService.getUserRoles(user.id)
         log.debug("사용자 ${user.id}가 다음 권한으로 로그인했습니다: ${roles.joinToString(", ")}")
