@@ -22,7 +22,7 @@ class GetLatestStats(
                 statsType = request.statsType,
                 entityId = request.entityId,
             )
-        return Response(stats)
+        return Response("stats")
     }
 
     data class Request(
@@ -31,6 +31,7 @@ class GetLatestStats(
     )
 
     data class Response<T : BaseStatsDocument>(
-        val stats: T?,
+//        val stats: T?,
+        val test : String = ""
     )
 }

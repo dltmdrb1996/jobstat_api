@@ -24,7 +24,7 @@ class GetStatsByEntityIdAndBaseDate(
                 baseDate = request.baseDate,
                 entityId = request.entityId,
             )
-        return Response(stats)
+        return Response("stats")
     }
 
     data class Request(
@@ -34,6 +34,7 @@ class GetStatsByEntityIdAndBaseDate(
     )
 
     data class Response<T : BaseStatsDocument>(
-        val stats: T?,
+//        val stats: T?,
+        val test : String = ""
     )
 }
