@@ -81,7 +81,7 @@ class CacheConfig : CachingConfigurer {
             val cache = cacheManager.getCache(cacheName)
             if (cache is CaffeineCache) {
                 val stats = cache.nativeCache.stats()
-                log.debug(
+                log.info(
                     """
                     캐시 '$cacheName' 통계:
                     - 히트: ${stats.hitCount()}
