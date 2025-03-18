@@ -215,57 +215,31 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
 //            .firstOrNull()
 //            ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
 
-//    override fun findByEntityIdAndBaseDate(
-//        entityId: Long,
-//        baseDate: BaseDate,
-//    ): T? {
-//        // 1) 필요한 필드만 프로젝션
-//        val projection = Projections.fields(
-//            Projections.include("period", "base_date", "entity_id", "name", "stats"),
-//            Projections.excludeId() // _id 필요하면 제외하지 않아도 됨
-//        )
-//
-//        return collection
-//            .find(
-//                Filters.and(
-//                    Filters.eq("entity_id", entityId),
-//                    Filters.eq("base_date", baseDate.toString()),
-//                ),
-//            )
-//            .projection(projection)              // 2) 프로젝션 적용
-//            .hintString("snapshot_lookup_idx")   // 인덱스 힌트
-//            .limit(1)
-//            .firstOrNull()
-//            ?.let { doc ->
-//                // 3) doc에는 지정한 필드만 들어옴
-//                mongoOperations.converter.read(entityInformation.javaType, doc)
-//            }
-//    }
-
     override fun findByEntityIdAndBaseDate(
         entityId: Long,
         baseDate: BaseDate,
     ): T? {
+        // 1) 필요한 필드만 프로젝션
         val projection = Projections.fields(
             Projections.include("period", "base_date", "entity_id", "name", "stats"),
-            Projections.excludeId()
+            Projections.excludeId() // _id 필요하면 제외하지 않아도 됨
         )
 
-        // 1) 조회 결과를 단일 Document로 가져옴
-        val doc = collection
+        return collection
             .find(
                 Filters.and(
                     Filters.eq("entity_id", entityId),
-                    Filters.eq("base_date", baseDate.toString())
-                )
+                    Filters.eq("base_date", baseDate.toString()),
+                ),
             )
-            .projection(projection)
-            .hintString("snapshot_lookup_idx")
+            .projection(projection)              // 2) 프로젝션 적용
+            .hintString("snapshot_lookup_idx")   // 인덱스 힌트
             .limit(1)
-            .firstOrNull() ?: return null
-
-        // 2) 미리 준비한 효율적인 변환 로직을 사용해 한 번에 변환
-        return efficientConvert(doc)
+            .firstOrNull()
+            ?.let { doc ->
+                // 3) doc에는 지정한 필드만 들어옴
+                mongoOperations.converter.read(entityInformation.javaType, doc)
+            }
     }
 
     override fun findByBaseDateAndEntityIds(
@@ -342,15 +316,14 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             Projections.excludeId()
         )
 
-        val doc =  collection
+        return collection
             .find(Filters.eq("entity_id", entityId))
             .projection(projection)              // 프로젝션 적용
             .sort(Sorts.descending("base_date"))
             .limit(1)
             .hintString("entity_latest_idx")
-            .firstOrNull() ?: return null
-
-        return efficientConvert(doc)
+            .firstOrNull()
+            ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }
 
     override fun findTopGrowthSkills(
@@ -549,12 +522,6 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .aggregate(pipeline)
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
-    }
-
-    // 개선된 변환 메서드: 재사용 가능한 경량화 변환 로직 사용 (예: Jackson ObjectMapper의 스트리밍 API 활용)
-    private fun efficientConvert(doc: Document): T {
-        // 예시: 이미 생성된 objectMapper를 사용해 Document를 변환
-        return objectMapper.convertValue(doc, entityInformation.javaType)
     }
 
 }
