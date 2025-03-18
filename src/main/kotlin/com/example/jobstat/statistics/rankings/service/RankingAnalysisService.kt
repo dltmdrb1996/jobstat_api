@@ -87,22 +87,20 @@ class RankingAnalysisServiceImpl(
         val statsType = rankingType.toStatsType()
         val rankingPage = findRankingPage(rankingType, baseDate, page)
         val rankings = rankingPage.items.data
-        val ids = rankings.map { it.entityId }
 
-        // stats를 Map으로 변환하여 빠른 검색이 가능하도록 함
-        val statsMap =
-            statsService
-                .findStatsByEntityIds<T>(statsType, baseDate, ids)
-                .associateBy { it.entityId }
+        // 각 엔티티 ID에 대해 개별적으로 stats를 조회하여 캐싱 활용
+        val rankingWithStats = rankings.map { ranking ->
+            val stat = statsService.findStatsByEntityIdAndBaseDate<T>(
+                statsType,
+                baseDate,
+                ranking.entityId
+            ) ?: throw AppException.fromErrorCode(ErrorCode.RESOURCE_NOT_FOUND)
 
-        // rankings의 순서를 유지하면서 매칭되는 stats를 찾아 결합
-        val rankingWithStats =
-            rankings.map { ranking ->
-                RankingWithStats(
-                    ranking = ranking,
-                    stat = statsMap[ranking.entityId] ?: throw AppException.fromErrorCode(ErrorCode.RESOURCE_NOT_FOUND),
-                )
-            }
+            RankingWithStats(
+                ranking = ranking,
+                stat = stat
+            )
+        }
 
         return RakingWithStatsPage(
             items = rankingWithStats,

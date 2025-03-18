@@ -4,6 +4,8 @@ import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.statistics.stats.registry.StatsRepositoryRegistry
 import com.example.jobstat.statistics.stats.registry.StatsType
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
@@ -36,6 +38,9 @@ interface StatsAnalysisService {
 class StatsAnalysisServiceImpl(
     private val statsRepositoryRegistry: StatsRepositoryRegistry,
 ) : StatsAnalysisService {
+
+    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+
     override fun <T : BaseStatsDocument> findStatsByEntityId(
         statsType: StatsType,
         entityId: Long,
@@ -71,7 +76,9 @@ class StatsAnalysisServiceImpl(
         baseDate: BaseDate,
         entityId: Long,
     ): T? {
+        log.info("findStatsByEntityIdAndBaseDate: $statsType, $baseDate, $entityId")
         val result = statsRepositoryRegistry.getRepository<T>(statsType).findByEntityIdAndBaseDate(entityId, baseDate)
+        log.info("findStatsByEntityIdAndBaseDate isNull? = ${result == null} result: ${result?.entityId}")
         return result
     }
 }
