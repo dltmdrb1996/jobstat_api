@@ -56,7 +56,7 @@ class GetSkillRankingWithStats(
             rankingType = request.rankingType.toDomain(),
             totalCount = result.totalCount,
             hasNextPage = result.hasNextPage,
-            items = emptyList(),
+            items = result.items,
         )
     }
 
@@ -75,7 +75,6 @@ class GetSkillRankingWithStats(
         @Schema(description = "다음 페이지 존재 여부", example = "true")
         val hasNextPage: Boolean,
         @Schema(description = "순위 및 통계 데이터 목록")
-//        val items: List<RankingWithStats<SkillStatsDocument>>,
-        val items : List<String> = emptyList()
+        val items: List<RankingWithStats<SkillStatsDocument>>,
     )
 }
