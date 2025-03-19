@@ -92,8 +92,7 @@ class RankingAnalysisServiceImpl(
         // stats를 Map으로 변환하여 빠른 검색이 가능하도록 함
         val statsMap =
             statsService
-                .findStatsByEntityIds<T>(statsType, baseDate, ids)
-                .associateBy { it.entityId }
+                .findStatsByEntityIdsAndBaseDate<T>(statsType, baseDate, ids)
 
         // rankings의 순서를 유지하면서 매칭되는 stats를 찾아 결합
         val rankingWithStats =
