@@ -16,7 +16,6 @@ import org.springframework.context.annotation.Configuration
 class ObjectMapperConfig {
     companion object {
         val OBJECT_MAPPER: ObjectMapper = JsonMapper.builder()
-            .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE) // 추가된 부분
             .addModule(JavaTimeModule())
             .addModule(AfterburnerModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
