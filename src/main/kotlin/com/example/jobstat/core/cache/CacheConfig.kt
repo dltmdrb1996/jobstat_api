@@ -6,13 +6,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
-import org.springframework.cache.caffeine.CaffeineCache
 import org.springframework.cache.caffeine.CaffeineCacheManager
-import org.springframework.cache.support.SimpleCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.annotation.Scheduled
 import java.time.Duration
 
 //@EnableScheduling
@@ -22,61 +18,60 @@ class CacheConfig : CachingConfigurer {
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     companion object {
-        const val STATS_CACHE_SIZE = 50000L
-        const val RANKING_CACHE_SIZE = 100L
-        const val LOGIN_ATTEMPTS_CACHE_SIZE = 10000L
-        val LOGIN_ATTEMPT_EXPIRE = Duration.ofMinutes(30)
-        val EXPIRE_AFTER_ACCESS = Duration.ofDays(1)
-
-        // 캐시 이름 상수화
-        const val STATS_DOCUMENT_CACHE = "StatsDocument"
-        const val STATS_WITH_RANKING_CACHE = "statsWithRanking"
-        const val LOGIN_ATTEMPTS_CACHE = "loginAttempts"
+        private const val STATS_CACHE_SIZE = 50000L
+        private const val RANKING_CACHE_SIZE = 100L
+        private const val LOGIN_ATTEMPTS_CACHE_SIZE = 10000L
+        private val LOGIN_ATTEMPT_EXPIRE = Duration.ofMinutes(30)
+        private val EXPIRE_AFTER_ACCESS = Duration.ofDays(1)
     }
 
-    /**
-     * Spring CacheManager - 애노테이션 기반 캐싱 및 StatsBulkCacheManager에서 공유해서 사용
-     */
     @Bean
     override fun cacheManager(): CacheManager {
-        // SimpleCacheManager 생성
-        val simpleCacheManager = SimpleCacheManager()
-
-        // 캐시 목록 생성
-        val caches = mutableListOf<org.springframework.cache.Cache>()
-
-        // statsWithRanking - 랭킹 캐싱
-        caches.add(CaffeineCache(
-            STATS_WITH_RANKING_CACHE,
+        // 기본 Caffeine 설정
+        val defaultCaffeine =
             Caffeine
                 .newBuilder()
-                .maximumSize(RANKING_CACHE_SIZE)
-                .expireAfterAccess(EXPIRE_AFTER_ACCESS)
+                .maximumSize(STATS_CACHE_SIZE)
+                .expireAfterWrite(EXPIRE_AFTER_ACCESS)
                 .recordStats()
-                .build()
-        ))
 
-        // loginAttempts - 로그인 시도 캐싱
-        caches.add(CaffeineCache(
-            LOGIN_ATTEMPTS_CACHE,
-            Caffeine
-                .newBuilder()
-                .maximumSize(LOGIN_ATTEMPTS_CACHE_SIZE)
-                .expireAfterWrite(LOGIN_ATTEMPT_EXPIRE)
-                .recordStats()
-                .build()
-        ))
+        return CaffeineCacheManager().apply {
+            setCaffeine(defaultCaffeine)
+            isAllowNullValues = true
 
-        // 모든 캐시를 CacheManager에 등록
-        simpleCacheManager.setCaches(caches)
+            // 캐시별 설정
+            val caches = mutableMapOf<String, com.github.benmanes.caffeine.cache.Cache<Any, Any>>()
 
-        return simpleCacheManager
+            caches["StatsDocument"] =
+                Caffeine
+                    .newBuilder()
+                    .maximumSize(STATS_CACHE_SIZE)
+                    .expireAfterWrite(EXPIRE_AFTER_ACCESS)
+                    .recordStats()
+                    .build()
+
+            caches["statsWithRanking"] =
+                Caffeine
+                    .newBuilder()
+                    .maximumSize(RANKING_CACHE_SIZE)
+                    .expireAfterAccess(EXPIRE_AFTER_ACCESS)
+                    .recordStats()
+                    .build()
+
+            caches["loginAttempts"] =
+                Caffeine
+                    .newBuilder()
+                    .maximumSize(LOGIN_ATTEMPTS_CACHE_SIZE)
+                    .expireAfterWrite(LOGIN_ATTEMPT_EXPIRE)
+                    .recordStats()
+                    .build()
+
+            val cacheNames = setOf("StatsDocument", "statsWithRanking", "loginAttempts")
+            setCacheNames(cacheNames)
+        }
     }
 
-//    /**
-//     * 캐시 통계 로깅 기능
-//     */
-//    @Scheduled(fixedRate = 5000) // 1분마다 로깅
+//    @Scheduled(fixedRate = 1000)
 //    fun logCacheStats() {
 //        val cacheManager = cacheManager()
 //        cacheManager.cacheNames.forEach { cacheName ->
