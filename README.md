@@ -1,4 +1,8 @@
+# 프로젝트 구성도
+![system-architecture-new](https://github.com/user-attachments/assets/6f9a8ac2-ffc7-4b00-91af-1d76b87e629c)
+
 # 프로젝트 구조
+
 ```
 ├── main
 │   ├── kotlin
