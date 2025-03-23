@@ -18,10 +18,11 @@ import org.springframework.stereotype.Service
 @Service
 internal class CreateBoard(
     private val boardService: BoardService,
-    private val bcryptPasswordUtil: PasswordUtil = FakePasswordUtil(),
     private val securityUtils: SecurityUtils,
+    //    private val bcryptPasswordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<CreateBoard.Request, CreateBoard.Response>(validator) {
+    private val bcryptPasswordUtil: PasswordUtil = FakePasswordUtil()
     @Transactional
     override fun execute(request: Request): Response {
         val userId = securityUtils.getCurrentUserId()

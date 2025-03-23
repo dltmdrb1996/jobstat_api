@@ -19,9 +19,11 @@ import org.springframework.stereotype.Service
 internal class AddComment(
     private val commentService: CommentService,
     private val securityUtils: SecurityUtils,
-    private val bcryptPasswordUtil: PasswordUtil = FakePasswordUtil(),
+//    private val bcryptPasswordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<AddComment.ExecuteRequest, AddComment.Response>(validator) {
+    private val bcryptPasswordUtil: PasswordUtil = FakePasswordUtil()
+
     @Transactional
     override fun execute(request: ExecuteRequest): Response {
         val userId = securityUtils.getCurrentUserId()
