@@ -2,33 +2,32 @@ package com.example.jobstat.core.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
-import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.DelegatingPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm
 
 @Configuration
 class AppConfig {
+    /**
+     * CPU 리소스를 절약하기 위한 PBKDF2 암호화 설정
+     * - 알고리즘: PBKDF2WithHmacSHA256 (보안성과 효율성의 균형)
+     * - 반복 횟수: 10000 (기본값 310000보다 대폭 감소)
+     * - 솔트 길이: 8 (기본값 16보다 감소)
+     */
     @Bean
-    @Primary // 우선 순위 지정
     fun passwordEncoder(): PasswordEncoder {
-        // 메모리를 많이 사용하고 CPU를 적게 사용하는 Argon2 설정
-        val customArgon2Encoder = Argon2PasswordEncoder(
-            32,      // saltLength
-            64,      // hashLength
-            1,       // parallelism - CPU 사용 최소화
-            65536,   // memory - 메모리 사용 증가 (64MB)
-            1        // iterations - CPU 사용 최소화
+        // iterations는 생성자에서만 설정 가능 (final 필드)
+        // 10000 반복은 OWASP 최소 권장값이면서 CPU 사용량 감소
+        val encoder = Pbkdf2PasswordEncoder(
+            "", // 비밀 값 없음
+            8,  // 솔트 길이 (기본값 16의 절반)
+            10000, // 반복 횟수 (기본값 310000의 약 3%)
+            SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256 // SHA-256 알고리즘
         )
 
-        val encoders = HashMap<String, PasswordEncoder>()
-        encoders["bcrypt"] = BCryptPasswordEncoder()
-        encoders["pbkdf2"] = Pbkdf2PasswordEncoder.defaultsForSpringSecurity_v5_8()
-        encoders["argon2"] = customArgon2Encoder
+        // Base64 인코딩 사용 (Hex보다 효율적)
+        encoder.setEncodeHashAsBase64(true)
 
-        return DelegatingPasswordEncoder("argon2", encoders)
+        return encoder
     }
 }
