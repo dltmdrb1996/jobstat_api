@@ -7,15 +7,12 @@ import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.CachingConfigurer
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.caffeine.CaffeineCache
-import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.cache.support.SimpleCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.scheduling.annotation.Scheduled
 import java.time.Duration
 
-//@EnableScheduling
+// @EnableScheduling
 @EnableCaching
 @Configuration
 class CacheConfig : CachingConfigurer {
@@ -46,26 +43,30 @@ class CacheConfig : CachingConfigurer {
         val caches = mutableListOf<org.springframework.cache.Cache>()
 
         // statsWithRanking - 랭킹 캐싱
-        caches.add(CaffeineCache(
-            STATS_WITH_RANKING_CACHE,
-            Caffeine
-                .newBuilder()
-                .maximumSize(RANKING_CACHE_SIZE)
-                .expireAfterAccess(EXPIRE_AFTER_ACCESS)
-                .recordStats()
-                .build()
-        ))
+        caches.add(
+            CaffeineCache(
+                STATS_WITH_RANKING_CACHE,
+                Caffeine
+                    .newBuilder()
+                    .maximumSize(RANKING_CACHE_SIZE)
+                    .expireAfterAccess(EXPIRE_AFTER_ACCESS)
+                    .recordStats()
+                    .build(),
+            ),
+        )
 
         // loginAttempts - 로그인 시도 캐싱
-        caches.add(CaffeineCache(
-            LOGIN_ATTEMPTS_CACHE,
-            Caffeine
-                .newBuilder()
-                .maximumSize(LOGIN_ATTEMPTS_CACHE_SIZE)
-                .expireAfterWrite(LOGIN_ATTEMPT_EXPIRE)
-                .recordStats()
-                .build()
-        ))
+        caches.add(
+            CaffeineCache(
+                LOGIN_ATTEMPTS_CACHE,
+                Caffeine
+                    .newBuilder()
+                    .maximumSize(LOGIN_ATTEMPTS_CACHE_SIZE)
+                    .expireAfterWrite(LOGIN_ATTEMPT_EXPIRE)
+                    .recordStats()
+                    .build(),
+            ),
+        )
 
         // 모든 캐시를 CacheManager에 등록
         simpleCacheManager.setCaches(caches)

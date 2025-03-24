@@ -1,32 +1,32 @@
-//package com.example.jobstat.core.security
+// package com.example.jobstat.core.security
 //
-//import com.example.jobstat.auth.user.entity.RoleData
-//import com.example.jobstat.core.error.AppException
-//import com.example.jobstat.core.error.ErrorCode
-//import com.example.jobstat.core.security.annotation.AdminAuth
-//import com.example.jobstat.core.security.annotation.Public
-//import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
-//import com.example.jobstat.core.wrapper.ApiResponse
-//import com.fasterxml.jackson.databind.ObjectMapper
-//import jakarta.servlet.FilterChain
-//import jakarta.servlet.http.HttpServletRequest
-//import jakarta.servlet.http.HttpServletResponse
-//import org.slf4j.Logger
-//import org.slf4j.LoggerFactory
-//import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-//import org.springframework.security.core.authority.SimpleGrantedAuthority
-//import org.springframework.security.core.context.SecurityContextHolder
-//import org.springframework.stereotype.Component
-//import org.springframework.web.filter.OncePerRequestFilter
-//import org.springframework.web.method.HandlerMethod
-//import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+// import com.example.jobstat.auth.user.entity.RoleData
+// import com.example.jobstat.core.error.AppException
+// import com.example.jobstat.core.error.ErrorCode
+// import com.example.jobstat.core.security.annotation.AdminAuth
+// import com.example.jobstat.core.security.annotation.Public
+// import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
+// import com.example.jobstat.core.wrapper.ApiResponse
+// import com.fasterxml.jackson.databind.ObjectMapper
+// import jakarta.servlet.FilterChain
+// import jakarta.servlet.http.HttpServletRequest
+// import jakarta.servlet.http.HttpServletResponse
+// import org.slf4j.Logger
+// import org.slf4j.LoggerFactory
+// import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+// import org.springframework.security.core.authority.SimpleGrantedAuthority
+// import org.springframework.security.core.context.SecurityContextHolder
+// import org.springframework.stereotype.Component
+// import org.springframework.web.filter.OncePerRequestFilter
+// import org.springframework.web.method.HandlerMethod
+// import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 //
-//@Component
-//class JwtTokenFilterNoCaching(
+// @Component
+// class JwtTokenFilterNoCaching(
 //    private val jwtTokenParser: JwtTokenParser,
 //    private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
 //    private val objectMapper: ObjectMapper,
-//) : OncePerRequestFilter() {
+// ) : OncePerRequestFilter() {
 //    private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 //
 //    companion object {
@@ -168,4 +168,4 @@
 //            writer.write(objectMapper.writeValueAsString(apiResponse))
 //        }
 //    }
-//}
+// }

@@ -21,7 +21,6 @@ internal class AddComment(
     private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<AddComment.ExecuteRequest, AddComment.Response>(validator) {
-
     @Transactional
     override fun execute(request: ExecuteRequest): Response {
         val userId = securityUtils.getCurrentUserId()

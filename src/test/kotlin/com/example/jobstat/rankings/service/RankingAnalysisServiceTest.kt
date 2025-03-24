@@ -311,24 +311,46 @@ class RankingAnalysisServiceTest {
                 createMockEntry(2, "Skill_2", entityId = 102),
             )
         val mockDoc = createMockDocument(mockRankings)
-        val mockStats =
-            mockRankings.map { ranking ->
-                mock<BaseStatsDocument>().apply {
-                    doReturn(ranking.entityId).whenever(this).entityId
-                }
+
+        // Map 형태로 반환할 통계 데이터 생성
+        val mockStatsMap =
+            mockRankings.associate { ranking ->
+                val mockStat =
+                    mock<BaseStatsDocument>().apply {
+                        doReturn(ranking.entityId).whenever(this).entityId
+                        doReturn(baseDate.toString()).whenever(this).baseDate
+                    }
+                ranking.entityId to mockStat
             }
 
         doReturn(mockDoc).whenever(mockRepository).findByPage(any(), eq(page))
-        doReturn(mockStats).whenever(mockStatsService).findStatsByEntityIds<BaseStatsDocument>(any(), any(), eq(mockRankings.map { it.entityId }))
+
+        // findStatsByEntityIdsAndBaseDate 메소드 모킹 (Map 반환)
+        doReturn(mockStatsMap)
+            .whenever(mockStatsService)
+            .findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(
+                any(),
+                eq(baseDate),
+                eq(mockRankings.map { it.entityId }),
+            )
 
         // when
-        val result = rankingAnalysisService.findStatsWithRanking<BaseStatsDocument>(RankingType.SKILL_GROWTH, baseDate, page)
+        val result =
+            rankingAnalysisService.findStatsWithRanking<BaseStatsDocument>(
+                RankingType.SKILL_GROWTH,
+                baseDate,
+                page,
+            )
 
         // then
         assertNotNull(result)
-        assertEquals(mockRankings.size, result.items.size) // 실제 데이터 크기와 비교
+        assertEquals(mockRankings.size, result.items.size)
         verify(mockRepository).findByPage(baseDate.toString(), page)
-        verify(mockStatsService).findStatsByEntityIds<BaseStatsDocument>(any(), eq(baseDate), any())
+        verify(mockStatsService).findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(
+            any(),
+            eq(baseDate),
+            any(),
+        )
     }
 
     @Nested

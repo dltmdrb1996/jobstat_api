@@ -13,16 +13,16 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes
     CompoundIndex(
         name = "snapshot_lookup_idx",
         def = "{'entity_id': 1, 'base_date': 1}",
-        unique = true
+        unique = true,
     ),
     CompoundIndex(
         name = "date_entity_idx",
-        def = "{'base_date': 1, 'entity_id': 1}"
+        def = "{'base_date': 1, 'entity_id': 1}",
     ),
     CompoundIndex(
         name = "entity_latest_idx",
-        def = "{'entity_id': 1, 'base_date': -1}"
-    )
+        def = "{'entity_id': 1, 'base_date': -1}",
+    ),
 )
 abstract class BaseStatsDocument(
     id: String? = null,

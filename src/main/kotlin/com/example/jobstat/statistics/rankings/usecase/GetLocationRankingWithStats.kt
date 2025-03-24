@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service

@@ -9,14 +9,10 @@ plugins {
     kotlin("plugin.spring") version "2.1.0"
     kotlin("plugin.jpa") version "2.1.0"
     kotlin("plugin.serialization") version "2.1.0"
-
-//    kotlin("plugin.allopen") version "2.0.10"
-//    kotlin("plugin.noarg") version "2.0.10"
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
     id("io.sentry.jvm.gradle") version "4.10.0"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2" // ktlint 플러그인 추가
-
-// 	kotlin("plugin.allopen") version "1.9.24" // Add allopen plugin
+    id("jacoco")
 }
 
 group = "com.example"
@@ -164,6 +160,35 @@ ktlint {
     filter {
         exclude("**/build/generated/**")
     }
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test) // 테스트 실행 후 리포트 생성
+    reports {
+        xml.required.set(true) // SonarQube나 다른 도구와 통합 시 필요
+        html.required.set(true) // 브라우저에서 볼 수 있는 HTML 리포트
+        csv.required.set(false) // CSV 리포트는 필요 없는 경우
+    }
+
+    // 커버리지 측정에서 제외할 클래스 지정 (필요한 경우)
+    classDirectories.setFrom(
+        files(
+            classDirectories.files.map {
+                fileTree(it) {
+                    exclude(
+                        "**/config/**",
+                        "**/*Application*",
+                        "**/*Configuration*",
+                        "**/dto/**",
+                    )
+                }
+            },
+        ),
+    )
 }
 
 // tasks.register("checkInternalModifier") {

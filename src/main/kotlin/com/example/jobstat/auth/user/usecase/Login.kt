@@ -103,12 +103,12 @@ internal class Login(
             refreshToken = refreshToken,
             expiresAt = Instant.now().plusSeconds(jwtTokenGenerator.getRefreshTokenExpiration()),
             user =
-            UserResponse(
-                id = user.id,
-                username = user.username,
-                email = user.email,
-                roles = roles,
-            ),
+                UserResponse(
+                    id = user.id,
+                    username = user.username,
+                    email = user.email,
+                    roles = roles,
+                ),
         )
     }
 

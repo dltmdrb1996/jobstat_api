@@ -21,7 +21,6 @@ internal class CreateBoard(
     private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<CreateBoard.Request, CreateBoard.Response>(validator) {
-
     @Transactional
     override fun execute(request: Request): Response {
         val userId = securityUtils.getCurrentUserId()

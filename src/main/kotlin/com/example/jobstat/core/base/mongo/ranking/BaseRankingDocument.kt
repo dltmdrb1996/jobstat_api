@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field
     ),
     CompoundIndex(
         name = "base_date_page_idx",
-        def = "{'base_date': 1, 'page': 1}"
+        def = "{'base_date': 1, 'page': 1}",
     ),
 )
 abstract class BaseRankingDocument<T : RankingEntry>(

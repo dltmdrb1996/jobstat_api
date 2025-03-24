@@ -110,36 +110,6 @@ class RankingAnalysisServiceImpl(
         )
     }
 
-//    override fun <T : BaseStatsDocument> findStatsWithRanking(
-//        rankingType: RankingType,
-//        baseDate: BaseDate,
-//        page: Int?,
-//    ): RakingWithStatsPage<T> {
-//        val statsType = rankingType.toStatsType()
-//        val rankingPage = findRankingPage(rankingType, baseDate, page)
-//        val rankings = rankingPage.items.data
-//
-//        // 각 엔티티 ID에 대해 개별적으로 stats를 조회하여 캐싱 활용
-//        val rankingWithStats = rankings.map { ranking ->
-//            val stat = statsService.findStatsByEntityIdAndBaseDate<T>(
-//                statsType,
-//                baseDate,
-//                ranking.entityId
-//            ) ?: throw AppException.fromErrorCode(ErrorCode.RESOURCE_NOT_FOUND)
-//
-//            RankingWithStats(
-//                ranking = ranking,
-//                stat = stat
-//            )
-//        }
-//
-//        return RakingWithStatsPage(
-//            items = rankingWithStats,
-//            rankingPage.rankedCount,
-//            rankingPage.hasNextPage,
-//        )
-//    }
-
     override fun findRankingPage(
         rankingType: RankingType,
         baseDate: BaseDate,

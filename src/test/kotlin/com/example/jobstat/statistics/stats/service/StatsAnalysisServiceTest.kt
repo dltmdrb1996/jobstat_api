@@ -4,6 +4,7 @@ import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.stats.*
 import com.example.jobstat.core.base.repository.StatsMongoRepository
 import com.example.jobstat.core.state.BaseDate
+import com.example.jobstat.statistics.fake.FakeStatsBulkCacheManager
 import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics.stats.document.SkillStatsDocument
 import com.example.jobstat.statistics.stats.registry.StatsRepositoryRegistry
@@ -24,6 +25,7 @@ class StatsAnalysisServiceTest {
     private lateinit var mockRepository: StatsMongoRepository<SkillStatsDocument, String>
     private lateinit var statsRepositoryRegistry: StatsRepositoryRegistry
     private lateinit var statsAnalysisService: StatsAnalysisService
+    private val fakeStatsBulkCacheManager = FakeStatsBulkCacheManager()
     private val random = Random(12345)
 
     private val exLevel = listOf("ENTRY", "JUNIOR", "MIDDLE", "SENIOR", "LEAD")
@@ -46,7 +48,7 @@ class StatsAnalysisServiceTest {
             .`when`(statsRepositoryRegistry)
             .getRepository<SkillStatsDocument>(any())
 
-        statsAnalysisService = StatsAnalysisServiceImpl(statsRepositoryRegistry)
+        statsAnalysisService = StatsAnalysisServiceImpl(statsRepositoryRegistry, fakeStatsBulkCacheManager)
     }
 
     private fun createSnapshotPeriod(baseDate: String): SnapshotPeriod {

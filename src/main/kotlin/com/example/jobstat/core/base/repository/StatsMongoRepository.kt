@@ -2,7 +2,6 @@ package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.state.BaseDate
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
@@ -11,8 +10,6 @@ import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
-import com.mongodb.client.model.Projections
-import org.springframework.beans.factory.annotation.Autowired
 
 @NoRepositoryBean
 interface StatsMongoRepository<T : BaseStatsDocument, ID : Any> : BaseTimeSeriesRepository<T, ID> {
@@ -187,9 +184,6 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
         mongoOperations.getCollection(entityInformation.collectionName)
     }
 
-    @Autowired
-    lateinit var objectMapper: ObjectMapper
-
     override fun getCollectionName(): String = entityInformation.collectionName
 
     override fun findByEntityId(entityId: Long): List<T> =
@@ -200,47 +194,20 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
 
-//    override fun findByEntityIdAndBaseDate(
-//        entityId: Long,
-//        baseDate: BaseDate,
-//    ): T? =
-//        collection
-//            .find(
-//                Filters.and(
-//                    Filters.eq("entity_id", entityId),
-//                    Filters.eq("base_date", baseDate.toString()),
-//                ),
-//            ).hintString("snapshot_lookup_idx")
-//            .limit(1)
-//            .firstOrNull()
-//            ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-
     override fun findByEntityIdAndBaseDate(
         entityId: Long,
         baseDate: BaseDate,
-    ): T? {
-        // 1) 필요한 필드만 프로젝션
-        val projection = Projections.fields(
-            Projections.include("period", "base_date", "entity_id", "name", "stats"),
-            Projections.excludeId() // _id 필요하면 제외하지 않아도 됨
-        )
-
-        return collection
+    ): T? =
+        collection
             .find(
                 Filters.and(
                     Filters.eq("entity_id", entityId),
                     Filters.eq("base_date", baseDate.toString()),
                 ),
-            )
-            .projection(projection)              // 2) 프로젝션 적용
-            .hintString("snapshot_lookup_idx")   // 인덱스 힌트
+            ).hintString("snapshot_lookup_idx")
             .limit(1)
             .firstOrNull()
-            ?.let { doc ->
-                // 3) doc에는 지정한 필드만 들어옴
-                mongoOperations.converter.read(entityInformation.javaType, doc)
-            }
-    }
+            ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
 
     override fun findByBaseDateAndEntityIds(
         baseDate: BaseDate,
@@ -248,26 +215,15 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
     ): List<T> {
         if (entityIds.isEmpty()) return emptyList()
 
-        // 1) 원하는 필드만 프로젝션
-        val projection = Projections.fields(
-            Projections.include("period", "base_date", "entity_id", "name", "stats"),
-            Projections.excludeId() // _id 제외할 수도 있음
-        )
-
         return collection
             .find(
                 Filters.and(
                     Filters.eq("base_date", baseDate.toString()),
                     Filters.`in`("entity_id", entityIds),
                 ),
-            )
-            .projection(projection)  // 2) 프로젝션 적용
-            .hintString("date_entity_idx")
+            ).hintString("snapshot_lookup_idx")
             .batchSize(OPTIMAL_BATCH_SIZE)
-            .map { doc ->
-                // 3) doc에는 위에서 지정한 필드만 들어있음
-                mongoOperations.converter.read(entityInformation.javaType, doc)
-            }
+            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
 
@@ -310,21 +266,13 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
 
-    override fun findLatestStatsByEntityId(entityId: Long): T? {
-        val projection = Projections.fields(
-            Projections.include("period", "base_date", "entity_id", "name", "stats"),
-            Projections.excludeId()
-        )
-
-        return collection
+    override fun findLatestStatsByEntityId(entityId: Long): T? =
+        collection
             .find(Filters.eq("entity_id", entityId))
-            .projection(projection)              // 프로젝션 적용
-            .sort(Sorts.descending("base_date"))
+            .hintString("snapshot_lookup_idx") // baseDate가 -1로 정렬되어 있어 별도 sort 불필요
             .limit(1)
-            .hintString("entity_latest_idx")
             .firstOrNull()
             ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
-    }
 
     override fun findTopGrowthSkills(
         startDate: BaseDate,
@@ -523,5 +471,4 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
-
 }

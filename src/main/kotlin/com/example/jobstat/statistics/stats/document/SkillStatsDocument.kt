@@ -21,20 +21,20 @@ class SkillStatsDocument(
     val name: String,
     @Field("stats")
     override val stats: SkillStats,
-//    @Field("experience_levels")
-//    val experienceLevels: List<SkillExperienceLevel>,
-//    @Field("company_size_distribution")
-//    val companySizeDistribution: List<CompanySizeDistribution>,
-//    @Field("industry_distribution")
-//    val industryDistribution: List<IndustryDistribution>,
-//    @Field("soft_skill")
-//    val isSoftSkill: Boolean,
-//    @Field("emerging_skill")
-//    val isEmergingSkill: Boolean,
-//    @Field("related_job_categories")
-//    val relatedJobCategories: List<RelatedJobCategory>,
-//    @Field("rankings")
-//    override val rankings: Map<RankingType, SkillRankingInfo>,
+    @Field("experience_levels")
+    val experienceLevels: List<SkillExperienceLevel>,
+    @Field("company_size_distribution")
+    val companySizeDistribution: List<CompanySizeDistribution>,
+    @Field("industry_distribution")
+    val industryDistribution: List<IndustryDistribution>,
+    @Field("soft_skill")
+    val isSoftSkill: Boolean,
+    @Field("emerging_skill")
+    val isEmergingSkill: Boolean,
+    @Field("related_job_categories")
+    val relatedJobCategories: List<RelatedJobCategory>,
+    @Field("rankings")
+    override val rankings: Map<RankingType, SkillRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, mapOf()) {
     override fun validate() {
 //        require(experienceLevels.isNotEmpty()) { "경력 수준이 비어있으면 안됩니다" }
@@ -85,75 +85,75 @@ class SkillStatsDocument(
             demandTrend,
         )
 
-//    data class SkillExperienceLevel(
-//        @Field("range")
-//        val range: String,
-//        @Field("posting_count")
-//        val postingCount: Int,
-//        @Field("avg_salary")
-//        override val avgSalary: Long,
-//    ) : CommonDistribution(postingCount, 0.0, avgSalary)
+    data class SkillExperienceLevel(
+        @Field("range")
+        val range: String,
+        @Field("posting_count")
+        val postingCount: Int,
+        @Field("avg_salary")
+        override val avgSalary: Long,
+    ) : CommonDistribution(postingCount, 0.0, avgSalary)
 
-//    data class CompanySizeDistribution(
-//        @Field("company_size")
-//        val companySize: String,
-//        @Field("count")
-//        override val count: Int,
-//        @Field("avg_salary")
-//        override val avgSalary: Long?,
-//    ) : CommonDistribution(count, 0.0, avgSalary)
+    data class CompanySizeDistribution(
+        @Field("company_size")
+        val companySize: String,
+        @Field("count")
+        override val count: Int,
+        @Field("avg_salary")
+        override val avgSalary: Long?,
+    ) : CommonDistribution(count, 0.0, avgSalary)
 
-//    data class IndustryDistribution(
-//        @Field("industry_id")
-//        val industryId: Long,
-//        @Field("industry_name")
-//        val industryName: String,
-//        @Field("count")
-//        override val count: Int,
-//        @Field("avg_salary")
-//        override val avgSalary: Long?,
-//    ) : CommonDistribution(count, 0.0, avgSalary)
+    data class IndustryDistribution(
+        @Field("industry_id")
+        val industryId: Long,
+        @Field("industry_name")
+        val industryName: String,
+        @Field("count")
+        override val count: Int,
+        @Field("avg_salary")
+        override val avgSalary: Long?,
+    ) : CommonDistribution(count, 0.0, avgSalary)
 
-//    data class RelatedJobCategory(
-//        @Field("job_category_id")
-//        val jobCategoryId: Long,
-//        @Field("name")
-//        val name: String,
-//        @Field("posting_count")
-//        val postingCount: Int,
-//        @Field("importance_score")
-//        val importanceScore: Double,
-//        @Field("growth_rate")
-//        val growthRate: Double,
-//    )
+    data class RelatedJobCategory(
+        @Field("job_category_id")
+        val jobCategoryId: Long,
+        @Field("name")
+        val name: String,
+        @Field("posting_count")
+        val postingCount: Int,
+        @Field("importance_score")
+        val importanceScore: Double,
+        @Field("growth_rate")
+        val growthRate: Double,
+    )
 
-//    fun copy(
-//        entityId: Long = this.entityId,
-//        baseDate: String = this.baseDate,
-//        period: SnapshotPeriod = this.period,
-//        name: String = this.name,
-//        stats: SkillStats = this.stats,
-//        experienceLevels: List<SkillExperienceLevel> = this.experienceLevels,
-//        companySizeDistribution: List<CompanySizeDistribution> = this.companySizeDistribution,
-//        industryDistribution: List<IndustryDistribution> = this.industryDistribution,
-//        isSoftSkill: Boolean = this.isSoftSkill,
-//        isEmergingSkill: Boolean = this.isEmergingSkill,
-//        relatedJobCategories: List<RelatedJobCategory> = this.relatedJobCategories,
-//        rankings: Map<RankingType, SkillRankingInfo> = this.rankings,
-//    ): SkillStatsDocument =
-//        SkillStatsDocument(
-//            id = this.id,
-//            entityId = entityId,
-//            baseDate = baseDate,
-//            period = period,
-//            name = name,
-//            stats = stats,
-//            experienceLevels = experienceLevels,
-//            companySizeDistribution = companySizeDistribution,
-//            industryDistribution = industryDistribution,
-//            isSoftSkill = isSoftSkill,
-//            isEmergingSkill = isEmergingSkill,
-//            relatedJobCategories = relatedJobCategories,
-//            rankings = rankings,
-//        )
+    fun copy(
+        entityId: Long = this.entityId,
+        baseDate: String = this.baseDate,
+        period: SnapshotPeriod = this.period,
+        name: String = this.name,
+        stats: SkillStats = this.stats,
+        experienceLevels: List<SkillExperienceLevel> = this.experienceLevels,
+        companySizeDistribution: List<CompanySizeDistribution> = this.companySizeDistribution,
+        industryDistribution: List<IndustryDistribution> = this.industryDistribution,
+        isSoftSkill: Boolean = this.isSoftSkill,
+        isEmergingSkill: Boolean = this.isEmergingSkill,
+        relatedJobCategories: List<RelatedJobCategory> = this.relatedJobCategories,
+        rankings: Map<RankingType, SkillRankingInfo> = this.rankings,
+    ): SkillStatsDocument =
+        SkillStatsDocument(
+            id = this.id,
+            entityId = entityId,
+            baseDate = baseDate,
+            period = period,
+            name = name,
+            stats = stats,
+            experienceLevels = experienceLevels,
+            companySizeDistribution = companySizeDistribution,
+            industryDistribution = industryDistribution,
+            isSoftSkill = isSoftSkill,
+            isEmergingSkill = isEmergingSkill,
+            relatedJobCategories = relatedJobCategories,
+            rankings = rankings,
+        )
 }

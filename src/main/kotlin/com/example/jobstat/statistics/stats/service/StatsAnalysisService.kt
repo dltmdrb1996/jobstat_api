@@ -67,9 +67,8 @@ interface StatsAnalysisService {
 @Service
 class StatsAnalysisServiceImpl(
     private val statsRepositoryRegistry: StatsRepositoryRegistry,
-    private val statsBulkCacheManager: StatsBulkCacheManager
+    private val statsBulkCacheManager: StatsBulkCacheManager,
 ) : StatsAnalysisService {
-
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     /**
@@ -168,18 +167,21 @@ class StatsAnalysisServiceImpl(
         }
 
         // 모든 엔티티에 대한 캐시 키 생성
-        val cacheKeys = entityIds.map { entityId ->
-            entityId to statsBulkCacheManager.createCacheKey(baseDate, statsType, entityId)
-        }.toMap()
+        val cacheKeys =
+            entityIds
+                .map { entityId ->
+                    entityId to statsBulkCacheManager.createCacheKey(baseDate, statsType, entityId)
+                }.toMap()
 
         // 캐시에서 일괄 조회
         val cachedResults = statsBulkCacheManager.getAll<T>(cacheKeys.values)
 
         // 캐시 미스된 엔티티 ID 확인
-        val missingEntityIds = entityIds.filter { entityId ->
-            val key = cacheKeys[entityId]
-            key !in cachedResults
-        }
+        val missingEntityIds =
+            entityIds.filter { entityId ->
+                val key = cacheKeys[entityId]
+                key !in cachedResults
+            }
 
         // 캐시 미스가 없으면 캐시 결과 바로 반환
         if (missingEntityIds.isEmpty()) {
@@ -192,22 +194,26 @@ class StatsAnalysisServiceImpl(
 
         // 캐시 미스된 엔티티들만 DB에서 일괄 조회
         log.debug("Bulk cache miss for {} entities", missingEntityIds.size)
-        val dbResults = statsRepositoryRegistry.getRepository<T>(statsType)
-            .findByBaseDateAndEntityIds(baseDate, missingEntityIds)
+        val dbResults =
+            statsRepositoryRegistry
+                .getRepository<T>(statsType)
+                .findByBaseDateAndEntityIds(baseDate, missingEntityIds)
 
         // DB 결과를 엔티티 ID로 매핑
         val dbResultsMap = dbResults.associateBy { it.entityId }
 
         // DB 결과를 캐시에 일괄 저장
-        val toCache = dbResults.mapNotNull { document ->
-            val entityId = document.entityId
-            val key = cacheKeys[entityId]
-            if (key != null) {
-                key to document
-            } else {
-                null
-            }
-        }.toMap()
+        val toCache =
+            dbResults
+                .mapNotNull { document ->
+                    val entityId = document.entityId
+                    val key = cacheKeys[entityId]
+                    if (key != null) {
+                        key to document
+                    } else {
+                        null
+                    }
+                }.toMap()
 
         statsBulkCacheManager.putAll(toCache)
 
@@ -230,18 +236,21 @@ class StatsAnalysisServiceImpl(
         }
 
         // 모든 엔티티에 대한 캐시 키 생성
-        val cacheKeys = entityIds.map { entityId ->
-            entityId to statsBulkCacheManager.createCacheKey(baseDate, statsType, entityId)
-        }.toMap()
+        val cacheKeys =
+            entityIds
+                .map { entityId ->
+                    entityId to statsBulkCacheManager.createCacheKey(baseDate, statsType, entityId)
+                }.toMap()
 
         // 캐시에서 일괄 조회
         val cachedResults = statsBulkCacheManager.getAll<T>(cacheKeys.values)
 
         // 캐시 미스된 엔티티 ID 확인
-        val missingEntityIds = entityIds.filter { entityId ->
-            val key = cacheKeys[entityId]
-            key !in cachedResults
-        }
+        val missingEntityIds =
+            entityIds.filter { entityId ->
+                val key = cacheKeys[entityId]
+                key !in cachedResults
+            }
 
         // 캐시 미스가 없으면 캐시 결과 바로 반환
         if (missingEntityIds.isEmpty()) {
@@ -255,28 +264,31 @@ class StatsAnalysisServiceImpl(
         // 캐시 미스된 엔티티들만 DB에서 일괄 조회
         log.debug("Bulk cache miss for {} entities", missingEntityIds.size)
         // findLatestStatsByEntityIds 메소드가 StatsMongoRepository에 없어서 개별 조회로 대체
-        val dbResults = missingEntityIds.mapNotNull { entityId ->
-            val result = statsRepositoryRegistry.getRepository<T>(statsType).findLatestStatsByEntityId(entityId)
-            if (result != null) {
-                result
-            } else {
-                null
+        val dbResults =
+            missingEntityIds.mapNotNull { entityId ->
+                val result = statsRepositoryRegistry.getRepository<T>(statsType).findLatestStatsByEntityId(entityId)
+                if (result != null) {
+                    result
+                } else {
+                    null
+                }
             }
-        }
 
         // DB 결과를 엔티티 ID로 매핑
         val dbResultsMap = dbResults.associateBy { it.entityId }
 
         // DB 결과를 캐시에 일괄 저장
-        val toCache = dbResults.mapNotNull { document ->
-            val entityId = document.entityId
-            val key = cacheKeys[entityId]
-            if (key != null) {
-                key to document
-            } else {
-                null
-            }
-        }.toMap()
+        val toCache =
+            dbResults
+                .mapNotNull { document ->
+                    val entityId = document.entityId
+                    val key = cacheKeys[entityId]
+                    if (key != null) {
+                        key to document
+                    } else {
+                        null
+                    }
+                }.toMap()
 
         statsBulkCacheManager.putAll(toCache)
 

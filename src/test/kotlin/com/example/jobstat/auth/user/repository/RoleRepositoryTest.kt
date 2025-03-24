@@ -13,7 +13,7 @@ import java.time.LocalDate
 import kotlin.test.*
 
 @DisplayName("RoleRepository 통합 테스트")
-class RoleRepositoryIntegrationTest : JpaIntegrationTestSupport() {
+class RoleRepositoryTest : JpaIntegrationTestSupport() {
     @Autowired
     private lateinit var roleRepository: RoleRepository
 
