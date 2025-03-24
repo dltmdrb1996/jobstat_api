@@ -106,6 +106,9 @@
                         └── dummy
 ```
 
+# 테스트 커버리지
+<img width="1553" alt="스크린샷 2025-03-24 오후 8 02 15" src="https://github.com/user-attachments/assets/1cbc9595-77c6-47f6-9185-6534a1ebe4cf" />
+
 # 필수 환경변수
 
 애플리케이션이 정상적으로 구동되기 위해 아래 환경변수들을 설정해야 합니다. 각 변수의 값은 본인의 실제 환경에 맞게 입력해 주세요.
@@ -145,7 +148,8 @@ classDiagram
       +baseDate: String
       +period: SnapshotPeriod
     }
-    BaseDocument <|-- BaseTimeSeriesDocument
+    BaseDocument <|-- BaseTimeSeriesDocument<img width="1563" alt="스크린샷 2025-03-24 오후 8 01 33" src="https://github.com/user-attachments/assets/bcfaaee7-8739-4367-9b46-172ec7bba301" />
+
 
     class SnapshotPeriod {
       +startDate: Instant
