@@ -148,8 +148,7 @@ classDiagram
       +baseDate: String
       +period: SnapshotPeriod
     }
-    BaseDocument <|-- BaseTimeSeriesDocument<img width="1563" alt="스크린샷 2025-03-24 오후 8 01 33" src="https://github.com/user-attachments/assets/bcfaaee7-8739-4367-9b46-172ec7bba301" />
-
+    BaseDocument <|-- BaseTimeSeriesDocument
 
     class SnapshotPeriod {
       +startDate: Instant
