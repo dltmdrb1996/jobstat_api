@@ -13,12 +13,12 @@ import org.springframework.stereotype.Service
 @Service
 internal class CreateGuestBoard(
     private val boardService: BoardService,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<CreateGuestBoard.Request, CreateGuestBoard.Response>(validator) {
     @Transactional
     override fun execute(request: Request): Response {
-        val encodedPassword = bcryptPasswordUtil.encode(request.password)
+        val encodedPassword = passwordUtil.encode(request.password)
         val board =
             boardService.createBoard(
                 title = request.title,

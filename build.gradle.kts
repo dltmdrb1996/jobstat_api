@@ -76,6 +76,7 @@ dependencies {
 
     // cache
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
+
     // coroutine
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
@@ -114,6 +115,8 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:mongodb:1.20.4")
     testImplementation("org.testcontainers:mysql")
+
+    implementation("org.bouncycastle:bcprov-jdk18on:1.80")
 }
 
 kotlin {

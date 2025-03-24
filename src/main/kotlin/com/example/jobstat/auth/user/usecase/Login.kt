@@ -23,7 +23,7 @@ internal class Login(
     private val userService: UserService,
     private val tokenService: TokenService,
     private val jwtTokenGenerator: JwtTokenGenerator,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     private val loginAttemptService: LoginAttemptService,
     validator: Validator,
 ) : ValidUseCase<Login.Request, Login.Response>(validator) {
@@ -33,19 +33,19 @@ internal class Login(
     override fun execute(request: Request): Response {
         val totalStartTime = Instant.now()
 
-//        if (loginAttemptService.isAccountLocked(request.email)) {
-//            throw AppException.fromErrorCode(
-//                ErrorCode.TOO_MANY_REQUESTS,
-//                UserConstants.ErrorMessages.ACCOUNT_LOCKED,
-//            )
-//        }
+        if (loginAttemptService.isAccountLocked(request.email)) {
+            throw AppException.fromErrorCode(
+                ErrorCode.TOO_MANY_REQUESTS,
+                UserConstants.ErrorMessages.ACCOUNT_LOCKED,
+            )
+        }
 
         val getUserStartTime = Instant.now()
         val user =
             try {
                 userService.getUserByEmail(request.email)
             } catch (e: Exception) {
-//                loginAttemptService.incrementFailedAttempts(request.email)
+                loginAttemptService.incrementFailedAttempts(request.email)
                 throw AppException.fromErrorCode(
                     ErrorCode.AUTHENTICATION_FAILURE,
                     UserConstants.ErrorMessages.AUTHENTICATION_FAILURE,
@@ -55,7 +55,7 @@ internal class Login(
         log.info("사용자 이메일 조회 소요시간: {}ms", Duration.between(getUserStartTime, getUserEndTime).toMillis())
 
         if (!user.isActive) {
-//            loginAttemptService.incrementFailedAttempts(request.email)
+            loginAttemptService.incrementFailedAttempts(request.email)
             throw AppException.fromErrorCode(
                 ErrorCode.ACCOUNT_DISABLED,
                 UserConstants.ErrorMessages.ACCOUNT_DISABLED,
@@ -63,19 +63,19 @@ internal class Login(
         }
 
         val passwordCheckStartTime = Instant.now()
-        val passwordMatches = bcryptPasswordUtil.matches(request.password, user.password)
+        val passwordMatches = passwordUtil.matches(request.password, user.password)
         val passwordCheckEndTime = Instant.now()
         log.info("비밀번호 검증 소요시간: {}ms", Duration.between(passwordCheckStartTime, passwordCheckEndTime).toMillis())
 
         if (!passwordMatches) {
-//            loginAttemptService.incrementFailedAttempts(request.email)
+            loginAttemptService.incrementFailedAttempts(request.email)
             throw AppException.fromErrorCode(
                 ErrorCode.AUTHENTICATION_FAILURE,
                 "유저정보가 일치하지 않습니다.",
             )
         }
 
-//        loginAttemptService.resetAttempts(request.email)
+        loginAttemptService.resetAttempts(request.email)
 
         val getRolesStartTime = Instant.now()
         val roles = userService.getUserRoles(user.id)

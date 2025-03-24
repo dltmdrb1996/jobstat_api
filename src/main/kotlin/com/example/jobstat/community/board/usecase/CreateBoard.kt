@@ -4,7 +4,6 @@ import com.example.jobstat.community.board.BoardConstants
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.security.FakePasswordUtil
 import com.example.jobstat.core.security.PasswordUtil
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.core.utils.SecurityUtils
@@ -19,10 +18,10 @@ import org.springframework.stereotype.Service
 internal class CreateBoard(
     private val boardService: BoardService,
     private val securityUtils: SecurityUtils,
-    //    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<CreateBoard.Request, CreateBoard.Response>(validator) {
-    private val bcryptPasswordUtil: PasswordUtil = FakePasswordUtil()
+
     @Transactional
     override fun execute(request: Request): Response {
         val userId = securityUtils.getCurrentUserId()
@@ -38,7 +37,7 @@ internal class CreateBoard(
         // 로그인 상태면 비밀번호는 무시하고 null로 설정
         val password =
             if (userId == null) {
-                request.password?.let { bcryptPasswordUtil.encode(it) }
+                request.password?.let { passwordUtil.encode(it) }
             } else {
                 null
             }

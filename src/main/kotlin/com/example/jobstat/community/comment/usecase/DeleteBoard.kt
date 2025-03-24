@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 internal class DeleteBoard(
     private val boardService: BoardService,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     private val securityUtils: SecurityUtils,
     validator: Validator,
 ) : ValidUseCase<DeleteBoard.ExecuteRequest, DeleteBoard.Response>(validator) {
@@ -26,7 +26,7 @@ internal class DeleteBoard(
 
         if (board.password != null) {
             if (request.password == null) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-            if (!bcryptPasswordUtil.matches(request.password, board.password!!)) {
+            if (!passwordUtil.matches(request.password, board.password!!)) {
                 throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
             }
         } else {

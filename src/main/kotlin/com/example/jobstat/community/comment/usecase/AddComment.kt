@@ -4,7 +4,6 @@ import com.example.jobstat.community.comment.CommentConstants
 import com.example.jobstat.community.comment.service.CommentService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.security.FakePasswordUtil
 import com.example.jobstat.core.security.PasswordUtil
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.core.utils.SecurityUtils
@@ -19,10 +18,9 @@ import org.springframework.stereotype.Service
 internal class AddComment(
     private val commentService: CommentService,
     private val securityUtils: SecurityUtils,
-//    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<AddComment.ExecuteRequest, AddComment.Response>(validator) {
-    private val bcryptPasswordUtil: PasswordUtil = FakePasswordUtil()
 
     @Transactional
     override fun execute(request: ExecuteRequest): Response {
@@ -37,7 +35,7 @@ internal class AddComment(
 
         val password =
             if (userId == null) {
-                request.password?.let { bcryptPasswordUtil.encode(it) }
+                request.password?.let { passwordUtil.encode(it) }
             } else {
                 null
             }
