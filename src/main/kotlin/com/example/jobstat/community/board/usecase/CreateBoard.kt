@@ -17,8 +17,8 @@ import org.springframework.stereotype.Service
 @Service
 internal class CreateBoard(
     private val boardService: BoardService,
-    private val bcryptPasswordUtil: PasswordUtil,
     private val securityUtils: SecurityUtils,
+    private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<CreateBoard.Request, CreateBoard.Response>(validator) {
     @Transactional
@@ -36,7 +36,7 @@ internal class CreateBoard(
         // 로그인 상태면 비밀번호는 무시하고 null로 설정
         val password =
             if (userId == null) {
-                request.password?.let { bcryptPasswordUtil.encode(it) }
+                request.password?.let { passwordUtil.encode(it) }
             } else {
                 null
             }

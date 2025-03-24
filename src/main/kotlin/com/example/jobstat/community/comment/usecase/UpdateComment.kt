@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service
 @Service
 internal class UpdateComment(
     private val commentService: CommentService,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     private val securityUtils: SecurityUtils,
     validator: Validator,
 ) : ValidUseCase<UpdateComment.ExecuteRequest, UpdateComment.Response>(validator) {
@@ -27,7 +27,7 @@ internal class UpdateComment(
 
         if (comment.password != null) {
             if (request.password == null) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-            if (!bcryptPasswordUtil.matches(request.password, comment.password!!)) {
+            if (!passwordUtil.matches(request.password, comment.password!!)) {
                 throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
             }
         } else {

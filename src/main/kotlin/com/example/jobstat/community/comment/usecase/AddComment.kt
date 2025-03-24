@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service
 internal class AddComment(
     private val commentService: CommentService,
     private val securityUtils: SecurityUtils,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<AddComment.ExecuteRequest, AddComment.Response>(validator) {
     @Transactional
@@ -34,7 +34,7 @@ internal class AddComment(
 
         val password =
             if (userId == null) {
-                request.password?.let { bcryptPasswordUtil.encode(it) }
+                request.password?.let { passwordUtil.encode(it) }
             } else {
                 null
             }

@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 internal class UpdateBoard(
     private val boardService: BoardService,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     private val securityUtils: SecurityUtils, // SecurityUtils 추가
     validator: Validator,
 ) : ValidUseCase<UpdateBoard.ExecuteRequest, UpdateBoard.Response>(validator) {
@@ -26,7 +26,7 @@ internal class UpdateBoard(
 
         if (board.password != null) {
             if (request.password == null) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-            if (!bcryptPasswordUtil.matches(request.password, board.password!!)) {
+            if (!passwordUtil.matches(request.password, board.password!!)) {
                 throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
             }
         } else {

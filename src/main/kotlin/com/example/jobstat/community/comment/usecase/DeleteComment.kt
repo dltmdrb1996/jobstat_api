@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service
 @Service
 internal class DeleteComment(
     private val commentService: CommentService,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     private val securityUtils: SecurityUtils,
     validator: Validator,
 ) : ValidUseCase<DeleteComment.ExecuteRequest, DeleteComment.Response>(validator) {
@@ -26,7 +26,7 @@ internal class DeleteComment(
 
         if (comment.password != null) {
             if (request.password == null) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-            if (!bcryptPasswordUtil.matches(request.password, comment.password!!)) {
+            if (!passwordUtil.matches(request.password, comment.password!!)) {
                 throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
             }
         } else {

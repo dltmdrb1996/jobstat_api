@@ -13,7 +13,7 @@ import java.time.LocalDate
 import kotlin.test.*
 
 @DisplayName("UserRepository 통합 테스트")
-class UserRepositoryIntegrationTest : JpaIntegrationTestSupport() {
+class UserRepositoryTest : JpaIntegrationTestSupport() {
     @Autowired
     private lateinit var userRepository: UserRepository
 

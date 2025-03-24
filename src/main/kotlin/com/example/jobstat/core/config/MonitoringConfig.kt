@@ -40,9 +40,9 @@ class MonitoringConfig(
 
             if (cpuLoad > CPU_THRESHOLD) {
                 // 로그 레벨 변경
-                (LoggerFactory.getILoggerFactory() as LoggerContext).apply {
-                    getLogger(Logger.ROOT_LOGGER_NAME).level = Level.DEBUG
-                }
+//                (LoggerFactory.getILoggerFactory() as LoggerContext).apply {
+//                    getLogger(Logger.ROOT_LOGGER_NAME).level = Level.DEBUG
+//                }
 
                 // 시스템 정보 수집
                 val systemInfo = collectSystemInfo(osBean)

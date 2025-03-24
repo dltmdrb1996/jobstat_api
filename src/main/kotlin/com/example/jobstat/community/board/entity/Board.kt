@@ -125,11 +125,6 @@ internal class Board protected constructor(
             validateTitle(title)
             validateContent(content)
             require(author.isNotBlank()) { BoardConstants.ErrorMessages.AUTHOR_REQUIRED }
-            password?.let {
-                require(it.length in BoardConstants.MIN_PASSWORD_LENGTH..BoardConstants.MAX_PASSWORD_LENGTH) {
-                    BoardConstants.ErrorMessages.INVALID_PASSWORD
-                }
-            }
             return Board(title, content, author, password, category, userId)
         }
 

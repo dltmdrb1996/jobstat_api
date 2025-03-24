@@ -12,7 +12,6 @@ import jakarta.transaction.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
@@ -27,11 +26,11 @@ class GetEducationRankingWithStats(
             )
     }
 
-    @Cacheable(
-        cacheNames = ["statsWithRanking"],
-        key = "#request.rankingType + ':' + #request.baseDate + ':' + #request.page",
-        unless = "#result == null",
-    )
+//    @Cacheable(
+//        cacheNames = ["statsWithRanking"],
+//        key = "#request.rankingType + ':' + #request.baseDate + ':' + #request.page",
+//        unless = "#result == null",
+//    )
     override operator fun invoke(request: Request): Response {
         val violations = validator.validate(request)
         if (violations.isNotEmpty()) {

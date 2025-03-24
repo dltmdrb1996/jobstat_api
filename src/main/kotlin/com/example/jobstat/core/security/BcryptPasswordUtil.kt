@@ -13,7 +13,7 @@ interface PasswordUtil {
 }
 
 @Component
-class BCryptPasswordUtil(
+class BcryptPasswordUtil(
     private val passwordEncoder: PasswordEncoder,
 ) : PasswordUtil {
     override fun encode(password: String): String = passwordEncoder.encode(password)

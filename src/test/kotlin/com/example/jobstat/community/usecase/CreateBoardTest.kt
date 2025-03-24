@@ -41,8 +41,8 @@ class CreateBoardTest {
         createBoard =
             CreateBoard(
                 boardService,
-                passwordUtil,
                 securityUtils,
+                passwordUtil,
                 Validation.buildDefaultValidatorFactory().validator,
             )
 

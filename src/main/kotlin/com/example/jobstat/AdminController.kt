@@ -16,7 +16,7 @@ class AdminController(
 ) {
     @PostMapping("/clear-cache")
     fun clearCaches(): ResponseEntity<Void> {
-        cacheManager.getCache("StatsByEntityIdAndBaseDate")?.clear()
+        cacheManager.getCache("StatsDocument")?.clear()
         cacheManager.getCache("statsWithRanking")?.clear()
         return ResponseEntity.ok().build()
     }

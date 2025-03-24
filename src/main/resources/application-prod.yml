@@ -16,10 +16,11 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      maximum-pool-size: 20
-      minimum-idle: 5
-      idle-timeout: 30000
-      connection-timeout: 20000
+      idle-timeout: 60000
+      maximum-pool-size: 50
+      minimum-idle: 10
+      connection-timeout: 30000
+      initialization-fail-timeout: 30000
       connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
       cache-prepared-statements: true
       prepared-statement-cache-size: 250
@@ -28,7 +29,7 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}?maxPoolSize=50&minPoolSize=10&maxIdleTimeMS=60000
       database: ${MONGO_DB:prod_database}
       auto-index-creation: true
     redis:
@@ -47,7 +48,7 @@ spring:
       connect-timeout: 5000
   batch:
     jdbc:
-      initialize-schema: always
+      initialize-schema: never
     job:
       enabled: false
     chunk-size: 1000
@@ -58,20 +59,24 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        format_sql: true
-    show-sql: true
+        format_sql: false
+        connection.provider_disables_autocommit: false
+        acquire_increment: 1
+        acquire_retry_attempts: 3
+        acquire_retry_delay: 5000
+
 
 batch:
   chunk-size: 500
   job-size: 100
 
 logging:
-#  level:
-#    io.lettuce.core: DEBUG
-#    org.springframework.data.redis: DEBUG
-  file:
-    name: logs/application.log
-  logback:
-    rollingpolicy:
-      max-file-size: 10MB
-      max-history: 30
+  level:
+    root: WARN
+    com.example: WARN
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type: ERROR
+    org.springframework: WARN
+    org.springframework.security: WARN
+    com.example.jobstat.core.security.JwtTokenFilter: ERROR

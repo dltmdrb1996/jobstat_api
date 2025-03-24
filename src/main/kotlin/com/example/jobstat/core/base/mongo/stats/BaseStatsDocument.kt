@@ -15,6 +15,14 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes
         def = "{'entity_id': 1, 'base_date': 1}",
         unique = true,
     ),
+    CompoundIndex(
+        name = "date_entity_idx",
+        def = "{'base_date': 1, 'entity_id': 1}",
+    ),
+    CompoundIndex(
+        name = "entity_latest_idx",
+        def = "{'entity_id': 1, 'base_date': -1}",
+    ),
 )
 abstract class BaseStatsDocument(
     id: String? = null,

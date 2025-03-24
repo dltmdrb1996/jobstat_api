@@ -16,7 +16,7 @@ internal class Register(
     private val userService: UserService,
     private val tokenService: TokenService,
     private val jwtTokenGenerator: JwtTokenGenerator,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<Register.Request, Register.Response>(validator) {
     @Transactional
@@ -25,7 +25,7 @@ internal class Register(
             userService.createUser(
                 username = request.username,
                 email = request.email,
-                password = bcryptPasswordUtil.encode(request.password),
+                password = passwordUtil.encode(request.password),
                 birthDate = request.birthDate,
             )
 
@@ -38,11 +38,11 @@ internal class Register(
 
     data class Request(
         @field:NotBlank
-        @field:Pattern(regexp = UserConstants.Patterns.USERNAME_PATTERN)
+        @field:Pattern(regexp = UserConstants.Patterns.USERNAME_PATTERN, message = UserConstants.ErrorMessages.INVALID_USERNAME)
         val username: String,
         @field:NotBlank
         @field:Email
-        @field:Size(max = UserConstants.MAX_EMAIL_LENGTH)
+        @field:Size(max = UserConstants.MAX_EMAIL_LENGTH, message = UserConstants.ErrorMessages.INVALID_EMAIL)
         val email: String,
         @field:NotBlank
         @field:Pattern(

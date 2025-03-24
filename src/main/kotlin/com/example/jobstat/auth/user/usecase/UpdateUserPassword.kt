@@ -15,14 +15,14 @@ import org.springframework.stereotype.Service
 @Service
 internal class UpdateUserPassword(
     private val userService: UserService,
-    private val bcryptPasswordUtil: PasswordUtil,
+    private val passwordUtil: PasswordUtil,
     validator: Validator,
 ) : ValidUseCase<UpdateUserPassword.Request, Unit>(validator) {
     @Transactional
     override fun execute(request: Request) {
         val user = userService.getUserById(request.userId)
 
-        if (!bcryptPasswordUtil.matches(request.currentPassword, user.password)) {
+        if (!passwordUtil.matches(request.currentPassword, user.password)) {
             throw AppException.fromErrorCode(
                 ErrorCode.AUTHENTICATION_FAILURE,
                 UserConstants.ErrorMessages.CURRENT_PASSWORD_MISMATCH,
@@ -32,7 +32,7 @@ internal class UpdateUserPassword(
         userService.updateUser(
             mapOf(
                 "id" to request.userId,
-                "password" to bcryptPasswordUtil.encode(request.newPassword),
+                "password" to passwordUtil.encode(request.newPassword),
             ),
         )
     }
