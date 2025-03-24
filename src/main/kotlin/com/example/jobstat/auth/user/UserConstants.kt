@@ -5,7 +5,7 @@ object UserConstants {
     const val MAX_USERNAME_LENGTH = 15
     const val MIN_USERNAME_LENGTH = 3
     const val MAX_EMAIL_LENGTH = 100
-    const val MAX_PASSWORD_LENGTH = 60 // bcrypt 인코딩된 비밀번호 길이
+    const val MAX_PASSWORD_LENGTH = 255 // argon 인코딩된 비밀번호 길이
     const val MIN_PASSWORD_LENGTH = 8
 
     // 로그인 시도 관련
