@@ -1,7 +1,7 @@
 # 프로젝트 구성도
 ![system-architecture-new](https://github.com/user-attachments/assets/6f9a8ac2-ffc7-4b00-91af-1d76b87e629c)
 
-# 프로젝트 구조
+# 프로젝트 트리구조
 
 ```
 ├── main
@@ -136,6 +136,8 @@
 ![mysql](https://github.com/user-attachments/assets/86c8795f-f0bf-4742-914d-9de97a57457b)
 
 # Mongo 도큐먼트 구조
+
+템플릿 메소드 패턴과 계층화된 상속 구조를 활용하여 MongoDB 기반의 리포지토리를 구현했습니다. BaseDocument, BaseRankingDocument, BaseReferenceDocument, BaseStatsDocument, BaseTimeSeriesDocument 등의 상속구조를 통해 다양한 통계 및 랭킹 데이터를 효과적으로 관리하였습니다. 또한 BaseMongoRepository, BaseRankingRepository, BaseTimeSeriesRepository 등의 추상화된 리포지토리 계층을 도입함으로써 CRUD 로직의 재사용성과 특화 쿼리의 확장성을 확보했습니다. 이러한 모듈화된 시스템 설계는 데이터 처리 효율성과 유지보수성을 향상시켰습니다.
 
 ### Stats 도큐먼트
 ```mermaid
@@ -1091,3 +1093,7 @@ flowchart TD
     class D1,D2,D3,D4,D5,D6,D7,D8,D9,D10,D11,D12,D13,D14 statisticsClass
     class E1,E2,E3,E4,E5,E6,E7,E8,E9 utilityClass
 ```
+
+최종 통계정보 생성을 위해서는 총 4단계 과정이 필요합니다. 파싱 대상 URL 스크래핑, URL 파싱, 메타데이터 및 매핑데이터 추출, 통계데이터 가공으로 구성됩니다. 각 단계는 명확한 책임 경계를 가진 독립적인 컴포넌트로 구현되어 있어 특정 단계의 실패가 전체 파이프라인에 영향을 미치지 않습니다. 각 과정의 결과는 DB에 개별적으로 저장되며 순차적인 실행으로 처리 순서를 보장합니다.  스크래핑을 통해 획득한 원시 데이터는 HTML 구조 분석을 통해 우선 정형화 가능한 부분을 추출한 후, 비정형 텍스트에 대해서는 NLP 기반 토큰화 및 분류 체계를 적용했습니다. OCR 기술을 활용하여 이미지 형태의 정보도 텍스트로 변환함으로써 데이터 수집 범위를 확장했습니다. 이 스크래핑 과정에서는 쓰레드의 블로킹이 빈번하게 발생하기 때문에 쓰레드 가용성을 높이기 위해 코루틴 기반의 병렬 처리 방식으로 구성하였습니다.
+
+토큰화된 데이터는 기존에 저장된 메타데이터에 대한 키워드 매핑 테이블을 통해 다양한 은어, 약어 등 여러 표현 형태와 연결되어 공고와 메타데이터를 정확히 매핑하도록 설계하였습니다. 또한 반복적인 데이터 강화를 위해 기존 키워드 목록에 포함되지 않는 토큰들도 빈도 분석 후 데이터베이스에 저장하여 지속적인 어휘 확장 및 매핑 정확도 향상에 활용하였습니다.
