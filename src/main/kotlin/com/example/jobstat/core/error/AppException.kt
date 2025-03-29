@@ -40,6 +40,7 @@ enum class ErrorCode(
     SQL_SYNTAX_ERROR("S004", "SQL 구문 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
     TRANSACTION_ERROR("S005", "트랜잭션 처리 오류가 발생했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
     EMAIL_SENDING_FAILURE("S006", "이메일 발송에 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
+    SERIALIZATION_FAILURE("S007", "직렬화에 실패했습니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
 }
 
 open class AppException private constructor(

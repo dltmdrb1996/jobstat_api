@@ -94,7 +94,6 @@ class StatsAnalysisServiceImpl(
         entityIds: List<Long>,
     ): List<T> {
         if (entityIds.isEmpty()) return emptyList()
-
         // 캐시를 통한 조회 활용
         val resultMap = findStatsByEntityIdsAndBaseDate<T>(statsType, baseDate, entityIds)
 
