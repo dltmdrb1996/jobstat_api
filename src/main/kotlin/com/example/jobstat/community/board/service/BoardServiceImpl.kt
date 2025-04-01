@@ -2,7 +2,6 @@ package com.example.jobstat.community.board.service
 
 import com.example.jobstat.community.board.BoardConstants
 import com.example.jobstat.community.board.entity.Board
-import com.example.jobstat.community.board.entity.ReadBoard
 import com.example.jobstat.community.board.repository.BoardRepository
 import com.example.jobstat.community.board.repository.CategoryRepository
 import com.example.jobstat.core.error.AppException
@@ -25,7 +24,7 @@ internal class BoardServiceImpl(
         categoryId: Long?,
         password: String?,
         userId: Long?,
-    ): ReadBoard {
+    ): Board {
         val category =
             categoryId?.let { categoryRepository.findById(it) }
                 ?: throw AppException.fromErrorCode(
@@ -33,66 +32,63 @@ internal class BoardServiceImpl(
                     BoardConstants.ErrorMessages.CATEGORY_REQUIRED,
                 )
 
-        val board = Board.create(title, content, author, password, category, userId)
-        return boardRepository.save(board)
+        return Board.create(title, content, author, password, category, userId)
+            .let(boardRepository::save)
     }
 
     @Transactional(readOnly = true)
-    override fun getBoardById(id: Long): ReadBoard = boardRepository.findById(id)
+    override fun getBoard(id: Long): Board = boardRepository.findById(id)
+    
 
     @Transactional(readOnly = true)
     override fun getBoardsByAuthor(
         author: String,
         pageable: Pageable,
-    ): Page<ReadBoard> = boardRepository.findByAuthor(author, pageable).map { it as ReadBoard }
+    ): Page<Board> = boardRepository.findByAuthor(author, pageable).map { it as Board }
 
     @Transactional(readOnly = true)
     override fun getBoardsByCategory(
         categoryId: Long,
         pageable: Pageable,
-    ): Page<ReadBoard> = boardRepository.findByCategory(categoryId, pageable).map { it as ReadBoard }
+    ): Page<Board> = boardRepository.findByCategory(categoryId, pageable).map { it as Board }
 
     @Transactional(readOnly = true)
     override fun getBoardsByAuthorAndCategory(
         author: String,
         categoryId: Long,
         pageable: Pageable,
-    ): Page<ReadBoard> = boardRepository.findByAuthorAndCategory(author, categoryId, pageable).map { it as ReadBoard }
+    ): Page<Board> = boardRepository.findByAuthorAndCategory(author, categoryId, pageable).map { it as Board }
 
     @Transactional(readOnly = true)
-    override fun getAllBoards(pageable: Pageable): Page<ReadBoard> = boardRepository.findAll(pageable).map { it as ReadBoard }
+    override fun getAllBoards(pageable: Pageable): Page<Board> = boardRepository.findAll(pageable).map { it as Board }
 
     @Transactional(readOnly = true)
-    override fun getAllBoardsWithComments(pageable: Pageable): Page<ReadBoard> = boardRepository.findAllWithDetails(pageable).map { it as ReadBoard }
+    override fun getAllBoardsWithComments(pageable: Pageable): Page<Board> = boardRepository.findAllWithDetails(pageable).map { it as Board }
 
     override fun updateBoard(
         id: Long,
         title: String,
         content: String,
-    ): ReadBoard {
-        val board = boardRepository.findById(id)
-        board.updateContent(title, content)
-        return boardRepository.save(board)
+    ): Board = boardRepository.findById(id).apply {
+        updateContent(title, content)
     }
 
     override fun deleteBoard(id: Long) {
         boardRepository.deleteById(id)
     }
 
-    override fun incrementViewCount(boardId: Long): ReadBoard {
-        val board = boardRepository.findById(boardId)
-        board.incrementViewCount()
-        return boardRepository.save(board)
-    }
+    override fun incrementViewCount(boardId: Long): Board = 
+        boardRepository.findById(boardId).apply {
+            incrementViewCount()
+        }
 
-    override fun incrementLikeCount(boardId: Long): ReadBoard {
-        val board = boardRepository.findById(boardId)
-        board.incrementLikeCount()
-        return boardRepository.save(board)
-    }
+    override fun incrementLikeCount(boardId: Long): Board = 
+        boardRepository.findById(boardId).apply {
+            incrementLikeCount()
+        }
 
     @Transactional(readOnly = true)
-    override fun getTopNBoardsByViews(limit: Int): List<ReadBoard> =
+    override fun getTopNBoardsByViews(limit: Int): List<Board> =
         boardRepository.findTopNByOrderByViewCountDesc(
             limit.coerceAtMost(BoardConstants.MAX_POPULAR_BOARDS_LIMIT),
         )
@@ -101,7 +97,7 @@ internal class BoardServiceImpl(
     override fun searchBoards(
         keyword: String,
         pageable: Pageable,
-    ): Page<ReadBoard> = boardRepository.search(keyword, pageable).map { it as ReadBoard }
+    ): Page<Board> = boardRepository.search(keyword, pageable).map { it as Board }
 
     @Transactional(readOnly = true)
     override fun countBoardsByAuthor(author: String): Long = boardRepository.countByAuthor(author)
@@ -111,4 +107,7 @@ internal class BoardServiceImpl(
         author: String,
         title: String,
     ): Boolean = boardRepository.existsByAuthorAndTitle(author, title)
+    
+    @Transactional(readOnly = true)
+    override fun getBoardsByIds(ids: List<Long>): List<Board> = boardRepository.findAllByIds(ids)
 }

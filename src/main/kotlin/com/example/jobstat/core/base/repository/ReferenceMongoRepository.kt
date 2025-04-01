@@ -13,7 +13,8 @@ import org.springframework.data.repository.NoRepositoryBean
 import java.time.Instant
 
 @NoRepositoryBean
-interface ReferenceMongoRepository<T : BaseReferenceDocument, ID : Any> : BaseMongoRepository<T, ID> {
+interface ReferenceMongoRepository<T : BaseReferenceDocument, ID : Any> :
+    com.example.jobstat.core.base.repository.BaseMongoRepository<T, ID> {
     fun findByReferenceId(referenceId: Long): T?
 
     fun findByReferenceIds(referenceIds: List<Long>): List<T>
@@ -39,7 +40,7 @@ interface ReferenceMongoRepository<T : BaseReferenceDocument, ID : Any> : BaseMo
 abstract class ReferenceMongoRepositoryImpl<T : BaseReferenceDocument, ID : Any>(
     private val entityInformation: MongoEntityInformation<T, ID>,
     private val mongoOperations: MongoOperations,
-) : BaseMongoRepositoryImpl<T, ID>(entityInformation, mongoOperations),
+) : com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl<T, ID>(entityInformation, mongoOperations),
     ReferenceMongoRepository<T, ID> {
     init {
         // Create compound index for reference lookups

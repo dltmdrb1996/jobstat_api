@@ -12,3 +12,13 @@ data class Address(
     @Column(length = 10)
     val zipCode: String,
 )
+
+@Embeddable
+data class Address(
+    @Column(length = 100)
+    val street: String,
+    @Column(length = 50)
+    val city: String,
+    @Column(length = 10)
+    val zipCode: String,
+)

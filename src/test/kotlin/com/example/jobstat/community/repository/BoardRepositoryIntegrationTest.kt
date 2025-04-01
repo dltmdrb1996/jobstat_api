@@ -5,7 +5,7 @@ import com.example.jobstat.community.board.entity.BoardCategory
 import com.example.jobstat.community.board.repository.BoardRepository
 import com.example.jobstat.community.board.repository.CategoryRepository
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.community.comment.repository.CommentRepository
+import com.example.jobstat.comment.repository.CommentRepository
 import com.example.jobstat.utils.base.JpaIntegrationTestSupport
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
@@ -30,14 +30,14 @@ class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
     @Autowired
     private lateinit var commentRepository: CommentRepository
 
-    private lateinit var testCategory: BoardCategory
+    private lateinit var testCategory: com.example.jobstat.community.board.entity.BoardCategory
     private lateinit var testBoard: Board
 
     @BeforeEach
     fun setUp() {
         cleanupTestData()
         // 회원 게시글인 경우 password = null → 반드시 userId를 전달 (예: 1L)
-        testCategory = BoardCategory.create("TEST_CATEGORY", "Test Category", "Test Description")
+        testCategory = com.example.jobstat.community.board.entity.BoardCategory.create("TEST_CATEGORY", "Test Category", "Test Description")
         testCategory = categoryRepository.save(testCategory)
 
         testBoard =
@@ -180,7 +180,7 @@ class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             // Given
             val anotherCategory =
                 categoryRepository.save(
-                    BoardCategory.create("ANOTHER_CATEGORY", "Another Category", "Another Description"),
+                    com.example.jobstat.community.board.entity.BoardCategory.create("ANOTHER_CATEGORY", "Another Category", "Another Description"),
                 )
             val board1 = saveAndGetAfterCommit(testBoard) { boardRepository.save(it) }
 
@@ -234,7 +234,7 @@ class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             // Given
             val anotherCategory =
                 categoryRepository.save(
-                    BoardCategory.create("ANOTHER_CATEGORY", "Another Category", "Another Description"),
+                    com.example.jobstat.community.board.entity.BoardCategory.create("ANOTHER_CATEGORY", "Another Category", "Another Description"),
                 )
 
             // 같은 작성자, 다른 카테고리
@@ -427,7 +427,7 @@ class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             val savedBoard = saveAndGetAfterCommit(testBoard) { boardRepository.save(it) }
 
             val comment =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Test Comment",
                     author = "commentUser",
                     password = null,
@@ -513,7 +513,7 @@ class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             val savedBoard = saveAndGetAfterCommit(testBoard) { boardRepository.save(it) }
 
             val comment1 =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Comment 1",
                     author = "user1",
                     password = null,
@@ -523,7 +523,7 @@ class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             saveAndGetAfterCommit(comment1) { commentRepository.save(it) }
 
             val comment2 =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Comment 2",
                     author = "user2",
                     password = null,
@@ -547,7 +547,7 @@ class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             val savedBoard = saveAndGetAfterCommit(testBoard) { boardRepository.save(it) }
 
             val comment =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Test Comment",
                     author = "commentUser",
                     password = null,

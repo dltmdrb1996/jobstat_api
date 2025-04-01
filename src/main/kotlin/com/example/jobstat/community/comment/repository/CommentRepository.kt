@@ -42,4 +42,6 @@ internal interface CommentRepository {
     ): Boolean
 
     fun deleteByBoardId(boardId: Long)
+
+    fun findAllByIds(ids: List<Long>): List<Comment>
 }

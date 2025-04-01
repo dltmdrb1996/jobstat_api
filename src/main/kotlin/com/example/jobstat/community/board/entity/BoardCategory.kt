@@ -3,14 +3,6 @@ package com.example.jobstat.community.board.entity
 import com.example.jobstat.core.base.BaseEntity
 import jakarta.persistence.*
 
-interface ReadBoardCategory {
-    val id: Long
-    val name: String
-    val displayName: String
-    val description: String
-    val boards: Set<ReadBoard>
-}
-
 @Entity
 @Table(
     name = "board_categories",
@@ -20,22 +12,21 @@ internal class BoardCategory protected constructor(
     name: String,
     displayName: String,
     description: String,
-) : BaseEntity(),
-    ReadBoardCategory {
+) : BaseEntity() {
     @Column(nullable = false, unique = true, length = 50)
-    override var name: String = name
+    var name: String = name
         protected set
 
     @Column(nullable = false, length = 50)
-    override var displayName: String = displayName
+    var displayName: String = displayName
         protected set
 
     @Column(nullable = false, length = 255)
-    override var description: String = description
+    var description: String = description
         protected set
 
     @OneToMany(mappedBy = "category", cascade = [CascadeType.ALL], orphanRemoval = true)
-    override var boards: MutableSet<Board> = mutableSetOf()
+    var boards: MutableSet<com.example.jobstat.community.board.entity.Board> = mutableSetOf()
         protected set
 
     fun updateName(name: String) {

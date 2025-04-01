@@ -1,12 +1,25 @@
 package com.example.jobstat.community.comment
 
+/**
+ * 댓글 관련 상수
+ */
 object CommentConstants {
-    // 페이징 관련
+    /**
+     * 기본 페이지 크기
+     */
     const val DEFAULT_PAGE_SIZE = 20
-    const val DEFAULT_RECENT_COMMENTS_LIMIT = 5
+    
+    /**
+     * 최근 댓글 조회 시 기본 개수
+     */
+    const val DEFAULT_RECENT_COMMENTS_SIZE = 5
+    
+    /**
+     * 최대 댓글 내용 길이
+     */
+    const val MAX_CONTENT_LENGTH = 500
 
     // 댓글 제한 관련
-    const val MAX_CONTENT_LENGTH = 1000
     const val MIN_CONTENT_LENGTH = 1
     const val MAX_AUTHOR_LENGTH = 50
 

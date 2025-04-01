@@ -4,7 +4,7 @@ import com.example.jobstat.auth.email.usecase.RequestEmailVerification
 import com.example.jobstat.auth.email.usecase.VerifyEmail
 import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.security.annotation.Public
-import com.example.jobstat.core.wrapper.ApiResponse
+import com.example.jobstat.core.global.wrapper.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity

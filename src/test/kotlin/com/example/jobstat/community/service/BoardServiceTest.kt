@@ -23,7 +23,7 @@ class BoardServiceTest {
     private lateinit var categoryRepository: FakeCategoryRepository
     private lateinit var commentRepository: FakeCommentRepository
     private lateinit var boardService: BoardService
-    private lateinit var testCategory: BoardCategory
+    private lateinit var testCategory: com.example.jobstat.community.board.entity.BoardCategory
 
     @BeforeEach
     fun setUp() {

@@ -1,18 +1,19 @@
 // BoardController.kt
 package com.example.jobstat.community.board
 
-import com.example.jobstat.community.board.usecase.CreateBoard
-import com.example.jobstat.community.board.usecase.GetBoardDetail
-import com.example.jobstat.community.board.usecase.GetBoardList
-import com.example.jobstat.community.board.usecase.GetBoardStats
-import com.example.jobstat.community.board.usecase.GetTopBoards
-import com.example.jobstat.community.board.usecase.LikeBoard
-import com.example.jobstat.community.board.usecase.UpdateBoard
-import com.example.jobstat.community.comment.usecase.DeleteBoard
+import com.example.jobstat.community.board.usecase.command.CreateBoard
+import com.example.jobstat.community.board.usecase.command.DeleteBoard
+import com.example.jobstat.community.board.usecase.fetch.GetBoardDetail
+import com.example.jobstat.community.board.usecase.fetch.GetBoardList
+import com.example.jobstat.community.board.usecase.fetch.GetBoardStats
+import com.example.jobstat.community.board.usecase.fetch.GetBoardsByIds
+import com.example.jobstat.community.board.usecase.fetch.GetTopBoards
+import com.example.jobstat.community.board.usecase.command.LikeBoard
+import com.example.jobstat.community.board.usecase.command.UpdateBoard
 import com.example.jobstat.core.constants.RestConstants
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
-import com.example.jobstat.core.wrapper.ApiResponse
+import com.example.jobstat.core.global.wrapper.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
@@ -30,6 +31,7 @@ internal class BoardController(
     private val updateBoard: UpdateBoard,
     private val deleteBoard: DeleteBoard,
     private val likeBoard: LikeBoard,
+    private val getBoardsByIds: GetBoardsByIds,
 ) {
     @PublicWithTokenCheck
     @PostMapping("/boards")
@@ -80,16 +82,29 @@ internal class BoardController(
     ): ResponseEntity<ApiResponse<UpdateBoard.Response>> = ApiResponse.ok(updateBoard(request.of(boardId)))
 
     @PublicWithTokenCheck
-    @DeleteMapping("/boards/{boardId}")
-    @Operation(summary = "게시글 삭제", description = "작성된 게시글을 삭제합니다.")
-    fun deleteBoard(
+    @DeleteMapping("/{boardId}")
+    @Operation(
+        summary = "게시글 삭제",
+        description = "게시글을 삭제합니다. 로그인 사용자는 자신의 글만, 비로그인 사용자는 비밀번호 검증 후 삭제 가능합니다."
+    )
+    fun deleteBoardById(
         @PathVariable boardId: Long,
-        @RequestBody request: DeleteBoard.Request,
-    ): ResponseEntity<ApiResponse<DeleteBoard.Response>> = ApiResponse.ok(deleteBoard(request.of(boardId)))
+        @RequestBody(required = false) request: DeleteBoard.Request?
+    ): ResponseEntity<ApiResponse<DeleteBoard.Response>> {
+        val executeRequest = request?.of(boardId) ?: DeleteBoard.ExecuteRequest(boardId, null)
+        return ApiResponse.ok(deleteBoard.invoke(executeRequest))
+    }
 
     @PostMapping("/boards/{boardId}/likes")
     @Operation(summary = "게시글 좋아요", description = "게시글에 좋아요를 표시합니다.")
     fun likeBoard(
         @PathVariable boardId: Long,
     ): ResponseEntity<ApiResponse<LikeBoard.Response>> = ApiResponse.ok(likeBoard(LikeBoard.Request(boardId)))
+    
+    @Public
+    @PostMapping("/boards/bulk")
+    @Operation(summary = "게시글 벌크 조회", description = "여러 게시글 ID로 게시글 목록을 한번에 조회합니다.")
+    fun fetchBoardsByIds(
+        @RequestBody request: GetBoardsByIds.Request,
+    ): ResponseEntity<ApiResponse<GetBoardsByIds.Response>> = ApiResponse.ok(getBoardsByIds(request))
 }

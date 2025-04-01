@@ -1,0 +1,159 @@
+ddns.domain: ${DDNS_DOMAIN}
+
+server:
+  tomcat:
+    threads:
+      max: 150
+    max-connections: 10000
+    accept-count: 300
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/plain
+    min-response-size: 2048
+  http2:
+    enabled: true
+  port: ${SERVER_PORT:8081}
+  forward-headers-strategy: NATIVE
+
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_ID}
+    password: ${GMAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  web:
+    resources:
+      add-mappings: false
+  application:
+    name: jobstat
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Seoul
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+  h2:
+    console:
+      enabled: false
+  cache:
+    type: caffeine
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: article-read-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+  jackson:
+    time-zone: Asia/Seoul
+    serialization:
+      write-dates-as-timestamps: false
+  datasource:
+    url: ${JDBC_URL:jdbc:mysql://localhost:3306/jobstat?serverTimezone=Asia/Seoul}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3000
+
+logging:
+  level:
+    root: WARN
+    com.example: WARN
+    org:
+      springframework:
+        security: WARN
+      hibernate:
+        SQL: ERROR
+        type:
+          descriptor:
+            sql:
+              BasicBinder: ERROR
+    org.springframework.boot.autoconfigure: WARN
+    org.springframework.data.mongodb.core.MongoTemplate: WARN
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: ["health", "info", "metrics"]
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+    metrics:
+      enabled: true
+    info:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+
+SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
+
+monitoring:
+  cpu:
+    threshold: 80.0
+    check-interval: 30000
+    debug-duration: 1800000 # 30분
+
+jwt:
+  secret: ${JWT_SECRET}
+  accessTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION:999999}
+  refreshTokenExpiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800}
+  tokenPrefix: "Bearer "
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:"http://localhost:3000,http://localhost:8080"}
+  security:
+    public-paths:
+      - "/api/auth/**"
+      - "/api/token/refresh"
+      - "/api/public/**"
+  cache:
+    ttl: ${CACHE_TTL:600}
+  mongodb:
+    page-size: ${MONGODB_PAGE_SIZE:20}
+
+admin:
+  username: ${ADMIN_USERNAME}
+  password: ${ADMIN_PASSWORD}
+
+counter:
+  like-reset-hour: 0
+  user-action-ttl-seconds: 86400
+  flush-interval-seconds: 300
+  flush-interval-milliseconds: 300000
+  view-count-cache-ttl-seconds: 60
+  view-count-sync-interval: 60000
+
+cache:
+  board:
+    detail:
+      ttl-seconds: 3600
+    list:
+      ttl-seconds: 300
+    popular:
+      ttl-seconds: 600
+    count:
+      ttl-seconds: 1800

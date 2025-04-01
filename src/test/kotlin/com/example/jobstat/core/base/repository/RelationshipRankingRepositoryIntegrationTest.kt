@@ -4,8 +4,8 @@ import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.state.EntityType
-import com.example.jobstat.statistics.rankings.document.IndustrySkillRankingsDocument
-import com.example.jobstat.statistics.rankings.repository.IndustrySkillRankingsRepositoryImpl
+import com.example.jobstat.statistics_read.rankings.document.IndustrySkillRankingsDocument
+import com.example.jobstat.statistics_read.rankings.repository.IndustrySkillRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

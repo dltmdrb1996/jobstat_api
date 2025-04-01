@@ -6,7 +6,7 @@ import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.security.PasswordUtil
 import com.example.jobstat.core.usecase.impl.ValidUseCase
-import com.example.jobstat.core.utils.SecurityUtils
+import com.example.jobstat.core.global.utils.SecurityUtils
 import jakarta.transaction.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
@@ -23,33 +23,50 @@ internal class UpdateComment(
 ) : ValidUseCase<UpdateComment.ExecuteRequest, UpdateComment.Response>(validator) {
     @Transactional
     override fun execute(request: ExecuteRequest): Response {
-        val comment = commentService.getCommentById(request.commentId)
-
-        if (comment.password != null) {
-            if (request.password == null) throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-            if (!passwordUtil.matches(request.password, comment.password!!)) {
-                throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-            }
-        } else {
-            val currentUserId =
-                securityUtils.getCurrentUserId()
-                    ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-            require(comment.userId == currentUserId) { CommentConstants.ErrorMessages.UNAUTHORIZED_UPDATE }
+        // 댓글 조회 및 권한 검증
+        commentService.getCommentById(request.commentId).also { comment ->
+            validatePermission(comment, request.password)
         }
 
-        val updated =
-            commentService.updateComment(
-                id = request.commentId,
-                content = request.content,
+        // 댓글 업데이트 및 응답 변환
+        return commentService.updateComment(
+            id = request.commentId,
+            content = request.content,
+        ).let { updated ->
+            Response(
+                id = updated.id,
+                content = updated.content,
+                author = updated.author,
+                createdAt = updated.createdAt.toString(),
+                updatedAt = updated.updatedAt.toString(),
             )
+        }
+    }
 
-        return Response(
-            id = updated.id,
-            content = updated.content,
-            author = updated.author,
-            createdAt = updated.createdAt.toString(),
-            updatedAt = updated.updatedAt.toString(),
-        )
+    private fun validatePermission(comment: com.example.jobstat.community.comment.entity.Comment, password: String?) {
+        comment.password?.let { storedPassword ->
+            // 비회원 댓글인 경우
+            validateGuestPermission(password, storedPassword)
+        } ?: run {
+            // 회원 댓글인 경우
+            validateMemberPermission(comment)
+        }
+    }
+
+    private fun validateGuestPermission(password: String?, storedPassword: String) {
+        password ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
+        if (!passwordUtil.matches(password, storedPassword)) {
+            throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
+        }
+    }
+
+    private fun validateMemberPermission(comment: com.example.jobstat.community.comment.entity.Comment) {
+        val currentUserId = securityUtils.getCurrentUserId()
+            ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
+            
+        require(comment.userId == currentUserId) { 
+            CommentConstants.ErrorMessages.UNAUTHORIZED_UPDATE 
+        }
     }
 
     data class Request(
@@ -59,29 +76,31 @@ internal class UpdateComment(
             max = CommentConstants.MAX_CONTENT_LENGTH,
         )
         val content: String,
+        
         @field:Size(
             min = CommentConstants.MIN_PASSWORD_LENGTH,
             max = CommentConstants.MAX_PASSWORD_LENGTH,
         )
         val password: String?,
     ) {
-        fun of(commentId: Long) =
-            ExecuteRequest(
-                commentId = commentId,
-                content = this.content,
-                password = this.password,
-            )
+        fun of(commentId: Long): ExecuteRequest = ExecuteRequest(
+            commentId = commentId,
+            content = this.content,
+            password = this.password,
+        )
     }
 
     data class ExecuteRequest(
         @field:Positive
         val commentId: Long,
+        
         @field:NotBlank
         @field:Size(
             min = CommentConstants.MIN_CONTENT_LENGTH,
             max = CommentConstants.MAX_CONTENT_LENGTH,
         )
         val content: String,
+        
         @field:Size(
             min = CommentConstants.MIN_PASSWORD_LENGTH,
             max = CommentConstants.MAX_PASSWORD_LENGTH,

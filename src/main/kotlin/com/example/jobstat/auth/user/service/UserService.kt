@@ -1,28 +1,28 @@
 package com.example.jobstat.auth.user.service
 
-import com.example.jobstat.auth.user.entity.ReadUser
+import com.example.jobstat.auth.user.entity.User
 import java.time.LocalDate
 
-interface UserService {
+internal interface UserService {
     fun createUser(
         username: String,
         email: String,
         password: String,
         birthDate: LocalDate,
-    ): ReadUser
+    ): User
 
     fun deleteUser(id: Long)
 
     // 유저 정보 조회
-    fun getUserById(id: Long): ReadUser
+    fun getUserById(id: Long): User
 
-    fun getUserByUsername(username: String): ReadUser
+    fun getUserByUsername(username: String): User
 
-    fun getUserByEmail(email: String): ReadUser
+    fun getUserByEmail(email: String): User
 
-    fun getAllUsers(): List<ReadUser>
+    fun getAllUsers(): List<User>
 
-    fun getUserWithRoles(id: Long): ReadUser
+    fun getUserWithRoles(id: Long): User
 
     fun getUserRoles(id: Long): List<String>
 
@@ -48,5 +48,5 @@ interface UserService {
         newEmail: String,
     )
 
-    fun updateUser(command: Map<String, Any>): ReadUser
+    fun updateUser(command: Map<String, Any>): User
 }

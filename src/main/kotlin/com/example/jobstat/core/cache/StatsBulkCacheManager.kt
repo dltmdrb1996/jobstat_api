@@ -4,7 +4,7 @@ import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.cache.CacheConfig.Companion.EXPIRE_AFTER_ACCESS
 import com.example.jobstat.core.cache.CacheConfig.Companion.STATS_CACHE_SIZE
 import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.statistics.stats.registry.StatsType
+import com.example.jobstat.statistics_read.stats.registry.StatsType
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import org.slf4j.LoggerFactory

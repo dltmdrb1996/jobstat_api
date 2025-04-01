@@ -4,12 +4,6 @@ import com.example.jobstat.auth.user.UserConstants
 import com.example.jobstat.core.base.BaseEntity
 import jakarta.persistence.*
 
-interface ReadRole {
-    val id: Long
-    val name: String
-    val users: Set<ReadUser>
-}
-
 @Entity
 @Table(
     name = "roles",
@@ -19,10 +13,9 @@ interface ReadRole {
 )
 internal class Role private constructor(
     name: String,
-) : BaseEntity(),
-    ReadRole {
+) : BaseEntity() {
     @Column(nullable = false, unique = true, length = UserConstants.MAX_ROLE_NAME_LENGTH)
-    override var name: String = name
+    var name: String = name
         protected set
 
     @OneToMany(
@@ -33,7 +26,7 @@ internal class Role private constructor(
     )
     private val _userRoles: MutableSet<UserRole> = mutableSetOf()
 
-    override val users: Set<User>
+    val users: Set<User>
         get() = _userRoles.mapNotNull { it.user }.toSet()
 
     fun getUserRole(user: User): UserRole? = _userRoles.find { it.user.id == user.id }

@@ -1,7 +1,7 @@
 package com.example.jobstat.core.config
 
-import com.example.jobstat.core.utils.serializer.DataSerializer
-import com.example.jobstat.core.utils.serializer.ObjectMapperDataSerializer
+import com.example.jobstat.core.global.utils.serializer.DataSerializer
+import com.example.jobstat.core.global.utils.serializer.ObjectMapperDataSerializer
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper

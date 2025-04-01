@@ -2,14 +2,14 @@ package com.example.jobstat.community.usecase
 
 import com.example.jobstat.community.board.entity.BoardCategory
 import com.example.jobstat.community.board.service.BoardServiceImpl
-import com.example.jobstat.community.comment.usecase.DeleteBoard
+import com.example.jobstat.comment.usecase.DeleteBoard
 import com.example.jobstat.community.fake.CategoryFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCategoryRepository
 import com.example.jobstat.community.fake.repository.FakeCommentRepository
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.utils.SecurityUtils
+import com.example.jobstat.core.global.utils.SecurityUtils
 import com.example.jobstat.utils.FakePasswordUtil
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Validation
@@ -29,7 +29,7 @@ class DeleteBoardTest {
     private lateinit var commentRepository: FakeCommentRepository
     private lateinit var boardService: BoardServiceImpl
     private lateinit var deleteBoard: DeleteBoard
-    private lateinit var testCategory: BoardCategory
+    private lateinit var testCategory: com.example.jobstat.community.board.entity.BoardCategory
     private lateinit var passwordUtil: FakePasswordUtil
     private lateinit var securityUtils: SecurityUtils
 

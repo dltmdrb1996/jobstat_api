@@ -1,8 +1,8 @@
 package com.example.jobstat.community.service
 
 import com.example.jobstat.community.board.entity.Board
-import com.example.jobstat.community.comment.service.CommentService
-import com.example.jobstat.community.comment.service.CommentServiceImpl
+import com.example.jobstat.comment.service.CommentService
+import com.example.jobstat.comment.service.CommentServiceImpl
 import com.example.jobstat.community.fake.BoardFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCommentRepository

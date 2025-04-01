@@ -19,13 +19,27 @@ internal class RefreshToken(
     validator: Validator,
 ) : ValidUseCase<RefreshToken.Request, RefreshToken.Response>(validator) {
     @Transactional
-    override fun execute(request: Request): Response {
-        val id = tokenService.getUserIdFromToken(request.refreshToken)
-        val user = userService.getUserWithRoles(id)
-        val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, user.getRolesString()))
-        val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, user.getRolesString()))
-        tokenService.saveToken(refreshToken, id, jwtTokenGenerator.getRefreshTokenExpiration())
-        return Response(accessToken, refreshToken)
+    override fun execute(request: Request): Response = with(request) {
+        // 리프레시 토큰으로부터 사용자 ID 조회
+        tokenService.getUserIdFromToken(refreshToken).let { userId ->
+            // 사용자 정보 및 역할 조회
+            userService.getUserWithRoles(userId).let { user ->
+                // 토큰 페이로드 생성
+                val roles = user.getRolesString()
+                val refreshPayload = RefreshPayload(user.id, roles)
+                val accessPayload = AccessPayload(user.id, roles)
+                
+                // 새 토큰 생성
+                val newRefreshToken = jwtTokenGenerator.createRefreshToken(refreshPayload)
+                val newAccessToken = jwtTokenGenerator.createAccessToken(accessPayload)
+                
+                // 리프레시 토큰 저장
+                tokenService.saveToken(newRefreshToken, userId, jwtTokenGenerator.getRefreshTokenExpiration())
+                
+                // 응답 반환
+                Response(newAccessToken, newRefreshToken)
+            }
+        }
     }
 
     data class Request(

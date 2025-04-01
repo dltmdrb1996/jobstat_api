@@ -12,12 +12,13 @@ internal class UpdateUserStatus(
     validator: Validator,
 ) : ValidUseCase<UpdateUserStatus.Request, Unit>(validator) {
     @Transactional
-    override fun execute(request: Request) {
+    override fun execute(request: Request): Unit = with(request) {
+        // 사용자 상태 업데이트
         userService.updateUser(
             mapOf(
-                "id" to request.userId,
-                "isActive" to request.active,
-            ),
+                "id" to userId,
+                "isActive" to active,
+            )
         )
     }
 

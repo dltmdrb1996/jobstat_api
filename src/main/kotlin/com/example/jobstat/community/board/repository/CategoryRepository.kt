@@ -2,6 +2,7 @@ package com.example.jobstat.community.board.repository
 
 import com.example.jobstat.community.board.entity.BoardCategory
 
+
 internal interface CategoryRepository {
     fun save(category: BoardCategory): BoardCategory
 

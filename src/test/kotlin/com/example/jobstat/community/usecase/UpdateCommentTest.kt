@@ -1,15 +1,15 @@
 package com.example.jobstat.community.usecase
 
-import com.example.jobstat.community.comment.service.CommentService
-import com.example.jobstat.community.comment.service.CommentServiceImpl
-import com.example.jobstat.community.comment.usecase.UpdateComment
+import com.example.jobstat.comment.service.CommentService
+import com.example.jobstat.comment.service.CommentServiceImpl
+import com.example.jobstat.comment.usecase.UpdateComment
 import com.example.jobstat.community.fake.BoardFixture
 import com.example.jobstat.community.fake.CommentFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCategoryRepository
 import com.example.jobstat.community.fake.repository.FakeCommentRepository
 import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.utils.SecurityUtils
+import com.example.jobstat.core.global.utils.SecurityUtils
 import com.example.jobstat.utils.FakePasswordUtil
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Validation

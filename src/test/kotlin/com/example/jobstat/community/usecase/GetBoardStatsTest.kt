@@ -2,9 +2,9 @@ package com.example.jobstat.community.usecase
 
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.board.service.BoardServiceImpl
-import com.example.jobstat.community.board.usecase.GetBoardStats
-import com.example.jobstat.community.comment.service.CommentService
-import com.example.jobstat.community.comment.service.CommentServiceImpl
+import com.example.jobstat.community.board.usecase.fetch.GetBoardStats
+import com.example.jobstat.comment.service.CommentService
+import com.example.jobstat.comment.service.CommentServiceImpl
 import com.example.jobstat.community.fake.BoardFixture
 import com.example.jobstat.community.fake.CategoryFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository

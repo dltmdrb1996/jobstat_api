@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.user.repository
 
 import com.example.jobstat.auth.user.entity.Role
-import com.example.jobstat.core.extension.orThrowNotFound
+import com.example.jobstat.core.global.extension.orThrowNotFound
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -38,25 +38,21 @@ internal class RoleRepositoryImpl(
 ) : RoleRepository {
     override fun save(role: Role): Role = roleJpaRepository.save(role)
 
-    override fun findById(id: Long): Role = roleJpaRepository.findByIdWithUsers(id).orThrowNotFound("역할", id)
+    override fun findById(id: Long): Role = 
+        roleJpaRepository.findByIdWithUsers(id).orThrowNotFound("역할", id)
 
-    override fun findByName(name: String): Role = roleJpaRepository.findByName(name).orThrowNotFound("역할", name)
+    override fun findByName(name: String): Role = 
+        roleJpaRepository.findByName(name).orThrowNotFound("역할", name)
 
     override fun findAll(): List<Role> = roleJpaRepository.findAll()
 
-    override fun deleteById(id: Long) {
-        roleJpaRepository.deleteById(id)
-    }
+    override fun deleteById(id: Long) = roleJpaRepository.deleteById(id)
 
-    override fun delete(role: Role) {
-        roleJpaRepository.delete(role)
-    }
+    override fun delete(role: Role) = roleJpaRepository.delete(role)
 
     override fun existsById(id: Long): Boolean = roleJpaRepository.existsById(id)
 
     override fun existsByName(name: String): Boolean = roleJpaRepository.existsByName(name)
 
-    override fun deleteAll() {
-        roleJpaRepository.deleteAll()
-    }
+    override fun deleteAll() = roleJpaRepository.deleteAll()
 }

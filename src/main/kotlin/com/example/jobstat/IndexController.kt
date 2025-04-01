@@ -5,7 +5,7 @@ import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.security.annotation.AdminAuth
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
-import com.example.jobstat.core.utils.SecurityUtils
+import com.example.jobstat.core.global.utils.SecurityUtils
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile

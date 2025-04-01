@@ -1,6 +1,6 @@
 package com.example.jobstat
 
-import com.example.jobstat.core.snowflake.Snowflake
+import com.example.jobstat.core.global.utils.Snowflake
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

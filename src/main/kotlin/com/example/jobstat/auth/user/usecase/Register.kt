@@ -20,20 +20,24 @@ internal class Register(
     validator: Validator,
 ) : ValidUseCase<Register.Request, Register.Response>(validator) {
     @Transactional
-    override fun execute(request: Request): Response {
-        val user =
-            userService.createUser(
-                username = request.username,
-                email = request.email,
-                password = passwordUtil.encode(request.password),
-                birthDate = request.birthDate,
-            )
-
-        val roles = user.getRolesString()
-        val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, roles))
-        val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, roles))
-        tokenService.saveToken(refreshToken, user.id, jwtTokenGenerator.getRefreshTokenExpiration())
-        return Response(accessToken, refreshToken)
+    override fun execute(request: Request): Response = with(request) {
+        // 사용자 생성
+        val encodedPassword = passwordUtil.encode(password)
+        userService.createUser(
+            username = username,
+            email = email,
+            password = encodedPassword,
+            birthDate = birthDate
+        ).let { user ->
+            // 역할 정보 추출 및 토큰 생성
+            val roles = user.getRolesString()
+            val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, roles))
+            val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, roles))
+            
+            // 토큰 저장 및 응답 생성
+            tokenService.saveToken(refreshToken, user.id, jwtTokenGenerator.getRefreshTokenExpiration())
+            Response(accessToken, refreshToken)
+        }
     }
 
     data class Request(

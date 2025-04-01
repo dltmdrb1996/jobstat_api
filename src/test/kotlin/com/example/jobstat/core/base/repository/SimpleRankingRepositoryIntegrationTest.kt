@@ -2,8 +2,8 @@ package com.example.jobstat.core.base.repository
 
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
-import com.example.jobstat.statistics.rankings.document.SkillGrowthRankingsDocument
-import com.example.jobstat.statistics.rankings.repository.SkillGrowthRankingsRepositoryImpl
+import com.example.jobstat.statistics_read.rankings.document.SkillGrowthRankingsDocument
+import com.example.jobstat.statistics_read.rankings.repository.SkillGrowthRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals

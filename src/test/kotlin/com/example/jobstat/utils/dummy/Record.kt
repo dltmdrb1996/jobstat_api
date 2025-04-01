@@ -11,13 +11,13 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface RecordRepository : BaseMongoRepository<Record, String>
+interface RecordRepository : com.example.jobstat.core.base.repository.BaseMongoRepository<Record, String>
 
 @Repository
 class RecordRepositoryImpl(
     private val entityInformation: MongoEntityInformation<Record, String>,
     private val mongoOperations: MongoOperations,
-) : BaseMongoRepositoryImpl<Record, String>(
+) : com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl<Record, String>(
         entityInformation,
         mongoOperations,
     ),

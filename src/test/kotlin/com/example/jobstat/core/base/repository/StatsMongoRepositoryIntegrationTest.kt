@@ -3,9 +3,9 @@ package com.example.jobstat.core.base.repository
 import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.stats.*
 import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
-import com.example.jobstat.statistics.stats.document.SkillStatsDocument
-import com.example.jobstat.statistics.stats.repository.SkillStatsRepository
+import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.example.jobstat.statistics_read.stats.document.SkillStatsDocument
+import com.example.jobstat.statistics_read.stats.repository.SkillStatsRepository
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired

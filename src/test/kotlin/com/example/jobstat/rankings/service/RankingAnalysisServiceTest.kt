@@ -8,10 +8,10 @@ import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.base.repository.BaseRankingRepository
 import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
-import com.example.jobstat.statistics.rankings.repository.RankingRepositoryRegistry
-import com.example.jobstat.statistics.rankings.service.RankingAnalysisServiceImpl
-import com.example.jobstat.statistics.stats.service.StatsAnalysisService
+import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.example.jobstat.statistics_read.rankings.repository.RankingRepositoryRegistry
+import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisServiceImpl
+import com.example.jobstat.statistics_read.stats.service.StatsAnalysisService
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

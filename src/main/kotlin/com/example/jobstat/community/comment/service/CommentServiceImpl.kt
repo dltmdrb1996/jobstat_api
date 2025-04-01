@@ -1,9 +1,7 @@
 package com.example.jobstat.community.comment.service
 
 import com.example.jobstat.community.board.repository.BoardRepository
-import com.example.jobstat.community.comment.CommentConstants
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.community.comment.entity.ReadComment
 import com.example.jobstat.community.comment.repository.CommentRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -11,77 +9,74 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional
+@Transactional(readOnly = true)
 internal class CommentServiceImpl(
     private val commentRepository: CommentRepository,
     private val boardRepository: BoardRepository,
 ) : CommentService {
+
+    @Transactional
     override fun createComment(
         boardId: Long,
         content: String,
         author: String,
         password: String?,
         userId: Long?,
-    ): ReadComment {
-        val board = boardRepository.findById(boardId)
-        val comment = Comment.create(content, author, password, board, userId)
-        board.addComment(comment)
-        return commentRepository.save(comment)
+    ): Comment {
+        // 게시글 조회 및 댓글 생성
+        return boardRepository.findById(boardId).let { board ->
+            Comment.create(
+                content = content,
+                author = author,
+                password = password,
+                board = board,
+                userId = userId,
+            ).let(commentRepository::save)
+        }
     }
 
-    @Transactional(readOnly = true)
-    override fun getCommentById(id: Long): ReadComment = commentRepository.findById(id)
-
-    @Transactional(readOnly = true)
+    override fun getCommentById(id: Long): Comment = commentRepository.findById(id)
+      
     override fun getCommentsByBoardId(
         boardId: Long,
         pageable: Pageable,
-    ): Page<ReadComment> = commentRepository.findByBoardId(boardId, pageable).map { it as ReadComment }
+    ): Page<Comment> = commentRepository.findByBoardId(boardId, pageable)
 
-    @Transactional(readOnly = true)
     override fun getCommentsByAuthor(
         author: String,
         pageable: Pageable,
-    ): Page<ReadComment> = commentRepository.findByAuthor(author, pageable).map { it as ReadComment }
+    ): Page<Comment> = commentRepository.findByAuthor(author, pageable)
 
-    @Transactional(readOnly = true)
     override fun getCommentsByBoardIdAndAuthor(
         boardId: Long,
         author: String,
         pageable: Pageable,
-    ): Page<ReadComment> = commentRepository.findByBoardIdAndAuthor(boardId, author, pageable).map { it as ReadComment }
+    ): Page<Comment> = commentRepository.findByBoardIdAndAuthor(boardId, author, pageable)
 
-    @Transactional(readOnly = true)
-    override fun getRecentCommentsByBoardId(
-        boardId: Long,
-        limit: Int,
-    ): List<ReadComment> =
-        commentRepository.findRecentComments(
-            boardId,
-            Pageable.ofSize(limit.coerceAtMost(CommentConstants.DEFAULT_RECENT_COMMENTS_LIMIT)),
-        )
-
+    @Transactional
     override fun updateComment(
         id: Long,
         content: String,
-    ): ReadComment {
-        val comment = commentRepository.findById(id)
-        comment.updateContent(content)
-        return commentRepository.save(comment)
+    ): Comment = getCommentById(id).apply {
+        updateContent(content)
     }
 
+    @Transactional
     override fun deleteComment(id: Long) {
-        val comment = commentRepository.findById(id)
-        comment.board.removeComment(comment)
-        commentRepository.deleteById(id)
+        getCommentById(id).also { comment ->
+            commentRepository.deleteById(comment.id)
+            comment.board.removeComment(comment)
+        }
     }
+    
+    override fun countCommentsByBoardId(boardId: Long): Long =
+        commentRepository.countByBoardId(boardId)
 
-    @Transactional(readOnly = true)
-    override fun countCommentsByBoardId(boardId: Long): Long = commentRepository.countByBoardId(boardId)
-
-    @Transactional(readOnly = true)
     override fun hasCommentedOnBoard(
         boardId: Long,
         author: String,
     ): Boolean = commentRepository.existsByBoardIdAndAuthor(boardId, author)
+    
+    override fun getCommentsByIds(ids: List<Long>): List<Comment> = 
+        commentRepository.findAllByIds(ids)
 }

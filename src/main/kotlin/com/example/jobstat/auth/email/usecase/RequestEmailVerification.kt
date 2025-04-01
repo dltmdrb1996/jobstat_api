@@ -20,14 +20,26 @@ internal class RequestEmailVerification(
     validator: Validator,
 ) : ValidUseCase<RequestEmailVerification.Request, Unit>(validator) {
     @Transactional
-    override fun execute(request: Request) {
-        // 1. 이메일 중복 체크
-        if (!userService.validateEmail(request.email)) {
+    override fun execute(request: Request): Unit = with(request) {
+        // 이메일 중복 확인
+        validateEmailAvailability(email)
+        
+        // 이전 인증 코드 확인
+        checkPreviousVerification(email)
+        
+        // 새 인증 코드 생성 및 발송
+        emailVerificationService.create(email)
+            .also { verification -> emailService.sendVerificationEmail(email, verification.code) }
+    }
+    
+    private fun validateEmailAvailability(email: String) {
+        if (!userService.validateEmail(email)) {
             throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 이메일입니다.")
         }
-
-        // 2. 이전 인증 코드 체크
-        emailVerificationService.findLatestByEmail(request.email)?.let { verification ->
+    }
+    
+    private fun checkPreviousVerification(email: String) {
+        emailVerificationService.findLatestByEmail(email)?.let { verification ->
             if (verification.isValid()) {
                 throw AppException.fromErrorCode(
                     ErrorCode.VERIFICATION_CODE_ALREADY_SENT,
@@ -35,12 +47,6 @@ internal class RequestEmailVerification(
                 )
             }
         }
-
-        // 3. 새 인증 코드 생성
-        val verification = emailVerificationService.create(request.email)
-
-        // 4. 이메일 발송
-        emailService.sendVerificationEmail(request.email, verification.code)
     }
 
     data class Request(

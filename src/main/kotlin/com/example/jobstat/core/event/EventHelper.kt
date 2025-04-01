@@ -1,8 +1,8 @@
 package com.example.jobstat.core.event
 
-import com.example.jobstat.core.utils.serializer.DataSerializer
-import com.example.jobstat.core.utils.serializer.ObjectMapperDataSerializer
-import com.example.jobstat.core.utils.serializer.deserializeAs
+import com.example.jobstat.core.global.utils.serializer.DataSerializer
+import com.example.jobstat.core.global.utils.serializer.ObjectMapperDataSerializer
+import com.example.jobstat.core.global.utils.serializer.deserializeAs
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.stereotype.Component
 import java.util.concurrent.ConcurrentHashMap

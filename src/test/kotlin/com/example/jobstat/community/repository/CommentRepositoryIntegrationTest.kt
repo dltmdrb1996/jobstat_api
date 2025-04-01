@@ -5,7 +5,7 @@ import com.example.jobstat.community.board.entity.BoardCategory
 import com.example.jobstat.community.board.repository.BoardRepository
 import com.example.jobstat.community.board.repository.CategoryRepository
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.community.comment.repository.CommentRepository
+import com.example.jobstat.comment.repository.CommentRepository
 import com.example.jobstat.utils.base.JpaIntegrationTestSupport
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.BeforeEach
@@ -30,9 +30,9 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
     @Autowired
     private lateinit var categoryRepository: CategoryRepository
 
-    private lateinit var testCategory: BoardCategory
+    private lateinit var testCategory: com.example.jobstat.community.board.entity.BoardCategory
     private lateinit var testBoard: Board
-    private lateinit var testComment: Comment
+    private lateinit var testComment: com.example.jobstat.community.comment.entity.Comment
 
     @BeforeEach
     fun setUp() {
@@ -40,7 +40,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
 
         testCategory =
             categoryRepository.save(
-                BoardCategory.create("TEST_CATEGORY", "Test Category", "Test Description"),
+                com.example.jobstat.community.board.entity.BoardCategory.create("TEST_CATEGORY", "Test Category", "Test Description"),
             )
 
         testBoard =
@@ -57,7 +57,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
 
         // 회원 댓글인 경우 password가 null이므로 userId를 전달 (예: 1L)
         testComment =
-            Comment.create(
+            com.example.jobstat.community.comment.entity.Comment.create(
                 content = "Test Comment",
                 author = "commentUser",
                 password = null,
@@ -103,7 +103,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             // Given
             val maxLengthContent = "a".repeat(1000)
             val comment =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = maxLengthContent,
                     author = "commentUser",
                     password = null,
@@ -126,7 +126,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
 
             // When & Then
             assertFailsWith<IllegalArgumentException> {
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = tooLongContent,
                     author = "commentUser",
                     password = null,
@@ -140,7 +140,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
         @DisplayName("빈 내용으로 댓글을 생성할 수 없다")
         fun createEmptyContentFail() {
             assertFailsWith<IllegalArgumentException> {
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "",
                     author = "commentUser",
                     password = null,
@@ -149,7 +149,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
                 )
             }
             assertFailsWith<IllegalArgumentException> {
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "   ",
                     author = "commentUser",
                     password = null,
@@ -217,7 +217,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             val comment1 = saveAndGetAfterCommit(testComment) { commentRepository.save(it) }
 
             val comment2 =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Recent Comment",
                     author = "commentUser",
                     password = null,
@@ -242,7 +242,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             val savedComment = saveAndGetAfterCommit(testComment) { commentRepository.save(it) }
 
             val comment2 =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Another Comment",
                     author = "anotherUser",
                     password = null,
@@ -278,7 +278,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             val savedBoard2 = saveAndGetAfterCommit(anotherBoard) { boardRepository.save(it) }
 
             val comment2 =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Another Comment",
                     author = "commentUser",
                     password = null,
@@ -342,7 +342,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             saveAndGetAfterCommit(testComment) { commentRepository.save(it) }
 
             val comment2 =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Another Comment",
                     author = "commentUser",
                     password = null,
@@ -370,7 +370,7 @@ class CommentRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             saveAndGetAfterCommit(testComment) { commentRepository.save(it) }
 
             val comment2 =
-                Comment.create(
+                com.example.jobstat.community.comment.entity.Comment.create(
                     content = "Comment 2",
                     author = "commentUser",
                     password = null,

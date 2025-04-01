@@ -1,6 +1,6 @@
 package com.example.jobstat.core.config
 
-import com.example.jobstat.core.converter.CustomModelConverter
+import com.example.jobstat.core.base.mongo.converter.CustomModelConverter
 import io.swagger.v3.core.converter.ModelConverters
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI

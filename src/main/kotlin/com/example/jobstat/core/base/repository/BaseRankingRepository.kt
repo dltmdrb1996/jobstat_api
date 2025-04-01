@@ -3,7 +3,7 @@ package com.example.jobstat.core.base.repository
 import com.example.jobstat.core.base.mongo.ranking.BaseRankingDocument
 import com.example.jobstat.core.base.mongo.ranking.RankingEntry
 import com.example.jobstat.core.base.repository.BaseRankingRepository.Companion.DEFAULT_PAGE_SIZE
-import com.example.jobstat.core.extension.orThrowNotFound
+import com.example.jobstat.core.global.extension.orThrowNotFound
 import com.mongodb.client.model.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

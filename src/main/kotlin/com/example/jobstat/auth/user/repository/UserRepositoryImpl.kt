@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.user.repository
 
 import com.example.jobstat.auth.user.entity.User
-import com.example.jobstat.core.extension.orThrowNotFound
+import com.example.jobstat.core.global.extension.orThrowNotFound
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -34,13 +34,9 @@ internal class UserRepositoryImpl(
 
     override fun findAll(): List<User> = userJpaRepository.findAll()
 
-    override fun deleteById(id: Long) {
-        userJpaRepository.deleteById(id)
-    }
+    override fun deleteById(id: Long) = userJpaRepository.deleteById(id)
 
-    override fun delete(user: User) {
-        userJpaRepository.delete(user)
-    }
+    override fun delete(user: User) = userJpaRepository.delete(user)
 
     override fun existsById(id: Long): Boolean = userJpaRepository.existsById(id)
 
@@ -50,7 +46,5 @@ internal class UserRepositoryImpl(
 
     override fun findByIdWithRoles(id: Long): User = userJpaRepository.findByIdWithRoles(id).orThrowNotFound("아이디", id)
 
-    override fun deleteAll() {
-        userJpaRepository.deleteAll()
-    }
+    override fun deleteAll() = userJpaRepository.deleteAll()
 }

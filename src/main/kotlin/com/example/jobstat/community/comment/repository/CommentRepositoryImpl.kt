@@ -1,7 +1,7 @@
 package com.example.jobstat.community.comment.repository
 
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.core.extension.orThrowNotFound
+import com.example.jobstat.core.global.extension.orThrowNotFound
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -51,6 +51,9 @@ internal interface CommentJpaRepository : JpaRepository<Comment, Long> {
     fun deleteByBoardId(
         @Param("boardId") boardId: Long,
     )
+
+    @Query("SELECT c FROM Comment c WHERE c.id IN :ids")
+    fun findAllByIdIn(@Param("ids") ids: List<Long>): List<Comment>
 }
 
 @Repository
@@ -94,4 +97,6 @@ internal class CommentRepositoryImpl(
     ): Boolean = commentJpaRepository.existsByBoardIdAndAuthor(boardId, author)
 
     override fun deleteByBoardId(boardId: Long) = commentJpaRepository.deleteByBoardId(boardId)
+
+    override fun findAllByIds(ids: List<Long>): List<Comment> = commentJpaRepository.findAllByIdIn(ids)
 }

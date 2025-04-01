@@ -1,14 +1,13 @@
 package com.example.jobstat.community.usecase
 
-import com.example.jobstat.community.board.entity.BoardCategory
 import com.example.jobstat.community.board.service.BoardServiceImpl
-import com.example.jobstat.community.board.usecase.CreateBoard
+import com.example.jobstat.community.board.usecase.command.CreateBoard
 import com.example.jobstat.community.fake.CategoryFixture
 import com.example.jobstat.community.fake.repository.FakeBoardRepository
 import com.example.jobstat.community.fake.repository.FakeCategoryRepository
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.utils.SecurityUtils
+import com.example.jobstat.core.global.utils.SecurityUtils
 import com.example.jobstat.utils.FakePasswordUtil
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation
@@ -27,7 +26,7 @@ class CreateBoardTest {
     private lateinit var categoryRepository: FakeCategoryRepository
     private lateinit var boardService: BoardServiceImpl
     private lateinit var createBoard: CreateBoard
-    private lateinit var testCategory: BoardCategory
+    private lateinit var testCategory: com.example.jobstat.community.board.entity.BoardCategory
     private lateinit var securityUtils: SecurityUtils
     private lateinit var passwordUtil: FakePasswordUtil
 

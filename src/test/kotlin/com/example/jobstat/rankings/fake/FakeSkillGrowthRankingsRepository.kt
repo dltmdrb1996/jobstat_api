@@ -1,8 +1,8 @@
 package com.example.jobstat.rankings.fake
 
-import com.example.jobstat.statistics.fake.AbstractFakeSimpleRankingRepository
-import com.example.jobstat.statistics.rankings.document.SkillGrowthRankingsDocument
-import com.example.jobstat.statistics.rankings.repository.SkillGrowthRankingsRepository
+import com.example.jobstat.statistics_read.fake.AbstractFakeSimpleRankingRepository
+import com.example.jobstat.statistics_read.rankings.document.SkillGrowthRankingsDocument
+import com.example.jobstat.statistics_read.rankings.repository.SkillGrowthRankingsRepository
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

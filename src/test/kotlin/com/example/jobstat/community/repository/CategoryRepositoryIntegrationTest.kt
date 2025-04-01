@@ -23,12 +23,12 @@ class CategoryRepositoryIntegrationTest : JpaIntegrationTestSupport() {
     @Autowired
     private lateinit var boardRepository: BoardRepository
 
-    private lateinit var testCategory: BoardCategory
+    private lateinit var testCategory: com.example.jobstat.community.board.entity.BoardCategory
 
     @BeforeEach
     fun setUp() {
         cleanupTestData()
-        testCategory = BoardCategory.create("TEST_CATEGORY", "Test Category", "Test Description")
+        testCategory = com.example.jobstat.community.board.entity.BoardCategory.create("TEST_CATEGORY", "Test Category", "Test Description")
     }
 
     override fun cleanupTestData() {
@@ -65,7 +65,7 @@ class CategoryRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             flushAndClear()
 
             // When & Then
-            val duplicateCategory = BoardCategory.create(testCategory.name, testCategory.displayName, testCategory.description)
+            val duplicateCategory = com.example.jobstat.community.board.entity.BoardCategory.create(testCategory.name, testCategory.displayName, testCategory.description)
             assertFailsWith<DataIntegrityViolationException> {
                 categoryRepository.save(duplicateCategory)
                 flushAndClear()
@@ -76,10 +76,10 @@ class CategoryRepositoryIntegrationTest : JpaIntegrationTestSupport() {
         @DisplayName("빈 이름으로 카테고리를 생성할 수 없다")
         fun createEmptyNameFail() {
             assertFailsWith<IllegalArgumentException> {
-                BoardCategory.create("", "Empty", "Description")
+                com.example.jobstat.community.board.entity.BoardCategory.create("", "Empty", "Description")
             }
             assertFailsWith<IllegalArgumentException> {
-                BoardCategory.create("   ", "Empty", "Description")
+                com.example.jobstat.community.board.entity.BoardCategory.create("   ", "Empty", "Description")
             }
         }
     }
@@ -136,7 +136,7 @@ class CategoryRepositoryIntegrationTest : JpaIntegrationTestSupport() {
         fun findAllSuccess() {
             // Given
             val category1 = saveAndGetAfterCommit(testCategory) { categoryRepository.save(it) }
-            val category2 = saveAndGetAfterCommit(BoardCategory.create("CATEGORY_2", "Category 2", "Description 2")) { categoryRepository.save(it) }
+            val category2 = saveAndGetAfterCommit(com.example.jobstat.community.board.entity.BoardCategory.create("CATEGORY_2", "Category 2", "Description 2")) { categoryRepository.save(it) }
 
             // When
             val categories = categoryRepository.findAll()
@@ -174,7 +174,7 @@ class CategoryRepositoryIntegrationTest : JpaIntegrationTestSupport() {
             saveAndGetAfterCommit(board2) { boardRepository.save(it) }
 
             // 두 번째 카테고리에 게시글 1개 추가
-            val category2 = saveAndGetAfterCommit(BoardCategory.create("CATEGORY_2", "Category 2", "Description 2")) { categoryRepository.save(it) }
+            val category2 = saveAndGetAfterCommit(com.example.jobstat.community.board.entity.BoardCategory.create("CATEGORY_2", "Category 2", "Description 2")) { categoryRepository.save(it) }
             val board3 =
                 Board.create(
                     title = "Title 3",

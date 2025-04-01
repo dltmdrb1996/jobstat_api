@@ -64,6 +64,8 @@ spring:
         acquire_increment: 1
         acquire_retry_attempts: 3
         acquire_retry_delay: 5000
+        jdbc:
+          time_zone: Asia/Seoul # Hibernate에서 시간대 설정
 
 
 batch:

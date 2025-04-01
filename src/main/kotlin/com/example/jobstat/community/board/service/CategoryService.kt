@@ -1,24 +1,25 @@
 package com.example.jobstat.community.board.service
 
-import com.example.jobstat.community.board.entity.ReadBoardCategory
+import com.example.jobstat.community.board.entity.BoardCategory
 
-interface CategoryService {
+
+internal interface CategoryService {
     fun createCategory(
         name: String,
         displayName: String,
         description: String,
-    ): ReadBoardCategory
+    ): BoardCategory
 
-    fun getCategoryById(id: Long): ReadBoardCategory
+    fun getCategoryById(id: Long): BoardCategory
 
-    fun getAllCategories(): List<ReadBoardCategory>
+    fun getAllCategories(): List<BoardCategory>
 
     fun updateCategory(
         id: Long,
         name: String,
         displayName: String,
         description: String,
-    ): ReadBoardCategory
+    ): BoardCategory
 
     fun deleteCategory(id: Long)
 

@@ -1,15 +1,14 @@
 package com.example.jobstat.auth.user.service
 
 import com.example.jobstat.auth.user.UserConstants
-import com.example.jobstat.auth.user.entity.ReadUser
-import com.example.jobstat.auth.user.entity.RoleData
 import com.example.jobstat.auth.user.entity.User
+import com.example.jobstat.auth.user.entity.RoleData
 import com.example.jobstat.auth.user.entity.UserRole
 import com.example.jobstat.auth.user.repository.RoleRepository
 import com.example.jobstat.auth.user.repository.UserRepository
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.extension.trueOrThrow
+import com.example.jobstat.core.global.extension.trueOrThrow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -28,24 +27,24 @@ internal class UserServiceImpl(
         password: String,
         birthDate: LocalDate,
     ): User {
-        val user = User.create(username, email, password, birthDate)
+        return User.create(username, email, password, birthDate).also { user ->
+            validateEmail(user.email).trueOrThrow {
+                AppException.fromErrorCode(
+                    ErrorCode.DUPLICATE_RESOURCE,
+                    UserConstants.ErrorMessages.DUPLICATE_EMAIL,
+                )
+            }
+            validateUsername(user.username).trueOrThrow {
+                AppException.fromErrorCode(
+                    ErrorCode.DUPLICATE_RESOURCE,
+                    UserConstants.ErrorMessages.DUPLICATE_USERNAME,
+                )
+            }
 
-        validateEmail(user.email).trueOrThrow {
-            AppException.fromErrorCode(
-                ErrorCode.DUPLICATE_RESOURCE,
-                UserConstants.ErrorMessages.DUPLICATE_EMAIL,
-            )
+            val role = roleRepository.findById(RoleData.USER.id)
+            UserRole.create(user, role)
+            userRepository.save(user)
         }
-        validateUsername(user.username).trueOrThrow {
-            AppException.fromErrorCode(
-                ErrorCode.DUPLICATE_RESOURCE,
-                UserConstants.ErrorMessages.DUPLICATE_USERNAME,
-            )
-        }
-
-        val role = roleRepository.findById(RoleData.USER.id)
-        UserRole.create(user, role)
-        return userRepository.save(user)
     }
 
     override fun getUserById(id: Long): User = userRepository.findById(id)
@@ -80,30 +79,22 @@ internal class UserServiceImpl(
 
     override fun isAccountEnabled(id: Long): Boolean = userRepository.findById(id).isActive
 
-    override fun getUserWithRoles(id: Long): ReadUser {
-        val user = userRepository.findByIdWithRoles(id)
-        return user
-    }
+    override fun getUserWithRoles(id: Long): User = userRepository.findByIdWithRoles(id)
 
-    override fun getUserRoles(id: Long): List<String> {
-        val user = userRepository.findByIdWithRoles(id)
-        return user.getRolesString()
-    }
+    override fun getUserRoles(id: Long): List<String> = userRepository.findByIdWithRoles(id).getRolesString()
 
-    override fun updateUser(command: Map<String, Any>): ReadUser {
+    override fun updateUser(command: Map<String, Any>): User {
         val userId = command["id"] as Long
-        val user = userRepository.findById(userId)
-
-        command.forEach { (key, value) ->
-            when (key) {
-                "password" -> user.updatePassword(value as String)
-                "email" -> user.updateEmail(value as String)
-                "isActive" -> if (value as Boolean) user.enableAccount() else user.disableAccount()
-                // 추가 필드가 있다면 여기에 추가
+        return userRepository.findById(userId).apply {
+            command.forEach { (key, value) ->
+                when (key) {
+                    "password" -> updatePassword(value as String)
+                    "email" -> updateEmail(value as String)
+                    "isActive" -> if (value as Boolean) enableAccount() else disableAccount()
+                    // 추가 필드가 있다면 여기에 추가
+                }
             }
-        }
-
-        return userRepository.save(user)
+        }.let(userRepository::save)
     }
 
     override fun enableUser(id: Long) {

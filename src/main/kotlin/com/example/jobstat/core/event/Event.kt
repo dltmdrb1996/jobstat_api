@@ -1,8 +1,9 @@
 package com.example.jobstat.core.event
 
+import com.example.jobstat.core.base.BaseIdEntity
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.utils.serializer.DataSerializer
+import com.example.jobstat.core.global.utils.serializer.DataSerializer
 import jakarta.persistence.Entity
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
@@ -13,12 +14,11 @@ import jakarta.persistence.Id
  */
 @Entity
 data class Event<T : EventPayload>(
-    @Id
-    val eventId: Long,
+    override val id: Long,
     @Enumerated
     val type: EventType,
     val payload: T
-) {
+) : BaseIdEntity() {
     /**
      * 이벤트를 JSON 문자열로 직렬화 (직렬화기를 받아서 사용)
      * @return 직렬화된 JSON 문자열

@@ -2,8 +2,8 @@ package com.example.jobstat.rankings.fake
 
 import com.example.jobstat.core.base.mongo.ranking.BaseRankingDocument
 import com.example.jobstat.core.base.repository.BaseRankingRepository
-import com.example.jobstat.statistics.rankings.model.rankingtype.RankingType
-import com.example.jobstat.statistics.rankings.repository.RankingRepositoryRegistry
+import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.example.jobstat.statistics_read.rankings.repository.RankingRepositoryRegistry
 
 class FakeRankingRepositoryRegistry(
     private val repositories: Map<RankingType, BaseRankingRepository<*, *, *>>,

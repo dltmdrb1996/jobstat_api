@@ -19,22 +19,25 @@ internal class UpdateUserPassword(
     validator: Validator,
 ) : ValidUseCase<UpdateUserPassword.Request, Unit>(validator) {
     @Transactional
-    override fun execute(request: Request) {
-        val user = userService.getUserById(request.userId)
-
-        if (!passwordUtil.matches(request.currentPassword, user.password)) {
-            throw AppException.fromErrorCode(
-                ErrorCode.AUTHENTICATION_FAILURE,
-                UserConstants.ErrorMessages.CURRENT_PASSWORD_MISMATCH,
+    override fun execute(request: Request): Unit = with(request) {
+        // 사용자 조회 및 현재 비밀번호 검증
+        userService.getUserById(userId).let { user ->
+            // 현재 비밀번호 확인
+            if (!passwordUtil.matches(currentPassword, user.password)) {
+                throw AppException.fromErrorCode(
+                    ErrorCode.AUTHENTICATION_FAILURE,
+                    UserConstants.ErrorMessages.CURRENT_PASSWORD_MISMATCH,
+                )
+            }
+            
+            // 새 비밀번호로 업데이트
+            userService.updateUser(
+                mapOf(
+                    "id" to userId,
+                    "password" to passwordUtil.encode(newPassword),
+                )
             )
         }
-
-        userService.updateUser(
-            mapOf(
-                "id" to request.userId,
-                "password" to passwordUtil.encode(request.newPassword),
-            ),
-        )
     }
 
     data class Request(

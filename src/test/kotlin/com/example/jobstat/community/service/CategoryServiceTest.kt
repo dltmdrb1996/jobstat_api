@@ -35,7 +35,7 @@ class CategoryServiceTest {
                     "카테고리 설명 1",
                 )
             assertEquals("카테고리1", createdCategory.name)
-            assertTrue((createdCategory as BoardCategory).id > 0)
+            assertTrue((createdCategory as com.example.jobstat.community.board.entity.BoardCategory).id > 0)
         }
 
         @Test

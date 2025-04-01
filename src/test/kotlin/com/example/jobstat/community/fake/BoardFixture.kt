@@ -12,7 +12,7 @@ internal class BoardFixture private constructor(
     private var password: String? = null,
     private var viewCount: Int = 0,
     private var likeCount: Int = 0,
-    private var category: BoardCategory = CategoryFixture.aCategory().create(),
+    private var category: com.example.jobstat.community.board.entity.BoardCategory = CategoryFixture.aCategory().create(),
     private var createdAt: LocalDateTime = LocalDateTime.now(),
     private var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) : IdFixture<Board>() {
@@ -34,7 +34,7 @@ internal class BoardFixture private constructor(
 
     fun withLikeCount(likeCount: Int) = apply { this.likeCount = likeCount }
 
-    fun withCategory(category: BoardCategory) = apply { this.category = category }
+    fun withCategory(category: com.example.jobstat.community.board.entity.BoardCategory) = apply { this.category = category }
 
     fun withCreatedAt(createdAt: LocalDateTime) = apply { this.createdAt = createdAt }
 
