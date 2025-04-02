@@ -2,7 +2,6 @@ package com.example.jobstat.core.outbox
 
 import com.example.jobstat.core.event.EventType
 import com.example.jobstat.core.event.outbox.OutboxConstants
-import com.example.jobstat.core.event.outbox.OutboxEvent
 import com.example.jobstat.core.event.outbox.OutboxEventPublisher
 import com.example.jobstat.core.event.payload.board.BoardCreatedEventPayload
 import com.example.jobstat.core.global.utils.serializer.DataSerializer

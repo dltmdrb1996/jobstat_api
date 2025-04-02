@@ -4,351 +4,327 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.redis.connection.StringRedisConnection
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Repository
-import java.time.Instant
-import java.time.temporal.ChronoUnit
 
 @Repository
 class RedisBoardIdListRepository(
     private val redisTemplate: StringRedisTemplate
-) : BoardIdListRepository {
+) {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     companion object {
         const val ALL_BOARDS_KEY = "community-read::board-list"
         const val CATEGORY_BOARDS_KEY_FORMAT = "community-read::category::%s::board-list"
+
         const val BOARDS_BY_LIKES_DAY_KEY = "community-read::likes::day::board-list"
         const val BOARDS_BY_LIKES_WEEK_KEY = "community-read::likes::week::board-list"
         const val BOARDS_BY_LIKES_MONTH_KEY = "community-read::likes::month::board-list"
+
         const val BOARDS_BY_VIEWS_DAY_KEY = "community-read::views::day::board-list"
         const val BOARDS_BY_VIEWS_WEEK_KEY = "community-read::views::week::board-list"
         const val BOARDS_BY_VIEWS_MONTH_KEY = "community-read::views::month::board-list"
+
+        // 내부 상태 키 (마지막 업데이트 시각 등을 저장)
+        private fun listStateKey(boardId: Long) = "board:list::$boardId"
+
+        // AllBoard Limit Size
+        const val ALL_BOARD_LIMIT_SIZE = 1000L
+        const val CATEGORY_LIMIT_SIZE = 1000L
+
+        // Ranking Limit Size
+        const val RANKING_LIMIT_SIZE = 100L
     }
 
-    private val log by lazy { LoggerFactory.getLogger(this::class.java) }
+    // 공개 getter들 (Service에서 직접 키를 쓰지 않도록)
+    fun getAllBoardsKey() = ALL_BOARDS_KEY
+    fun getCategoryKey(categoryId: Long) = CATEGORY_BOARDS_KEY_FORMAT.format(categoryId)
 
-    override fun add(boardId: Long, sortValue: Double, limit: Long) {
-        try {
-            redisTemplate.executePipelined { connection ->
-                val stringConn = connection as StringRedisConnection
-                val existingScore = stringConn.zScore(ALL_BOARDS_KEY, toPaddedString(boardId))
-                if (existingScore != null && existingScore == sortValue) {
-                    log.info("Board id {} already exists with same sortValue.", boardId)
-                } else {
-                    stringConn.zAdd(ALL_BOARDS_KEY, sortValue, toPaddedString(boardId))
-                }
-                stringConn.zRemRange(ALL_BOARDS_KEY, 0, -(limit + 1))
-                null
-            }
-        } catch (e: Exception) {
-            log.error("게시글 ID 리스트 추가 실패: boardId={}, sortValue={}", boardId, sortValue, e)
-            throw e
-        }
+    // ----------------------------
+    // A) 읽기 (Query) 로직
+    // ----------------------------
+    fun readAllByTime(offset: Long, limit: Long): List<Long> {
+        return redisTemplate.opsForZSet()
+            .reverseRange(ALL_BOARDS_KEY, offset, offset + limit - 1)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun delete(boardId: Long) {
-        try {
-            redisTemplate.opsForZSet().remove(ALL_BOARDS_KEY, toPaddedString(boardId))
-        } catch (e: Exception) {
-            log.error("게시글 ID 리스트 삭제 실패: boardId={}", boardId, e)
-            throw e
-        }
-    }
-
-    override fun readAllByTime(offset: Long, limit: Long): List<Long> {
-        try {
+    fun readAllByTimeInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long> {
+        if (lastBoardId == null) {
             return redisTemplate.opsForZSet()
-                .reverseRange(ALL_BOARDS_KEY, offset, offset + limit - 1)
+                .reverseRange(ALL_BOARDS_KEY, 0, limit - 1)
                 ?.map { it.toLong() } ?: emptyList()
-        } catch (e: Exception) {
-            log.error("시간순 게시글 ID 리스트 조회 실패: offset={}, limit={}", offset, limit, e)
-            throw e
         }
+        val score = redisTemplate.opsForZSet().score(ALL_BOARDS_KEY, lastBoardId.toString()) ?: 0.0
+        return redisTemplate.opsForZSet()
+            .reverseRangeByScore(ALL_BOARDS_KEY, 0.0, score - 0.000001, 0, limit)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun readAllByTimeInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long> {
-        try {
-            return if (lastBoardId == null) {
-                redisTemplate.opsForZSet()
-                    .reverseRange(ALL_BOARDS_KEY, 0, limit - 1)
-                    ?.map { it.toLong() } ?: emptyList()
-            } else {
-                val lastBoardScore = redisTemplate.opsForZSet().score(ALL_BOARDS_KEY, toPaddedString(lastBoardId))
-                if (lastBoardScore == null) {
-                    emptyList()
-                } else {
-                    redisTemplate.opsForZSet()
-                        .reverseRangeByScore(ALL_BOARDS_KEY, 0.0, lastBoardScore - 0.000001, 0, limit)
-                        ?.map { it.toLong() } ?: emptyList()
-                }
-            }
-        } catch (e: Exception) {
-            log.error("무한 스크롤 시간순 게시글 ID 리스트 조회 실패: lastBoardId={}, limit={}", lastBoardId, limit, e)
-            throw e
-        }
+    fun readAllByCategory(categoryId: Long, offset: Long, limit: Long): List<Long> {
+        val key = getCategoryKey(categoryId)
+        return redisTemplate.opsForZSet()
+            .reverseRange(key, offset, offset + limit - 1)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun addToCategoryList(categoryId: Long, boardId: Long, sortValue: Double) {
-        try {
-            val key = CATEGORY_BOARDS_KEY_FORMAT.format(categoryId)
-            val existingScore = redisTemplate.opsForZSet().score(key, toPaddedString(boardId))
-            if (existingScore != null && existingScore == sortValue) {
-                log.info("Board id {} already exists in category {} with same sortValue.", boardId, categoryId)
-            } else {
-                redisTemplate.opsForZSet().add(key, toPaddedString(boardId), sortValue)
-            }
-        } catch (e: Exception) {
-            log.error("카테고리별 게시글 ID 리스트 추가 실패: categoryId={}, boardId={}", categoryId, boardId, e)
-            throw e
-        }
-    }
-
-    override fun deleteFromCategoryList(categoryId: Long, boardId: Long) {
-        try {
-            redisTemplate.opsForZSet().remove(CATEGORY_BOARDS_KEY_FORMAT.format(categoryId), toPaddedString(boardId))
-        } catch (e: Exception) {
-            log.error("카테고리별 게시글 ID 리스트 삭제 실패: categoryId={}, boardId={}", categoryId, boardId, e)
-            throw e
-        }
-    }
-
-    override fun readAllByCategory(categoryId: Long, offset: Long, limit: Long): List<Long> {
-        try {
+    fun readAllByCategoryInfiniteScroll(categoryId: Long, lastBoardId: Long?, limit: Long): List<Long> {
+        val key = getCategoryKey(categoryId)
+        if (lastBoardId == null) {
             return redisTemplate.opsForZSet()
-                .reverseRange(CATEGORY_BOARDS_KEY_FORMAT.format(categoryId), offset, offset + limit - 1)
+                .reverseRange(key, 0, limit - 1)
                 ?.map { it.toLong() } ?: emptyList()
-        } catch (e: Exception) {
-            log.error("카테고리별 게시글 ID 리스트 조회 실패: categoryId={}, offset={}, limit={}", categoryId, offset, limit, e)
-            throw e
         }
+        val score = redisTemplate.opsForZSet().score(key, lastBoardId.toString()) ?: 0.0
+        return redisTemplate.opsForZSet()
+            .reverseRangeByScore(key, 0.0, score - 0.000001, 0, limit)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun readAllByCategoryInfiniteScroll(categoryId: Long, lastBoardId: Long?, limit: Long): List<Long> {
-        try {
-            val key = CATEGORY_BOARDS_KEY_FORMAT.format(categoryId)
-            return if (lastBoardId == null) {
-                redisTemplate.opsForZSet()
-                    .reverseRange(key, 0, limit - 1)
-                    ?.map { it.toLong() } ?: emptyList()
-            } else {
-                val lastBoardScore = redisTemplate.opsForZSet().score(key, toPaddedString(lastBoardId))
-                if (lastBoardScore == null) {
-                    emptyList()
-                } else {
-                    redisTemplate.opsForZSet()
-                        .reverseRangeByScore(key, 0.0, lastBoardScore - 0.000001, 0, limit)
-                        ?.map { it.toLong() } ?: emptyList()
-                }
-            }
-        } catch (e: Exception) {
-            log.error("무한 스크롤 카테고리별 게시글 ID 리스트 조회 실패: categoryId={}, lastBoardId={}, limit={}", categoryId, lastBoardId, limit, e)
-            throw e
-        }
+    fun readAllByLikesDay(offset: Long, limit: Long): List<Long> {
+        return redisTemplate.opsForZSet()
+            .reverseRange(BOARDS_BY_LIKES_DAY_KEY, offset, offset + limit - 1)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun addToLikesByDayList(boardId: Long, createdAt: Long, likeCount: Int) {
-        try {
-            val now = Instant.now()
-            val boardCreatedAt = Instant.ofEpochMilli(createdAt)
-            if (ChronoUnit.DAYS.between(boardCreatedAt, now) <= 1) {
-                redisTemplate.executePipelined { connection ->
-                    val stringConn = connection as StringRedisConnection
-                    stringConn.zAdd(BOARDS_BY_LIKES_DAY_KEY, likeCount.toDouble(), toPaddedString(boardId))
-                    stringConn.zRemRange(BOARDS_BY_LIKES_DAY_KEY, 0, -101)
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            log.error("일별 좋아요순 게시글 ID 리스트 추가 실패: boardId={}, likeCount={}", boardId, likeCount, e)
-            throw e
-        }
-    }
-
-    override fun addToLikesByWeekList(boardId: Long, createdAt: Long, likeCount: Int) {
-        try {
-            val now = Instant.now()
-            val boardCreatedAt = Instant.ofEpochMilli(createdAt)
-            if (ChronoUnit.DAYS.between(boardCreatedAt, now) <= 7) {
-                redisTemplate.executePipelined { connection ->
-                    val stringConn = connection as StringRedisConnection
-                    stringConn.zAdd(BOARDS_BY_LIKES_WEEK_KEY, likeCount.toDouble(), toPaddedString(boardId))
-                    stringConn.zRemRange(BOARDS_BY_LIKES_WEEK_KEY, 0, -101)
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            log.error("주간 좋아요순 게시글 ID 리스트 추가 실패: boardId={}, likeCount={}", boardId, likeCount, e)
-            throw e
-        }
-    }
-
-    override fun addToLikesByMonthList(boardId: Long, createdAt: Long, likeCount: Int) {
-        try {
-            val now = Instant.now()
-            val boardCreatedAt = Instant.ofEpochMilli(createdAt)
-            if (ChronoUnit.DAYS.between(boardCreatedAt, now) <= 30) {
-                redisTemplate.executePipelined { connection ->
-                    val stringConn = connection as StringRedisConnection
-                    stringConn.zAdd(BOARDS_BY_LIKES_MONTH_KEY, likeCount.toDouble(), toPaddedString(boardId))
-                    stringConn.zRemRange(BOARDS_BY_LIKES_MONTH_KEY, 0, -101)
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            log.error("월간 좋아요순 게시글 ID 리스트 추가 실패: boardId={}, likeCount={}", boardId, likeCount, e)
-            throw e
-        }
-    }
-
-    override fun deleteFromLikesList(boardId: Long) {
-        try {
-            redisTemplate.executePipelined { connection ->
-                val stringConn = connection as StringRedisConnection
-                stringConn.zRem(BOARDS_BY_LIKES_DAY_KEY, toPaddedString(boardId))
-                stringConn.zRem(BOARDS_BY_LIKES_WEEK_KEY, toPaddedString(boardId))
-                stringConn.zRem(BOARDS_BY_LIKES_MONTH_KEY, toPaddedString(boardId))
-                null
-            }
-        } catch (e: Exception) {
-            log.error("좋아요순 게시글 ID 리스트 삭제 실패: boardId={}", boardId, e)
-            throw e
-        }
-    }
-
-    override fun readAllByLikesDay(limit: Long): List<Long> {
-        try {
+    fun readAllByLikesDayInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long> {
+        if (lastBoardId == null) {
             return redisTemplate.opsForZSet()
                 .reverseRange(BOARDS_BY_LIKES_DAY_KEY, 0, limit - 1)
                 ?.map { it.toLong() } ?: emptyList()
-        } catch (e: Exception) {
-            log.error("일별 좋아요순 게시글 ID 리스트 조회 실패: limit={}", limit, e)
-            throw e
         }
+        val score = redisTemplate.opsForZSet().score(BOARDS_BY_LIKES_DAY_KEY, lastBoardId.toString()) ?: 0.0
+        return redisTemplate.opsForZSet()
+            .reverseRangeByScore(BOARDS_BY_LIKES_DAY_KEY, 0.0, score - 0.000001, 0, limit)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun readAllByLikesWeek(limit: Long): List<Long> {
-        try {
+    fun readAllByLikesWeek(offset: Long, limit: Long): List<Long> {
+        return redisTemplate.opsForZSet()
+            .reverseRange(BOARDS_BY_LIKES_WEEK_KEY, offset, offset + limit - 1)
+            ?.map { it.toLong() } ?: emptyList()
+    }
+
+    fun readAllByLikesWeekInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long> {
+        if (lastBoardId == null) {
             return redisTemplate.opsForZSet()
                 .reverseRange(BOARDS_BY_LIKES_WEEK_KEY, 0, limit - 1)
                 ?.map { it.toLong() } ?: emptyList()
-        } catch (e: Exception) {
-            log.error("주간 좋아요순 게시글 ID 리스트 조회 실패: limit={}", limit, e)
-            throw e
         }
+        val score = redisTemplate.opsForZSet().score(BOARDS_BY_LIKES_WEEK_KEY, lastBoardId.toString()) ?: 0.0
+        return redisTemplate.opsForZSet()
+            .reverseRangeByScore(BOARDS_BY_LIKES_WEEK_KEY, 0.0, score - 0.000001, 0, limit)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun readAllByLikesMonth(limit: Long): List<Long> {
-        try {
+    fun readAllByLikesMonth(offset: Long, limit: Long): List<Long> {
+        return redisTemplate.opsForZSet()
+            .reverseRange(BOARDS_BY_LIKES_MONTH_KEY, offset, offset + limit - 1)
+            ?.map { it.toLong() } ?: emptyList()
+    }
+
+    fun readAllByLikesMonthInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long> {
+        if (lastBoardId == null) {
             return redisTemplate.opsForZSet()
                 .reverseRange(BOARDS_BY_LIKES_MONTH_KEY, 0, limit - 1)
                 ?.map { it.toLong() } ?: emptyList()
-        } catch (e: Exception) {
-            log.error("월간 좋아요순 게시글 ID 리스트 조회 실패: limit={}", limit, e)
-            throw e
         }
+        val score = redisTemplate.opsForZSet().score(BOARDS_BY_LIKES_MONTH_KEY, lastBoardId.toString()) ?: 0.0
+        return redisTemplate.opsForZSet()
+            .reverseRangeByScore(BOARDS_BY_LIKES_MONTH_KEY, 0.0, score - 0.000001, 0, limit)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun addToViewsByDayList(boardId: Long, createdAt: Long, viewCount: Int) {
-        try {
-            val now = Instant.now()
-            val boardCreatedAt = Instant.ofEpochMilli(createdAt)
-            if (ChronoUnit.DAYS.between(boardCreatedAt, now) <= 1) {
-                redisTemplate.executePipelined { connection ->
-                    val stringConn = connection as StringRedisConnection
-                    stringConn.zAdd(BOARDS_BY_VIEWS_DAY_KEY, viewCount.toDouble(), toPaddedString(boardId))
-                    stringConn.zRemRange(BOARDS_BY_VIEWS_DAY_KEY, 0, -101)
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            log.error("일별 조회수순 게시글 ID 리스트 추가 실패: boardId={}, viewCount={}", boardId, viewCount, e)
-            throw e
-        }
+    fun readAllByViewsDay(offset: Long, limit: Long): List<Long> {
+        return redisTemplate.opsForZSet()
+            .reverseRange(BOARDS_BY_VIEWS_DAY_KEY, offset, offset + limit - 1)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun addToViewsByWeekList(boardId: Long, createdAt: Long, viewCount: Int) {
-        try {
-            val now = Instant.now()
-            val boardCreatedAt = Instant.ofEpochMilli(createdAt)
-            if (ChronoUnit.DAYS.between(boardCreatedAt, now) <= 7) {
-                redisTemplate.executePipelined { connection ->
-                    val stringConn = connection as StringRedisConnection
-                    stringConn.zAdd(BOARDS_BY_VIEWS_WEEK_KEY, viewCount.toDouble(), toPaddedString(boardId))
-                    stringConn.zRemRange(BOARDS_BY_VIEWS_WEEK_KEY, 0, -101)
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            log.error("주간 조회수순 게시글 ID 리스트 추가 실패: boardId={}, viewCount={}", boardId, viewCount, e)
-            throw e
-        }
-    }
-
-    override fun addToViewsByMonthList(boardId: Long, createdAt: Long, viewCount: Int) {
-        try {
-            val now = Instant.now()
-            val boardCreatedAt = Instant.ofEpochMilli(createdAt)
-            if (ChronoUnit.DAYS.between(boardCreatedAt, now) <= 30) {
-                redisTemplate.executePipelined { connection ->
-                    val stringConn = connection as StringRedisConnection
-                    stringConn.zAdd(BOARDS_BY_VIEWS_MONTH_KEY, viewCount.toDouble(), toPaddedString(boardId))
-                    stringConn.zRemRange(BOARDS_BY_VIEWS_MONTH_KEY, 0, -101)
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            log.error("월간 조회수순 게시글 ID 리스트 추가 실패: boardId={}, viewCount={}", boardId, viewCount, e)
-            throw e
-        }
-    }
-
-    override fun deleteFromViewsList(boardId: Long) {
-        try {
-            redisTemplate.executePipelined { connection ->
-                val stringConn = connection as StringRedisConnection
-                stringConn.zRem(BOARDS_BY_VIEWS_DAY_KEY, toPaddedString(boardId))
-                stringConn.zRem(BOARDS_BY_VIEWS_WEEK_KEY, toPaddedString(boardId))
-                stringConn.zRem(BOARDS_BY_VIEWS_MONTH_KEY, toPaddedString(boardId))
-                null
-            }
-        } catch (e: Exception) {
-            log.error("조회수순 게시글 ID 리스트 삭제 실패: boardId={}", boardId, e)
-            throw e
-        }
-    }
-
-    override fun readAllByViewsDay(limit: Long): List<Long> {
-        try {
+    fun readAllByViewsDayInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long> {
+        if (lastBoardId == null) {
             return redisTemplate.opsForZSet()
                 .reverseRange(BOARDS_BY_VIEWS_DAY_KEY, 0, limit - 1)
                 ?.map { it.toLong() } ?: emptyList()
-        } catch (e: Exception) {
-            log.error("일별 조회수순 게시글 ID 리스트 조회 실패: limit={}", limit, e)
-            throw e
         }
+        val score = redisTemplate.opsForZSet().score(BOARDS_BY_VIEWS_DAY_KEY, lastBoardId.toString()) ?: 0.0
+        return redisTemplate.opsForZSet()
+            .reverseRangeByScore(BOARDS_BY_VIEWS_DAY_KEY, 0.0, score - 0.000001, 0, limit)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun readAllByViewsWeek(limit: Long): List<Long> {
-        try {
+    fun readAllByViewsWeek(offset: Long, limit: Long): List<Long> {
+        return redisTemplate.opsForZSet()
+            .reverseRange(BOARDS_BY_VIEWS_WEEK_KEY, offset, offset + limit - 1)
+            ?.map { it.toLong() } ?: emptyList()
+    }
+
+    fun readAllByViewsWeekInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long> {
+        if (lastBoardId == null) {
             return redisTemplate.opsForZSet()
                 .reverseRange(BOARDS_BY_VIEWS_WEEK_KEY, 0, limit - 1)
                 ?.map { it.toLong() } ?: emptyList()
-        } catch (e: Exception) {
-            log.error("주간 조회수순 게시글 ID 리스트 조회 실패: limit={}", limit, e)
-            throw e
         }
+        val score = redisTemplate.opsForZSet().score(BOARDS_BY_VIEWS_WEEK_KEY, lastBoardId.toString()) ?: 0.0
+        return redisTemplate.opsForZSet()
+            .reverseRangeByScore(BOARDS_BY_VIEWS_WEEK_KEY, 0.0, score - 0.000001, 0, limit)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    override fun readAllByViewsMonth(limit: Long): List<Long> {
-        try {
+    fun readAllByViewsMonth(offset: Long, limit: Long): List<Long> {
+        return redisTemplate.opsForZSet()
+            .reverseRange(BOARDS_BY_VIEWS_MONTH_KEY, offset, offset + limit - 1)
+            ?.map { it.toLong() } ?: emptyList()
+    }
+
+    fun readAllByViewsMonthInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long> {
+        if (lastBoardId == null) {
             return redisTemplate.opsForZSet()
                 .reverseRange(BOARDS_BY_VIEWS_MONTH_KEY, 0, limit - 1)
                 ?.map { it.toLong() } ?: emptyList()
-        } catch (e: Exception) {
-            log.error("월간 조회수순 게시글 ID 리스트 조회 실패: limit={}", limit, e)
-            throw e
         }
+        val score = redisTemplate.opsForZSet().score(BOARDS_BY_VIEWS_MONTH_KEY, lastBoardId.toString()) ?: 0.0
+        return redisTemplate.opsForZSet()
+            .reverseRangeByScore(BOARDS_BY_VIEWS_MONTH_KEY, 0.0, score - 0.000001, 0, limit)
+            ?.map { it.toLong() } ?: emptyList()
     }
 
-    private fun toPaddedString(id: Long): String {
-        return "%019d".format(id)
+    // -----------------------------
+    // B) 쓰기 (파이프라인, eventTs 기반)
+    // -----------------------------
+    fun addBoardInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        eventTs: Long,
+        score: Double,
+    ) {
+        val stateKey = listStateKey(boardId)
+        val currentTs = conn.hGet(stateKey, "eventTs").toLongOrNull() ?: 0
+        if (eventTs <= currentTs) return
+
+        conn.zAdd(ALL_BOARDS_KEY, score, boardId.toString())
+        conn.zRemRange(ALL_BOARDS_KEY, 0, -(ALL_BOARD_LIMIT_SIZE + 1))
+        conn.hSet(stateKey, "eventTs", eventTs.toString())
+    }
+
+    fun addBoardToCategoryInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        categoryId: Long,
+        eventTs: Long,
+        score: Double,
+    ) {
+        val stateKey = listStateKey(boardId)
+        val currentTs = conn.hGet(stateKey, "eventTs")?.toLongOrNull() ?: 0
+        if (eventTs <= currentTs) return
+
+        val catKey = CATEGORY_BOARDS_KEY_FORMAT.format(categoryId)
+        conn.zAdd(catKey, score, boardId.toString())
+        conn.zRemRange(catKey, 0, -(CATEGORY_LIMIT_SIZE + 1))
+        conn.hSet(stateKey, "eventTs", eventTs.toString())
+    }
+
+    fun removeBoardInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        categoryId: Long?,
+        eventTs: Long
+    ) {
+        val stateKey = listStateKey(boardId)
+        val currentTs = conn.hGet(stateKey, "eventTs")?.toLongOrNull() ?: 0
+        if (eventTs <= currentTs) return
+
+        conn.zRem(ALL_BOARDS_KEY, boardId.toString())
+        if (categoryId != null) {
+            val catKey = CATEGORY_BOARDS_KEY_FORMAT.format(categoryId)
+            conn.zRem(catKey, boardId.toString())
+        }
+        conn.hSet(stateKey, "eventTs", eventTs.toString())
+    }
+
+    fun addLikesRankingInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        eventTs: Long,
+        likeScore: Double
+    ) {
+        val stateKey = listStateKey(boardId)
+        val currentTs = conn.hGet(stateKey, "eventTs")?.toLongOrNull() ?: 0
+        if (eventTs <= currentTs) return
+
+        conn.zAdd(BOARDS_BY_LIKES_DAY_KEY, likeScore, boardId.toString())
+        conn.zRemRange(BOARDS_BY_LIKES_DAY_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.zAdd(BOARDS_BY_LIKES_WEEK_KEY, likeScore, boardId.toString())
+        conn.zRemRange(BOARDS_BY_LIKES_WEEK_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.zAdd(BOARDS_BY_LIKES_MONTH_KEY, likeScore, boardId.toString())
+        conn.zRemRange(BOARDS_BY_LIKES_MONTH_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.hSet(stateKey, "eventTs", eventTs.toString())
+    }
+
+    fun incrLikesRankingInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        eventTs: Long,
+        likeDelta: Double
+    ) {
+        val stateKey = listStateKey(boardId)
+        val currentTs = conn.hGet(stateKey, "eventTs")?.toLongOrNull() ?: 0
+        if (eventTs <= currentTs) return
+
+        conn.zIncrBy(BOARDS_BY_LIKES_DAY_KEY, likeDelta, boardId.toString())
+        conn.zRemRange(BOARDS_BY_LIKES_DAY_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.zIncrBy(BOARDS_BY_LIKES_WEEK_KEY, likeDelta, boardId.toString())
+        conn.zRemRange(BOARDS_BY_LIKES_WEEK_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.zIncrBy(BOARDS_BY_LIKES_MONTH_KEY, likeDelta, boardId.toString())
+        conn.zRemRange(BOARDS_BY_LIKES_MONTH_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.hSet(stateKey, "eventTs", eventTs.toString())
+    }
+
+    fun addViewsRankingInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        eventTs: Long,
+        viewScore: Double
+    ) {
+        val stateKey = listStateKey(boardId)
+        val currentTs = conn.hGet(stateKey, "eventTs")?.toLongOrNull() ?: 0
+        if (eventTs <= currentTs) return
+
+        conn.zAdd(BOARDS_BY_VIEWS_DAY_KEY, viewScore, boardId.toString())
+        conn.zRemRange(BOARDS_BY_VIEWS_DAY_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.zAdd(BOARDS_BY_VIEWS_WEEK_KEY, viewScore, boardId.toString())
+        conn.zRemRange(BOARDS_BY_VIEWS_WEEK_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.zAdd(BOARDS_BY_VIEWS_MONTH_KEY, viewScore, boardId.toString())
+        conn.zRemRange(BOARDS_BY_VIEWS_MONTH_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.hSet(stateKey, "eventTs", eventTs.toString())
+    }
+
+    fun incrViewsRankingInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        eventTs: Long,
+        viewDelta: Double
+    ) {
+        val stateKey = listStateKey(boardId)
+        val currentTs = conn.hGet(stateKey, "eventTs")?.toLongOrNull() ?: 0
+        if (eventTs <= currentTs) return
+
+        conn.zIncrBy(BOARDS_BY_VIEWS_DAY_KEY, viewDelta, boardId.toString())
+        conn.zRemRange(BOARDS_BY_VIEWS_DAY_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.zIncrBy(BOARDS_BY_VIEWS_WEEK_KEY, viewDelta, boardId.toString())
+        conn.zRemRange(BOARDS_BY_VIEWS_WEEK_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.zIncrBy(BOARDS_BY_VIEWS_MONTH_KEY, viewDelta, boardId.toString())
+        conn.zRemRange(BOARDS_BY_VIEWS_MONTH_KEY, 0, -(RANKING_LIMIT_SIZE + 1))
+
+        conn.hSet(stateKey, "eventTs", eventTs.toString())
     }
 }

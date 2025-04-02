@@ -25,8 +25,7 @@ class OutboxEventPublisher(
                 type = type,
                 payload = payload
             ).toJson(dataSerializer),
-            shardKey = sharedKey and OutboxConstants.SHARD_COUNT.toLong()
         )
-        applicationEventPublisher.publishEvent(OutboxEvent.of(outbox))
+        applicationEventPublisher.publishEvent(outbox)
     }
 }

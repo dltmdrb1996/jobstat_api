@@ -1,9 +1,11 @@
 package com.example.jobstat.community.board.usecase.command
 
+import com.example.jobstat.community.CommunityEventPublisher
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.counting.CounterService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.global.extension.toEpochMilli
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.core.global.utils.SecurityUtils
 import jakarta.validation.Validator
@@ -18,9 +20,10 @@ import org.springframework.stereotype.Service
  */
 @Service
 internal class LikeBoard(
-    private val optimizedCounterService: CounterService,
+    private val counterService: CounterService,
     private val securityUtils: SecurityUtils,
     private val boardService: BoardService,
+    private val communityEventPublisher: CommunityEventPublisher,
     validator: Validator,
 ) : ValidUseCase<LikeBoard.Request, LikeBoard.Response>(validator) {
 
@@ -39,21 +42,22 @@ internal class LikeBoard(
         // 게시글 존재 여부 확인 및 조회 - DB에서 한 번만 조회
         val board = validateBoardExists(request.boardId)
 
-        // 오늘 이미 좋아요를 눌렀는지 확인
-        if (optimizedCounterService.hasUserLikedToday(request.boardId, userIdStr)) {
-            throw AppException.fromErrorCode(
-                ErrorCode.INVALID_OPERATION,
-                "이미 오늘 좋아요를 눌렀습니다. 하루에 한 번만 가능합니다."
-            )
-        }
 
         // 엔티티에서 DB 값 직접 전달
-        val likeCount = optimizedCounterService.incrementLikeCount(
+        val likeCount = counterService.incrementLikeCount(
             boardId = request.boardId,
             userId = userIdStr,
             dbLikeCount = board.likeCount
         )
 
+        // 5) ReadModel 이벤트 발행
+        communityEventPublisher.publishBoardLiked(
+            boardId = board.id,
+            createdAt = board.createdAt,
+            userId = userId,
+            eventTs = board.updatedAt.toEpochMilli(),
+            likeCount = likeCount
+        )
         log.info("게시글 좋아요 성공: boardId={}, userId={}, likeCount={}",
             request.boardId, userId, likeCount)
 

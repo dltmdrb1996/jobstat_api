@@ -103,11 +103,5 @@ internal class BoardServiceImpl(
     override fun countBoardsByAuthor(author: String): Long = boardRepository.countByAuthor(author)
 
     @Transactional(readOnly = true)
-    override fun isBoardTitleDuplicated(
-        author: String,
-        title: String,
-    ): Boolean = boardRepository.existsByAuthorAndTitle(author, title)
-    
-    @Transactional(readOnly = true)
     override fun getBoardsByIds(ids: List<Long>): List<Board> = boardRepository.findAllByIds(ids)
 }

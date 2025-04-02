@@ -2,8 +2,6 @@ package com.example.jobstat.community_read.repository
 
 interface BoardIdListRepository {
     // 기본 ID 목록 (최신순)
-    fun add(boardId: Long, sortValue: Double = System.currentTimeMillis().toDouble(), limit: Long = 1000)
-    fun delete(boardId: Long)
     fun readAllByTime(offset: Long, limit: Long): List<Long>
     fun readAllByTimeInfiniteScroll(lastBoardId: Long?, limit: Long): List<Long>
 

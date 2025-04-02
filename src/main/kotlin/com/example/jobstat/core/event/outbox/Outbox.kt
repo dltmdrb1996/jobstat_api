@@ -15,10 +15,9 @@ class Outbox(
     override val id: Long,
     @Enumerated(EnumType.STRING) val eventType: EventType,
     val payload: String,
-    val shardKey: Long
 ) : BaseIdEntity() {
     companion object {
-        fun create(outboxId: Long, eventType: EventType, payload: String, shardKey: Long): Outbox =
-            Outbox(outboxId, eventType, payload, shardKey)
+        fun create(outboxId: Long, eventType: EventType, payload: String): Outbox =
+            Outbox(outboxId, eventType, payload)
     }
 }

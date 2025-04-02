@@ -55,12 +55,6 @@ internal interface BoardService {
 
     fun incrementViewCount(boardId: Long): Board
 
-
-    fun isBoardTitleDuplicated(
-        author: String,
-        title: String,
-    ): Boolean
-
     fun incrementLikeCount(boardId: Long): Board
     
     fun getBoardsByIds(ids: List<Long>): List<Board>

@@ -1,7 +1,6 @@
-package com.example.jobstat.core.event.outbox.relay
+package com.example.jobstat.core.event.outbox.shard
 
 import com.example.jobstat.core.event.outbox.OutboxConstants
-import com.example.jobstat.core.event.outbox.OutboxShardAssignment
 import jakarta.annotation.PreDestroy
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.redis.connection.StringRedisConnection

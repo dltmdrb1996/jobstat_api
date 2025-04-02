@@ -43,10 +43,17 @@ internal class BoardController(
     @Public
     @GetMapping("/boards/{boardId}")
     @Operation(summary = "게시글 상세 조회", description = "특정 게시글의 상세 내용을 조회합니다.")
-    fun getBoardDetail(
+    fun fetchBoardDetail(
         @PathVariable boardId: Long,
         @RequestParam(required = false) commentPage: Int?,
     ): ResponseEntity<ApiResponse<GetBoardDetail.Response>> = ApiResponse.ok(getBoardDetail(GetBoardDetail.Request(boardId, commentPage)))
+
+    @Public
+    @PostMapping("/boards/bulk")
+    @Operation(summary = "게시글 벌크 조회", description = "여러 게시글 ID로 게시글 목록을 한번에 조회합니다.")
+    fun fetchBoardsByIds(
+        @RequestBody request: GetBoardsByIds.Request,
+    ): ResponseEntity<ApiResponse<GetBoardsByIds.Response>> = ApiResponse.ok(getBoardsByIds(request))
 
     @Public
     @GetMapping("/boards")
@@ -100,11 +107,5 @@ internal class BoardController(
     fun likeBoard(
         @PathVariable boardId: Long,
     ): ResponseEntity<ApiResponse<LikeBoard.Response>> = ApiResponse.ok(likeBoard(LikeBoard.Request(boardId)))
-    
-    @Public
-    @PostMapping("/boards/bulk")
-    @Operation(summary = "게시글 벌크 조회", description = "여러 게시글 ID로 게시글 목록을 한번에 조회합니다.")
-    fun fetchBoardsByIds(
-        @RequestBody request: GetBoardsByIds.Request,
-    ): ResponseEntity<ApiResponse<GetBoardsByIds.Response>> = ApiResponse.ok(getBoardsByIds(request))
+
 }

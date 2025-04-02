@@ -7,6 +7,7 @@ import com.example.jobstat.core.event.payload.board.*
 import com.example.jobstat.core.event.payload.comment.*
 import com.example.jobstat.core.event.publisher.AbstractEventPublisher
 import com.example.jobstat.core.event.outbox.OutboxEventPublisher
+import com.example.jobstat.core.global.extension.toEpochMilli
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
@@ -33,9 +34,6 @@ internal class CommunityEventPublisher(
             EventType.BOARD_VIEWED,
             EventType.BOARD_LIKED,
             EventType.BOARD_UNLIKED,
-            EventType.BOARD_VIEW_COUNT_UPDATED,
-            EventType.BOARD_LIKE_COUNT_UPDATED,
-            EventType.BOARD_LIKE_COUNT_DECREASED,
 
             // 댓글 이벤트 타입
             EventType.COMMENT_CREATED,
@@ -44,13 +42,13 @@ internal class CommunityEventPublisher(
         )
     }
 
-    fun publishBoardCreated(board: Board, categoryId: Long, userId: String? = null) {
+    fun publishBoardCreated(board: Board, categoryId: Long, userId: Long? = null) {
         val payload = BoardCreatedEventPayload(
             boardId = board.id,
             userId = userId,
             categoryId = categoryId,
             createdAt = board.createdAt,
-            updatedAt = board.updatedAt,
+            eventTs = board.updatedAt.toEpochMilli(),
             title = board.title,
             content = board.content,
             author = board.author
@@ -64,7 +62,7 @@ internal class CommunityEventPublisher(
     fun publishBoardUpdated(board: Board) {
         val payload = BoardUpdatedEventPayload(
             boardId = board.id,
-            updatedAt = board.updatedAt,
+            eventTs = board.updatedAt.toEpochMilli(),
             title = board.title,
             content = board.content,
             author = board.author
@@ -75,10 +73,12 @@ internal class CommunityEventPublisher(
     /**
      * 게시글 삭제 이벤트 발행
      */
-    fun publishBoardDeleted(boardId: Long, userId: String? = null) {
+    fun publishBoardDeleted(boardId: Long, userId: Long? = null, categoryId: Long, eventTs: Long) {
         val payload = BoardDeletedEventPayload(
             boardId = boardId,
-            userId = userId
+            eventTs = eventTs,
+            categoryId = categoryId,
+            userId = userId,
         )
         publish(EventType.BOARD_DELETED, payload, boardId)
     }
@@ -86,11 +86,13 @@ internal class CommunityEventPublisher(
     /**
      * 게시글 좋아요 이벤트 발행
      */
-    fun publishBoardLiked(boardId: Long, userId: Long, likeCount: Int = 1) {
+    fun publishBoardLiked(boardId: Long, createdAt: LocalDateTime, eventTs: Long, userId: Long, likeCount: Int) {
         val payload = BoardLikedEventPayload(
             boardId = boardId,
+            createdAt = createdAt,
+            eventTs = eventTs,
             userId = userId,
-            likeCount = likeCount
+            likeCount = likeCount,
         )
         publish(EventType.BOARD_LIKED, payload, boardId)
     }
@@ -98,10 +100,12 @@ internal class CommunityEventPublisher(
     /**
      * 게시글 좋아요 취소 이벤트 발행
      */
-    fun publishBoardUnliked(boardId: Long, userId: Long, author: String? = null, likeCount: Int = 0) {
+    fun publishBoardUnliked(boardId: Long, createdAt: LocalDateTime, userId: Long, eventTs: Long,  likeCount: Int) {
         val payload = BoardUnlikedEventPayload(
             boardId = boardId,
+            createdAt = createdAt,
             userId = userId,
+            eventTs = eventTs,
             likeCount = likeCount
         )
         // BOARD_UNLIKED 이벤트 타입으로 변경
@@ -111,18 +115,19 @@ internal class CommunityEventPublisher(
     /**
      * 게시글 조회수 업데이트 이벤트 발행
      */
-    fun publishBoardViewCountUpdated(
+    fun publishBoardViewed(
         boardId: Long,
-        viewCount: Int,
-        incrementAmount: Int
+        createdAt: LocalDateTime,
+        eventTs: Long,
+        viewCount : Int,
     ) {
-        val payload = BoardViewCountUpdatedEventPayload(
+        val payload = BoardViewedEventPayload(
             boardId = boardId,
+            createdAt = createdAt,
+            eventTs = eventTs,
             viewCount = viewCount,
-            incrementAmount = incrementAmount,
-            timestamp = System.currentTimeMillis()
         )
-        publish(EventType.BOARD_VIEW_COUNT_UPDATED, payload, boardId)
+        publish(EventType.BOARD_VIEWED, payload, boardId)
     }
 
     /**

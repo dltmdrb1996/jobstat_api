@@ -49,7 +49,7 @@ internal class CreateBoard(
         communityEventPublisher.publishBoardCreated(
             board = createdBoard,
             categoryId = request.categoryId,
-            userId = userId?.toString()
+            userId = userId
         )
 
         return Response.from(createdBoard)

@@ -1,4 +1,3 @@
-// ObjectMapperDataSerializer.kt
 package com.example.jobstat.core.global.utils.serializer
 
 import com.fasterxml.jackson.core.JsonProcessingException
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 
-@Component
 class ObjectMapperDataSerializer(
     private val objectMapper: ObjectMapper
 ) : DataSerializer {
@@ -25,7 +23,7 @@ class ObjectMapperDataSerializer(
         }
     }
 
-    override fun <T : Any> deserialize(data: Any, clazz: Class<T>): T {
+    override fun <T : Any> deserialize(data: Any, clazz: Class<T>): T? {
         return objectMapper.convertValue(data, clazz)
     }
 
@@ -57,18 +55,4 @@ class ObjectMapperDataSerializer(
             null
         }
     }
-}
-
-// TypeReference 관련 확장 함수
-inline fun <reified T> DataSerializer.deserializeCollection(data: String): T? {
-    return if (this is ObjectMapperDataSerializer) {
-        this.deserializeCollection(data, object : TypeReference<T>() {})
-    } else {
-        null
-    }
-}
-
-// 문자열용 확장 함수
-inline fun <reified T> String.deserializeCollectionAs(dataSerializer: DataSerializer): T? {
-    return dataSerializer.deserializeCollection<T>(this)
 }

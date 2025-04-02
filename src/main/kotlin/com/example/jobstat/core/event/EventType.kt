@@ -4,7 +4,6 @@ import com.example.jobstat.core.event.payload.comment.CommentCreatedEventPayload
 import com.example.jobstat.core.event.payload.comment.CommentDeletedEventPayload
 import org.slf4j.LoggerFactory
 import com.example.jobstat.core.event.payload.board.*
-import com.example.jobstat.core.event.payload.comment.BoardLikeCountUpdatedEventPayload
 import com.example.jobstat.core.event.payload.comment.CommentUpdatedEventPayload
 
 enum class EventType(
@@ -18,9 +17,6 @@ enum class EventType(
     BOARD_VIEWED(BoardViewedEventPayload::class.java, Topic.COMMUNITY_BOARD),
     BOARD_LIKED(BoardLikedEventPayload::class.java, Topic.COMMUNITY_BOARD),
     BOARD_UNLIKED(BoardUnlikedEventPayload::class.java, Topic.COMMUNITY_BOARD),
-    BOARD_VIEW_COUNT_UPDATED(BoardViewCountUpdatedEventPayload::class.java, Topic.COMMUNITY_BOARD),
-    BOARD_LIKE_COUNT_UPDATED(BoardLikeCountUpdatedEventPayload::class.java, Topic.COMMUNITY_BOARD),
-    BOARD_LIKE_COUNT_DECREASED(BoardLikeCountDecreasedEventPayload::class.java, Topic.COMMUNITY_BOARD),
 
     COMMENT_CREATED(CommentCreatedEventPayload::class.java, Topic.COMMUNITY_COMMENT),
     COMMENT_UPDATED(CommentUpdatedEventPayload::class.java, Topic.COMMUNITY_COMMENT),

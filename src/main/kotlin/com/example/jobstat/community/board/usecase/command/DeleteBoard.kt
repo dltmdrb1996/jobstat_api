@@ -6,6 +6,7 @@ import com.example.jobstat.community.board.entity.Board
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.global.extension.toEpochMilli
 import com.example.jobstat.core.security.PasswordUtil
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.core.global.utils.SecurityUtils
@@ -45,7 +46,8 @@ internal class DeleteBoard(
             // 이벤트 발행
             communityEventPublisher.publishBoardDeleted(
                 boardId = id,
-                userId = userId?.toString()
+                eventTs = updatedAt.toEpochMilli(),
+                userId = userId
             )
         }
 

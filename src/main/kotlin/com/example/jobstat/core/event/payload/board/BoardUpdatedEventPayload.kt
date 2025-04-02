@@ -10,8 +10,8 @@ import java.time.LocalDateTime
 data class BoardUpdatedEventPayload(
     @JsonProperty("boardId")
     val boardId: Long,
-    @JsonProperty("updatedAt")
-    val updatedAt: LocalDateTime,
+    @JsonProperty("eventTs")
+    val eventTs: Long,
     @JsonProperty("title")
     val title: String,
     @JsonProperty("content")

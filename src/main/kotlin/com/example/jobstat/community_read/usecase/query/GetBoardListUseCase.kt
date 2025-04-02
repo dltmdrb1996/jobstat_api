@@ -1,6 +1,5 @@
 package com.example.jobstat.community_read.usecase.query
 
-import com.example.jobstat.community_read.client.response.BoardReadResponse
 import com.example.jobstat.community_read.response.ResponseMapper
 import com.example.jobstat.community_read.service.CommunityReadService
 import com.example.jobstat.core.constants.CommunityReadConstants

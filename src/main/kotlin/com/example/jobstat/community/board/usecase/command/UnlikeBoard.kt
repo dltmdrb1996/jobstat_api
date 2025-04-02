@@ -1,9 +1,11 @@
 package com.example.jobstat.community.board.usecase.command
 
+import com.example.jobstat.community.CommunityEventPublisher
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.counting.CounterService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.global.extension.toEpochMilli
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.core.global.utils.SecurityUtils
 import jakarta.validation.Validator
@@ -18,9 +20,10 @@ import org.springframework.stereotype.Service
  */
 @Service
 internal class UnlikeBoard(
-    private val optimizedCounterService: CounterService,
+    private val counterService: CounterService,
     private val securityUtils: SecurityUtils,
     private val boardService: BoardService,
+    private val communityEventPublisher: CommunityEventPublisher,
     validator: Validator,
 ) : ValidUseCase<UnlikeBoard.Request, UnlikeBoard.Response>(validator) {
 
@@ -39,20 +42,20 @@ internal class UnlikeBoard(
         // 게시글 존재 여부 확인 및 조회 - DB에서 한 번만 조회
         val board = validateBoardExists(request.boardId)
 
-        // 사용자가 좋아요를 눌렀는지 확인
-        if (!optimizedCounterService.hasUserLiked(request.boardId, userIdStr)) {
-            throw AppException.fromErrorCode(
-                ErrorCode.INVALID_OPERATION,
-                "좋아요를 누른 적이 없는 게시글입니다.",
-                "boardId: ${request.boardId}, userId: $userId"
-            )
-        }
-
         // 엔티티에서 DB 값 직접 전달
-        val likeCount = optimizedCounterService.decrementLikeCount(
-            boardId = request.boardId,
+        val likeCount = counterService.decrementLikeCount(
+            boardId = board.id,
             userId = userIdStr,
             dbLikeCount = board.likeCount
+        )
+
+        // 5) ReadModel 이벤트 발행
+        communityEventPublisher.publishBoardLiked(
+            boardId = board.id,
+            createdAt = board.createdAt,
+            userId = userId,
+            eventTs = board.updatedAt.toEpochMilli(),
+            likeCount = likeCount
         )
 
         log.info("게시글 좋아요 취소 성공: boardId={}, userId={}, likeCount={}",

@@ -1,103 +1,112 @@
 package com.example.jobstat.community_read.repository
 
 import com.example.jobstat.community_read.model.BoardReadModel
-import com.example.jobstat.core.constants.RedisKeyConstants
-import com.example.jobstat.core.global.utils.RedisOperationUtils
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.example.jobstat.core.error.AppException
+import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.global.utils.serializer.DataSerializer
 import org.slf4j.LoggerFactory
+import org.springframework.data.redis.connection.StringRedisConnection
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Repository
-import java.time.Duration
 
 @Repository
 class RedisBoardDetailRepository(
     private val redisTemplate: StringRedisTemplate,
-    private val objectMapper: ObjectMapper,
-) : BoardDetailRepository {
+    private val dataSerializer: DataSerializer,
+) {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
-    private val log by lazy { LoggerFactory.getLogger(this::class.java) }
+    companion object {
+        fun detailKey(boardId: Long) = "board:detail:json::$boardId"
+        fun detailStateKey(boardId: Long) = "board:detailstate::$boardId"
+    }
 
-    override fun create(boardModel: BoardReadModel, ttl: Duration) {
-        RedisOperationUtils.executeWithRetry(
-            logger = log,
-            operationName = "게시글 상세 정보 저장",
-            detailInfo = "boardId: ${boardModel.id}",
-            errorCode = null
-        ) {
-            val key = RedisKeyConstants.Board.detailKey(boardModel.id)
-            val existingJson = redisTemplate.opsForValue().get(key)
-            if (existingJson != null) {
-                val existing = objectMapper.readValue(existingJson, BoardReadModel::class.java)
-                if (existing.updatedAt >= boardModel.updatedAt) {
-                    log.info("Board detail for id {} is already up-to-date. Skipping creation.", boardModel.id)
-                    return@executeWithRetry
+    // ========================
+    // 1) Read
+    // ========================
+    fun findBoardDetail(boardId: Long): BoardReadModel? {
+        return redisTemplate.opsForValue().get(detailKey(boardId))
+            ?.let { dataSerializer.deserialize(it, BoardReadModel::class) }
+    }
+
+    // bulk read (pipeline) – optional
+    fun findBoardDetails(boardIds: List<Long>): Map<Long, BoardReadModel> {
+        if (boardIds.isEmpty()) return emptyMap()
+
+        val keys = boardIds.map { detailKey(it) }
+        val values = redisTemplate.opsForValue().multiGet(keys)
+        val resultMap = mutableMapOf<Long, BoardReadModel>()
+        boardIds.forEachIndexed { index, boardId ->
+            val data = values?.get(index)
+            if (data != null) {
+                dataSerializer.deserialize(data, BoardReadModel::class)?.let {
+                    resultMap[boardId] = it
                 }
             }
-            val json = objectMapper.writeValueAsString(boardModel)
-            redisTemplate.opsForValue().set(key, json, ttl)
+        }
+
+        return resultMap
+    }
+
+    // ========================
+    // 2) Write (with eventTs)
+    // ========================
+    fun saveBoardDetail(board: BoardReadModel, eventTs: Long) {
+        redisTemplate.executePipelined { conn ->
+            val stringConn = conn as StringRedisConnection
+            saveBoardDetailInPipeline(stringConn, board, eventTs)
+            null
         }
     }
 
-    override fun update(boardModel: BoardReadModel) {
-        RedisOperationUtils.executeWithRetry(
-            logger = log,
-            operationName = "게시글 상세 정보 업데이트",
-            detailInfo = "boardId: ${boardModel.id}",
-            errorCode = null
-        ) {
-            val key = RedisKeyConstants.Board.detailKey(boardModel.id)
-            val existingJson = redisTemplate.opsForValue().get(key)
-            if (existingJson != null) {
-                val existing = objectMapper.readValue(existingJson, BoardReadModel::class.java)
-                if (existing.updatedAt >= boardModel.updatedAt) {
-                    log.info("Board detail for id {} is already up-to-date. Skipping update.", boardModel.id)
-                    return@executeWithRetry
-                }
+    fun saveBoardDetails(boards: List<BoardReadModel>, eventTs: Long) {
+        if (boards.isEmpty()) return
+        redisTemplate.executePipelined { conn ->
+            val stringConn = conn as StringRedisConnection
+            boards.forEach { b ->
+                saveBoardDetailInPipeline(stringConn, b, eventTs)
             }
-            val json = objectMapper.writeValueAsString(boardModel)
-            redisTemplate.opsForValue().set(key, json)
+            null
         }
     }
 
-    override fun delete(boardId: Long) {
-        RedisOperationUtils.executeWithRetry(
-            logger = log,
-            operationName = "게시글 상세 정보 삭제",
-            detailInfo = "boardId: $boardId",
-            errorCode = null
-        ) {
-            redisTemplate.delete(RedisKeyConstants.Board.detailKey(boardId))
-        }
+    /**
+     * 파이프라인 내부 – eventTs 비교 후 JSON 직렬화
+     */
+    fun saveBoardDetailInPipeline(conn: StringRedisConnection, board: BoardReadModel, eventTs: Long) {
+        val stateKey = detailStateKey(board.id)
+        val json = dataSerializer.serialize(board)
+            ?: throw AppException.fromErrorCode(ErrorCode.SERIALIZATION_FAILURE)
+        conn.set(detailKey(board.id), json)
+        conn.hSet(stateKey, "eventTs", eventTs.toString())
     }
 
-    override fun read(boardId: Long): BoardReadModel? {
-        return RedisOperationUtils.executeWithRetry(
-            logger = log,
-            operationName = "게시글 상세 정보 조회",
-            detailInfo = "boardId: $boardId",
-            errorCode = null
-        ) {
-            val key = RedisKeyConstants.Board.detailKey(boardId)
-            val json = redisTemplate.opsForValue().get(key) ?: return@executeWithRetry null
-            objectMapper.readValue(json, BoardReadModel::class.java)
-        }
-    }
+    /**
+     * 게시글 수정 (제목, 내용만 업데이트)
+     */
+    fun updateBoardContentInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        title: String,
+        content: String,
+        eventTs: Long
+    ) {
+        val detailKey = detailKey(boardId)
+        val stateKey = detailStateKey(boardId)
+        val currentTs = conn.hGet(stateKey, "lastDetailUpdateTs")?.toLongOrNull() ?: 0
 
-    override fun readAll(boardIds: List<Long>): Map<Long, BoardReadModel> {
-        return RedisOperationUtils.executeWithRetry(
-            logger = log,
-            operationName = "게시글 상세 정보 일괄 조회",
-            detailInfo = "boardIds: $boardIds",
-            errorCode = null
-        ) {
-            if (boardIds.isEmpty()) return@executeWithRetry emptyMap()
-            val keys = boardIds.map { RedisKeyConstants.Board.detailKey(it) }
-            val values = redisTemplate.opsForValue().multiGet(keys) ?: return@executeWithRetry emptyMap()
-            boardIds.zip(values)
-                .filter { (_, json) -> json != null }
-                .associate { (id, json) ->
-                    id to objectMapper.readValue(json!!, BoardReadModel::class.java)
-                }
+        if (eventTs <= currentTs) {
+            // 이미 처리된 이벤트면 무시
+            return
         }
+
+        // 제목, 내용 업데이트
+        conn.hSet(detailKey, "title", title)
+        conn.hSet(detailKey, "content", content)
+
+        // 이벤트 타임스탬프 업데이트
+        conn.hSet(stateKey, "lastDetailUpdateTs", eventTs.toString())
+
+        log.debug("Updated board content: boardId={}, eventTs={}", boardId, eventTs)
     }
 }

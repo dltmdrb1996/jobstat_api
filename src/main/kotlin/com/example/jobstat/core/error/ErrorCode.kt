@@ -43,4 +43,5 @@ enum class ErrorCode(
     LIKE_COUNT_UPDATE_FAILED("S011", "좋아요 수 업데이트 실패", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
     COMMENT_COUNT_UPDATE_FAILED("S012", "댓글 수 업데이트 실패", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
     CACHE_INVALIDATION_FAILED("S013", "캐시 무효화 실패", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
+    INVALID_RESPONSE("S014", "유효하지 않은 응답입니다", HttpStatus.INTERNAL_SERVER_ERROR, AppExceptionType.SERVER_ERROR),
 }

@@ -1,4 +1,4 @@
-package com.example.jobstat.core.event.outbox
+package com.example.jobstat.core.event.outbox.shard
 
 data class OutboxShardAssignment(
     val shards: List<Long> = emptyList()

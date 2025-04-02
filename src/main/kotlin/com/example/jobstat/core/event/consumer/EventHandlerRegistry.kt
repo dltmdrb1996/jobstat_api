@@ -1,3 +1,5 @@
+package com.example.jobstat.core.event.consumer
+
 import com.example.jobstat.core.event.Event
 import com.example.jobstat.core.event.EventPayload
 import com.example.jobstat.core.event.EventType
@@ -10,7 +12,6 @@ import jakarta.annotation.PostConstruct
 
 @Component
 class EventHandlerRegistry(
-    // 모든 EventHandlingUseCase 구현체가 주입됨
     private val handlers: List<EventHandlingUseCase<*, *, *>>,
     private val retryTemplate: RetryTemplate,
     private val dlqPublisher: DLQPublisher

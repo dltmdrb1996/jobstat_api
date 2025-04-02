@@ -2,6 +2,8 @@ package com.example.jobstat.community_read.scheduler
 
 import com.example.jobstat.community_read.repository.RedisBoardDetailRepository
 import com.example.jobstat.community_read.repository.RedisBoardIdListRepository
+import com.example.jobstat.community_read.service.CommunityReadService
+import com.example.jobstat.core.global.extension.toEpochMilli
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -20,10 +22,11 @@ import java.util.concurrent.TimeUnit
 @Component
 @EnableScheduling
 class CacheCleanupScheduler(
-    private val redisTemplate: StringRedisTemplate
+    private val redisTemplate: StringRedisTemplate,
+    private val communityReadService: CommunityReadService
 ) {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
-    
+
     /**
      * 일간 캐시 정리 (매일 새벽 1시에 실행)
      * 하루가 지난 게시글을 일간 좋아요/조회수 순위 목록에서 제거
@@ -33,31 +36,31 @@ class CacheCleanupScheduler(
         try {
             log.info("[CacheCleanupScheduler] 일간 캐시 정리 시작")
             val startTime = System.currentTimeMillis()
-            
+
             // 게시글 스캔 및 필터링
             val dayAgo = Instant.now().minus(1, ChronoUnit.DAYS).toEpochMilli()
-            
+
             // 일간 좋아요 순위 정리
             cleanupExpiredElements(
-                RedisBoardIdListRepository.BOARDS_BY_LIKES_DAY_KEY, 
+                RedisBoardIdListRepository.BOARDS_BY_LIKES_DAY_KEY,
                 dayAgo,
                 "일간 좋아요 순위"
             )
-            
+
             // 일간 조회수 순위 정리
             cleanupExpiredElements(
-                RedisBoardIdListRepository.BOARDS_BY_VIEWS_DAY_KEY, 
+                RedisBoardIdListRepository.BOARDS_BY_VIEWS_DAY_KEY,
                 dayAgo,
                 "일간 조회수 순위"
             )
-            
+
             val duration = System.currentTimeMillis() - startTime
             log.info("[CacheCleanupScheduler] 일간 캐시 정리 완료: 소요 시간 {}ms", duration)
         } catch (e: Exception) {
             log.error("[CacheCleanupScheduler] 일간 캐시 정리 중 오류 발생", e)
         }
     }
-    
+
     /**
      * 주간 캐시 정리 (매주 월요일 새벽 2시에 실행)
      * 7일이 지난 게시글을 주간 좋아요/조회수 순위 목록에서 제거
@@ -67,31 +70,31 @@ class CacheCleanupScheduler(
         try {
             log.info("[CacheCleanupScheduler] 주간 캐시 정리 시작")
             val startTime = System.currentTimeMillis()
-            
+
             // 게시글 스캔 및 필터링
             val weekAgo = Instant.now().minus(7, ChronoUnit.DAYS).toEpochMilli()
-            
+
             // 주간 좋아요 순위 정리
             cleanupExpiredElements(
-                RedisBoardIdListRepository.BOARDS_BY_LIKES_WEEK_KEY, 
+                RedisBoardIdListRepository.BOARDS_BY_LIKES_WEEK_KEY,
                 weekAgo,
                 "주간 좋아요 순위"
             )
-            
+
             // 주간 조회수 순위 정리
             cleanupExpiredElements(
-                RedisBoardIdListRepository.BOARDS_BY_VIEWS_WEEK_KEY, 
+                RedisBoardIdListRepository.BOARDS_BY_VIEWS_WEEK_KEY,
                 weekAgo,
                 "주간 조회수 순위"
             )
-            
+
             val duration = System.currentTimeMillis() - startTime
             log.info("[CacheCleanupScheduler] 주간 캐시 정리 완료: 소요 시간 {}ms", duration)
         } catch (e: Exception) {
             log.error("[CacheCleanupScheduler] 주간 캐시 정리 중 오류 발생", e)
         }
     }
-    
+
     /**
      * 월간 캐시 정리 (매월 1일 새벽 3시에 실행)
      * 30일이 지난 게시글을 월간 좋아요/조회수 순위 목록에서 제거
@@ -101,31 +104,31 @@ class CacheCleanupScheduler(
         try {
             log.info("[CacheCleanupScheduler] 월간 캐시 정리 시작")
             val startTime = System.currentTimeMillis()
-            
+
             // 게시글 스캔 및 필터링
             val monthAgo = Instant.now().minus(30, ChronoUnit.DAYS).toEpochMilli()
-            
+
             // 월간 좋아요 순위 정리
             cleanupExpiredElements(
-                RedisBoardIdListRepository.BOARDS_BY_LIKES_MONTH_KEY, 
+                RedisBoardIdListRepository.BOARDS_BY_LIKES_MONTH_KEY,
                 monthAgo,
                 "월간 좋아요 순위"
             )
-            
+
             // 월간 조회수 순위 정리
             cleanupExpiredElements(
-                RedisBoardIdListRepository.BOARDS_BY_VIEWS_MONTH_KEY, 
+                RedisBoardIdListRepository.BOARDS_BY_VIEWS_MONTH_KEY,
                 monthAgo,
                 "월간 조회수 순위"
             )
-            
+
             val duration = System.currentTimeMillis() - startTime
             log.info("[CacheCleanupScheduler] 월간 캐시 정리 완료: 소요 시간 {}ms", duration)
         } catch (e: Exception) {
             log.error("[CacheCleanupScheduler] 월간 캐시 정리 중 오류 발생", e)
         }
     }
-    
+
     /**
      * 모든 캐시 정리 (매일 새벽 4시에 실행)
      * 모든 기간의 캐시를 한 번에 정리
@@ -135,31 +138,31 @@ class CacheCleanupScheduler(
         try {
             log.info("[CacheCleanupScheduler] 전체 캐시 정리 시작")
             val startTime = System.currentTimeMillis()
-            
+
             // 각 기간별 기준 시간 계산
             val dayAgo = Instant.now().minus(1, ChronoUnit.DAYS).toEpochMilli()
             val weekAgo = Instant.now().minus(7, ChronoUnit.DAYS).toEpochMilli()
             val monthAgo = Instant.now().minus(30, ChronoUnit.DAYS).toEpochMilli()
-            
+
             // 일간 캐시 정리
             cleanupExpiredElements(RedisBoardIdListRepository.BOARDS_BY_LIKES_DAY_KEY, dayAgo, "일간 좋아요 순위")
             cleanupExpiredElements(RedisBoardIdListRepository.BOARDS_BY_VIEWS_DAY_KEY, dayAgo, "일간 조회수 순위")
-            
+
             // 주간 캐시 정리
             cleanupExpiredElements(RedisBoardIdListRepository.BOARDS_BY_LIKES_WEEK_KEY, weekAgo, "주간 좋아요 순위")
             cleanupExpiredElements(RedisBoardIdListRepository.BOARDS_BY_VIEWS_WEEK_KEY, weekAgo, "주간 조회수 순위")
-            
+
             // 월간 캐시 정리
             cleanupExpiredElements(RedisBoardIdListRepository.BOARDS_BY_LIKES_MONTH_KEY, monthAgo, "월간 좋아요 순위")
             cleanupExpiredElements(RedisBoardIdListRepository.BOARDS_BY_VIEWS_MONTH_KEY, monthAgo, "월간 조회수 순위")
-            
+
             val duration = System.currentTimeMillis() - startTime
             log.info("[CacheCleanupScheduler] 전체 캐시 정리 완료: 소요 시간 {}ms", duration)
         } catch (e: Exception) {
             log.error("[CacheCleanupScheduler] 전체 캐시 정리 중 오류 발생", e)
         }
     }
-    
+
     /**
      * 수동 캐시 정리 (API 또는 관리자 도구에서 호출 가능)
      * 모든 기간의 캐시를 강제로 정리
@@ -174,7 +177,7 @@ class CacheCleanupScheduler(
             throw e
         }
     }
-    
+
     /**
      * 기간이 지난 요소를 정리
      * @param key Redis 키
@@ -182,67 +185,167 @@ class CacheCleanupScheduler(
      * @param label 로깅용 레이블
      */
     private fun cleanupExpiredElements(key: String, timestampThreshold: Long, label: String) {
-        // 게시글 ID 형식: %019d (19자리 숫자, 0으로 패딩)
         val cursor = redisTemplate.opsForZSet().scan(
             key,
             org.springframework.data.redis.core.ScanOptions.scanOptions().count(100).build()
         )
 
         val expiredElements = mutableListOf<String>()
+        val boardIdsToCheck = mutableListOf<Long>()
 
         try {
             while (cursor.hasNext()) {
                 val tuple = cursor.next()
-                val boardIdPadded = tuple.value // TypedTuple에서 값을 추출
+                val boardIdStr = tuple.value
 
-                if (boardIdPadded != null) {
+                if (boardIdStr != null) {
                     try {
                         // 게시글 ID 추출
-                        val boardId = boardIdPadded.toLong()
-
-                        // 게시글 상세 정보 키 형식 사용 (RedisBoardDetailRepository와 일치)
-                        val boardKey = RedisBoardDetailRepository.BOARD_KEY_FORMAT.format(boardId)
-
-                        // 게시글 JSON 데이터 조회
-                        val boardJson = redisTemplate.opsForValue().get(boardKey)
-
-                        if (boardJson == null) {
-                            // 게시글 정보가 없으면 제거 대상으로 간주
-                            expiredElements.add(boardIdPadded)
-                        } else {
-                            // JSON에서 createdAt 정보 추출 (ObjectMapper 없이 간단히 처리)
-                            val createdAtPattern = "\"createdAt\"\\s*:\\s*\"([^\"]+)\"".toRegex()
-                            val matchResult = createdAtPattern.find(boardJson)
-
-                            if (matchResult != null) {
-                                val createdAt = matchResult.groupValues[1]
-                                val createdTimestamp = Instant.parse(createdAt).toEpochMilli()
-
-                                if (createdTimestamp < timestampThreshold) {
-                                    expiredElements.add(boardIdPadded)
-                                }
-                            } else {
-                                // createdAt을 찾을 수 없으면 보수적으로 유지
-                                log.warn("[CacheCleanupScheduler] 게시글 JSON에서 createdAt을 찾을 수 없음: boardId={}", boardId)
-                            }
-                        }
+                        val boardId = boardIdStr.toLong()
+                        // 검증 대상 목록에 추가
+                        boardIdsToCheck.add(boardId)
                     } catch (e: Exception) {
-                        log.warn("[CacheCleanupScheduler] 게시글 확인 중 오류: boardId={}, error={}", boardIdPadded, e.message)
-                        // 오류 발생해도 계속 진행
+                        log.warn("[CacheCleanupScheduler] 게시글 ID 변환 중 오류: boardId={}, error={}", boardIdStr, e.message)
                     }
                 }
             }
         } finally {
-            TimeUnit.MILLISECONDS.sleep(100) // 약간의 지연으로 부하 감소
             cursor.close()
         }
 
-        // 한 번에 일괄 삭제
-        if (expiredElements.isNotEmpty()) {
-            redisTemplate.opsForZSet().remove(key, *expiredElements.toTypedArray())
-            log.info("[CacheCleanupScheduler] {}에서 만료된 게시글 {} 개 제거", label, expiredElements.size)
-        } else {
-            log.info("[CacheCleanupScheduler] {}에서 만료된 게시글 없음", label)
+        if (boardIdsToCheck.isEmpty()) {
+            log.info("[CacheCleanupScheduler] {}에서 검증할 게시글 없음", label)
+            return
+        }
+
+        log.info("[CacheCleanupScheduler] {}에서 {} 개 게시글 검증 시작", label, boardIdsToCheck.size)
+
+        // 서비스를 통해 게시글 세부 정보 조회 (DB 조회 포함)
+        try {
+            val boardDetails = communityReadService.getBoardByIdsWithFetch(boardIdsToCheck)
+
+            // 검증: 기간이 지난 게시글 찾기
+            for (boardId in boardIdsToCheck) {
+                val board = boardDetails.find { it.id == boardId }
+
+                if (board == null) {
+                    // DB에도 없는 게시글은 제거 대상
+                    expiredElements.add(boardId.toString())
+                    log.debug("[CacheCleanupScheduler] DB에 존재하지 않는 게시글 제거 대상으로 설정: boardId={}", boardId)
+                } else {
+                    // 날짜 확인
+                    val createdTimestamp = board.createdAt.toEpochMilli()
+
+                    if (createdTimestamp < timestampThreshold) {
+                        // 기간이 지난 게시글은 제거 대상
+                        expiredElements.add(boardId.toString())
+                        log.debug("[CacheCleanupScheduler] 기간 경과로 제거 대상으로 설정: boardId={}, createdAt={}",
+                            boardId, board.createdAt)
+                    }
+                }
+            }
+
+            // 한 번에 일괄 삭제
+            if (expiredElements.isNotEmpty()) {
+                redisTemplate.opsForZSet().remove(key, *expiredElements.toTypedArray())
+                log.info("[CacheCleanupScheduler] {}에서 만료된 게시글 {} 개 제거", label, expiredElements.size)
+            } else {
+                log.info("[CacheCleanupScheduler] {}에서 만료된 게시글 없음", label)
+            }
+
+        } catch (e: Exception) {
+            log.error("[CacheCleanupScheduler] 게시글 검증 중 오류 발생", e)
         }
     }
-} 
+
+    /**
+     * 미아 데이터 검증 및 정리 (매일 새벽 5시에 실행)
+     * 랭킹은 있지만 상세 정보가 없는 데이터를 검증하고 필요한 경우 DB에서 가져온 후 정리
+     */
+    @Scheduled(cron = "0 0 5 * * *")
+    fun verifyAndReconcileData() {
+        try {
+            log.info("[CacheCleanupScheduler] 데이터 일관성 검증 및 복구 시작")
+            val startTime = System.currentTimeMillis()
+
+            // 모든 랭킹 키 목록
+            val rankingKeys = listOf(
+                RedisBoardIdListRepository.BOARDS_BY_LIKES_DAY_KEY,
+                RedisBoardIdListRepository.BOARDS_BY_LIKES_WEEK_KEY,
+                RedisBoardIdListRepository.BOARDS_BY_LIKES_MONTH_KEY,
+                RedisBoardIdListRepository.BOARDS_BY_VIEWS_DAY_KEY,
+                RedisBoardIdListRepository.BOARDS_BY_VIEWS_WEEK_KEY,
+                RedisBoardIdListRepository.BOARDS_BY_VIEWS_MONTH_KEY
+            )
+
+            // 각 랭킹 키에 대해 재검증 및 복구 수행
+            for (key in rankingKeys) {
+                verifyAndReconcileRankingData(key)
+            }
+
+            val duration = System.currentTimeMillis() - startTime
+            log.info("[CacheCleanupScheduler] 데이터 일관성 검증 및 복구 완료: 소요 시간 {}ms", duration)
+        } catch (e: Exception) {
+            log.error("[CacheCleanupScheduler] 데이터 일관성 검증 및 복구 중 오류 발생", e)
+        }
+    }
+
+    /**
+     * 랭킹 데이터 검증 및 복구
+     * - Redis에 있지만 상세 정보가 없는 게시글: DB에서 조회하여 복구 시도
+     * - DB에도 없는 게시글: 랭킹에서 제거
+     */
+    private fun verifyAndReconcileRankingData(key: String) {
+        try {
+            log.info("[CacheCleanupScheduler] {} 랭킹 데이터 검증 및 복구 시작", key)
+
+            val cursor = redisTemplate.opsForZSet().scan(
+                key,
+                org.springframework.data.redis.core.ScanOptions.scanOptions().count(100).build()
+            )
+
+            val boardIds = mutableListOf<Long>()
+
+            try {
+                while (cursor.hasNext()) {
+                    val tuple = cursor.next()
+                    val boardIdStr = tuple.value
+
+                    if (boardIdStr != null) {
+                        try {
+                            boardIds.add(boardIdStr.toLong())
+                        } catch (e: Exception) {
+                            log.warn("[CacheCleanupScheduler] ID 변환 오류: {}", boardIdStr)
+                        }
+                    }
+                }
+            } finally {
+                cursor.close()
+            }
+
+            if (boardIds.isEmpty()) {
+                log.info("[CacheCleanupScheduler] {}에 검증할 데이터 없음", key)
+                return
+            }
+
+            // 서비스를 통해 게시글 정보 조회 (캐시 미스 시 DB에서 자동 조회)
+            log.info("[CacheCleanupScheduler] {}의 {} 개 게시글 검증", key, boardIds.size)
+            val boardDetails = communityReadService.getBoardByIdsWithFetch(boardIds)
+
+            // DB에도 없는 게시글 식별
+            val validIds = boardDetails.map { it.id }.toSet()
+            val invalidIds = boardIds.filter { !validIds.contains(it) }
+
+            if (invalidIds.isNotEmpty()) {
+                // DB에 없는 게시글은 랭킹에서 제거
+                redisTemplate.opsForZSet().remove(key, *invalidIds.map { it.toString() }.toTypedArray())
+                log.info("[CacheCleanupScheduler] {}에서 DB에 존재하지 않는 게시글 {} 개 제거", key, invalidIds.size)
+            } else {
+                log.info("[CacheCleanupScheduler] {}의 모든 게시글이 유효함", key)
+            }
+
+        } catch (e: Exception) {
+            log.error("[CacheCleanupScheduler] {} 랭킹 데이터 검증 및 복구 중 오류 발생", key, e)
+        }
+    }
+}

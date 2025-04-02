@@ -2,7 +2,6 @@ package com.example.jobstat.community_read.usecase.query
 
 import com.example.jobstat.community_read.model.BoardReadModel
 import com.example.jobstat.community_read.client.BoardClient
-import com.example.jobstat.community_read.client.response.BoardReadResponse
 import com.example.jobstat.community_read.client.mapper.ResponseMapper
 import com.example.jobstat.community_read.repository.BoardDetailRepository
 import com.example.jobstat.community_read.repository.BoardIdListRepository
