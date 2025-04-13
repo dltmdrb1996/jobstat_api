@@ -29,7 +29,7 @@ class CustomModelConverter : ModelConverter {
         if (type !is ParameterizedType) return resolvedSchema
 
         val rawClass = type.rawType as? Class<*> ?: return resolvedSchema
-        if (rawClass.canonicalName != "com.example.jobstat.core.wrapper.ApiResponse") {
+        if (rawClass.canonicalName != "com.example.jobstat.core.global.wrapper.ApiResponse") {
             return resolvedSchema
         }
 

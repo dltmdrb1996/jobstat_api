@@ -35,7 +35,7 @@ class OpenApiConfig(
             .info(
                 Info()
                     .title("JobStat API")
-                    .version("v1")
+                    .version("v2")
                     .description("JobStat 애플리케이션의 API 문서"),
             ).servers(
                 listOf(

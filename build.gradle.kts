@@ -108,6 +108,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.0")
 //    testImplementation("io.mockk:mockk:1.13.16")
 
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.2.1") // 실제 최신 버전 확인 필요
+
     // 컨테이너 테스트 관련
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:mongodb:1.20.4")

@@ -8,7 +8,7 @@ import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingTyp
 import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisService
 import com.example.jobstat.statistics_read.stats.document.IndustryStatsDocument
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull

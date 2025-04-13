@@ -71,12 +71,7 @@ batch:
   job-size: 100
 
 logging:
-  #  level:
-  #    io.lettuce.core: DEBUG
-  #    org.springframework.data.redis: DEBUG
-  file:
-    name: logs/application.log
-  logback:
-    rollingpolicy:
-      max-file-size: 10MB
-      max-history: 30
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE # Hibernate 6+ 대비

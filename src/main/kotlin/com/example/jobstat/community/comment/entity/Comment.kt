@@ -1,8 +1,8 @@
 package com.example.jobstat.community.comment.entity
 
 import com.example.jobstat.community.board.entity.Board
-import com.example.jobstat.community.comment.CommentConstants
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.community.comment.utils.CommentConstants
+import com.example.jobstat.core.base.AuditableEntitySnow
 import jakarta.persistence.*
 
 @Entity
@@ -13,7 +13,7 @@ internal class Comment protected constructor(
     password: String?,
     board: Board,
     userId: Long?,
-) : BaseEntity() {
+) : AuditableEntitySnow() {
 
     @Column(nullable = false, length = CommentConstants.MAX_CONTENT_LENGTH)
     var content: String = content

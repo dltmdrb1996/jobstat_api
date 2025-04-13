@@ -10,7 +10,7 @@ import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisServi
 import com.example.jobstat.statistics_read.stats.document.*
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull

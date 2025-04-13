@@ -9,7 +9,8 @@ import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.security.*
 import com.example.jobstat.core.usecase.impl.ValidUseCase
-import jakarta.transaction.Transactional
+import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
@@ -31,6 +32,10 @@ internal class Login(
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     @Transactional
+    override fun invoke(request: Request): Response {
+        return super.invoke(request)
+    }
+
     override fun execute(request: Request): Response {
         val totalStartTime = Instant.now()
         
@@ -55,7 +60,7 @@ internal class Login(
             refreshToken = refreshToken,
             expiresAt = expiresAt,
             user = UserResponse(
-                id = user.id,
+                id = user.id.toString(),
                 username = user.username,
                 email = user.email,
                 roles = user.getRolesString(),
@@ -150,24 +155,86 @@ internal class Login(
         )
     }
 
+    @Schema(
+        name = "LoginRequest",
+        description = "로그인 요청 모델"
+    )
     data class Request(
-        @field:Pattern(regexp = UserConstants.Patterns.EMAIL_PATTERN)
+        @field:Schema(
+            description = "이메일 주소", 
+            example = "user@example.com",
+            pattern = UserConstants.Patterns.EMAIL_PATTERN,
+            required = true
+        )
+        @field:Pattern(regexp = UserConstants.Patterns.EMAIL_PATTERN, message = "유효한 이메일 형식이 아닙니다")
         val email: String,
+        
+        @field:Schema(
+            description = "비밀번호", 
+            example = "Password1234!",
+            required = true
+        )
         @field:NotBlank(message = UserConstants.ErrorMessages.PASSWORD_REQUIRED)
         val password: String,
     )
 
+    @Schema(
+        name = "LoginResponse",
+        description = "로그인 응답 모델"
+    )
     data class Response(
+        @field:Schema(
+            description = "발급된 액세스 토큰", 
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        )
         val accessToken: String,
+        
+        @field:Schema(
+            description = "발급된 리프레시 토큰", 
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        )
         val refreshToken: String,
+        
+        @field:Schema(
+            description = "토큰 만료 시간", 
+            example = "2023-12-31T23:59:59Z",
+            format = "date-time"
+        )
         val expiresAt: Instant,
+        
+        @field:Schema(
+            description = "로그인한 사용자 정보"
+        )
         val user: UserResponse,
     )
 
+    @Schema(
+        name = "LoginUserResponse",
+        description = "로그인 사용자 정보 모델"
+    )
     data class UserResponse(
-        val id: Long,
+        @field:Schema(
+            description = "사용자 ID", 
+            example = "1"
+        )
+        val id: String,
+        
+        @field:Schema(
+            description = "사용자명", 
+            example = "홍길동"
+        )
         val username: String,
+        
+        @field:Schema(
+            description = "이메일 주소", 
+            example = "user@example.com"
+        )
         val email: String,
+        
+        @field:Schema(
+            description = "사용자 권한 목록", 
+            example = "[\"ROLE_USER\", \"ROLE_ADMIN\"]"
+        )
         val roles: List<String>,
     )
 }

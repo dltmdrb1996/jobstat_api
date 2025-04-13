@@ -37,6 +37,7 @@ class GlobalExceptionHandler(
             }
 
         // 에러 타입에 따라 로깅 레벨 조정
+        if(isDev) ex.printStackTrace()
         when {
             appException.isServerError() -> {
                 log.error("Server Error [{}]: {} - {}",
@@ -44,7 +45,6 @@ class GlobalExceptionHandler(
                     appException.message,
                     appException.detailInfo()
                 )
-                ex.printStackTrace()
                 if (isProd) captureEvent(appException, errorId)
             }
             else -> {

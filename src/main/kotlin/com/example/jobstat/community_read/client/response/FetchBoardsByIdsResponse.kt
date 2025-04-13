@@ -1,18 +1,20 @@
 package com.example.jobstat.community_read.client.response
 
-import com.example.jobstat.community_read.model.BoardReadModel
+import com.example.jobstat.community_read.model.BoardReadModel // BoardReadModel import 가정
 import java.time.LocalDateTime
 
 data class FetchBoardsByIdsResponse(
     val boards: List<BoardItem>
 ) {
-    fun toBoardReadModels(): List<BoardReadModel> {
-        return boards.map { it.toBoardReadModel() }
+    companion object {
+        fun from(response: FetchBoardsByIdsResponse): List<BoardReadModel> {
+            return response.boards.map { BoardItem.from(it) }
+        }
     }
 }
 
 data class BoardItem(
-    val id: Long,
+    val id: String,
     val userId: Long?,
     val categoryId: Long,
     val title: String,
@@ -25,22 +27,21 @@ data class BoardItem(
     val createdAt: LocalDateTime,
     val eventTs : Long
 ) {
-    fun toBoardReadModel(): BoardReadModel {
-        return BoardReadModel(
-            id = id,
-            createdAt = createdAt,
-            title = title,
-            content = content,
-            author = author,
-            categoryId = categoryId,
-            userId = userId,
-            viewCount = viewCount,
-            likeCount = likeCount,
-            commentCount = commentCount,
-            eventTs = eventTs
-        )
+    companion object {
+        fun from(item: BoardItem): BoardReadModel {
+            return BoardReadModel(
+                id = item.id.toLong(),
+                createdAt = item.createdAt,
+                title = item.title,
+                content = item.content,
+                author = item.author,
+                categoryId = item.categoryId,
+                userId = item.userId,
+                viewCount = item.viewCount,
+                likeCount = item.likeCount,
+                commentCount = item.commentCount,
+                eventTs = item.eventTs
+            )
+        }
     }
 }
-
-
-

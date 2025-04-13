@@ -54,6 +54,20 @@ internal interface CommentJpaRepository : JpaRepository<Comment, Long> {
 
     @Query("SELECT c FROM Comment c WHERE c.id IN :ids")
     fun findAllByIdIn(@Param("ids") ids: List<Long>): List<Comment>
+    
+    @Query("SELECT c FROM Comment c WHERE c.board.id = :boardId AND (:lastCommentId IS NULL OR c.id < :lastCommentId) ORDER BY c.id DESC")
+    fun findCommentsByBoardIdAfter(
+        @Param("boardId") boardId: Long,
+        @Param("lastCommentId") lastCommentId: Long?,
+        pageable: Pageable
+    ): List<Comment>
+    
+    @Query("SELECT c FROM Comment c WHERE c.author = :author AND (:lastCommentId IS NULL OR c.id < :lastCommentId) ORDER BY c.id DESC")
+    fun findCommentsByAuthorAfter(
+        @Param("author") author: String,
+        @Param("lastCommentId") lastCommentId: Long?,
+        pageable: Pageable
+    ): List<Comment>
 }
 
 @Repository
@@ -99,4 +113,18 @@ internal class CommentRepositoryImpl(
     override fun deleteByBoardId(boardId: Long) = commentJpaRepository.deleteByBoardId(boardId)
 
     override fun findAllByIds(ids: List<Long>): List<Comment> = commentJpaRepository.findAllByIdIn(ids)
+    
+    override fun findCommentsByBoardIdAfter(
+        boardId: Long,
+        lastCommentId: Long?,
+        limit: Int
+    ): List<Comment> = 
+        commentJpaRepository.findCommentsByBoardIdAfter(boardId, lastCommentId, Pageable.ofSize(limit))
+    
+    override fun findCommentsByAuthorAfter(
+        author: String,
+        lastCommentId: Long?,
+        limit: Int
+    ): List<Comment> = 
+        commentJpaRepository.findCommentsByAuthorAfter(author, lastCommentId, Pageable.ofSize(limit))
 }

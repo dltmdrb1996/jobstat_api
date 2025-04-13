@@ -1,6 +1,6 @@
 package com.example.jobstat.auth.user.entity
 
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.AuditableEntitySnow
 import jakarta.persistence.*
 
 @Entity
@@ -20,7 +20,7 @@ internal class UserRole private constructor(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
     val role: Role,
-) : BaseEntity() {
+) : AuditableEntitySnow() {
     companion object {
         fun create(
             user: User,

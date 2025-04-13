@@ -1,12 +1,41 @@
 package com.example.jobstat.community_read.repository
 
 import com.example.jobstat.community_read.model.BoardReadModel
-import java.time.Duration
+import org.springframework.data.redis.connection.StringRedisConnection
 
 interface BoardDetailRepository {
-    fun create(boardModel: BoardReadModel, ttl: Duration = Duration.ofDays(1))
-    fun update(boardModel: BoardReadModel)
-    fun delete(boardId: Long)
-    fun read(boardId: Long): BoardReadModel?
-    fun readAll(boardIds: List<Long>): Map<Long, BoardReadModel>
+    /**
+     * 게시글 상세 정보 조회
+     */
+    fun findBoardDetail(boardId: Long): BoardReadModel?
+    
+    /**
+     * 여러 게시글 상세 정보 조회
+     */
+    fun findBoardDetails(boardIds: List<Long>): Map<Long, BoardReadModel>
+    
+    /**
+     * 게시글 상세 정보 저장
+     */
+    fun saveBoardDetail(board: BoardReadModel, eventTs: Long)
+    
+    /**
+     * 여러 게시글 상세 정보 저장
+     */
+    fun saveBoardDetails(boards: List<BoardReadModel>, eventTs: Long)
+    
+    /**
+     * 파이프라인에서 게시글 상세 정보 저장
+     */
+    fun saveBoardDetailInPipeline(conn: StringRedisConnection, board: BoardReadModel)
+    
+//    /**
+//     * 파이프라인에서 게시글 내용 업데이트
+//     */
+//    fun updateBoardContentInPipeline(
+//        conn: StringRedisConnection,
+//        boardId: Long,
+//        title: String,
+//        content: String,
+//    )
 }

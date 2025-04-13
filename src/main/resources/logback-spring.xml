@@ -114,10 +114,17 @@
         <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
-
         <logger name="org.hibernate.type.descriptor.sql" level="TRACE" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
+<!--        <logger name="org.hibernate.engine.jdbc" level="DEBUG"/>-->
+<!--        <logger name="org.hibernate.orm.jdbc" level="DEBUG"/>-->
+<!--        <logger name="org.hibernate.orm.jdbc.SQL" level="DEBUG" additivity="false">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </logger>-->
+<!--        <logger name="org.hibernate.orm.jdbc.bind" level="TRACE" additivity="false">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </logger>-->
     </springProfile>
 
     <springProfile name="prod">

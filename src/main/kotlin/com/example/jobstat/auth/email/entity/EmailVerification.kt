@@ -1,6 +1,6 @@
 package com.example.jobstat.auth.email.entity
 
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.AuditableEntitySnow
 import jakarta.persistence.*
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -21,7 +21,7 @@ class EmailVerification(
     email: String,
     code: String,
     expiresAt: LocalDateTime,
-) : BaseEntity(),
+) : AuditableEntitySnow(),
     ReadEmailVerification {
     @Column(nullable = false)
     override val email: String = email

@@ -17,8 +17,6 @@ import java.util.stream.IntStream
 
 inline fun <reified T> T.logger(): Logger = LoggerFactory.getLogger(T::class.java)
 
-fun LocalDateTime.toEpochMilli(): Long = this.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-
 fun Map<*, *>.toJsonString(): String {
     val sb = StringBuilder()
     sb.append("{")

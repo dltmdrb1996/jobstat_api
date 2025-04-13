@@ -15,8 +15,8 @@ import org.springframework.web.servlet.NoHandlerFoundException
 import java.sql.SQLSyntaxErrorException
 
 object ExceptionHandlers {
-    fun handle(ex: Exception): AppException =
-        when (ex) {
+    fun handle(ex: Exception): AppException {
+        return when (ex) {
             is NoHandlerFoundException -> handleNoHandlerFoundException(ex)
             is HttpRequestMethodNotSupportedException -> handleHttpRequestMethodNotSupportedException(ex)
             is MissingServletRequestParameterException -> handleMissingServletRequestParameterException(ex)
@@ -32,6 +32,8 @@ object ExceptionHandlers {
             is IllegalArgumentException -> handleIllegalArgumentException(ex)
             else -> handleUnknownException(ex)
         }
+    }
+
 
     private fun handleNoHandlerFoundException(ex: NoHandlerFoundException): AppException =
         AppException

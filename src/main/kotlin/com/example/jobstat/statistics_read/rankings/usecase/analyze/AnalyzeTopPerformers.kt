@@ -5,7 +5,7 @@ import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisService
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull

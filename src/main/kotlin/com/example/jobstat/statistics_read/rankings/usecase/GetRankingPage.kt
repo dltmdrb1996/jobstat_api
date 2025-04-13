@@ -6,7 +6,7 @@ import com.example.jobstat.statistics_read.rankings.model.RankingPage
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisService
 import io.swagger.v3.oas.annotations.media.Schema
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Service

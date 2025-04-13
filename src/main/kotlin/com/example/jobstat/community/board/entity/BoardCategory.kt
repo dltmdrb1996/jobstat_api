@@ -1,6 +1,6 @@
 package com.example.jobstat.community.board.entity
 
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.BaseAutoIncEntity
 import jakarta.persistence.*
 
 @Entity
@@ -12,7 +12,7 @@ internal class BoardCategory protected constructor(
     name: String,
     displayName: String,
     description: String,
-) : BaseEntity() {
+) : BaseAutoIncEntity() {
     @Column(nullable = false, unique = true, length = 50)
     var name: String = name
         protected set

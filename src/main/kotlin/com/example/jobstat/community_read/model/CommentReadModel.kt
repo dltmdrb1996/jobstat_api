@@ -9,11 +9,10 @@ import java.time.LocalDateTime
 data class CommentReadModel(
     val id: Long,
     val boardId: Long,
-    val content: String,
-    val author: String,
     val userId: Long? = null,
-    val likeCount: Int = 0,
-    val createdAt: LocalDateTime = LocalDateTime.now(),
-    val updatedAt: LocalDateTime = LocalDateTime.now(),
-    val isDeleted: Boolean = false
-) 
+    val author: String,
+    val content: String,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime? = null,
+    val eventTs: Long
+)

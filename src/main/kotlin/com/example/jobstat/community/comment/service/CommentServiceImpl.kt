@@ -79,4 +79,18 @@ internal class CommentServiceImpl(
     
     override fun getCommentsByIds(ids: List<Long>): List<Comment> = 
         commentRepository.findAllByIds(ids)
+        
+    override fun getCommentsByBoardIdAfter(
+        boardId: Long, 
+        lastCommentId: Long?, 
+        limit: Int
+    ): List<Comment> = 
+        commentRepository.findCommentsByBoardIdAfter(boardId, lastCommentId, limit)
+    
+    override fun getCommentsByAuthorAfter(
+        author: String, 
+        lastCommentId: Long?, 
+        limit: Int
+    ): List<Comment> = 
+        commentRepository.findCommentsByAuthorAfter(author, lastCommentId, limit)
 }

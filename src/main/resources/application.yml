@@ -48,9 +48,9 @@ spring:
   cache:
     type: caffeine
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
     consumer:
-      group-id: article-read-group
+      group-id: default-group
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -58,8 +58,9 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-      acks: all
-      retries: 3
+
+
+
   jackson:
     time-zone: Asia/Seoul
     serialization:
@@ -73,21 +74,21 @@ spring:
       password: ${REDIS_PASSWORD:}
       timeout: 3000
 
-logging:
-  level:
-    root: WARN
-    com.example: WARN
-    org:
-      springframework:
-        security: WARN
-      hibernate:
-        SQL: ERROR
-        type:
-          descriptor:
-            sql:
-              BasicBinder: ERROR
-    org.springframework.boot.autoconfigure: WARN
-    org.springframework.data.mongodb.core.MongoTemplate: WARN
+#logging:
+#  level:
+#    root: WARN
+#    com.example: WARN
+#    org:
+#      springframework:
+#        security: WARN
+#      hibernate:
+#        SQL: ERROR
+#        type:
+#          descriptor:
+#            sql:
+#              BasicBinder: ERROR
+#    org.springframework.boot.autoconfigure: WARN
+#    org.springframework.data.mongodb.core.MongoTemplate: WARN
 
 management:
   endpoints:
@@ -107,6 +108,13 @@ management:
     metrics:
       export:
         enabled: true
+
+springdoc:
+  swagger-ui:
+    default-models-expand-depth: 1
+  default-produces-media-type: application/json
+  api-docs:
+    resolve-schema-properties: true
 
 SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
 
@@ -143,7 +151,7 @@ counter:
   like-reset-hour: 0
   user-action-ttl-seconds: 86400
   flush-interval-seconds: 300
-  flush-interval-milliseconds: 300000
+  flush-interval-milliseconds: 10000
   view-count-cache-ttl-seconds: 60
   view-count-sync-interval: 60000
 
@@ -157,3 +165,42 @@ cache:
       ttl-seconds: 600
     count:
       ttl-seconds: 1800
+
+outbox:
+  relay:
+    kafka-send-timeout-seconds: 3
+    scheduler:
+      fixed-delay-seconds: 10
+      initial-delay-seconds: 5
+      cutoff-seconds: 10
+      batch-size: 100
+    max-retry-count: 3
+
+  processor:
+    kafka-send-timeout-seconds: 5
+    max-retry-count: 3
+
+dlt:
+  consumer:
+    group-id: dlt-persistence-group-${spring.profiles.active:dev}
+
+
+kafka:
+  consumer:
+    common:
+      dlt-suffix: .DLT
+      auto-create-dlt: true
+    community-read:
+      topic: community-read
+      group-id: community-read-consumer-group-${spring.profiles.active:dev}
+      retry:
+        attempts: 3
+        delay-ms: 1000
+        multiplier: 2.0
+    community-command:
+      topic: community-command
+      group-id: community-command-consumer-group-${spring.profiles.active:dev} # Command 서비스 컨슈머 그룹 ID (프로파일 포함, Read 그룹과 달라야 함)
+      retry: # 재시도 설정 (Read 서비스와 동일하게 설정하거나 필요에 따라 조정 가능)
+        attempts: 3             # 재시도 횟수
+        delay-ms: 1000          # 초기 재시도 지연 시간 (ms)
+        multiplier: 2.0         # 재시도 지연 시간 배수

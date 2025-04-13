@@ -18,7 +18,7 @@ class KspBatchProcessor : SymbolProcessorProvider {
                     try {
                         generateMapperFile(classDeclaration, environment)
                     } catch (e: Exception) {
-                        environment.log.error(
+                        environment.logger.error(
                             "Failed to generate mapper for ${classDeclaration.qualifiedName?.asString()}: ${e.message}",
                             classDeclaration
                         )

@@ -10,7 +10,7 @@ interface EventPublisher {
      * @param payload 이벤트 페이로드
      * @param sharedKey 샤딩 키
      */
-    fun publish(type: EventType, payload: EventPayload, sharedKey: Long)
+    fun publish(type: EventType, payload: EventPayload)
 
     /**
      * 이 퍼블리셔가 지원하는 이벤트 타입들을 반환

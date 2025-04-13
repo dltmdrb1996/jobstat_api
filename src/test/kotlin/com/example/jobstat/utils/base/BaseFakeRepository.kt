@@ -1,6 +1,6 @@
 package com.example.jobstat.utils.base
 
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.BaseAutoIncEntity
 import com.example.jobstat.utils.TestFixture
 import jakarta.persistence.EntityNotFoundException
 import java.lang.reflect.Field
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong
  * - ID 시퀀스(sequence) 관리
  * - store(메모리 맵)에 엔티티 보관
  */
-abstract class BaseFakeRepository<T : BaseEntity, F : TestFixture<T>> {
+abstract class BaseFakeRepository<T : BaseAutoIncEntity, F : TestFixture<T>> {
     protected val store = ConcurrentHashMap<Long, T>()
     private val sequence = AtomicLong(0)
 
@@ -82,7 +82,7 @@ abstract class BaseFakeRepository<T : BaseEntity, F : TestFixture<T>> {
         newId: Long,
     ) {
         try {
-            val idField: Field = BaseEntity::class.java.getDeclaredField("id")
+            val idField: Field = BaseAutoIncEntity::class.java.getDeclaredField("id")
             idField.isAccessible = true
             idField.set(entity, newId)
         } catch (e: Exception) {

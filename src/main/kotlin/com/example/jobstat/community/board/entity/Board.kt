@@ -1,8 +1,8 @@
 package com.example.jobstat.community.board.entity
 
-import com.example.jobstat.community.board.BoardConstants
+import com.example.jobstat.community.board.utils.BoardConstants
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.AuditableEntitySnow
 import jakarta.persistence.*
 
 @Entity
@@ -14,7 +14,7 @@ internal class Board protected constructor(
     password: String?,
     category: BoardCategory,
     userId: Long?,
-) : BaseEntity() {
+) : AuditableEntitySnow() {
     @Column(nullable = false, length = BoardConstants.MAX_TITLE_LENGTH)
     var title: String = title
         protected set

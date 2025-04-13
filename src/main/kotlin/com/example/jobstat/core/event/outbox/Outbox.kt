@@ -1,23 +1,54 @@
 package com.example.jobstat.core.event.outbox
 
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.Table
-import com.example.jobstat.core.base.AuditableEntity
-import com.example.jobstat.core.base.BaseIdEntity
+import com.example.jobstat.core.base.AuditableEntitySnow
 import com.example.jobstat.core.event.EventType
-import java.time.LocalDateTime
+import jakarta.persistence.*
 
-@Table(name = "outbox")
 @Entity
-class Outbox(
-    override val id: Long,
-    @Enumerated(EnumType.STRING) val eventType: EventType,
-    val payload: String,
-) : BaseIdEntity() {
+@Table(name = "outbox")
+class Outbox protected constructor(
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    val eventType: EventType,
+
+    @Column(name = "payload", columnDefinition = "TEXT")
+    val event: String,
+) : AuditableEntitySnow() {
+
+    @Column(name = "retry_count", nullable = false)
+    var retryCount: Int = 0
+        internal set
+
+    fun incrementRetryCount(): Int {
+        this.retryCount++
+        return this.retryCount
+    }
+
+    fun isMaxRetryExceeded(maxRetries: Int): Boolean {
+        return retryCount >= maxRetries
+    }
+
+    fun copy(
+        eventType: EventType = this.eventType,
+        event: String = this.event,
+        retryCount: Int = this.retryCount
+    ): Outbox {
+        return Outbox(
+            eventType = eventType,
+            event = event
+        ).apply {
+            this.retryCount = retryCount
+        }
+    }
+
     companion object {
-        fun create(outboxId: Long, eventType: EventType, payload: String): Outbox =
-            Outbox(outboxId, eventType, payload)
+        fun create(eventType: EventType, event: String): Outbox {
+            require(event.isNotBlank()) { "이벤트 페이로드는 비어 있을 수 없습니다." }
+
+            return Outbox(
+                eventType = eventType,
+                event = event,
+            )
+        }
     }
 }

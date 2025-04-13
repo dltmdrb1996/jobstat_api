@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 internal interface BoardJpaRepository : JpaRepository<Board, Long> {
     fun findByAuthor(
@@ -16,7 +17,7 @@ internal interface BoardJpaRepository : JpaRepository<Board, Long> {
         pageable: Pageable,
     ): Page<Board>
 
-    @Query("SELECT b FROM Board b ORDER BY b.viewCount DESC Limit :limit")
+    @Query("SELECT b FROM Board b ORDER BY b.viewCount DESC LIMIT :limit")
     fun findTopNByOrderByViewCountDesc(
         @Param("limit") limit: Int,
     ): List<Board>
@@ -80,10 +81,106 @@ internal interface BoardJpaRepository : JpaRepository<Board, Long> {
 
     @Query("SELECT b FROM Board b WHERE b.category.id = :categoryId")
     fun findAllByCategoryId(@Param("categoryId") categoryId: Long): List<Board>
-    
+
     @Query("SELECT b FROM Board b WHERE b.id IN :ids")
     fun findAllByIdIn(@Param("ids") ids: List<Long>): List<Board>
 
+    // 다음 메서드들은 cursor-based 페이지네이션을 위한 메서드입니다.
+    @Query("SELECT b FROM Board b WHERE (:lastBoardId IS NULL OR b.id < :lastBoardId) ORDER BY b.id DESC")
+    fun findBoardsAfter(
+        @Param("lastBoardId") lastBoardId: Long?,
+        pageable: Pageable
+    ): List<Board>
+
+    @Query("SELECT b FROM Board b WHERE b.category.id = :categoryId AND (:lastBoardId IS NULL OR b.id < :lastBoardId) ORDER BY b.id DESC")
+    fun findBoardsByCategoryAfter(
+        @Param("categoryId") categoryId: Long,
+        @Param("lastBoardId") lastBoardId: Long?,
+        pageable: Pageable
+    ): List<Board>
+
+    @Query("SELECT b FROM Board b WHERE b.author = :author AND (:lastBoardId IS NULL OR b.id < :lastBoardId) ORDER BY b.id DESC")
+    fun findBoardsByAuthorAfter(
+        @Param("author") author: String,
+        @Param("lastBoardId") lastBoardId: Long?,
+        pageable: Pageable
+    ): List<Board>
+
+    @Query("""
+        SELECT b FROM Board b 
+        WHERE (LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) 
+           OR LOWER(b.content) LIKE LOWER(CONCAT('%', :keyword, '%')))
+           AND (:lastBoardId IS NULL OR b.id < :lastBoardId)
+        ORDER BY b.id DESC
+    """)
+    fun searchBoardsAfter(
+        @Param("keyword") keyword: String,
+        @Param("lastBoardId") lastBoardId: Long?,
+        pageable: Pageable
+    ): List<Board>
+
+    @Query("""
+        SELECT b.id FROM Board b
+        WHERE b.createdAt BETWEEN :startTime AND :endTime
+          AND (:lastBoardId IS NULL OR b.id < :lastBoardId)
+        ORDER BY b.likeCount DESC, b.id DESC
+    """)
+    fun findBoardIdsRankedByLikesAfter(
+        @Param("startTime") startTime: LocalDateTime,
+        @Param("endTime") endTime: LocalDateTime,
+        @Param("lastBoardId") lastBoardId: Long?,
+        pageable: Pageable
+    ): List<Long>
+
+
+    @Query("""
+        SELECT b.id FROM Board b
+        WHERE b.createdAt BETWEEN :startTime AND :endTime
+          AND (:lastBoardId IS NULL OR b.id < :lastBoardId)
+        ORDER BY b.viewCount DESC, b.id DESC
+    """)
+    fun findBoardIdsRankedByViewsAfter(
+        @Param("startTime") startTime: LocalDateTime,
+        @Param("endTime") endTime: LocalDateTime,
+        @Param("lastBoardId") lastBoardId: Long?,
+        pageable: Pageable
+    ): List<Long>
+
+    @Query("""
+        SELECT b.id FROM Board b
+        WHERE b.createdAt BETWEEN :startTime AND :endTime
+        ORDER BY b.likeCount DESC, b.id DESC
+    """)
+    fun findBoardIdsRankedByLikes(
+        @Param("startTime") startTime: LocalDateTime,
+        @Param("endTime") endTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<Long> // ID만 반환하도록 수정
+    // Offset 기반 - 조회수 순
+    @Query("""
+        SELECT b.id FROM Board b
+        WHERE b.createdAt BETWEEN :startTime AND :endTime
+        ORDER BY b.viewCount DESC, b.id DESC
+    """)
+    fun findBoardIdsRankedByViews(
+        @Param("startTime") startTime: LocalDateTime,
+        @Param("endTime") endTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<Long> // ID만 반환하도록 수정
+
+    @Query("SELECT b.id as boardId, b.likeCount as score FROM Board b WHERE b.createdAt BETWEEN :startTime AND :endTime ORDER BY b.likeCount DESC, b.id DESC")
+    fun findBoardRankingsByLikes(
+        @Param("startTime") startTime: LocalDateTime,
+        @Param("endTime") endTime: LocalDateTime,
+        pageable: Pageable // Use Pageable to limit results
+    ): Page<BoardRankingQueryResult> // Use a projection interface
+
+    @Query("SELECT b.id as boardId, b.viewCount as score FROM Board b WHERE b.createdAt BETWEEN :startTime AND :endTime ORDER BY b.viewCount DESC, b.id DESC")
+    fun findBoardRankingsByViews(
+        @Param("startTime") startTime: LocalDateTime,
+        @Param("endTime") endTime: LocalDateTime,
+        pageable: Pageable // Use Pageable to limit results
+    ): Page<BoardRankingQueryResult>
 }
 
 @Repository
@@ -106,7 +203,7 @@ internal class BoardRepositoryImpl(
     override fun findTopNByOrderByViewCountDesc(limit: Int): List<Board> =
         boardJpaRepository.findTopNByOrderByViewCountDesc(limit)
 
-    override fun findAllWithDetails(pageable: Pageable): Page<Board> = 
+    override fun findAllWithDetails(pageable: Pageable): Page<Board> =
         boardJpaRepository.findAllWithDetails(pageable)
 
     override fun search(keyword: String, pageable: Pageable): Page<Board> = boardJpaRepository.search(keyword, pageable)
@@ -129,9 +226,9 @@ internal class BoardRepositoryImpl(
         title: String,
     ): Boolean = boardJpaRepository.existsByAuthorAndTitle(author, title)
 
-    override fun findViewCountById(boardId: Long): Int? = boardJpaRepository.findViewCountById(boardId)
+    override fun findViewCountById(id: Long): Int? = boardJpaRepository.findViewCountById(id)
 
-    override fun findLikeCountById(boardId: Long): Int? = boardJpaRepository.findLikeCountById(boardId)
+    override fun findLikeCountById(id: Long): Int? = boardJpaRepository.findLikeCountById(id)
 
     override fun updateViewCount(boardId: Long, count: Int) {
         boardJpaRepository.updateViewCount(boardId, count)
@@ -141,9 +238,60 @@ internal class BoardRepositoryImpl(
         boardJpaRepository.updateLikeCount(boardId, count)
     }
 
-    override fun findAllByCategoryId(categoryId: Long): List<Board> = 
+    override fun findAllByCategoryId(categoryId: Long): List<Board> =
         boardJpaRepository.findAllByCategoryId(categoryId)
-        
-    override fun findAllByIds(ids: List<Long>): List<Board> = 
+
+    override fun findAllByIds(ids: List<Long>): List<Board> =
         boardJpaRepository.findAllByIdIn(ids)
+
+    override fun findBoardsAfter(lastBoardId: Long?, limit: Int): List<Board> =
+        boardJpaRepository.findBoardsAfter(lastBoardId, Pageable.ofSize(limit))
+
+    override fun findBoardsByCategoryAfter(categoryId: Long, lastBoardId: Long?, limit: Int): List<Board> =
+        boardJpaRepository.findBoardsByCategoryAfter(categoryId, lastBoardId, Pageable.ofSize(limit))
+
+    override fun findBoardsByAuthorAfter(author: String, lastBoardId: Long?, limit: Int): List<Board> =
+        boardJpaRepository.findBoardsByAuthorAfter(author, lastBoardId, Pageable.ofSize(limit))
+
+    override fun searchBoardsAfter(keyword: String, lastBoardId: Long?, limit: Int): List<Board> =
+        boardJpaRepository.searchBoardsAfter(keyword, lastBoardId, Pageable.ofSize(limit))
+
+    override fun findBoardIdsRankedByLikes(
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<Long> = boardJpaRepository.findBoardIdsRankedByLikes(startTime, endTime, pageable)
+
+    override fun findBoardIdsRankedByViews(
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<Long> = boardJpaRepository.findBoardIdsRankedByViews(startTime, endTime, pageable)
+
+    override fun findBoardIdsRankedByLikesAfter(
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        lastBoardId: Long?,
+        limit: Int
+    ): List<Long> = boardJpaRepository.findBoardIdsRankedByLikesAfter(startTime, endTime, /* lastLikeCount 제거 */ lastBoardId, Pageable.ofSize(limit)) // JpaRepository 호출 변경
+
+    override fun findBoardIdsRankedByViewsAfter(
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        lastBoardId: Long?,
+        limit: Int
+    ): List<Long> = boardJpaRepository.findBoardIdsRankedByViewsAfter(startTime, endTime, /* lastViewCount 제거 */ lastBoardId, Pageable.ofSize(limit)) // JpaRepository 호출 변경
+
+
+    override fun findBoardRankingsByLikes(
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<BoardRankingQueryResult> = boardJpaRepository.findBoardRankingsByLikes(startTime, endTime, pageable)
+
+    override fun findBoardRankingsByViews(
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<BoardRankingQueryResult> = boardJpaRepository.findBoardRankingsByViews(startTime, endTime, pageable)
 }

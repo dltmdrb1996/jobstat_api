@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolationException
 abstract class ValidUseCase<in Request : Any, out Response : Any>(
     private val validator: jakarta.validation.Validator,
 ) : UseCase<Request, Response> {
+
     override operator fun invoke(request: Request): Response {
         val violations = validator.validate(request)
         if (violations.isNotEmpty()) {

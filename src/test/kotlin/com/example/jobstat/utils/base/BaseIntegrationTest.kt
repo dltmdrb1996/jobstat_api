@@ -9,7 +9,7 @@ import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_PASSWORD
 import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_USERNAME
 import com.example.jobstat.utils.config.TestMongoConfig.Companion.mongoContainer
 import com.example.jobstat.utils.config.TestMysqlConfig
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance

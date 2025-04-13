@@ -6,7 +6,8 @@ import com.example.jobstat.auth.user.service.UserService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.usecase.impl.ValidUseCase
-import jakarta.transaction.Transactional
+import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
@@ -49,9 +50,18 @@ internal class RequestEmailVerification(
         }
     }
 
+    @Schema(
+        name = "RequestEmailVerificationRequest",
+        description = "이메일 인증 요청 모델"
+    )
     data class Request(
-        @field:NotBlank
-        @field:Email
+        @field:Schema(
+            description = "인증할 이메일 주소", 
+            example = "user@example.com",
+            required = true
+        )
+        @field:NotBlank(message = "이메일은 필수 입력값입니다")
+        @field:Email(message = "유효한 이메일 형식이 아닙니다")
         val email: String,
     )
 }

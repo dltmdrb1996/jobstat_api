@@ -1,6 +1,6 @@
 package com.example.jobstat.community.board.usecase.command
 
-import com.example.jobstat.community.CommunityEventPublisher
+import com.example.jobstat.community.event.CommunityCommandEventPublisher
 import com.example.jobstat.community.board.entity.Board
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.core.error.AppException
@@ -8,10 +8,10 @@ import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.security.PasswordUtil
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.core.global.utils.SecurityUtils
-import jakarta.transaction.Transactional
+import io.swagger.v3.oas.annotations.media.Schema
+import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.Positive
 import jakarta.validation.constraints.Size
 import org.springframework.stereotype.Service
 
@@ -20,11 +20,15 @@ internal class UpdateBoard(
     private val boardService: BoardService,
     private val passwordUtil: PasswordUtil,
     private val securityUtils: SecurityUtils,
-    private val eventPublisher: CommunityEventPublisher,
+    private val eventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
 ) : ValidUseCase<UpdateBoard.ExecuteRequest, UpdateBoard.Response>(validator) {
 
     @Transactional
+    override fun invoke(request: ExecuteRequest): Response {
+        return super.invoke(request)
+    }
+
     override fun execute(request: ExecuteRequest): Response {
         val board = boardService.getBoard(request.boardId)
 
@@ -43,7 +47,7 @@ internal class UpdateBoard(
         )
 
         return Response(
-            id = updated.id,
+            id = updated.id.toString(),
             title = updated.title,
             content = updated.content,
             createdAt = updated.createdAt.toString(),
@@ -90,16 +94,51 @@ internal class UpdateBoard(
         }
     }
 
+    @Schema(
+        name = "UpdateBoardRequest",
+        description = "게시글 수정 요청 모델"
+    )
     data class Request(
-        @field:NotBlank
-        @field:Size(max = 100)
+        @field:Schema(
+            description = "게시글 제목", 
+            example = "수정된 게시글 제목입니다",
+            required = true,
+            minLength = 1,
+            maxLength = 100
+        )
+        @field:NotBlank(message = "제목은 필수입니다")
+        @field:Size(
+            max = 100,
+            message = "제목은 최대 100자까지 입력 가능합니다"
+        )
         val title: String,
 
-        @field:NotBlank
-        @field:Size(max = 5000)
+        @field:Schema(
+            description = "게시글 내용", 
+            example = "수정된 게시글 내용입니다. 자세한 내용을 작성합니다.",
+            required = true,
+            minLength = 1,
+            maxLength = 5000
+        )
+        @field:NotBlank(message = "내용은 필수입니다")
+        @field:Size(
+            max = 5000,
+            message = "내용은 최대 5000자까지 입력 가능합니다"
+        )
         val content: String,
 
-        @field:Size(min = 4, max = 15)
+        @field:Schema(
+            description = "비밀번호 (비회원 게시글 수정 시 필수)", 
+            example = "password1234", 
+            nullable = true,
+            minLength = 4,
+            maxLength = 15
+        )
+        @field:Size(
+            min = 4, 
+            max = 15,
+            message = "비밀번호는 4~15자 사이여야 합니다"
+        )
         val password: String?,
     ) {
         fun of(boardId: Long) = ExecuteRequest(
@@ -110,27 +149,94 @@ internal class UpdateBoard(
         )
     }
 
+    @Schema(
+        name = "UpdateBoardExecuteRequest",
+        description = "게시글 수정 실행 요청 모델"
+    )
     data class ExecuteRequest(
-        @field:Positive
+        @field:Schema(
+            description = "수정할 게시글 ID", 
+            example = "1",
+            required = true
+        )
         val boardId: Long,
 
-        @field:NotBlank
-        @field:Size(max = 100)
+        @field:Schema(
+            description = "게시글 제목", 
+            example = "수정된 게시글 제목입니다",
+            required = true,
+            minLength = 1,
+            maxLength = 100
+        )
+        @field:NotBlank(message = "제목은 필수입니다")
+        @field:Size(
+            max = 100,
+            message = "제목은 최대 100자까지 입력 가능합니다"
+        )
         val title: String,
 
-        @field:NotBlank
-        @field:Size(max = 5000)
+        @field:Schema(
+            description = "게시글 내용", 
+            example = "수정된 게시글 내용입니다. 자세한 내용을 작성합니다.",
+            required = true,
+            minLength = 1,
+            maxLength = 5000
+        )
+        @field:NotBlank(message = "내용은 필수입니다")
+        @field:Size(
+            max = 5000,
+            message = "내용은 최대 5000자까지 입력 가능합니다"
+        )
         val content: String,
 
-        @field:Size(min = 4, max = 15)
+        @field:Schema(
+            description = "비밀번호 (비회원 게시글 수정 시 필수)", 
+            example = "password1234", 
+            nullable = true,
+            minLength = 4,
+            maxLength = 15
+        )
+        @field:Size(
+            min = 4, 
+            max = 15,
+            message = "비밀번호는 4~15자 사이여야 합니다"
+        )
         val password: String?,
     )
 
+    @Schema(
+        name = "UpdateBoardResponse",
+        description = "게시글 수정 응답 모델"
+    )
     data class Response(
-        val id: Long,
+        @field:Schema(
+            description = "게시글 ID", 
+            example = "1"
+        )
+        val id: String,
+        
+        @field:Schema(
+            description = "게시글 제목", 
+            example = "수정된 게시글 제목입니다"
+        )
         val title: String,
+        
+        @field:Schema(
+            description = "게시글 내용", 
+            example = "수정된 게시글 내용입니다. 자세한 내용을 작성합니다."
+        )
         val content: String,
+        
+        @field:Schema(
+            description = "생성 일시", 
+            example = "2023-05-10T14:30:15.123456"
+        )
         val createdAt: String,
+        
+        @field:Schema(
+            description = "수정 일시", 
+            example = "2023-05-11T09:45:22.654321"
+        )
         val updatedAt: String,
     )
 }

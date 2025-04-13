@@ -4,7 +4,7 @@ import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 import com.example.jobstat.statistics_read.stats.service.StatsAnalysisService
-import jakarta.transaction.Transactional
+import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull

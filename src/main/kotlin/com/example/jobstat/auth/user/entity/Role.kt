@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.user.entity
 
 import com.example.jobstat.auth.user.UserConstants
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.AuditableEntitySnow
 import jakarta.persistence.*
 
 @Entity
@@ -13,7 +13,7 @@ import jakarta.persistence.*
 )
 internal class Role private constructor(
     name: String,
-) : BaseEntity() {
+) : AuditableEntitySnow() {
     @Column(nullable = false, unique = true, length = UserConstants.MAX_ROLE_NAME_LENGTH)
     var name: String = name
         protected set

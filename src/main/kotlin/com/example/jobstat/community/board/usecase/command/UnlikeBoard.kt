@@ -1,17 +1,17 @@
 package com.example.jobstat.community.board.usecase.command
 
-import com.example.jobstat.community.CommunityEventPublisher
+import com.example.jobstat.community.event.CommunityCommandEventPublisher
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.counting.CounterService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.extension.toEpochMilli
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.core.global.utils.SecurityUtils
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
-import jakarta.validation.constraints.Positive
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 /**
  * 게시글 좋아요 취소 유스케이스 (최적화 버전)
@@ -23,24 +23,27 @@ internal class UnlikeBoard(
     private val counterService: CounterService,
     private val securityUtils: SecurityUtils,
     private val boardService: BoardService,
-    private val communityEventPublisher: CommunityEventPublisher,
+    private val communityCommandEventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
 ) : ValidUseCase<UnlikeBoard.Request, UnlikeBoard.Response>(validator) {
 
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    /**
-     * 좋아요 취소 요청 처리
-     */
+    @Transactional
+    override fun invoke(request: Request): Response {
+        return super.invoke(request)
+    }
+
     override fun execute(request: Request): Response {
         log.info("게시글 좋아요 취소 요청: boardId={}", request.boardId)
 
         // 사용자 인증 정보 확인
         val userId = getUserIdOrThrow()
         val userIdStr = userId.toString()
+        val boardId = request.boardId
 
         // 게시글 존재 여부 확인 및 조회 - DB에서 한 번만 조회
-        val board = validateBoardExists(request.boardId)
+        val board = validateBoardExists(boardId)
 
         // 엔티티에서 DB 값 직접 전달
         val likeCount = counterService.decrementLikeCount(
@@ -50,11 +53,10 @@ internal class UnlikeBoard(
         )
 
         // 5) ReadModel 이벤트 발행
-        communityEventPublisher.publishBoardLiked(
-            boardId = board.id,
+        communityCommandEventPublisher.publishBoardLiked(
+            boardId = boardId,
             createdAt = board.createdAt,
             userId = userId,
-            eventTs = board.updatedAt.toEpochMilli(),
             likeCount = likeCount
         )
 
@@ -90,15 +92,32 @@ internal class UnlikeBoard(
     /**
      * 요청 모델
      */
+    @Schema(
+        name = "UnlikeBoardRequest",
+        description = "게시글 좋아요 취소 요청 모델"
+    )
     data class Request(
-        @field:Positive(message = "게시글 ID는 양수여야 합니다")
+        @field:Schema(
+            description = "좋아요 취소 대상 게시글 ID", 
+            example = "1",
+            required = true
+        )
         val boardId: Long,
     )
 
     /**
      * 응답 모델
      */
+    @Schema(
+        name = "UnlikeBoardResponse",
+        description = "게시글 좋아요 취소 응답 모델"
+    )
     data class Response(
+        @field:Schema(
+            description = "좋아요 취소 후 총 좋아요 수", 
+            example = "41",
+            minimum = "0"
+        )
         val likeCount: Int,
     )
 }
