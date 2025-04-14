@@ -1,4 +1,3 @@
-// src/main/kotlin/com/example/jobstat/core/event/dlq/DeadLetterQueueRepository.kt
 package com.example.jobstat.core.event.dlt
 
 import org.springframework.data.jpa.repository.JpaRepository

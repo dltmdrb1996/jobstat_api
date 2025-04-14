@@ -1,134 +1,183 @@
+// file: src/main/kotlin/com/example/jobstat/core/event/outbox/OutboxProcessor.kt
 package com.example.jobstat.core.event.outbox
 
+import com.example.jobstat.core.event.dlt.CustomDltHeaders
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.kafka.clients.producer.ProducerRecord
+import org.apache.kafka.common.header.Header
+import org.apache.kafka.common.header.internals.RecordHeader
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.nio.charset.StandardCharsets
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-/**
- * 아웃박스 프로세서
- * 아웃박스 항목을 Kafka로 전송하고 실패 시 재시도 로직을 처리합니다.
- * 일반적으로 스케줄러에 의해 호출되며, 별도의 트랜잭션으로 실행됩니다.
- */
 @Component
 class OutboxProcessor(
     private val outboxRepository: OutboxRepository,
     private val outboxKafkaTemplate: KafkaTemplate<String, String>,
-    // --- 설정값 주입 ---
-    @Value("\${outbox.processor.kafka-send-timeout-seconds:5}") // 기본값 5초 (스케줄러는 조금 더 길게)
+    private val objectMapper: ObjectMapper,
+    @Value("\${outbox.processor.kafka-send-timeout-seconds:5}")
     private val kafkaSendTimeoutSeconds: Long,
-    @Value("\${outbox.processor.max-retry-count:5}") // 기본값 5
+    @Value("\${outbox.processor.max-retry-count:3}")
     private val maxRetryCount: Int,
+    @Value("\${kafka.consumer.common.dlt-suffix:.DLT}")
+    private val dltSuffix: String,
 ) {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    // ===================================================
-    // 메인 처리 메소드
-    // ===================================================
+    companion object {
+        private const val OUTBOX_FAILURE_SOURCE = "OUTBOX_PUBLISHER"
+        private const val DEFAULT_EVENT_ID_PREFIX = "unknown-outbox-"
+        private const val UNKNOWN_EVENT_TYPE = "unknown"
+    }
 
-    /**
-     * 단일 Outbox 항목 처리 - 별도 트랜잭션으로 실행됩니다.
-     * Kafka로 재전송을 시도합니다.
-     * 실패 시 재시도 횟수를 증가시키거나, 최대 횟수 초과 시 로그 기록 후 Outbox 항목을 삭제합니다.
-     */
-    @Transactional // 이 메서드 전체가 하나의 트랜잭션으로 묶입니다.
+    @Transactional
     fun processOutboxItem(outbox: Outbox) {
+        if (outbox.retryCount >= maxRetryCount) {
+            log.warn(
+                "이미 최대 재시도 횟수({})에 도달한 Outbox 항목(ID: {}) 처리를 건너<0xEB><0x8E>>니다.",
+                maxRetryCount, outbox.id
+            )
+            return
+        }
+
         log.info("아웃박스 처리 시작 (스케줄러): id=${outbox.id}, type=${outbox.eventType}, retryCount=${outbox.retryCount}")
-        // Kafka 전송 시도
         retryEventExecute(outbox)
     }
 
-    // ===================================================
-    // Kafka 전송 관련 메소드
-    // ===================================================
-
-    /**
-     * 이벤트 재시도 실행 (Kafka 전송 시도).
-     * 성공 시 Outbox 레코드 삭제, 실패 시 재시도 실패 처리 로직 호출.
-     * `processOutboxItem`의 트랜잭션 내에서 호출됩니다.
-     */
     private fun retryEventExecute(outbox: Outbox) {
         try {
             log.debug("Kafka 메시지 재전송 시도: id=${outbox.id}, topic=${outbox.eventType.topic}")
 
-            // Kafka 메시지 전송 (동기 방식 사용 - @Transactional 내부)
-            val sendResult =
-                outboxKafkaTemplate
-                    .send(
-                        outbox.eventType.topic,
-                        outbox.id.toString(), // key로 id 사용
-                        outbox.event,
-                    ).get(kafkaSendTimeoutSeconds, TimeUnit.SECONDS) // 설정된 타임아웃 사용
+            val sendResult = outboxKafkaTemplate.send(
+                outbox.eventType.topic,
+                outbox.id.toString(),
+                outbox.event,
+            ).get(kafkaSendTimeoutSeconds, TimeUnit.SECONDS)
 
-            // 전송 결과 로깅
             val recordMetadata = sendResult.recordMetadata
             log.debug("Kafka 재전송 응답 수신: id=${outbox.id}, partition=${recordMetadata?.partition()}, offset=${recordMetadata?.offset()}")
 
-            // 성공 시 Outbox 삭제 (같은 트랜잭션 내)
             outboxRepository.deleteById(outbox.id)
-
             log.info(
                 "이벤트 재시도 성공 및 Outbox 삭제: id=${outbox.id}, type=${outbox.eventType}, retryCount=${outbox.retryCount}",
             )
         } catch (e: Exception) {
-            // 타임아웃 포함 Kafka 전송 관련 모든 예외 처리
-            val errorMessage =
-                when (e) {
-                    is TimeoutException -> "Kafka 전송 확인 대기 중 타임아웃"
-                    else -> e.message ?: "알 수 없는 Kafka 전송 오류"
-                }
+            val errorMessage = when (e) {
+                is TimeoutException -> "Kafka 전송 확인 대기 중 타임아웃 ($kafkaSendTimeoutSeconds 초)"
+                else -> e.message ?: "알 수 없는 Kafka 전송 오류"
+            }
             log.error(
                 "이벤트 재시도 실패: id=${outbox.id}, type=${outbox.eventType}, retryCount=${outbox.retryCount}, error='$errorMessage'",
+                e
             )
-            // 실패 처리 (재시도 횟수 증가 또는 최대 횟수 초과 처리)
-            processFailedRetry(outbox, errorMessage)
+            processFailedAttempt(outbox, errorMessage)
         }
     }
 
-    // ===================================================
-    // 실패 처리 관련 메소드
-    // ===================================================
+    private fun processFailedAttempt(outbox: Outbox, errorMessage: String) {
+        val nextRetryCount = outbox.retryCount + 1
+
+        if (nextRetryCount >= maxRetryCount) {
+            log.warn("재시도 실패 후 최대 횟수(${maxRetryCount}) 도달: id=${outbox.id}. DLT 전송 시도 및 Outbox 상태 업데이트.",)
+            attemptDltSendAndUpdateStatus(outbox, nextRetryCount, errorMessage)
+        } else {
+            try {
+                outbox.incrementRetryCount()
+                outboxRepository.save(outbox)
+                log.info(
+                    "재시도 횟수 증가 (Dirty Check): id=${outbox.id}, type=${outbox.eventType}, newRetryCount=${outbox.retryCount}",
+                )
+            } catch (e: Exception) {
+                log.error("Outbox 재시도 횟수 업데이트 중 예상치 못한 오류: id=${outbox.id}, error=${e.message}", e)
+                throw e
+            }
+        }
+    }
 
     /**
-     * Kafka 재전송 실패 시 처리 로직.
-     * 재시도 횟수를 증가시키거나, 최대 횟수 초과 시 로그 남기고 Outbox 레코드 삭제.
-     * `processOutboxItem`의 트랜잭션 내에서 호출됩니다.
-     *
-     * @param outbox 실패한 Outbox 항목
-     * @param errorMessage 실패 원인 메시지
+     * DLT 전송을 시도하고, 결과에 따라 Outbox 레코드를 삭제하거나 재시도 횟수만 업데이트합니다.
      */
-    private fun processFailedRetry(
-        outbox: Outbox,
-        errorMessage: String,
-    ) {
+    private fun attemptDltSendAndUpdateStatus(outbox: Outbox, finalRetryCount: Int, errorMessage: String) {
+        var dltSendSuccessful = false
         try {
-            val nextRetryCount = outbox.retryCount + 1
+            // 1. DLT 메시지 준비
+            val originalPayload = outbox.event
+            val (eventId, eventType) = extractEventMetadata(originalPayload, outbox.id.toString(), outbox.eventType.name)
+            val dltTopic = outbox.eventType.topic + dltSuffix
 
-            if (nextRetryCount >= maxRetryCount) { // 최대 재시도 횟수 도달 시 처리
-                log.warn(
-                    "재시도 실패 후 최대 횟수 도달: id=${outbox.id}, finalRetryCount=$nextRetryCount. 오류 로깅 후 Outbox 레코드 삭제.",
-                )
-                // 최대 재시도 도달 시 Outbox 메시지 삭제
-                // Kafka로의 전송 자체가 계속 실패하는 상황으로, 시스템 관리자의 수동 조치 필요
-                outboxRepository.deleteById(outbox.id)
-                log.error(
-                    "치명적 오류: ${maxRetryCount}번의 재시도 후 Kafka 전송 실패 및 Outbox 메시지 삭제됨. 수동 확인 필요. OutboxId=${outbox.id}, Type=${outbox.eventType}, Reason='${errorMessage.take(500)}'",
-                )
-            } else {
-                // 재시도 횟수 업데이트 후 저장 (같은 트랜잭션 내)
-                val updatedOutbox = outbox.copy(retryCount = nextRetryCount)
-                outboxRepository.save(updatedOutbox)
-                log.info(
-                    "재시도 횟수 증가: id=${updatedOutbox.id}, type=${updatedOutbox.eventType}, newRetryCount=${updatedOutbox.retryCount}",
-                )
-            }
+            // 2. 커스텀 헤더 생성
+            val headers = listOf<Header>(
+                RecordHeader(CustomDltHeaders.X_FAILURE_SOURCE, OUTBOX_FAILURE_SOURCE.toByteArray(StandardCharsets.UTF_8)),
+                RecordHeader(CustomDltHeaders.X_RETRY_COUNT, finalRetryCount.toString().toByteArray(StandardCharsets.UTF_8)),
+                RecordHeader(CustomDltHeaders.X_LAST_ERROR, errorMessage.take(500).toByteArray(StandardCharsets.UTF_8))
+            )
+
+            // 3. ProducerRecord 생성
+            val producerRecord = ProducerRecord<String, String>(
+                dltTopic, null, eventId, originalPayload, headers
+            )
+
+            // 4. DLT로 메시지 전송 (동기 방식)
+            log.info("Outbox 실패 메시지 DLT 전송 시도: id=${outbox.id}, dltTopic=$dltTopic, eventId=$eventId")
+            val sendResult = outboxKafkaTemplate.send(producerRecord).get(kafkaSendTimeoutSeconds, TimeUnit.SECONDS)
+            log.info(
+                "Outbox 실패 메시지 DLT 전송 성공: id=${outbox.id}, dltTopic=$dltTopic, offset=${sendResult.recordMetadata?.offset()}",
+            )
+            dltSendSuccessful = true // DLT 전송 성공 플래그 설정
+
         } catch (e: Exception) {
-            log.error("재시도 실패 처리 중 심각한 오류 발생 (트랜잭션 롤백 가능성 있음): id=${outbox.id}, error=${e.message}", e)
-            // 이 예외는 상위 @Transactional에 의해 처리되어 롤백될 수 있음
-            throw e // 예외를 다시 던져 트랜잭션 롤백 유도
+            // DLT 전송 자체도 실패하는 경우
+            log.error(
+                "치명적 오류: Outbox 실패 메시지 DLT 전송 실패! Outbox 레코드는 유지됩니다(retryCount={}). 수동 확인 필요. " +
+                        "outboxId=${outbox.id}, type=${outbox.eventType}, dltTopic=${outbox.eventType.topic + dltSuffix}, error=${e.message}",
+                finalRetryCount, e
+            )
+            // dltSendSuccessful 플래그는 false로 유지됨
         }
+
+        // 5. DLT 전송 결과에 따라 Outbox 처리
+        try {
+            if (dltSendSuccessful) {
+                // DLT 전송 성공 시 Outbox 레코드 삭제
+                outboxRepository.deleteById(outbox.id)
+                log.info("DLT 전송 성공 후 Outbox 레코드 삭제 완료: id=${outbox.id}")
+            } else {
+                // DLT 전송 실패 시 Outbox 레코드 유지하되, retryCount는 최종 값으로 업데이트하여 더 이상 처리되지 않도록 함
+                if (outbox.retryCount < finalRetryCount) { // 이미 업데이트된 경우는 제외
+                    outbox.retryCount = finalRetryCount
+                    log.warn("DLT 전송 실패로 Outbox 레코드 유지 및 retryCount 업데이트: id={}, newRetryCount={}", outbox.id, outbox.retryCount)
+                    // save() 는 트랜잭션 커밋 시 자동으로 호출됨 (Dirty Checking)
+                } else {
+                    log.warn("DLT 전송 실패. Outbox 레코드(ID: {})는 이미 최종 재시도 횟수({}) 상태이므로 유지됩니다.", outbox.id, outbox.retryCount)
+                }
+            }
+        } catch (updateOrDeleteEx: Exception) {
+            log.error(
+                "Outbox 레코드 최종 처리(삭제 또는 업데이트) 중 오류 발생: id={}, dltSentSuccess={}, error={}",
+                outbox.id, dltSendSuccessful, updateOrDeleteEx.message, updateOrDeleteEx
+            )
+            // 이 경우에도 예외를 던져 트랜잭션 롤백 유도 (DB 상태 불일치 방지)
+            throw updateOrDeleteEx
+        }
+    }
+
+    private fun extractEventMetadata(payload: String, fallbackEventId: String, fallbackEventType: String): Pair<String, String> {
+        var eventId = fallbackEventId
+        var eventType = fallbackEventType
+        try {
+            val jsonNode = objectMapper.readTree(payload)
+            eventId = jsonNode.path("eventId").asText(fallbackEventId)
+            eventType = jsonNode.path("type").asText(fallbackEventType)
+            if (eventId.isBlank()) eventId = fallbackEventId
+            if (eventType.isBlank()) eventType = fallbackEventType
+        } catch (e: Exception) {
+            log.warn("Outbox 페이로드에서 eventId/type 파싱 실패 (Fallback 사용): fallbackEventId=$fallbackEventId, error=${e.message}")
+        }
+        return Pair(eventId, eventType)
     }
 }

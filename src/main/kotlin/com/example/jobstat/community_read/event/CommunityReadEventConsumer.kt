@@ -4,6 +4,7 @@ import com.example.jobstat.core.event.consumer.AbstractEventConsumer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.RetryableTopic
+import org.springframework.kafka.support.Acknowledgment
 import org.springframework.retry.annotation.Backoff
 import org.springframework.stereotype.Component
 
@@ -35,11 +36,11 @@ class CommunityReadEventConsumer : AbstractEventConsumer() {
         groupId = "\${kafka.consumer.community-read.group-id:community-read-group}",
         containerFactory = "kafkaListenerContainerFactory",
     )
-    fun receiveEvent(event: String) {
+    fun receiveEvent(event: String, ack: Acknowledgment) {
         log.info(
             "[{}] Kafka 메시지 수신 시도: topic=$topic, groupId=$groupId",
             this::class.simpleName,
         )
-        super.consumeEvent(event)
+        super.consumeEvent(event, ack)
     }
 }

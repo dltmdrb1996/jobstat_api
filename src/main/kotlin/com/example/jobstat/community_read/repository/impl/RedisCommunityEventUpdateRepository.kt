@@ -212,7 +212,6 @@ class RedisCommunityEventUpdateRepository(
         return executeScript(applyCommentDeletionScript, keys, args, "댓글 삭제") == ReadSideLuaScriptConfig.SCRIPT_RESULT_SUCCESS
     }
 
-    // Lua 스크립트 실행 공통 메소드
     private fun executeScript(script: RedisScript<Long>, keys: List<String>, args: Array<String>, operationDesc: String): Long {
         return try {
             val result = redisTemplate.execute(script, keys, *args)
@@ -220,14 +219,12 @@ class RedisCommunityEventUpdateRepository(
                 log.error("Redis Lua 스크립트({}) 실행 결과 null: {}", script.sha1 ?: "N/A", operationDesc)
                 throw AppException.fromErrorCode(ErrorCode.REDIS_OPERATION_FAILED, "$operationDesc Lua 스크립트 결과 null")
             }
-            // 스크립트가 0(Skipped) 또는 1(Success)을 반환한다고 가정
             if (result == ReadSideLuaScriptConfig.SCRIPT_RESULT_SKIPPED) {
                 log.debug("Redis Lua 스크립트({}) 실행 건너뜀(오래된 이벤트): {}", script.sha1 ?: "N/A", operationDesc)
             }
             result
         } catch (e: Exception) {
             log.error("Redis Lua 스크립트({}) 실행 중 예외 발생: {}", script.sha1 ?: "N/A", operationDesc, e)
-            // 예외를 다시 던지거나, 상황에 따라 -1 등 에러 코드를 반환하도록 처리 가능
             throw AppException.fromErrorCode(ErrorCode.REDIS_OPERATION_FAILED, "$operationDesc 처리 중 오류 발생")
         }
     }

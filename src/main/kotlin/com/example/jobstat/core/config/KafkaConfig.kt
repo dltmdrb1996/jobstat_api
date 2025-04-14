@@ -25,7 +25,8 @@ class KafkaConfig {
     ): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.consumerFactory = consumerFactory
-        factory.containerProperties.ackMode = ContainerProperties.AckMode.RECORD
+        factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
+//        factory.containerProperties.ackMode = ContainerProperties.AckMode.RECORD
         return factory
     }
 
