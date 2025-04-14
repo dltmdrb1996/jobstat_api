@@ -12,5 +12,5 @@ data class CommentDeletedEventPayload(
     @JsonProperty("boardId")
     val boardId: Long,
     @JsonProperty("eventTs")
-    val eventTs: Long
+    val eventTs: Long,
 ) : EventPayload

@@ -9,8 +9,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
-interface BaseTimeSeriesRepository<T : BaseTimeSeriesDocument, ID : Any> :
-    com.example.jobstat.core.base.repository.BaseMongoRepository<T, ID> {
+interface BaseTimeSeriesRepository<T : BaseTimeSeriesDocument, ID : Any> : com.example.jobstat.core.base.repository.BaseMongoRepository<T, ID> {
     /**
      * 특정 기준일자의 데이터를 조회합니다
      * @param baseDate 조회할 기준일자

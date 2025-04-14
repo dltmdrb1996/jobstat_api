@@ -6,7 +6,7 @@ package com.example.jobstat.community_read.client.response
  */
 data class FetchCommentIdsResponse(
     val ids: List<String>,
-    val hasNext: Boolean
+    val hasNext: Boolean,
 ) {
     companion object {
         /**
@@ -19,8 +19,6 @@ data class FetchCommentIdsResponse(
         /**
          * Command 서버 응답 DTO의 hasNext 값을 반환합니다. (Offset 기반 Fallback 시 사용)
          */
-        fun hasNext(response: FetchCommentIdsResponse): Boolean {
-            return response.hasNext
-        }
+        fun hasNext(response: FetchCommentIdsResponse): Boolean = response.hasNext
     }
 }

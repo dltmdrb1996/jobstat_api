@@ -1,9 +1,9 @@
 package com.example.jobstat.statistics_read
 
 import com.example.jobstat.core.constants.RestConstants
+import com.example.jobstat.core.global.wrapper.ApiResponse
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.core.global.wrapper.ApiResponse
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 import com.example.jobstat.statistics_read.stats.usecase.GetLatestStats
 import com.example.jobstat.statistics_read.stats.usecase.GetStatsByEntityId

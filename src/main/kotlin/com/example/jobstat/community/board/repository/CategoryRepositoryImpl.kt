@@ -27,13 +27,13 @@ internal class CategoryRepositoryImpl(
     override fun findAll(): List<BoardCategory> = categoryJpaRepository.findAll()
 
     override fun findAllWithBoardCount(): List<Pair<BoardCategory, Long>> =
-        categoryJpaRepository.findAllWithBoardCount()
+        categoryJpaRepository
+            .findAllWithBoardCount()
             .map { result -> Pair(result[0] as BoardCategory, result[1] as Long) }
 
     override fun deleteById(id: Long) = categoryJpaRepository.deleteById(id)
 
     override fun existsByName(name: String): Boolean = categoryJpaRepository.existsByName(name)
 
-    override fun findByName(name: String): BoardCategory = 
-        categoryJpaRepository.findByName(name).orThrowNotFound("Category with name", name)
+    override fun findByName(name: String): BoardCategory = categoryJpaRepository.findByName(name).orThrowNotFound("Category with name", name)
 }

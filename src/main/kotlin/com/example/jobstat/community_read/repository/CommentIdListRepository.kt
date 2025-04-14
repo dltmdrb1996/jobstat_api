@@ -10,39 +10,64 @@ import org.springframework.data.redis.connection.StringRedisConnection
 interface CommentIdListRepository {
 
     /**
-     * 게시글별 댓글 ID 리스트에 추가
-     */
-    fun add(boardId: Long, commentId: Long, sortValue: Double)
-
-    /**
-     * 게시글별 댓글 ID 리스트에서 삭제
-     */
-    fun delete(boardId: Long, commentId: Long)
-
-    /**
      * 게시글별 댓글 ID 리스트 조회
      */
-    fun readAllByBoard(boardId: Long, pageable: Pageable): Page<Long>
+    fun readAllByBoard(
+        boardId: Long,
+        pageable: Pageable,
+    ): Page<Long>
 
     /**
      * 무한 스크롤 방식의 게시글별 댓글 ID 리스트 조회
      */
-    fun readAllByBoardInfiniteScroll(boardId: Long, lastCommentId: Long?, limit: Long): List<Long>
+    fun readAllByBoardInfiniteScroll(
+        boardId: Long,
+        lastCommentId: Long?,
+        limit: Long,
+    ): List<Long>
+
+    /**
+     * 게시글별 댓글 ID 목록 조회 (Pageable 기반)
+     */
+    fun readCommentsByBoardId(
+        boardId: Long,
+        pageable: Pageable,
+    ): Page<Long>
+
+    /**
+     * 게시글별 댓글 ID 목록 조회 (커서 기반)
+     */
+    fun readCommentsByBoardIdByCursor(
+        boardId: Long,
+        lastCommentId: Long?,
+        limit: Long,
+    ): List<Long>
 
     /**
      * 게시글별 댓글 목록 키 반환
      */
     fun getBoardCommentsKey(boardId: Long): String
 
-    /**
-     * 게시글별 댓글 ID 목록 조회 (Pageable 기반)
-     */
-    fun readCommentsByBoardId(boardId: Long, pageable: Pageable): Page<Long>
+    // 수정 관련 메소드
 
     /**
-     * 게시글별 댓글 ID 목록 조회 (커서 기반)
+     * 게시글별 댓글 ID 리스트에 추가
      */
-    fun readCommentsByBoardIdByCursor(boardId: Long, lastCommentId: Long?, limit: Long): List<Long>
+    fun add(
+        boardId: Long,
+        commentId: Long,
+        sortValue: Double,
+    )
+
+    /**
+     * 게시글별 댓글 ID 리스트에서 삭제
+     */
+    fun delete(
+        boardId: Long,
+        commentId: Long,
+    )
+
+    // 파이프라인 관련 메소드
 
     /**
      * 댓글 추가 (파이프라인 사용)
@@ -51,7 +76,7 @@ interface CommentIdListRepository {
         conn: StringRedisConnection,
         boardId: Long,
         commentId: Long,
-        score: Double
+        score: Double,
     )
 
     /**
@@ -60,6 +85,6 @@ interface CommentIdListRepository {
     fun removeCommentInPipeline(
         conn: StringRedisConnection,
         boardId: Long,
-        commentId: Long
+        commentId: Long,
     )
 }

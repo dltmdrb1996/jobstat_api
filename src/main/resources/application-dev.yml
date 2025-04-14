@@ -70,8 +70,3 @@ batch:
   chunk-size: 500
   job-size: 100
 
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
-    org.hibernate.orm.jdbc.bind: TRACE # Hibernate 6+ 대비

@@ -16,11 +16,11 @@ data class FetchBoardByIdResponse(
     val commentCount: Int,
     val userLiked: Boolean,
     val createdAt: LocalDateTime,
-    val eventTs: Long
+    val eventTs: Long,
 ) {
     companion object {
-        fun from(response: FetchBoardByIdResponse): BoardReadModel {
-            return BoardReadModel(
+        fun from(response: FetchBoardByIdResponse): BoardReadModel =
+            BoardReadModel(
                 // BoardReadModel의 id가 String이라고 가정하고 할당
                 id = response.id.toLong(),
                 createdAt = response.createdAt,
@@ -36,6 +36,5 @@ data class FetchBoardByIdResponse(
                 // BoardReadModel에 userLiked 필드가 있다면 추가
                 // userLiked = response.userLiked
             )
-        }
     }
 }

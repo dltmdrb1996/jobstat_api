@@ -1,15 +1,15 @@
-//package com.example.jobstat.community.fake.repository
+// package com.example.jobstat.community.fake.repository
 //
-//import com.example.jobstat.community.board.entity.Board
-//import com.example.jobstat.community.board.repository.BoardRepository
-//import com.example.jobstat.community.fake.BoardFixture
-//import com.example.jobstat.utils.IndexManager
-//import com.example.jobstat.utils.base.BaseFakeRepository
-//import org.springframework.data.domain.Page
-//import org.springframework.data.domain.PageImpl
-//import org.springframework.data.domain.Pageable
+// import com.example.jobstat.community.board.entity.Board
+// import com.example.jobstat.community.board.repository.BoardRepository
+// import com.example.jobstat.community.fake.BoardFixture
+// import com.example.jobstat.utils.IndexManager
+// import com.example.jobstat.utils.base.BaseFakeRepository
+// import org.springframework.data.domain.Page
+// import org.springframework.data.domain.PageImpl
+// import org.springframework.data.domain.Pageable
 //
-//internal class FakeBoardRepository : BoardRepository {
+// internal class FakeBoardRepository : BoardRepository {
 //    private val baseRepo =
 //        object : BaseFakeRepository<Board, BoardFixture>() {
 //            override fun fixture() = BoardFixture.aBoard()
@@ -120,4 +120,4 @@
 //        baseRepo.clear()
 //        authorTitleIndex.clear()
 //    }
-//}
+// }

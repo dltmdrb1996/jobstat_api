@@ -2,22 +2,17 @@ package com.example.jobstat.community.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.core.io.ClassPathResource
 import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.data.redis.core.script.RedisScript
 
 @Suppress("UNCHECKED_CAST")
 @Configuration
 class LuaScriptConfig {
-
-    // Like 스크립트 Bean 정의
     @Bean
-    fun atomicLikeScript(): RedisScript<List<Long>?> { // 반환 타입을 List<Long>으로 지정
+    fun atomicLikeScript(): RedisScript<List<Long>?> {
         val script = DefaultRedisScript<List<Long>?>()
-        // 방법 1: 파일 로드
-        // script.setLocation(ClassPathResource("lua/atomic_like.lua"))
-        // 방법 2: 스크립트 텍스트 직접 설정
-        script.setScriptText("""
+        script.setScriptText(
+            """
             local userKey = KEYS[1]
             local countKey = KEYS[2]
             local pendingKey = KEYS[3]
@@ -34,18 +29,17 @@ class LuaScriptConfig {
                 end
             end
             return {1, newCount}
-        """.trimIndent())
-        // 중요: 결과 타입을 명시해야 Spring이 올바르게 변환 시도
-        // Redis는 List<Long>을 반환하므로 List::class.java 사용 가능 (내부 요소 타입은 직접 캐스팅 필요할 수 있음)
-         script.setResultType(List::class.java as Class<List<Long>?>) // 타입 캐스팅 주의
+            """.trimIndent(),
+        )
+        script.setResultType(List::class.java as Class<List<Long>?>)
         return script
     }
 
-    // Unlike 스크립트 Bean 정의
     @Bean
-    fun atomicUnlikeScript(): RedisScript<List<Long>?> { // 반환 타입을 List<Long>으로 지정
+    fun atomicUnlikeScript(): RedisScript<List<Long>?> {
         val script = DefaultRedisScript<List<Long>?>()
-        script.setScriptText("""
+        script.setScriptText(
+            """
             local userKey = KEYS[1]
             local countKey = KEYS[2]
             local pendingKey = KEYS[3]
@@ -56,22 +50,71 @@ class LuaScriptConfig {
             local newCount = redis.call('DECR', countKey)
             redis.call('SADD', pendingKey, boardIdStr)
             return {1, newCount}
-        """.trimIndent())
+            """.trimIndent(),
+        )
         script.resultType = List::class.java as Class<List<Long>?>
         return script
     }
 
-    // 다른 스크립트들도 필요하다면 Bean으로 정의...
-    // 예: GetAndDelete 스크립트
     @Bean
     fun getAndDeleteScript(): RedisScript<String> {
-         val script = DefaultRedisScript<String>()
-         script.setScriptText("""
-             local value = redis.call('GET', KEYS[1])
-             if value then redis.call('DEL', KEYS[1]) end
-             return value
-         """.trimIndent())
-         script.setResultType(String::class.java)
-         return script
-     }
+        val script = DefaultRedisScript<String>()
+        script.setScriptText(
+            """
+            local value = redis.call('GET', KEYS[1])
+            if value then redis.call('DEL', KEYS[1]) end
+            return value
+            """.trimIndent(),
+        )
+        script.setResultType(String::class.java)
+        return script
+    }
+
+    @Bean
+    fun atomicIncrementAndAddPendingScript(): RedisScript<Long> {
+        val script = DefaultRedisScript<Long>()
+        script.setScriptText(
+            """
+            local countKey = KEYS[1]
+            local pendingKey = KEYS[2]
+            local boardIdStr = ARGV[1]
+            
+            local newCount = redis.call('INCR', countKey) 
+            
+            redis.call('SADD', pendingKey, boardIdStr) 
+            
+            return newCount 
+            """.trimIndent(),
+        )
+        // 스크립트 결과 타입을 Long으로 설정
+        script.setResultType(Long::class.java)
+        return script
+    }
+
+    @Bean
+    fun getCountersAndLikedStatusScript(): RedisScript<List<Any>> {
+        val script = DefaultRedisScript<List<Any>>()
+        script.setScriptText(
+            """
+            local viewKey = KEYS[1]
+            local likeKey = KEYS[2]
+            local userLikeKey = KEYS[3]
+            local userId = ARGV[1]
+
+            local viewCount = redis.call('GET', viewKey) or 0 
+            local likeCount = redis.call('GET', likeKey) or 0
+
+            local likedStatus = 0 
+            if userId and #userId > 0 then
+                if redis.call('EXISTS', userLikeKey) == 1 then
+                     likedStatus = redis.call('SISMEMBER', userLikeKey, userId)
+                end
+            end
+            
+            return {viewCount, likeCount, likedStatus} 
+            """.trimIndent(),
+        )
+        script.setResultType(List::class.java as Class<List<Any>>)
+        return script
+    }
 }

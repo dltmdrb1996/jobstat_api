@@ -1,21 +1,21 @@
-//package com.example.jobstat.community.usecase
+// package com.example.jobstat.community.usecase
 //
-//import com.example.jobstat.community.board.service.BoardService
-//import com.example.jobstat.community.board.service.BoardServiceImpl
-//import com.example.jobstat.community.fake.BoardFixture
-//import com.example.jobstat.community.fake.CategoryFixture
-//import com.example.jobstat.community.fake.repository.FakeBoardRepository
-//import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-//import com.example.jobstat.community.fake.repository.FakeCommentRepository
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Test
-//import kotlin.test.assertEquals
-//import kotlin.test.assertTrue
+// import com.example.jobstat.community.board.service.BoardService
+// import com.example.jobstat.community.board.service.BoardServiceImpl
+// import com.example.jobstat.community.fake.BoardFixture
+// import com.example.jobstat.community.fake.CategoryFixture
+// import com.example.jobstat.community.fake.repository.FakeBoardRepository
+// import com.example.jobstat.community.fake.repository.FakeCategoryRepository
+// import com.example.jobstat.community.fake.repository.FakeCommentRepository
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Test
+// import kotlin.test.assertEquals
+// import kotlin.test.assertTrue
 //
-//@DisplayName("GetTopBoards Usecase 테스트")
-//class GetTopBoardsTest {
+// @DisplayName("GetTopBoards Usecase 테스트")
+// class GetTopBoardsTest {
 //    private lateinit var boardRepository: FakeBoardRepository
 //    private lateinit var categoryRepository: FakeCategoryRepository
 //    private lateinit var commentRepository: FakeCommentRepository
@@ -59,4 +59,4 @@
 //        // 첫 번째는 10회, 두 번째는 5회
 //        assertTrue(response.items[0].viewCount >= response.items[1].viewCount)
 //    }
-//}
+// }

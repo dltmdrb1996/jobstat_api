@@ -7,7 +7,6 @@ import java.util.Objects
 
 @MappedSuperclass
 abstract class BaseSnowIdEntity {
-
     @Id
     @SnowflakeId
     @Column(name = "id", nullable = false, updatable = false)
@@ -17,15 +16,14 @@ abstract class BaseSnowIdEntity {
         if (this === other) return true
         if (other == null || javaClass != other.javaClass && other !is HibernateProxy) return false
         val currentId = this.id ?: return false
-        val otherId = when (other) {
-            is BaseSnowIdEntity -> other.id
-            is HibernateProxy -> (other.hibernateLazyInitializer.identifier as? Long)
-            else -> return false
-        } ?: return false
+        val otherId =
+            when (other) {
+                is BaseSnowIdEntity -> other.id
+                is HibernateProxy -> (other.hibernateLazyInitializer.identifier as? Long)
+                else -> return false
+            } ?: return false
         return currentId == otherId
     }
 
-    override fun hashCode(): Int {
-        return Objects.hashCode(id)
-    }
+    override fun hashCode(): Int = Objects.hashCode(id)
 }

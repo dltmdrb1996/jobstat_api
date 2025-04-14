@@ -1,14 +1,14 @@
 package com.example.jobstat.core.global.utils.id_generator // 실제 패키지 경로
 
-import kotlin.math.max
 import org.slf4j.LoggerFactory
+import kotlin.math.max
 
 /**
  * Synchronized 키워드를 사용하여 ID 유일성을 보장하는 단순 Snowflake ID 생성기.
  * SnowflakeGenerator 인터페이스를 구현한다. 샤딩 미사용 시 기본 선택지.
  */
 class SynchronizedSnowflake(
-    private val nodeId: Long = 0L
+    private val nodeId: Long = 0L,
 ) : SnowflakeGenerator { // 인터페이스 구현
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -24,7 +24,7 @@ class SynchronizedSnowflake(
 
         // 비트 쉬프트 상수
         private const val TIMESTAMP_SHIFT = NODE_ID_BITS + SEQUENCE_BITS // 22
-        private const val NODE_ID_SHIFT = SEQUENCE_BITS          // 12
+        private const val NODE_ID_SHIFT = SEQUENCE_BITS // 12
 
         // 기준 시각 (Epoch) - UTC 2024-01-01T00:00:00Z
         private const val DEFAULT_EPOCH_MILLIS = 1704067200000L
@@ -72,9 +72,11 @@ class SynchronizedSnowflake(
             resultSequence = sequence
         }
 
-        return ((resultTimestamp shl TIMESTAMP_SHIFT)
+        return (
+            (resultTimestamp shl TIMESTAMP_SHIFT)
                 or (nodeId shl NODE_ID_SHIFT)
-                or resultSequence)
+                or resultSequence
+        )
     }
 
     private fun waitNextMillis(currentLastTimestamp: Long): Long {

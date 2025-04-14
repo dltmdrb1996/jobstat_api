@@ -11,7 +11,9 @@ internal class CategoryFixture private constructor(
     private var createdAt: LocalDateTime = LocalDateTime.now(),
     private var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) : IdFixture<com.example.jobstat.community.board.entity.BoardCategory>() {
-    override fun create(): com.example.jobstat.community.board.entity.BoardCategory = com.example.jobstat.community.board.entity.BoardCategory.create(name, displayName, description)
+    override fun create(): com.example.jobstat.community.board.entity.BoardCategory =
+        com.example.jobstat.community.board.entity.BoardCategory
+            .create(name, displayName, description)
 
     fun withName(name: String) = apply { this.name = name }
 

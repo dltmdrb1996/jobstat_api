@@ -24,15 +24,16 @@ class EmailServiceImpl(
     ) {
         try {
             // 이메일 메시지 생성 및 전송
-            SimpleMailMessage().apply {
-                setFrom(fromEmail)
-                setTo(to)
-                setSubject("[JobStat] 이메일 인증")
-                setText("인증 코드: $code\n30분 안에 인증을 완료해주세요.")
-            }.also { message ->
-                emailSender.send(message)
-                log.debug("인증 이메일 발송 완료: $to")
-            }
+            SimpleMailMessage()
+                .apply {
+                    setFrom(fromEmail)
+                    setTo(to)
+                    setSubject("[JobStat] 이메일 인증")
+                    setText("인증 코드: $code\n30분 안에 인증을 완료해주세요.")
+                }.also { message ->
+                    emailSender.send(message)
+                    log.debug("인증 이메일 발송 완료: $to")
+                }
         } catch (e: Exception) {
             log.error("인증 이메일 발송 실패: $to", e)
             throw AppException.fromErrorCode(

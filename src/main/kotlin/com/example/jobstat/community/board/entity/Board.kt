@@ -86,11 +86,11 @@ internal class Board protected constructor(
         commentCount--
     }
 
-    fun incrementViewCount(count : Int = 1) {
+    fun incrementViewCount(count: Int = 1) {
         viewCount += count
     }
 
-    fun incrementLikeCount(count : Int = 1) {
+    fun incrementLikeCount(count: Int = 1) {
         likeCount += count
     }
 

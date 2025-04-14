@@ -9,7 +9,6 @@ import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_PASSWORD
 import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_USERNAME
 import com.example.jobstat.utils.config.TestMongoConfig.Companion.mongoContainer
 import com.example.jobstat.utils.config.TestMysqlConfig
-import org.springframework.transaction.annotation.Transactional
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -21,6 +20,7 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
+import org.springframework.transaction.annotation.Transactional
 import kotlin.system.measureTimeMillis
 
 @SpringBootTest

@@ -5,12 +5,11 @@ package com.example.jobstat.community_read.client.response
  */
 data class FetchBoardIdsResponse(
     val ids: List<String>,
-    val hasNext: Boolean
+    val hasNext: Boolean,
 ) {
     companion object {
-        fun from(response: FetchBoardIdsResponse): List<Long> {
-            return response.ids?.map { it.toLongOrNull() ?: throw IllegalArgumentException("Invalid ID format") }
+        fun from(response: FetchBoardIdsResponse): List<Long> =
+            response.ids?.map { it.toLongOrNull() ?: throw IllegalArgumentException("Invalid ID format") }
                 ?: emptyList()
-        }
     }
-} 
+}

@@ -1,24 +1,24 @@
-//package com.example.jobstat.community.service
+// package com.example.jobstat.community.service
 //
-//import com.example.jobstat.community.board.entity.Board
-//import com.example.jobstat.community.board.entity.BoardCategory
-//import com.example.jobstat.community.board.service.BoardService
-//import com.example.jobstat.community.board.service.BoardServiceImpl
-//import com.example.jobstat.community.fake.CategoryFixture
-//import com.example.jobstat.community.fake.repository.FakeBoardRepository
-//import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-//import com.example.jobstat.community.fake.repository.FakeCommentRepository
-//import com.example.jobstat.core.error.AppException
-//import com.example.jobstat.core.error.ErrorCode
-//import jakarta.persistence.EntityNotFoundException
-//import org.junit.jupiter.api.*
-//import org.junit.jupiter.api.Assertions.*
-//import org.springframework.data.domain.PageRequest
-//import kotlin.test.assertFailsWith
-//import kotlin.test.assertTrue
+// import com.example.jobstat.community.board.entity.Board
+// import com.example.jobstat.community.board.entity.BoardCategory
+// import com.example.jobstat.community.board.service.BoardService
+// import com.example.jobstat.community.board.service.BoardServiceImpl
+// import com.example.jobstat.community.fake.CategoryFixture
+// import com.example.jobstat.community.fake.repository.FakeBoardRepository
+// import com.example.jobstat.community.fake.repository.FakeCategoryRepository
+// import com.example.jobstat.community.fake.repository.FakeCommentRepository
+// import com.example.jobstat.core.error.AppException
+// import com.example.jobstat.core.error.ErrorCode
+// import jakarta.persistence.EntityNotFoundException
+// import org.junit.jupiter.api.*
+// import org.junit.jupiter.api.Assertions.*
+// import org.springframework.data.domain.PageRequest
+// import kotlin.test.assertFailsWith
+// import kotlin.test.assertTrue
 //
-//@DisplayName("BoardService 테스트")
-//class BoardServiceTest {
+// @DisplayName("BoardService 테스트")
+// class BoardServiceTest {
 //    private lateinit var boardRepository: FakeBoardRepository
 //    private lateinit var categoryRepository: FakeCategoryRepository
 //    private lateinit var commentRepository: FakeCommentRepository
@@ -935,4 +935,4 @@
 //            }
 //        }
 //    }
-//}
+// }

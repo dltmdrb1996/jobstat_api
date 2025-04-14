@@ -7,11 +7,11 @@ import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 internal class RequestEmailVerification(
@@ -21,24 +21,26 @@ internal class RequestEmailVerification(
     validator: Validator,
 ) : ValidUseCase<RequestEmailVerification.Request, Unit>(validator) {
     @Transactional
-    override fun execute(request: Request): Unit = with(request) {
-        // 이메일 중복 확인
-        validateEmailAvailability(email)
-        
-        // 이전 인증 코드 확인
-        checkPreviousVerification(email)
-        
-        // 새 인증 코드 생성 및 발송
-        emailVerificationService.create(email)
-            .also { verification -> emailService.sendVerificationEmail(email, verification.code) }
-    }
-    
+    override fun execute(request: Request): Unit =
+        with(request) {
+            // 이메일 중복 확인
+            validateEmailAvailability(email)
+
+            // 이전 인증 코드 확인
+            checkPreviousVerification(email)
+
+            // 새 인증 코드 생성 및 발송
+            emailVerificationService
+                .create(email)
+                .also { verification -> emailService.sendVerificationEmail(email, verification.code) }
+        }
+
     private fun validateEmailAvailability(email: String) {
         if (!userService.validateEmail(email)) {
             throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 이메일입니다.")
         }
     }
-    
+
     private fun checkPreviousVerification(email: String) {
         emailVerificationService.findLatestByEmail(email)?.let { verification ->
             if (verification.isValid()) {
@@ -52,13 +54,13 @@ internal class RequestEmailVerification(
 
     @Schema(
         name = "RequestEmailVerificationRequest",
-        description = "이메일 인증 요청 모델"
+        description = "이메일 인증 요청 모델",
     )
     data class Request(
         @field:Schema(
-            description = "인증할 이메일 주소", 
+            description = "인증할 이메일 주소",
             example = "user@example.com",
-            required = true
+            required = true,
         )
         @field:NotBlank(message = "이메일은 필수 입력값입니다")
         @field:Email(message = "유효한 이메일 형식이 아닙니다")

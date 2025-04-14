@@ -20,8 +20,8 @@ internal class LoginAttemptServiceImpl(
                 count = attempts.count + 1,
                 lastFailedAt = Instant.now(),
                 blockedUntil = calculateBlockedUntil(attempts.count + 1),
-            ).also { 
-                cache.put(username, it) 
+            ).also {
+                cache.put(username, it)
             }
         }
     }

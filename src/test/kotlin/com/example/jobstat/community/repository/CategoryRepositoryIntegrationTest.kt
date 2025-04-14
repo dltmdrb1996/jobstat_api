@@ -1,22 +1,22 @@
-//package com.example.jobstat.community.repository
+// package com.example.jobstat.community.repository
 //
-//import com.example.jobstat.community.board.entity.Board
-//import com.example.jobstat.community.board.entity.BoardCategory
-//import com.example.jobstat.community.board.repository.BoardRepository
-//import com.example.jobstat.community.board.repository.CategoryRepository
-//import com.example.jobstat.utils.base.JpaIntegrationTestSupport
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Nested
-//import org.junit.jupiter.api.Test
-//import org.springframework.beans.factory.annotation.Autowired
-//import org.springframework.dao.DataIntegrityViolationException
-//import org.springframework.data.domain.PageRequest
-//import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
-//import kotlin.test.*
+// import com.example.jobstat.community.board.entity.Board
+// import com.example.jobstat.community.board.entity.BoardCategory
+// import com.example.jobstat.community.board.repository.BoardRepository
+// import com.example.jobstat.community.board.repository.CategoryRepository
+// import com.example.jobstat.utils.base.JpaIntegrationTestSupport
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Nested
+// import org.junit.jupiter.api.Test
+// import org.springframework.beans.factory.annotation.Autowired
+// import org.springframework.dao.DataIntegrityViolationException
+// import org.springframework.data.domain.PageRequest
+// import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
+// import kotlin.test.*
 //
-//@DisplayName("CategoryRepository 통합 테스트")
-//class CategoryRepositoryIntegrationTest : JpaIntegrationTestSupport() {
+// @DisplayName("CategoryRepository 통합 테스트")
+// class CategoryRepositoryIntegrationTest : JpaIntegrationTestSupport() {
 //    @Autowired
 //    private lateinit var categoryRepository: CategoryRepository
 //
@@ -273,4 +273,4 @@
 //            assertTrue(boardRepository.findAll(PageRequest.of(0, 10)).isEmpty)
 //        }
 //    }
-//}
+// }

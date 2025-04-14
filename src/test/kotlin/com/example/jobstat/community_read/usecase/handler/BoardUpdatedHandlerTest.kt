@@ -1,26 +1,26 @@
-//package com.example.jobstat.community_read.usecase.handler
+// package com.example.jobstat.community_read.usecase.handler
 //
-//import com.example.jobstat.community_read.model.BoardReadModel
-//import com.example.jobstat.community_read.service.CommunityReadService
-//import com.example.jobstat.core.event.Event
-//import com.example.jobstat.core.event.EventType
-//import com.example.jobstat.core.event.payload.board.BoardUpdatedEventPayload
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.Test
-//import org.junit.jupiter.api.extension.ExtendWith
-//import org.mockito.Mock
-//import org.mockito.Mockito.*
-//import org.mockito.junit.jupiter.MockitoExtension
-//import org.springframework.test.context.ActiveProfiles
-//import java.time.LocalDateTime
-//import kotlin.test.assertEquals
-//import kotlin.test.assertNotNull
-//import kotlin.test.assertNull
+// import com.example.jobstat.community_read.model.BoardReadModel
+// import com.example.jobstat.community_read.service.CommunityReadService
+// import com.example.jobstat.core.event.Event
+// import com.example.jobstat.core.event.EventType
+// import com.example.jobstat.core.event.payload.board.BoardUpdatedEventPayload
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.Test
+// import org.junit.jupiter.api.extension.ExtendWith
+// import org.mockito.Mock
+// import org.mockito.Mockito.*
+// import org.mockito.junit.jupiter.MockitoExtension
+// import org.springframework.test.context.ActiveProfiles
+// import java.time.LocalDateTime
+// import kotlin.test.assertEquals
+// import kotlin.test.assertNotNull
+// import kotlin.test.assertNull
 //
-//@ExtendWith(MockitoExtension::class)
-//@ActiveProfiles("test")
-//class HandleBoardUpdatedUseCaseTest {
+// @ExtendWith(MockitoExtension::class)
+// @ActiveProfiles("test")
+// class HandleBoardUpdatedUseCaseTest {
 //
 //    @Mock
 //    private lateinit var communityReadService: CommunityReadService
@@ -233,4 +233,4 @@
 //        assertNotNull(response.board)
 //        assertEquals(title, response.board?.title)
 //    }
-//}
+// }

@@ -21,7 +21,8 @@ internal class TokenServiceImpl(
     ) {
         // 사용자 키 생성 및 리프레시 토큰 저장
         val userKey = "$REFRESH_TOKEN_PREFIX$userId"
-        stringRedisTemplate.opsForValue()
+        stringRedisTemplate
+            .opsForValue()
             .set(userKey, refreshToken, expirationInSeconds, TimeUnit.SECONDS)
     }
 
@@ -36,14 +37,14 @@ internal class TokenServiceImpl(
      * 리프레시 토큰으로 사용자 키를 찾습니다
      */
     private fun findUserKeyByRefreshToken(refreshToken: String): String? =
-        stringRedisTemplate.keys("$REFRESH_TOKEN_PREFIX*")
+        stringRedisTemplate
+            .keys("$REFRESH_TOKEN_PREFIX*")
             .find { key -> stringRedisTemplate.opsForValue().get(key) == refreshToken }
 
     /**
      * 사용자 키에서 사용자 ID를 추출합니다
      */
-    private fun extractUserIdFromKey(userIdKey: String): Long = 
-        userIdKey.substringAfter(REFRESH_TOKEN_PREFIX).toLong()
+    private fun extractUserIdFromKey(userIdKey: String): Long = userIdKey.substringAfter(REFRESH_TOKEN_PREFIX).toLong()
 
     override fun removeToken(userId: Long) {
         val userKey = "$REFRESH_TOKEN_PREFIX$userId"

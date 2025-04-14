@@ -8,9 +8,8 @@ import org.springframework.stereotype.Component
 
 @Component
 internal class IncViewedHandler(
-    private val counterService: CounterService // CounterService 주입
+    private val counterService: CounterService, // CounterService 주입
 ) : EventHandlingUseCase<EventType, IncViewEventPayload, Unit>() {
-
     override val eventType: EventType = EventType.BOARD_INC_VIEW
 
     /**
@@ -24,12 +23,15 @@ internal class IncViewedHandler(
 
             log.info(
                 "Redis 조회수 증가 및 Pending 처리 완료: boardId={}, newTotalRedisAndViewCount={}",
-                payload.boardId, newTotalViewCount
+                payload.boardId,
+                newTotalViewCount,
             )
         } catch (e: Exception) {
             log.error(
                 "BoardViewed 이벤트 처리 중 CounterService 오류 발생: boardId={}, error={}",
-                payload.boardId, e.message, e
+                payload.boardId,
+                e.message,
+                e,
             )
             throw e // 예외를 다시 던져 RetryableTopic이 재시도하도록 함
         }

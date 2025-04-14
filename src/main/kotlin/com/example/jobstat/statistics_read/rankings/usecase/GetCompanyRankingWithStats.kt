@@ -8,11 +8,11 @@ import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingTyp
 import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisService
 import com.example.jobstat.statistics_read.stats.document.CompanyStatsDocument
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GetCompanyRankingWithStats(
@@ -56,22 +56,24 @@ class GetCompanyRankingWithStats(
     }
 
     @Transactional
-    fun execute(request: Request): Response = with(request) {
-        // 기업 관련 통계와 순위 조회
-        rankingAnalysisService.findStatsWithRanking<CompanyStatsDocument>(
-            rankingType = rankingType.toDomain(),
-            baseDate = baseDate,
-            page = page,
-        ).let { result ->
-            // 응답 객체 생성
-            Response(
-                rankingType = rankingType.toDomain(),
-                totalCount = result.totalCount,
-                hasNextPage = result.hasNextPage,
-                items = result.items,
-            )
+    fun execute(request: Request): Response =
+        with(request) {
+            // 기업 관련 통계와 순위 조회
+            rankingAnalysisService
+                .findStatsWithRanking<CompanyStatsDocument>(
+                    rankingType = rankingType.toDomain(),
+                    baseDate = baseDate,
+                    page = page,
+                ).let { result ->
+                    // 응답 객체 생성
+                    Response(
+                        rankingType = rankingType.toDomain(),
+                        totalCount = result.totalCount,
+                        hasNextPage = result.hasNextPage,
+                        items = result.items,
+                    )
+                }
         }
-    }
 
     data class Request(
         @field:NotNull val rankingType: CompanyRankingType,

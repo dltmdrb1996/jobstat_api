@@ -11,25 +11,37 @@ interface CommentDetailRepository {
      * 댓글 상세 정보 조회
      */
     fun findCommentDetail(commentId: Long): CommentReadModel?
-    
+
     /**
      * 여러 댓글 상세 정보 조회
      */
     fun findCommentDetails(commentIds: List<Long>): Map<Long, CommentReadModel>
-    
+
+    // 저장 관련 메소드
+
     /**
      * 댓글 상세 정보 저장
      */
-    fun saveCommentDetail(comment: CommentReadModel, eventTs: Long)
-    
+    fun saveCommentDetail(
+        comment: CommentReadModel,
+        eventTs: Long,
+    )
+
     /**
      * 여러 댓글 상세 정보 저장
      */
-    fun saveCommentDetails(comments: List<CommentReadModel>, eventTs: Long)
-    
+    fun saveCommentDetails(
+        comments: List<CommentReadModel>,
+        eventTs: Long,
+    )
+
+    // 파이프라인 관련 메소드
+
     /**
      * 파이프라인에서 댓글 상세 정보 저장
      */
-    fun saveCommentDetailInPipeline(conn: StringRedisConnection, comment: CommentReadModel)
-    
+    fun saveCommentDetailInPipeline(
+        conn: StringRedisConnection,
+        comment: CommentReadModel,
+    )
 }

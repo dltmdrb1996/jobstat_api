@@ -16,7 +16,6 @@ class RedisConfig(
     @Value("\${spring.data.redis.database}") private val dataIndex: Int,
     @Value("\${spring.data.redis.password}") private val password: String,
 ) {
-
     @Bean
     fun createLettuceConnectionFactory(): RedisConnectionFactory {
         val redisStandaloneConfiguration = RedisStandaloneConfiguration()

@@ -22,18 +22,17 @@ data class CommentCreatedEventPayload(
     @JsonProperty("createdAt")
     val createdAt: LocalDateTime,
     @JsonProperty("eventTs")
-    val eventTs: Long
+    val eventTs: Long,
 ) : EventPayload {
-    fun toReadModel() = CommentReadModel(
-        id = commentId,
-        boardId = boardId,
-        userId = userId,
-        author = author,
-        content = content,
-        createdAt = createdAt,
-        updatedAt = createdAt,
-        eventTs = eventTs
-    )
+    fun toReadModel() =
+        CommentReadModel(
+            id = commentId,
+            boardId = boardId,
+            userId = userId,
+            author = author,
+            content = content,
+            createdAt = createdAt,
+            updatedAt = createdAt,
+            eventTs = eventTs,
+        )
 }
-
-

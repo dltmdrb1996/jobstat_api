@@ -5,11 +5,11 @@ import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.usecase.impl.ValidUseCase
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 import com.example.jobstat.statistics_read.stats.service.StatsAnalysisService
-import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GetStatsByEntityIdAndBaseDate(
@@ -17,14 +17,16 @@ class GetStatsByEntityIdAndBaseDate(
     validator: Validator,
 ) : ValidUseCase<GetStatsByEntityIdAndBaseDate.Request, GetStatsByEntityIdAndBaseDate.Response<*>>(validator) {
     @Transactional
-    override fun execute(request: Request): Response<*> = with(request) {
-        // 엔티티 ID와 기준일자에 해당하는 통계 조회
-        statsAnalysisService.findStatsByEntityIdAndBaseDate<BaseStatsDocument>(
-            statsType = statsType,
-            baseDate = baseDate,
-            entityId = entityId,
-        ).let(::Response)
-    }
+    override fun execute(request: Request): Response<*> =
+        with(request) {
+            // 엔티티 ID와 기준일자에 해당하는 통계 조회
+            statsAnalysisService
+                .findStatsByEntityIdAndBaseDate<BaseStatsDocument>(
+                    statsType = statsType,
+                    baseDate = baseDate,
+                    entityId = entityId,
+                ).let(::Response)
+        }
 
     data class Request(
         @field:NotNull val statsType: StatsType,

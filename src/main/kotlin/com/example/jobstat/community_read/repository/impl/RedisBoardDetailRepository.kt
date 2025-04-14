@@ -18,18 +18,28 @@ class RedisBoardDetailRepository(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     companion object {
-        // 키 이름은 그대로 유지 (JSON 문자열 저장)
+        // 키 포맷 정의
         fun detailKey(boardId: Long) = "board:detail:json::$boardId"
+
         fun detailStateKey(boardId: Long) = "board:detailstate::$boardId"
     }
 
-    // findBoardDetail: 변경 없음
-    override fun findBoardDetail(boardId: Long): BoardReadModel? {
-        return redisTemplate.opsForValue().get(detailKey(boardId))
-            ?.let { dataSerializer.deserialize(it, BoardReadModel::class) }
-    }
+    // --------------------------
+    // 조회 관련 메소드
+    // --------------------------
 
-    // findBoardDetails: 변경 없음
+    /**
+     * 게시글 상세 정보 조회
+     */
+    override fun findBoardDetail(boardId: Long): BoardReadModel? =
+        redisTemplate
+            .opsForValue()
+            .get(detailKey(boardId))
+            ?.let { dataSerializer.deserialize(it, BoardReadModel::class) }
+
+    /**
+     * 여러 게시글 상세 정보 조회
+     */
     override fun findBoardDetails(boardIds: List<Long>): Map<Long, BoardReadModel> {
         if (boardIds.isEmpty()) return emptyMap()
 
@@ -47,8 +57,17 @@ class RedisBoardDetailRepository(
         return resultMap
     }
 
-    // saveBoardDetail: 변경 없음
-    override fun saveBoardDetail(board: BoardReadModel, eventTs: Long) {
+    // --------------------------
+    // 저장 관련 메소드
+    // --------------------------
+
+    /**
+     * 게시글 상세 정보 저장
+     */
+    override fun saveBoardDetail(
+        board: BoardReadModel,
+        eventTs: Long,
+    ) {
         redisTemplate.executePipelined { conn ->
             val stringConn = conn as StringRedisConnection
             saveBoardDetailInPipeline(stringConn, board)
@@ -56,8 +75,13 @@ class RedisBoardDetailRepository(
         }
     }
 
-    // saveBoardDetails: 변경 없음
-    override fun saveBoardDetails(boards: List<BoardReadModel>, eventTs: Long) {
+    /**
+     * 여러 게시글 상세 정보 저장
+     */
+    override fun saveBoardDetails(
+        boards: List<BoardReadModel>,
+        eventTs: Long,
+    ) {
         if (boards.isEmpty()) return
         redisTemplate.executePipelined { conn ->
             val stringConn = conn as StringRedisConnection
@@ -68,14 +92,21 @@ class RedisBoardDetailRepository(
         }
     }
 
-    // saveBoardDetailInPipeline: 변경 없음 (JSON 문자열을 SET으로 저장)
-    override fun saveBoardDetailInPipeline(conn: StringRedisConnection, board: BoardReadModel) {
-        val json = dataSerializer.serialize(board)
-            ?: throw AppException.fromErrorCode(ErrorCode.SERIALIZATION_FAILURE)
-        conn.set(detailKey(board.id), json)
-        log.debug("게시글 상세 정보 저장/업데이트 (SET): boardId=${board.id}") // 로그 수정
-    }
+    // --------------------------
+    // 파이프라인 관련 메소드
+    // --------------------------
 
-    // updateBoardContentInPipeline: 삭제! 이 로직은 더 이상 유효하지 않음
-    // override fun updateBoardContentInPipeline(...) { ... }
+    /**
+     * 파이프라인에서 게시글 상세 정보 저장
+     */
+    override fun saveBoardDetailInPipeline(
+        conn: StringRedisConnection,
+        board: BoardReadModel,
+    ) {
+        val json =
+            dataSerializer.serialize(board)
+                ?: throw AppException.fromErrorCode(ErrorCode.SERIALIZATION_FAILURE)
+        conn.set(detailKey(board.id), json)
+        log.debug("게시글 상세 정보 저장/업데이트 (SET): boardId=${board.id}")
+    }
 }

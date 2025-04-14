@@ -26,15 +26,20 @@ abstract class BaseClient {
     @PostConstruct
     fun initRestClient() {
         // RestClient 초기화는 유지
-        restClient = RestClient.builder()
-            .baseUrl(getServiceUrl())
-            .build()
+        restClient =
+            RestClient
+                .builder()
+                .baseUrl(getServiceUrl())
+                .build()
     }
 
     /**
      * URI 빌더 유틸리티 (유지)
      */
-    protected fun buildUri(path: String, queryParams: Map<String, Any?> = emptyMap()): String {
+    protected fun buildUri(
+        path: String,
+        queryParams: Map<String, Any?> = emptyMap(),
+    ): String {
         if (queryParams.isEmpty()) {
             return path
         }
@@ -43,7 +48,11 @@ abstract class BaseClient {
         queryParams.entries
             .filter { it.value != null }
             .forEach { (key, value) ->
-                builder.append(key).append('=').append(value).append('&')
+                builder
+                    .append(key)
+                    .append('=')
+                    .append(value)
+                    .append('&')
             }
         return builder.toString().trimEnd('&')
     }

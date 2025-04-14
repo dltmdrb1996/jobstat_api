@@ -1,20 +1,20 @@
-//package com.example.jobstat.community.board.usecase
+// package com.example.jobstat.community.board.usecase
 //
-//import com.example.jobstat.comment.service.CommentService
-//import jakarta.validation.ConstraintViolationException
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Nested
-//import org.junit.jupiter.api.Test
-//import org.mockito.kotlin.*
-//import kotlin.test.assertEquals
-//import kotlin.test.assertFailsWith
-//import kotlin.test.assertFalse
-//import kotlin.test.assertTrue
+// import com.example.jobstat.comment.service.CommentService
+// import jakarta.validation.ConstraintViolationException
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Nested
+// import org.junit.jupiter.api.Test
+// import org.mockito.kotlin.*
+// import kotlin.test.assertEquals
+// import kotlin.test.assertFailsWith
+// import kotlin.test.assertFalse
+// import kotlin.test.assertTrue
 //
-//@DisplayName("DeleteCommentsOnBoardDeleted 유스케이스 테스트")
-//class DeleteCommentsOnBoardDeletedTest {
+// @DisplayName("DeleteCommentsOnBoardDeleted 유스케이스 테스트")
+// class DeleteCommentsOnBoardDeletedTest {
 //    private lateinit var commentService: CommentService
 //    private lateinit var deleteCommentsOnBoardDeleted: DeleteCommentsOnBoardDeleted
 //
@@ -99,4 +99,4 @@
 //            verifyNoInteractions(commentService)
 //        }
 //    }
-//}
+// }

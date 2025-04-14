@@ -1,24 +1,24 @@
-//package com.example.jobstat.community.usecase
+// package com.example.jobstat.community.usecase
 //
-//import com.example.jobstat.community.board.service.BoardService
-//import com.example.jobstat.community.board.service.BoardServiceImpl
-//import com.example.jobstat.community.board.usecase.get.GetBoardStats
-//import com.example.jobstat.comment.service.CommentService
-//import com.example.jobstat.comment.service.CommentServiceImpl
-//import com.example.jobstat.community.fake.BoardFixture
-//import com.example.jobstat.community.fake.CategoryFixture
-//import com.example.jobstat.community.fake.repository.FakeBoardRepository
-//import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-//import com.example.jobstat.community.fake.repository.FakeCommentRepository
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.Assertions.assertTrue
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Test
-//import kotlin.test.assertEquals
+// import com.example.jobstat.community.board.service.BoardService
+// import com.example.jobstat.community.board.service.BoardServiceImpl
+// import com.example.jobstat.community.board.usecase.get.GetBoardStats
+// import com.example.jobstat.comment.service.CommentService
+// import com.example.jobstat.comment.service.CommentServiceImpl
+// import com.example.jobstat.community.fake.BoardFixture
+// import com.example.jobstat.community.fake.CategoryFixture
+// import com.example.jobstat.community.fake.repository.FakeBoardRepository
+// import com.example.jobstat.community.fake.repository.FakeCategoryRepository
+// import com.example.jobstat.community.fake.repository.FakeCommentRepository
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.Assertions.assertTrue
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Test
+// import kotlin.test.assertEquals
 //
-//@DisplayName("GetBoardStats Usecase 테스트")
-//class GetBoardStatsTest {
+// @DisplayName("GetBoardStats Usecase 테스트")
+// class GetBoardStatsTest {
 //    private lateinit var boardRepository: FakeBoardRepository
 //    private lateinit var categoryRepository: FakeCategoryRepository
 //    private lateinit var commentRepository: FakeCommentRepository
@@ -78,4 +78,4 @@
 //        assertEquals(3, response.totalBoardCount)
 //        assertTrue(response.hasCommentedOnBoard)
 //    }
-//}
+// }

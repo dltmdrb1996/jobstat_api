@@ -1,8 +1,8 @@
 package com.example.jobstat.auth.user.entity
 
 import com.example.jobstat.auth.user.UserConstants
-import com.example.jobstat.core.state.Address
 import com.example.jobstat.core.base.SoftDeleteBaseAutoIncEntity
+import com.example.jobstat.core.state.Address
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -19,7 +19,6 @@ internal class User private constructor(
     password: String,
     birthDate: LocalDate,
 ) : SoftDeleteBaseAutoIncEntity() {
-
     @Column(
         name = "username",
         nullable = false,

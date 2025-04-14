@@ -1,33 +1,33 @@
-//package com.example.jobstat.community.usecase
+// package com.example.jobstat.community.usecase
 //
-//import com.example.jobstat.community.board.service.BoardService
-//import com.example.jobstat.community.board.service.BoardServiceImpl
-//import com.example.jobstat.comment.service.CommentService
-//import com.example.jobstat.comment.service.CommentServiceImpl
-//import com.example.jobstat.comment.usecase.DeleteComment
-//import com.example.jobstat.community.fake.BoardFixture
-//import com.example.jobstat.community.fake.CategoryFixture
-//import com.example.jobstat.community.fake.repository.FakeBoardRepository
-//import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-//import com.example.jobstat.community.fake.repository.FakeCommentRepository
-//import com.example.jobstat.core.error.AppException
-//import com.example.jobstat.core.global.utils.SecurityUtils
-//import com.example.jobstat.utils.FakePasswordUtil
-//import jakarta.persistence.EntityNotFoundException
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.Assertions.assertEquals
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Nested
-//import org.junit.jupiter.api.Test
-//import org.mockito.kotlin.mock
-//import org.mockito.kotlin.whenever
-//import kotlin.properties.Delegates
-//import kotlin.test.assertFailsWith
-//import kotlin.test.assertTrue
+// import com.example.jobstat.community.board.service.BoardService
+// import com.example.jobstat.community.board.service.BoardServiceImpl
+// import com.example.jobstat.comment.service.CommentService
+// import com.example.jobstat.comment.service.CommentServiceImpl
+// import com.example.jobstat.comment.usecase.DeleteComment
+// import com.example.jobstat.community.fake.BoardFixture
+// import com.example.jobstat.community.fake.CategoryFixture
+// import com.example.jobstat.community.fake.repository.FakeBoardRepository
+// import com.example.jobstat.community.fake.repository.FakeCategoryRepository
+// import com.example.jobstat.community.fake.repository.FakeCommentRepository
+// import com.example.jobstat.core.error.AppException
+// import com.example.jobstat.core.global.utils.SecurityUtils
+// import com.example.jobstat.utils.FakePasswordUtil
+// import jakarta.persistence.EntityNotFoundException
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.Assertions.assertEquals
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Nested
+// import org.junit.jupiter.api.Test
+// import org.mockito.kotlin.mock
+// import org.mockito.kotlin.whenever
+// import kotlin.properties.Delegates
+// import kotlin.test.assertFailsWith
+// import kotlin.test.assertTrue
 //
-//@DisplayName("DeleteComment Usecase 테스트")
-//class DeleteCommentTest {
+// @DisplayName("DeleteComment Usecase 테스트")
+// class DeleteCommentTest {
 //    private lateinit var boardRepository: FakeBoardRepository
 //    private lateinit var categoryRepository: FakeCategoryRepository
 //    private lateinit var commentRepository: FakeCommentRepository
@@ -247,4 +247,4 @@
 //            }
 //        }
 //    }
-//}
+// }

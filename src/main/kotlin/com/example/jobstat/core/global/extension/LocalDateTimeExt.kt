@@ -4,10 +4,6 @@ import java.time.LocalDateTime
 import java.time.ZoneOffset
 
 /**
- * LocalDateTime 확장 함수 모음
- */
- 
-/**
  * LocalDateTime을 epoch 밀리초로 변환
  */
 fun LocalDateTime.toEpochMilli(): Long = this.toInstant(ZoneOffset.UTC).toEpochMilli()
@@ -15,6 +11,7 @@ fun LocalDateTime.toEpochMilli(): Long = this.toInstant(ZoneOffset.UTC).toEpochM
 /**
  * LocalDateTime을 지정된 포맷의 문자열로 변환
  */
-fun LocalDateTime.format(pattern: String = "yyyy-MM-dd HH:mm:ss"): String {
-    return java.time.format.DateTimeFormatter.ofPattern(pattern).format(this)
-} 
+fun LocalDateTime.format(pattern: String = "yyyy-MM-dd HH:mm:ss"): String =
+    java.time.format.DateTimeFormatter
+        .ofPattern(pattern)
+        .format(this)

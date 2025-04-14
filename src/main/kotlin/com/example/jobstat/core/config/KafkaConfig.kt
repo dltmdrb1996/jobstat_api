@@ -11,21 +11,17 @@ import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.listener.ContainerProperties
-import org.springframework.kafka.listener.DefaultErrorHandler
-import org.springframework.util.backoff.FixedBackOff
 
 @Configuration
 @ComponentScan("com.example.jobstat.core.event.outbox") // 필요에 따라 패키지를 조정하세요
 class KafkaConfig {
-
     @Value("\${spring.kafka.bootstrap-servers}")
     private lateinit var bootstrapServers: String
-
 
     @Bean
     fun kafkaListenerContainerFactory(
         consumerFactory: ConsumerFactory<String?, String?>,
-        kafkaTemplate: KafkaTemplate<*, *> // DLT 사용 시 필요할 수 있음
+        kafkaTemplate: KafkaTemplate<*, *>,
     ): ConcurrentKafkaListenerContainerFactory<String, String> {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.consumerFactory = consumerFactory
@@ -35,12 +31,13 @@ class KafkaConfig {
 
     @Bean
     fun outboxKafkaTemplate(): KafkaTemplate<String, String> {
-        val configProps = HashMap<String, Any>().apply {
-            put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-            put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
-            put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
-            put(ProducerConfig.ACKS_CONFIG, "all")
-        }
+        val configProps =
+            HashMap<String, Any>().apply {
+                put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
+                put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
+                put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
+                put(ProducerConfig.ACKS_CONFIG, "all")
+            }
         return KafkaTemplate(DefaultKafkaProducerFactory(configProps))
     }
 }

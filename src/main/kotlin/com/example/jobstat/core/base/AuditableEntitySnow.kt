@@ -18,4 +18,4 @@ abstract class AuditableEntitySnow : BaseSnowIdEntity() {
     @Column(name = "updated_at", nullable = false)
     var updatedAt: LocalDateTime = LocalDateTime.now()
         protected set
-} 
+}

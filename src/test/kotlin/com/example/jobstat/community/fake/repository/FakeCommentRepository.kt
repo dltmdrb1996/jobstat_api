@@ -1,14 +1,14 @@
-//package com.example.jobstat.community.fake.repository
+// package com.example.jobstat.community.fake.repository
 //
-//import com.example.jobstat.community.comment.entity.Comment
-//import com.example.jobstat.comment.repository.CommentRepository
-//import com.example.jobstat.community.fake.CommentFixture
-//import com.example.jobstat.utils.base.BaseFakeRepository
-//import org.springframework.data.domain.Page
-//import org.springframework.data.domain.PageImpl
-//import org.springframework.data.domain.Pageable
+// import com.example.jobstat.community.comment.entity.Comment
+// import com.example.jobstat.comment.repository.CommentRepository
+// import com.example.jobstat.community.fake.CommentFixture
+// import com.example.jobstat.utils.base.BaseFakeRepository
+// import org.springframework.data.domain.Page
+// import org.springframework.data.domain.PageImpl
+// import org.springframework.data.domain.Pageable
 //
-//internal class FakeCommentRepository : CommentRepository {
+// internal class FakeCommentRepository : CommentRepository {
 //    private val baseRepo =
 //        object : BaseFakeRepository<com.example.jobstat.community.comment.entity.Comment, CommentFixture>() {
 //            override fun fixture() = CommentFixture.aComment()
@@ -97,4 +97,4 @@
 //    fun clear() {
 //        baseRepo.clear()
 //    }
-//}
+// }

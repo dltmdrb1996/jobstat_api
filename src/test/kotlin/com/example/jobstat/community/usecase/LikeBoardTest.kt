@@ -1,19 +1,19 @@
-//package com.example.jobstat.community.usecase
+// package com.example.jobstat.community.usecase
 //
-//import com.example.jobstat.community.board.service.BoardService
-//import com.example.jobstat.community.board.service.BoardServiceImpl
-//import com.example.jobstat.community.board.usecase.command.LikeBoard
-//import com.example.jobstat.community.fake.repository.FakeBoardRepository
-//import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-//import com.example.jobstat.community.fake.repository.FakeCommentRepository
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Test
-//import kotlin.test.assertEquals
+// import com.example.jobstat.community.board.service.BoardService
+// import com.example.jobstat.community.board.service.BoardServiceImpl
+// import com.example.jobstat.community.board.usecase.command.LikeBoard
+// import com.example.jobstat.community.fake.repository.FakeBoardRepository
+// import com.example.jobstat.community.fake.repository.FakeCategoryRepository
+// import com.example.jobstat.community.fake.repository.FakeCommentRepository
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Test
+// import kotlin.test.assertEquals
 //
-//@DisplayName("LikeBoard Usecase 테스트")
-//class LikeBoardTest {
+// @DisplayName("LikeBoard Usecase 테스트")
+// class LikeBoardTest {
 //    private lateinit var boardRepository: FakeBoardRepository
 //    private lateinit var categoryRepository: FakeCategoryRepository
 //    private lateinit var commentRepository: FakeCommentRepository
@@ -49,4 +49,4 @@
 //        val response = likeBoard(request)
 //        assertEquals(1, response.likeCount)
 //    }
-//}
+// }

@@ -11,18 +11,20 @@ class RetryConfig {
     @Bean
     fun retryTemplate(): RetryTemplate {
         val retryTemplate = RetryTemplate()
-        val backOffPolicy = ExponentialBackOffPolicy().apply {
-            initialInterval = 1000L  // 첫 재시도 1초 후
-            multiplier = 2.0         // 매번 2배씩 증가
-            maxInterval = 5000L      // 최대 5초 대기
-        }
+        val backOffPolicy =
+            ExponentialBackOffPolicy().apply {
+                initialInterval = 1000L // 첫 재시도 1초 후
+                multiplier = 2.0 // 매번 2배씩 증가
+                maxInterval = 5000L // 최대 5초 대기
+            }
         retryTemplate.setBackOffPolicy(backOffPolicy)
-        
-        val retryPolicy = SimpleRetryPolicy().apply {
-            maxAttempts = 3  // 최대 3회 시도 (원본 호출 포함)
-        }
+
+        val retryPolicy =
+            SimpleRetryPolicy().apply {
+                maxAttempts = 3 // 최대 3회 시도 (원본 호출 포함)
+            }
         retryTemplate.setRetryPolicy(retryPolicy)
-        
+
         return retryTemplate
     }
 }

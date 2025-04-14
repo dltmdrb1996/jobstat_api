@@ -1,18 +1,18 @@
-//package com.example.jobstat.community.service
+// package com.example.jobstat.community.service
 //
-//import com.example.jobstat.community.board.entity.BoardCategory
-//import com.example.jobstat.community.board.service.CategoryService
-//import com.example.jobstat.community.board.service.CategoryServiceImpl
-//import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-//import com.example.jobstat.core.error.AppException
-//import com.example.jobstat.core.error.ErrorCode
-//import jakarta.persistence.EntityNotFoundException
-//import org.junit.jupiter.api.*
-//import org.junit.jupiter.api.Assertions.*
-//import kotlin.test.assertFailsWith
+// import com.example.jobstat.community.board.entity.BoardCategory
+// import com.example.jobstat.community.board.service.CategoryService
+// import com.example.jobstat.community.board.service.CategoryServiceImpl
+// import com.example.jobstat.community.fake.repository.FakeCategoryRepository
+// import com.example.jobstat.core.error.AppException
+// import com.example.jobstat.core.error.ErrorCode
+// import jakarta.persistence.EntityNotFoundException
+// import org.junit.jupiter.api.*
+// import org.junit.jupiter.api.Assertions.*
+// import kotlin.test.assertFailsWith
 //
-//@DisplayName("CategoryService 테스트")
-//class CategoryServiceTest {
+// @DisplayName("CategoryService 테스트")
+// class CategoryServiceTest {
 //    private lateinit var categoryRepository: FakeCategoryRepository
 //    private lateinit var categoryService: CategoryService
 //
@@ -227,4 +227,4 @@
 //            assertTrue(categoryService.isCategoryNameAvailable("TEST"))
 //        }
 //    }
-//}
+// }

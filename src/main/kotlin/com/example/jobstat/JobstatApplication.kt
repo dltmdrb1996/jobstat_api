@@ -24,9 +24,9 @@ class JobstatApplication
 fun main(args: Array<String>) {
     // JVM 전체에 대한 기본 시간대 설정
     TimeZone.setDefault(TimeZone.getTimeZone(KOREA_TIME_ZONE_ID))
-    
+
     // 동일한 효과의 JVM 시스템 속성 설정 (이중 보호)
     System.setProperty("user.timezone", KOREA_TIME_ZONE_ID)
-    
+
     runApplication<JobstatApplication>(*args)
 }

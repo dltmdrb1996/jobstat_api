@@ -30,7 +30,6 @@ class CommunityEventHandlerImpl(
     private val commentIdListRepository: CommentIdListRepository,
     private val commentDetailRepository: CommentDetailRepository,
     private val commentCountRepository: CommentCountRepository,
-    // dataSerializer는 BoardDetailRepository에 주입되어 있으므로 여기선 필요 없음
 ) : CommunityEventHandler {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -40,9 +39,14 @@ class CommunityEventHandlerImpl(
         private const val EVENT_TS_TTL_DAYS = 1L
     }
 
-    // handleBoardCreated: 변경 없음
+    // --------------------------
+    // 게시글 기본 이벤트 핸들러
+    // --------------------------
+
+    /**
+     * 게시글 생성 이벤트 처리
+     */
     override fun handleBoardCreated(payload: BoardCreatedEventPayload) {
-        // ... (기존 코드 유지)
         redisTemplate.executePipelined { conn ->
             val stringConn = conn as StringRedisConnection
             val eventTsKey = "board:${payload.boardId}"
@@ -54,13 +58,13 @@ class CommunityEventHandlerImpl(
             // 1. 상세 정보 저장 (JSON 직렬화 방식)
             with(payload.toReadModel()) {
                 val score = eventTs.toDouble()
-                // saveBoardDetailInPipeline은 이제 SET 명령어를 사용
+                // JSON 문자열 SET 명령어로 저장
                 boardDetailRepository.saveBoardDetailInPipeline(stringConn, this)
                 // 2. 최신순 목록 갱신
                 boardIdListRepository.addBoardInPipeline(stringConn, id, score)
                 // 3. 카테고리별 목록 갱신 (카테고리 존재 시)
                 boardIdListRepository.addBoardToCategoryInPipeline(stringConn, id, categoryId, score)
-                // 4. 전체 게시글 수 증가 (Count repository)
+                // 4. 전체 게시글 수 증가
                 boardCountRepository.applyCountInPipeline(stringConn, 1)
             }
 
@@ -82,19 +86,19 @@ class CommunityEventHandlerImpl(
         }
 
         // 2. (Modify) 읽어온 데이터 기반으로 새 객체 생성 (Kotlin copy 활용)
-        val updatedBoard = currentBoard.copy(
-            title = payload.title,
-            content = payload.content,
-            // eventTs는 페이로드의 것을 사용하는 것이 일관성 있을 수 있음 (선택 사항)
-            eventTs = payload.eventTs
-        )
+        val updatedBoard =
+            currentBoard.copy(
+                title = payload.title,
+                content = payload.content,
+                eventTs = payload.eventTs,
+            )
 
         // 3. (Write) 파이프라인 내에서 업데이트된 객체 저장
         redisTemplate.executePipelined { conn ->
             val stringConn = conn as StringRedisConnection
             val eventTsKey = "board:${payload.boardId}"
 
-            // Idempotency 체크
+            // 이벤트 타임스탬프 검증
             if (!checkEventTs(stringConn, eventTsKey, payload.eventTs)) {
                 return@executePipelined null
             }
@@ -109,6 +113,9 @@ class CommunityEventHandlerImpl(
         }
     }
 
+    /**
+     * 게시글 삭제 이벤트 처리
+     */
     override fun handleBoardDeleted(payload: BoardDeletedEventPayload) {
         redisTemplate.executePipelined { conn ->
             val stringConn = conn as StringRedisConnection
@@ -121,7 +128,7 @@ class CommunityEventHandlerImpl(
             // 1. 최신순 목록 및 카테고리 목록에서 제거
             boardIdListRepository.removeBoardInPipeline(stringConn, payload.boardId, payload.categoryId)
 
-            // 2. 상세 정보 삭제 (직렬화된 JSON key 삭제) - SET으로 저장했으므로 DEL 사용 가능
+            // 2. 상세 정보 삭제 (직렬화된 JSON key 삭제)
             stringConn.del(RedisBoardDetailRepository.detailKey(payload.boardId))
             stringConn.del(RedisBoardDetailRepository.detailStateKey(payload.boardId))
 
@@ -136,27 +143,26 @@ class CommunityEventHandlerImpl(
         }
     }
 
+    // --------------------------
+    // 게시글 상호작용 이벤트 핸들러
+    // --------------------------
+
     /**
-     * 게시글 좋아요/좋아요 취소 이벤트 처리 (Read-Modify-Write 방식)
-     * BoardLikedEventPayload와 BoardUnlikedEventPayload를 처리하는 공통 로직 (예시)
-     * 실제 구현 시에는 분리하거나 인터페이스 사용 등 고려
+     * 게시글 좋아요 이벤트 처리 (Read-Modify-Write 방식)
      */
-    private fun handleBoardLikeUpdate(boardId: Long, likeCount: Int, eventTs: Long) {
-
-    }
-
     override fun handleBoardLiked(payload: BoardLikedEventPayload) {
         with(payload) {
             val currentBoard = boardDetailRepository.findBoardDetail(boardId)
             if (currentBoard == null) {
-                log.warn("게시글 좋아요/취소 처리 실패: 원본 데이터를 찾을 수 없음. boardId=$boardId")
+                log.warn("게시글 좋아요 처리 실패: 원본 데이터를 찾을 수 없음. boardId=$boardId")
                 return
             }
 
-            val updatedBoard = currentBoard.copy(
-                likeCount = likeCount, // 페이로드의 최종 likeCount 사용
-                eventTs = eventTs
-            )
+            val updatedBoard =
+                currentBoard.copy(
+                    likeCount = likeCount, // 페이로드의 최종 likeCount 사용
+                    eventTs = eventTs,
+                )
 
             redisTemplate.executePipelined { conn ->
                 val stringConn = conn as StringRedisConnection
@@ -165,9 +171,6 @@ class CommunityEventHandlerImpl(
                 if (!checkEventTs(stringConn, eventTsKey, eventTs)) {
                     return@executePipelined null
                 }
-
-                // 좋아요 랭킹 업데이트는 그대로 유지 (Sorted Set 사용 가정)
-//            boardIdListRepository.addLikesRankingInPipeline(stringConn, boardId, likeCount.toDouble())
 
                 // 상세 정보 JSON 업데이트
                 boardDetailRepository.saveBoardDetailInPipeline(stringConn, updatedBoard)
@@ -180,7 +183,7 @@ class CommunityEventHandlerImpl(
     }
 
     /**
-     * 조회수 업데이트 이벤트 처리 (Read-Modify-Write 방식)
+     * 게시글 조회수 업데이트 이벤트 처리 (Read-Modify-Write 방식)
      */
     override fun handleBoardViewed(payload: BoardViewedEventPayload) {
         val currentBoard = boardDetailRepository.findBoardDetail(payload.boardId)
@@ -189,10 +192,11 @@ class CommunityEventHandlerImpl(
             return
         }
 
-        val updatedBoard = currentBoard.copy(
-            viewCount = payload.viewCount, // 페이로드의 최종 viewCount 사용
-            eventTs = payload.eventTs
-        )
+        val updatedBoard =
+            currentBoard.copy(
+                viewCount = payload.viewCount, // 페이로드의 최종 viewCount 사용
+                eventTs = payload.eventTs,
+            )
 
         redisTemplate.executePipelined { conn ->
             val stringConn = conn as StringRedisConnection
@@ -202,9 +206,6 @@ class CommunityEventHandlerImpl(
                 return@executePipelined null
             }
 
-            // 조회수 랭킹 업데이트는 그대로 유지 (Sorted Set 사용 가정)
-//            boardIdListRepository.addViewsRankingInPipeline(stringConn, payload.boardId, payload.viewCount.toDouble())
-
             // 상세 정보 JSON 업데이트
             boardDetailRepository.saveBoardDetailInPipeline(stringConn, updatedBoard)
 
@@ -213,6 +214,55 @@ class CommunityEventHandlerImpl(
             null
         }
     }
+
+    // --------------------------
+    // 게시글 랭킹 이벤트 핸들러
+    // --------------------------
+
+    /**
+     * 게시글 랭킹 업데이트 이벤트 처리
+     */
+    override fun handleBoardRankingUpdated(payload: BoardRankingUpdatedEventPayload) {
+        val rankingKey = RedisBoardIdListRepository.getRankingKey(payload.metric, payload.period)
+        if (rankingKey == null) {
+            log.error("랭킹 업데이트에 잘못된 지표/기간 조합이 사용됨: {}", payload)
+            return
+        }
+
+        // 각 랭킹 리스트 타입별로 전용 eventTs 키 사용
+        val eventTsEntityKey =
+            RANKING_EVENT_TS_KEY_FORMAT.format(
+                payload.metric.name.lowercase(),
+                payload.period.name.lowercase(),
+            )
+
+        redisTemplate.executePipelined { conn ->
+            val stringConn = conn as StringRedisConnection
+
+            // 이벤트 타임스탬프 검증
+            if (!checkEventTs(stringConn, eventTsEntityKey, payload.eventTs)) {
+                log.warn(
+                    "오래된 랭킹 업데이트 이벤트 건너뜀 - {}. 현재 타임스탬프가 이벤트 타임스탬프보다 최신: {}",
+                    eventTsEntityKey,
+                    payload.eventTs,
+                )
+                return@executePipelined null
+            }
+
+            // Redis에서 랭킹 리스트 교체
+            boardIdListRepository.replaceRankingListInPipeline(stringConn, rankingKey, payload.rankings)
+
+            // 이 랭킹 리스트의 이벤트 타임스탬프 업데이트
+            updateEventTs(stringConn, eventTsEntityKey, payload.eventTs)
+
+            log.info("랭킹 리스트 '{}' 업데이트 완료 - {}개 항목", rankingKey, payload.rankings.size)
+            null
+        }
+    }
+
+    // --------------------------
+    // 댓글 기본 이벤트 핸들러
+    // --------------------------
 
     /**
      * 댓글 생성 이벤트 처리 (게시글의 commentCount 업데이트 필요 - Read-Modify-Write)
@@ -225,7 +275,7 @@ class CommunityEventHandlerImpl(
             val stringConn = conn as StringRedisConnection
             val commentEventTsKey = "comment:${payload.commentId}"
 
-            // 댓글 이벤트 시간 체크
+            // 댓글 이벤트 타임스탬프 검증
             if (!checkEventTs(stringConn, commentEventTsKey, payload.eventTs)) {
                 log.debug("댓글 생성 이벤트 타임스탬프가 이전보다 작음: commentId=${payload.commentId}, eventTs=${payload.eventTs}")
                 return@executePipelined null
@@ -257,6 +307,9 @@ class CommunityEventHandlerImpl(
         }
     }
 
+    /**
+     * 댓글 수정 이벤트 처리 (Read-Modify-Write 방식)
+     */
     override fun handleCommentUpdated(payload: CommentUpdatedEventPayload) {
         val currentComment = commentDetailRepository.findCommentDetail(payload.commentId)
 
@@ -265,18 +318,19 @@ class CommunityEventHandlerImpl(
             return // 원본이 없으면 업데이트 불가
         }
 
-        val updatedComment = currentComment.copy(
-            content = payload.content,
-            updatedAt = payload.updatedAt,
-            eventTs = payload.eventTs
-        )
+        val updatedComment =
+            currentComment.copy(
+                content = payload.content,
+                updatedAt = payload.updatedAt,
+                eventTs = payload.eventTs,
+            )
 
         redisTemplate.executePipelined { conn ->
             val stringConn = conn as StringRedisConnection
-            // 이벤트 타임스탬프 키 생성 (board가 아닌 comment 사용)
+            // 이벤트 타임스탬프 키 생성
             val eventTsKey = "comment:${payload.commentId}"
 
-            // Idempotency 체크
+            // 이벤트 타임스탬프 검증
             if (!checkEventTs(stringConn, eventTsKey, payload.eventTs)) {
                 log.debug("댓글 수정 이벤트 타임스탬프가 이전보다 작음: commentId=${payload.commentId}, eventTs=${payload.eventTs}")
                 return@executePipelined null
@@ -290,7 +344,9 @@ class CommunityEventHandlerImpl(
         }
     }
 
-
+    /**
+     * 댓글 삭제 이벤트 처리
+     */
     override fun handleCommentDeleted(payload: CommentDeletedEventPayload) {
         val currentBoard = boardDetailRepository.findBoardDetail(payload.boardId)
         redisTemplate.executePipelined { conn ->
@@ -301,12 +357,16 @@ class CommunityEventHandlerImpl(
                 return@executePipelined null
             }
 
+            // 1. 게시글의 댓글 목록에서 제거
             commentIdListRepository.removeCommentInPipeline(stringConn, payload.boardId, payload.commentId)
+            // 2. 댓글 상세 정보 삭제
             stringConn.del(RedisCommentDetailRepository.detailKey(payload.commentId))
-            stringConn.del(RedisCommentDetailRepository.detailStateKey(payload.commentId)) // 이 키의 용도 확인 필요
+            stringConn.del(RedisCommentDetailRepository.detailStateKey(payload.commentId))
+            // 3. 댓글 카운트 감소
             commentCountRepository.applyBoardCommentCountInPipeline(stringConn, payload.boardId, -1)
             commentCountRepository.applyTotalCountInPipeline(stringConn, -1)
 
+            // 4. 게시글 상세 정보의 댓글 수 업데이트
             if (currentBoard != null) {
                 val updatedBoard = currentBoard.copy(commentCount = (currentBoard.commentCount - 1).coerceAtLeast(0))
                 boardDetailRepository.saveBoardDetailInPipeline(stringConn, updatedBoard)
@@ -314,55 +374,40 @@ class CommunityEventHandlerImpl(
                 log.warn("댓글 삭제 시 게시글 정보 업데이트 실패: 원본 게시글 데이터를 찾을 수 없음. boardId=${payload.boardId}")
             }
 
+            // 5. 이벤트 타임스탬프 키 삭제
             stringConn.del(EVENT_TS_KEY_PREFIX + commentEventTsKey)
             log.debug("댓글 삭제 및 관련 데이터 업데이트됨: commentId=${payload.commentId}, boardId=${payload.boardId}")
             null
         }
     }
 
-    override fun handleBoardRankingUpdated(payload: BoardRankingUpdatedEventPayload) {
-        val rankingKey = RedisBoardIdListRepository.getRankingKey(payload.metric, payload.period)
-        if (rankingKey == null) {
-            log.error("랭킹 업데이트에 잘못된 지표/기간 조합이 사용됨: {}", payload)
-            return
-        }
+    // --------------------------
+    // 유틸리티 메소드
+    // --------------------------
 
-        // 각 랭킹 리스트 타입별로 전용 eventTs 키 사용
-        val eventTsEntityKey = RANKING_EVENT_TS_KEY_FORMAT.format(
-            payload.metric.name.lowercase(),
-            payload.period.name.lowercase()
-        )
-
-        redisTemplate.executePipelined { conn ->
-            val stringConn = conn as StringRedisConnection
-
-            // Idempotency 체크
-            if (!checkEventTs(stringConn, eventTsEntityKey, payload.eventTs)) {
-                log.warn(
-                    "오래된 랭킹 업데이트 이벤트 건너뜀 - {}. 현재 타임스탬프가 이벤트 타임스탬프보다 최신: {}",
-                    eventTsEntityKey, payload.eventTs
-                )
-                return@executePipelined null
-            }
-
-            // Redis에서 랭킹 리스트 교체
-            boardIdListRepository.replaceRankingListInPipeline(stringConn, rankingKey, payload.rankings)
-
-            // 이 랭킹 리스트의 이벤트 타임스탬프 업데이트
-            updateEventTs(stringConn, eventTsEntityKey, payload.eventTs)
-
-            log.info("랭킹 리스트 '{}' 업데이트 완료 - {}개 항목", rankingKey, payload.rankings.size)
-            null
-        }
-    }
-
-    private fun checkEventTs(conn: StringRedisConnection, key: String, eventTs: Long): Boolean {
+    /**
+     * 이벤트 타임스탬프 검증
+     * 현재 저장된 타임스탬프보다 이벤트 타임스탬프가 더 최신인지 확인
+     */
+    private fun checkEventTs(
+        conn: StringRedisConnection,
+        key: String,
+        eventTs: Long,
+    ): Boolean {
         val eventTsKey = EVENT_TS_KEY_PREFIX + key
         val currentTs = conn.hGet(eventTsKey, "ts")?.toLongOrNull() ?: 0
         return eventTs > currentTs
     }
 
-    private fun updateEventTs(conn: StringRedisConnection, key: String, eventTs: Long) {
+    /**
+     * 이벤트 타임스탬프 업데이트
+     * 처리된 이벤트의 타임스탬프를 Redis에 저장하고 TTL 설정
+     */
+    private fun updateEventTs(
+        conn: StringRedisConnection,
+        key: String,
+        eventTs: Long,
+    ) {
         val eventTsKey = EVENT_TS_KEY_PREFIX + key
         conn.hSet(eventTsKey, "ts", eventTs.toString())
         // TTL 설정 (초 단위)

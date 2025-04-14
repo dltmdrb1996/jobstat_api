@@ -10,11 +10,11 @@ import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisServi
 import com.example.jobstat.statistics_read.stats.document.*
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GetRankingWithStats(
@@ -43,7 +43,7 @@ class GetRankingWithStats(
     fun execute(request: Request): Response<*> {
         // 통계 타입 결정
         val statsType = request.rankingType.toStatsType()
-        
+
         // 통계 타입에 따라 적절한 통계 문서 타입으로 처리
         return when (statsType) {
             StatsType.BENEFIT -> executeWithType<BenefitStatsDocument>(request)
@@ -63,23 +63,24 @@ class GetRankingWithStats(
     /**
      * 특정 통계 문서 타입에 대한 순위 및 통계 정보 조회
      */
-    private inline fun <reified T : BaseStatsDocument> executeWithType(request: Request): Response<T> = 
+    private inline fun <reified T : BaseStatsDocument> executeWithType(request: Request): Response<T> =
         with(request) {
             // 특정 타입에 맞는 통계와 순위 정보 조회
-            rankingAnalysisService.findStatsWithRanking<T>(
-                rankingType = rankingType,
-                baseDate = baseDate,
-                page = page,
-            ).let { result ->
-                // 응답 생성
-                Response(
-                    statType = rankingType.toStatsType(),
+            rankingAnalysisService
+                .findStatsWithRanking<T>(
                     rankingType = rankingType,
-                    totalCount = result.totalCount,
-                    hasNextPage = result.hasNextPage,
-                    items = result.items,
-                )
-            }
+                    baseDate = baseDate,
+                    page = page,
+                ).let { result ->
+                    // 응답 생성
+                    Response(
+                        statType = rankingType.toStatsType(),
+                        rankingType = rankingType,
+                        totalCount = result.totalCount,
+                        hasNextPage = result.hasNextPage,
+                        items = result.items,
+                    )
+                }
         }
 
     data class Request(

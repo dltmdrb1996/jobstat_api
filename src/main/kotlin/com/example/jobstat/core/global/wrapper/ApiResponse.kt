@@ -48,7 +48,6 @@ data class ApiResponse<T>(
             message: String = httpStatus.reasonPhrase,
         ): ResponseEntity<ApiResponse<Unit>> = createResponse(httpStatus, message = message)
 
-
         private fun <T> createResponse(
             status: HttpStatus,
             data: T? = null,

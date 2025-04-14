@@ -17,5 +17,5 @@ data class CommentUpdatedEventPayload(
     @JsonProperty("updatedAt")
     val updatedAt: LocalDateTime,
     @JsonProperty("eventTs")
-    val eventTs: Long
+    val eventTs: Long,
 ) : EventPayload

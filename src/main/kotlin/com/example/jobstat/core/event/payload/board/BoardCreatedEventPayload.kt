@@ -26,17 +26,18 @@ data class BoardCreatedEventPayload(
     @JsonProperty("author")
     val author: String,
 ) : EventPayload {
-    fun toReadModel() = BoardReadModel(
-        id = boardId,
-        userId = userId,
-        categoryId = categoryId,
-        createdAt = createdAt,
-        title = title,
-        content = content,
-        author = author,
-        commentCount = 0,
-        likeCount = 0,
-        viewCount = 0,
-        eventTs = eventTs
-    )
+    fun toReadModel() =
+        BoardReadModel(
+            id = boardId,
+            userId = userId,
+            categoryId = categoryId,
+            createdAt = createdAt,
+            title = title,
+            content = content,
+            author = author,
+            commentCount = 0,
+            likeCount = 0,
+            viewCount = 0,
+            eventTs = eventTs,
+        )
 }

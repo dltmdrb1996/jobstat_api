@@ -1,4 +1,3 @@
-// file: src/main/kotlin/com/example/jobstat/community/board/usecase/get/dto/BoardIdsResponse.kt
 package com.example.jobstat.community.board.usecase.get.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
@@ -8,5 +7,5 @@ data class BoardIdsResponse(
     @field:Schema(description = "게시글 ID 목록", example = "[\"1\", \"2\", \"3\"]")
     val ids: List<String>,
     @field:Schema(description = "다음 페이지 존재 여부", example = "true")
-    val hasNext: Boolean
+    val hasNext: Boolean,
 )

@@ -14,5 +14,5 @@ data class CommentReadModel(
     val content: String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime? = null,
-    val eventTs: Long
+    val eventTs: Long,
 )

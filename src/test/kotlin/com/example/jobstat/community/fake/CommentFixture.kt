@@ -14,7 +14,9 @@ internal class CommentFixture private constructor(
     private var createdAt: LocalDateTime = LocalDateTime.now(),
     private var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) : IdFixture<com.example.jobstat.community.comment.entity.Comment>() {
-    override fun create(): com.example.jobstat.community.comment.entity.Comment = com.example.jobstat.community.comment.entity.Comment.create(content, author, password, board, userId)
+    override fun create(): com.example.jobstat.community.comment.entity.Comment =
+        com.example.jobstat.community.comment.entity.Comment
+            .create(content, author, password, board, userId)
 
     fun withContent(content: String) = apply { this.content = content }
 

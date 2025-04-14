@@ -1,11 +1,11 @@
 // file: src/main/kotlin/com/example/jobstat/community_read/client/CommentClient.kt
 package com.example.jobstat.community_read.client
 
+import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardId
+import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardIdAfter
 import com.example.jobstat.community_read.client.response.CommentDTO
 import com.example.jobstat.community_read.client.response.FetchCommentIdsResponse
 import com.example.jobstat.community_read.model.CommentReadModel
-import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardId
-import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardIdAfter
 import com.example.jobstat.core.base.BaseClient
 import com.example.jobstat.core.global.wrapper.ApiResponse
 import org.slf4j.LoggerFactory
@@ -19,7 +19,6 @@ import org.springframework.web.client.RestClientException
  */
 @Component
 class CommentClient : BaseClient() {
-
     @Value("\${endpoints.comment-service.url:http://localhost:8080}") // Command 서버 주소 (댓글 API 담당)
     private lateinit var commentServiceUrl: String
 
@@ -52,7 +51,12 @@ class CommentClient : BaseClient() {
         try {
             val typeRef = COMMENT_RESPONSE_TYPE
             val uri = "/api/v1/comments/$commentId" // Command 서버 경로와 일치
-            val responseWrapper: ApiResponse<CommentDTO>? = restClient.get().uri(uri).retrieve().body(typeRef)
+            val responseWrapper: ApiResponse<CommentDTO>? =
+                restClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(typeRef)
 
             return if (responseWrapper?.data != null) {
                 CommentDTO.from(responseWrapper.data) // CommentReadModel로 변환
@@ -77,7 +81,13 @@ class CommentClient : BaseClient() {
         try {
             val uri = "/api/v1/comments/bulk"
             val typeRef = COMMENTS_ARRAY_RESPONSE_TYPE
-            val responseWrapper: ApiResponse<Array<CommentDTO>>? = restClient.post().uri(uri).body(request).retrieve().body(typeRef)
+            val responseWrapper: ApiResponse<Array<CommentDTO>>? =
+                restClient
+                    .post()
+                    .uri(uri)
+                    .body(request)
+                    .retrieve()
+                    .body(typeRef)
 
             return if (responseWrapper?.data != null) {
                 CommentDTO.fromList(responseWrapper.data.toList()) // CommentReadModel 리스트로 변환
@@ -98,7 +108,11 @@ class CommentClient : BaseClient() {
      * [Fallback] 게시글의 댓글 ID 목록 조회 (Offset 기반)
      * 기존 Command 서버 API(GET /boards/{boardId}/comments)를 사용하여 구현. (댓글 전체 내용 조회)
      */
-    fun fetchCommentIdsByBoardId(boardId: Long, page: Int, limit: Int): FetchCommentIdsResponse? {
+    fun fetchCommentIdsByBoardId(
+        boardId: Long,
+        page: Int,
+        limit: Int,
+    ): FetchCommentIdsResponse? {
         val logContext = "CommentClient.fetchCommentIdsByBoardId"
         try {
             // Command 서버의 실제 응답 DTO 타입 사용
@@ -107,17 +121,19 @@ class CommentClient : BaseClient() {
 
             log.debug("[{}] Calling Fallback API (fetches full comment data): {}", logContext, uri)
 
-            val responseWrapper: ApiResponse<GetCommentsByBoardId.Response>? = restClient.get()
-                .uri(uri)
-                .retrieve()
-                .body(typeRef)
+            val responseWrapper: ApiResponse<GetCommentsByBoardId.Response>? =
+                restClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(typeRef)
 
             return if (responseWrapper?.data != null) {
                 val responseData = responseWrapper.data
                 // 상세 정보에서 ID만 추출하여 FetchCommentIdsResponse 형태로 변환
                 FetchCommentIdsResponse(
                     ids = responseData.items.content.map { it.id }, // CommentListItem에서 id 추출
-                    hasNext = responseData.items.hasNext()
+                    hasNext = responseData.items.hasNext(),
                 )
             } else {
                 log.warn("[{}] Fallback API call ({}) returned null data or indicated failure: {}", logContext, uri, responseWrapper)
@@ -136,7 +152,11 @@ class CommentClient : BaseClient() {
      * [Fallback] 게시글의 댓글 ID 목록 조회 (Cursor 기반)
      * 기존 Command 서버 API(GET /boards/{boardId}/comments/after)를 사용하여 구현. (댓글 전체 내용 조회)
      */
-    fun fetchCommentIdsByBoardIdAfter(boardId: Long, lastCommentId: Long?, limit: Int): FetchCommentIdsResponse? {
+    fun fetchCommentIdsByBoardIdAfter(
+        boardId: Long,
+        lastCommentId: Long?,
+        limit: Int,
+    ): FetchCommentIdsResponse? {
         val logContext = "CommentClient.fetchCommentIdsByBoardIdAfter"
         val queryParams = mutableMapOf<String, Any>("limit" to limit)
         lastCommentId?.let { queryParams["lastCommentId"] = it }
@@ -148,17 +168,19 @@ class CommentClient : BaseClient() {
 
             log.debug("[{}] Calling Fallback API (fetches full comment data): {}", logContext, uri)
 
-            val responseWrapper: ApiResponse<GetCommentsByBoardIdAfter.Response>? = restClient.get()
-                .uri(uri)
-                .retrieve()
-                .body(typeRef)
+            val responseWrapper: ApiResponse<GetCommentsByBoardIdAfter.Response>? =
+                restClient
+                    .get()
+                    .uri(uri)
+                    .retrieve()
+                    .body(typeRef)
 
             return if (responseWrapper?.data != null) {
                 val responseData = responseWrapper.data
                 // 상세 정보에서 ID만 추출하여 FetchCommentIdsResponse 형태로 변환
                 FetchCommentIdsResponse(
                     ids = responseData.items.map { it.id }, // CommentItem에서 id 추출
-                    hasNext = responseData.hasNext
+                    hasNext = responseData.hasNext,
                 )
             } else {
                 log.warn("[{}] Fallback API call ({}) returned null data or indicated failure: {}", logContext, uri, responseWrapper)

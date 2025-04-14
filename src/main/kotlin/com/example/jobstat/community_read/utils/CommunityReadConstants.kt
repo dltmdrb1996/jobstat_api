@@ -9,19 +9,19 @@ object CommunityReadConstants {
      */
     const val DEFAULT_PAGE_SIZE = 10
     const val MAX_PAGE_SIZE = 50
-    
+
     /**
      * 댓글 페이징 기본 설정
      */
     const val DEFAULT_COMMENT_PAGE_SIZE = 10
     const val MAX_COMMENT_PAGE_SIZE = 30
-    
+
     /**
      * 인기 게시글 관련 설정
      */
     const val DEFAULT_TOP_BOARDS_LIMIT = 10
     const val MAX_POPULAR_BOARDS_LIMIT = 30
-    
+
     /**
      * Redis 키 관련 설정
      */
@@ -32,14 +32,14 @@ object CommunityReadConstants {
         const val CATEGORY_INDEX_PREFIX = "category-boards:"
         const val BOARD_COMMENTS_PREFIX = "board-comments:"
         const val AUTHOR_COMMENTS_PREFIX = "author-comments:"
-        
+
         /**
          * Redis 키 TTL 설정 (초 단위)
          */
         const val DEFAULT_TTL = 86400 // 24시간
         const val POPULAR_BOARDS_TTL = 3600 // 1시간
     }
-    
+
     /**
      * 캐시 관련 설정
      */
@@ -50,4 +50,4 @@ object CommunityReadConstants {
         const val COMMENT_LIST = "commentList"
         const val BOARD_STATS = "boardStats"
     }
-} 
+}

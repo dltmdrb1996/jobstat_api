@@ -9,11 +9,11 @@ import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisServi
 import com.example.jobstat.statistics_read.stats.document.JobCategoryStatsDocument
 import com.example.jobstat.statistics_read.stats.document.JobCategoryStatsDocument.*
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GetJobCategoryRankingWithStats(
@@ -50,27 +50,30 @@ class GetJobCategoryRankingWithStats(
     }
 
     @Transactional
-    fun execute(request: Request): Response = with(request) {
-        // 직무 카테고리 관련 통계와 순위 조회
-        rankingAnalysisService.findStatsWithRanking<JobCategoryStatsDocument>(
-            rankingType = rankingType.toDomain(),
-            baseDate = baseDate,
-            page = page,
-        ).let { result ->
-            // 응답 객체 생성
-            Response(
-                rankingType = rankingType.toDomain(),
-                totalCount = result.totalCount,
-                hasNextPage = result.hasNextPage,
-                items = result.items.map { it -> 
-                    RankingWithStats(
-                        ranking = it.ranking,
-                        stat = it.stat,
+    fun execute(request: Request): Response =
+        with(request) {
+            // 직무 카테고리 관련 통계와 순위 조회
+            rankingAnalysisService
+                .findStatsWithRanking<JobCategoryStatsDocument>(
+                    rankingType = rankingType.toDomain(),
+                    baseDate = baseDate,
+                    page = page,
+                ).let { result ->
+                    // 응답 객체 생성
+                    Response(
+                        rankingType = rankingType.toDomain(),
+                        totalCount = result.totalCount,
+                        hasNextPage = result.hasNextPage,
+                        items =
+                            result.items.map { it ->
+                                RankingWithStats(
+                                    ranking = it.ranking,
+                                    stat = it.stat,
+                                )
+                            },
                     )
-                },
-            )
+                }
         }
-    }
 
     data class Request(
         @field:NotNull val rankingType: JobCategoryRankingType,

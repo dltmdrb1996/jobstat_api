@@ -1,17 +1,15 @@
 package com.example.jobstat.core.global.utils.id_generator
 
-import com.example.jobstat.core.global.utils.id_generator.sharded.ShardedSnowflake // 실제 경로 확인
 import com.example.jobstat.core.global.utils.id_generator.SynchronizedSnowflake // 실제 경로 확인
+import com.example.jobstat.core.global.utils.id_generator.sharded.ShardedSnowflake // 실제 경로 확인
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 
 @Configuration
 class IdGeneratorConfig {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     /**
@@ -39,13 +37,15 @@ class IdGeneratorConfig {
         val maxNodeId = SynchronizedSnowflake.MAX_NODE_ID // 실제 MAX_NODE_ID 상수 접근
         require(nodeId in 0..maxNodeId) {
             "Configured Snowflake Node ID ($nodeId) is out of range (0-$maxNodeId). " +
-                    "Please check environment variable 'SNOWFLAKE_NODE_ID', system property 'snowflake.node-id', or application config."
+                "Please check environment variable 'SNOWFLAKE_NODE_ID', system property 'snowflake.node-id', or application config."
         }
 
         // 기본값(0)이 사용될 경우 경고 로그 출력 (운영 환경 주의)
         if (nodeId == 0L) {
-            log.warn("Using default Snowflake Node ID 0. Ensure this is intended, especially in multi-instance deployments. " +
-                    "Consider setting a unique SNOWFLAKE_NODE_ID environment variable or -Dsnowflake.node-id system property for each instance.")
+            log.warn(
+                "Using default Snowflake Node ID 0. Ensure this is intended, especially in multi-instance deployments. " +
+                    "Consider setting a unique SNOWFLAKE_NODE_ID environment variable or -Dsnowflake.node-id system property for each instance.",
+            )
         } else {
             log.info("Creating SynchronizedSnowflakeGenerator Bean with Node ID: {}", nodeId)
         }
@@ -56,7 +56,8 @@ class IdGeneratorConfig {
     fun shardedSnowflakeGenerator(): SnowflakeGenerator {
         // 설정된 nodeId 값 검증
         val maxNodeId = ShardedSnowflake.MAX_NODE_ID // ShardedSnowflake의 MAX_NODE_ID 사용 (가정)
-        require(nodeId in 0..maxNodeId) { // ShardedSnowflake 구현에 따라 maxNodeId가 다를 수 있음
+        require(nodeId in 0..maxNodeId) {
+            // ShardedSnowflake 구현에 따라 maxNodeId가 다를 수 있음
             "Configured Snowflake Node ID ($nodeId) for sharded generator is out of range (0-$maxNodeId)."
         }
         log.info("Creating ShardedSnowflake Bean with Node ID: {}, Shard Count: {}", nodeId, shardCount)

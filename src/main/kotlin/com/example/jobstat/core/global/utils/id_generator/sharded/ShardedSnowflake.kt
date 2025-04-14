@@ -1,9 +1,9 @@
 package com.example.jobstat.core.global.utils.id_generator.sharded
 
 import com.example.jobstat.core.global.utils.id_generator.SnowflakeGenerator
+import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.log2
-import org.slf4j.LoggerFactory
 
 /**
  * 내부적으로 여러 SynchronizedSnowflakeCore 인스턴스(Shard)를 사용하고,
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
  */
 class ShardedSnowflake(
     private val nodeId: Long = 0L,
-    shardCount: Int = DEFAULT_SHARD_COUNT
+    shardCount: Int = DEFAULT_SHARD_COUNT,
 ) : SnowflakeGenerator { // 인터페이스 구현
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -67,13 +67,17 @@ class ShardedSnowflake(
         this.timestampShift = NODE_ID_BITS + this.nodeAndShardIdShift
 
         // 각 코어 생성 시, 계산된 시퀀스 비트 수 전달
-        cores = Array(this.shardCount) { index ->
-            SynchronizedSnowflakeCore(nodeId, this.coreSequenceBits)
-        }
+        cores =
+            Array(this.shardCount) { index ->
+                SynchronizedSnowflakeCore(nodeId, this.coreSequenceBits)
+            }
 
         log.info(
             "Initialized ShardedSnowflake: NodeId={}, Shards={}, ShardBits={}, SequenceBitsPerCore={}",
-            nodeId, this.shardCount, this.shardIdBits, this.coreSequenceBits
+            nodeId,
+            this.shardCount,
+            this.shardIdBits,
+            this.coreSequenceBits,
         )
     }
 
@@ -92,9 +96,11 @@ class ShardedSnowflake(
         val sequence = timestampAndSequence and coreMaxSequence // Masking 필요
 
         // 비트 연산을 사용하여 최종 ID 조합
-        return ((timestamp shl timestampShift)             // 타임스탬프 부분
-                or (nodeId shl nodeAndShardIdShift)       // 노드 ID 부분
+        return (
+            (timestamp shl timestampShift) // 타임스탬프 부분
+                or (nodeId shl nodeAndShardIdShift) // 노드 ID 부분
                 or (shardIndex.toLong() shl shardIdShift) // 샤드 ID 부분
-                or sequence)                               // 시퀀스 부분
+                or sequence
+        ) // 시퀀스 부분
     }
 }

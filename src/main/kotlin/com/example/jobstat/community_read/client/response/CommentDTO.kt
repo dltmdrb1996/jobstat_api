@@ -1,8 +1,8 @@
 package com.example.jobstat.community_read.client.response
 
 import com.example.jobstat.community_read.model.CommentReadModel
-import java.time.LocalDateTime
 import com.example.jobstat.core.global.extension.toEpochMilli
+import java.time.LocalDateTime
 
 /**
  * 외부 시스템에서 받아온 댓글 데이터를 위한 DTO
@@ -14,11 +14,11 @@ data class CommentDTO(
     val author: String,
     val content: String,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
 ) {
     companion object {
-        fun from(dto: CommentDTO): CommentReadModel {
-            return CommentReadModel(
+        fun from(dto: CommentDTO): CommentReadModel =
+            CommentReadModel(
                 id = dto.id,
                 boardId = dto.boardId,
                 userId = dto.userId,
@@ -26,12 +26,9 @@ data class CommentDTO(
                 content = dto.content,
                 createdAt = dto.createdAt,
                 updatedAt = dto.updatedAt,
-                eventTs = dto.updatedAt.toEpochMilli()
+                eventTs = dto.updatedAt.toEpochMilli(),
             )
-        }
-        
-        fun fromList(dtoList: List<CommentDTO>): List<CommentReadModel> {
-            return dtoList.map { from(it) }
-        }
+
+        fun fromList(dtoList: List<CommentDTO>): List<CommentReadModel> = dtoList.map { from(it) }
     }
-} 
+}

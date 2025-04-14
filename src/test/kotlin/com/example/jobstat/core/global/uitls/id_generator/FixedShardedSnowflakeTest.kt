@@ -3,7 +3,6 @@ package com.example.jobstat.core.global.uitls.id_generator // 테스트 대상 �
 // 테스트 대상 클래스 import (경로는 실제 프로젝트에 맞게 조정)
 import com.example.jobstat.core.global.utils.id_generator.sharded.ShardedSnowflake.Companion.NODE_ID_BITS
 import com.example.jobstat.core.global.utils.id_generator.sharded.SynchronizedSnowflakeCore
-import com.example.jobstat.core.global.utils.id_generator.sharded.ShardedSnowflake as FixedShardedSnowflake
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.params.ParameterizedTest
@@ -13,9 +12,9 @@ import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
+import com.example.jobstat.core.global.utils.id_generator.sharded.ShardedSnowflake as FixedShardedSnowflake
 
 class FixedShardedSnowflakeTest {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     companion object {
@@ -24,8 +23,9 @@ class FixedShardedSnowflakeTest {
 
         // Reflection용 상수
         private const val CORE_LAST_TIMESTAMP_FIELD_NAME = "lastTimestamp" // Synchronized 버전의 필드 이름
-        private const val CORE_EPOCH_MILLIS_FIELD_NAME = "epochMillis"    // Synchronized 버전의 필드 이름 (epochStartMillis -> epochMillis로 변경되었을 수 있으니 확인)
-                                                                          // -> 이전 코드 확인 결과 epochMillis 가 맞음.
+        private const val CORE_EPOCH_MILLIS_FIELD_NAME = "epochMillis" // Synchronized 버전의 필드 이름 (epochStartMillis -> epochMillis로 변경되었을 수 있으니 확인)
+
+        // -> 이전 코드 확인 결과 epochMillis 가 맞음.
         // Shard ID 비트 계산 (ShardedSnowflake 내부 로직과 일치해야 함)
         private val SHARD_ID_BITS = FixedShardedSnowflake.NODE_ID_BITS // companion object 접근
         private val CORE_SEQUENCE_BITS = FixedShardedSnowflake.TOTAL_SEQUENCE_BITS
@@ -47,8 +47,13 @@ class FixedShardedSnowflakeTest {
         val shardedSnowflake = FixedShardedSnowflake(nodeId = DEFAULT_NODE_ID, shardCount = shardCount)
         val errors = AtomicLong(0)
 
-        log.info("[Fixed Sharded 유일성 - {} 스레드, {} 샤드] 테스트 시작 (ID/스레드: {}, 총 예상 ID: {})",
-            threadCount, shardCount, idsPerThread, totalIdsExpected)
+        log.info(
+            "[Fixed Sharded 유일성 - {} 스레드, {} 샤드] 테스트 시작 (ID/스레드: {}, 총 예상 ID: {})",
+            threadCount,
+            shardCount,
+            idsPerThread,
+            totalIdsExpected,
+        )
 
         try {
             runConcurrentTest(threadCount) { latch ->
@@ -69,17 +74,20 @@ class FixedShardedSnowflakeTest {
                 }
             }
         } catch (e: TimeoutException) {
-             log.error("[Fixed Sharded 유일성 - {} 스레드] 테스트 시간 초과!", threadCount, e)
-             fail("테스트 시간 초과") // 시간 초과 시 실패 처리
+            log.error("[Fixed Sharded 유일성 - {} 스레드] 테스트 시간 초과!", threadCount, e)
+            fail("테스트 시간 초과") // 시간 초과 시 실패 처리
         }
 
         // 최종 검증: 오류가 없고, 생성된 고유 ID 수가 예상과 정확히 일치해야 함
         assertEquals(0, errors.get(), "[Fixed Sharded 유일성] ID 생성 중 오류 또는 중복 발생")
         assertEquals(totalIdsExpected, allIds.size.toLong(), "[Fixed Sharded 유일성] 생성된 ID 개수가 예상과 다릅니다 (중복 발생 가능성).")
-        log.info("[Fixed Sharded 유일성 - {} 스레드, {} 샤드] 테스트 통과 (생성된 ID: {})",
-            threadCount, shardCount, allIds.size)
+        log.info(
+            "[Fixed Sharded 유일성 - {} 스레드, {} 샤드] 테스트 통과 (생성된 ID: {})",
+            threadCount,
+            shardCount,
+            allIds.size,
+        )
     }
-
 
     // --- 시간 역행 테스트 ---
     // 목적: 내부 코어의 시계가 역행하는 상황을 시뮬레이션했을 때,
@@ -125,7 +133,7 @@ class FixedShardedSnowflakeTest {
         // Round-robin으로 분배되므로, 최대 shardCount + alpha 만큼 호출
         val maxAttempts = shardCount * 2
         assertDoesNotThrow(
-            "내부 Core의 시계 역행 상황(lastTimestamp 조작) 시 예외가 발생해서는 안 됩니다 (max() 처리 기대)."
+            "내부 Core의 시계 역행 상황(lastTimestamp 조작) 시 예외가 발생해서는 안 됩니다 (max() 처리 기대).",
         ) {
             for (i in 1..maxAttempts) {
                 try {
@@ -138,7 +146,7 @@ class FixedShardedSnowflakeTest {
                     // }
                 } catch (e: Exception) {
                     // 어떤 예외든 발생하면 테스트 실패
-                     log.error("[Fixed Sharded 시간 역행] 시도 {} 중 예상치 못한 예외 발생!", i, e)
+                    log.error("[Fixed Sharded 시간 역행] 시도 {} 중 예상치 못한 예외 발생!", i, e)
                     throw e // assertDoesNotThrow 가 잡도록 예외 다시 던짐
                 }
             }
@@ -155,9 +163,11 @@ class FixedShardedSnowflakeTest {
         }
     }
 
-
     // --- Helper Methods ---
-    private fun runConcurrentTest(threadCount: Int, task: (CountDownLatch) -> Unit) {
+    private fun runConcurrentTest(
+        threadCount: Int,
+        task: (CountDownLatch) -> Unit,
+    ) {
         val executor = Executors.newFixedThreadPool(threadCount)
         val latch = CountDownLatch(threadCount)
         try {

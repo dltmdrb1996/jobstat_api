@@ -15,17 +15,159 @@ class RedisCommentIdListRepository(
     private val redisTemplate: StringRedisTemplate,
     private val cursorPaginationScript: RedisScript<List<*>>,
 ) : CommentIdListRepository {
+    companion object {
+        const val COMMENT_LIMIT_SIZE = 100L
+        // 키 포맷 정의
+        const val BOARD_COMMENTS_KEY_FORMAT = "community-read::board::%s::comment-list"
+
+        fun getBoardCommentsKey(boardId: Long): String =
+            BOARD_COMMENTS_KEY_FORMAT.format(boardId)
+    }
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    private companion object {
-        const val BOARD_COMMENTS_KEY_FORMAT = "community-read::board::%s::comment-list"
-        
-        // Comment List Limit Size
-        const val COMMENT_LIMIT_SIZE = 100L
+    // --------------------------
+    // 조회 관련 메소드
+    // --------------------------
+
+    /**
+     * 게시글별 댓글 ID 리스트 조회
+     */
+    override fun readAllByBoard(
+        boardId: Long,
+        pageable: Pageable,
+    ): Page<Long> {
+        try {
+            val key = getBoardCommentsKey(boardId)
+            val offset = pageable.offset
+            val pageSize = pageable.pageSize.toLong()
+
+            val totalSize = redisTemplate.opsForZSet().size(key) ?: 0
+
+            val content =
+                redisTemplate
+                    .opsForZSet()
+                    .reverseRange(key, offset, offset + pageSize - 1)
+                    ?.map { it.toLong() } ?: emptyList()
+
+            return PageImpl(content, pageable, totalSize)
+        } catch (e: Exception) {
+            log.error("게시글별 댓글 ID 리스트 조회 실패: boardId=$boardId, pageable=$pageable", e)
+            throw e
+        }
     }
 
-    override fun add(boardId: Long, commentId: Long, sortValue: Double) {
+    /**
+     * 무한 스크롤 방식의 게시글별 댓글 ID 리스트 조회
+     */
+    override fun readAllByBoardInfiniteScroll(
+        boardId: Long,
+        lastCommentId: Long?,
+        limit: Long,
+    ): List<Long> {
+        try {
+            val key = getBoardCommentsKey(boardId)
+            return if (lastCommentId == null) {
+                redisTemplate
+                    .opsForZSet()
+                    .reverseRange(key, 0, limit - 1)
+                    ?.map { it.toLong() } ?: emptyList()
+            } else {
+                val lastCommentScore = redisTemplate.opsForZSet().score(key, toPaddedString(lastCommentId))
+                if (lastCommentScore == null) {
+                    emptyList()
+                } else {
+                    redisTemplate
+                        .opsForZSet()
+                        .reverseRangeByScore(key, 0.0, lastCommentScore - 0.000001, 0, limit)
+                        ?.map { it.toLong() } ?: emptyList()
+                }
+            }
+        } catch (e: Exception) {
+            log.error("무한 스크롤 게시글별 댓글 ID 리스트 조회 실패: boardId=$boardId, lastCommentId=$lastCommentId, limit=$limit", e)
+            throw e
+        }
+    }
+
+    /**
+     * 게시글별 댓글 ID 목록 조회 (Pageable 기반)
+     */
+    override fun readCommentsByBoardId(
+        boardId: Long,
+        pageable: Pageable,
+    ): Page<Long> {
+        val key = getBoardCommentsKey(boardId)
+        val offset = pageable.offset
+        val pageSize = pageable.pageSize.toLong()
+
+        val totalSize = redisTemplate.opsForZSet().size(key) ?: 0
+
+        val content =
+            redisTemplate
+                .opsForZSet()
+                .reverseRangeByScore(key, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, offset, pageSize)
+                ?.map { it.toLong() } ?: emptyList()
+
+        return PageImpl(content, pageable, totalSize)
+    }
+
+    /**
+     * 게시글별 댓글 ID 목록 조회 (커서 기반)
+     */
+    override fun readCommentsByBoardIdByCursor(
+        boardId: Long,
+        lastCommentId: Long?,
+        limit: Long,
+    ): List<Long> {
+        val key = getBoardCommentsKey(boardId)
+
+        if (lastCommentId == null) {
+            return redisTemplate
+                .opsForZSet()
+                .reverseRange(key, 0, limit - 1)
+                ?.map { it.toLong() } ?: emptyList()
+        }
+
+        val result =
+            redisTemplate.execute(
+                cursorPaginationScript,
+                listOf(key),
+                lastCommentId.toString(),
+                limit.toString(),
+            )
+
+        return result.mapNotNull { (it as? String)?.toLongOrNull() }
+    }
+
+    /**
+     * 게시글별 댓글 목록 키 반환
+     */
+    override fun getBoardCommentsKey(boardId: Long): String = BOARD_COMMENTS_KEY_FORMAT.format(boardId)
+
+    /**
+     * 게시글 댓글 수 조회
+     */
+    fun getCommentCount(boardId: Long): Long {
+        try {
+            return redisTemplate.opsForZSet().size(getBoardCommentsKey(boardId)) ?: 0
+        } catch (e: Exception) {
+            log.error("게시글 댓글 수 조회 실패: boardId=$boardId", e)
+            throw e
+        }
+    }
+
+    // --------------------------
+    // 수정 관련 메소드
+    // --------------------------
+
+    /**
+     * 게시글별 댓글 ID 리스트에 추가
+     */
+    override fun add(
+        boardId: Long,
+        commentId: Long,
+        sortValue: Double,
+    ) {
         try {
             val key = getBoardCommentsKey(boardId)
             val existingScore = redisTemplate.opsForZSet().score(key, toPaddedString(commentId))
@@ -39,134 +181,58 @@ class RedisCommentIdListRepository(
                 redisTemplate.opsForZSet().removeRange(key, 0, size - COMMENT_LIMIT_SIZE - 1)
             }
         } catch (e: Exception) {
-            log.error("게시글별 댓글 ID 리스트 추가 실패: boardId=${boardId}, commentId=${commentId}", e)
+            log.error("게시글별 댓글 ID 리스트 추가 실패: boardId=$boardId, commentId=$commentId", e)
             throw e
         }
     }
 
-    override fun delete(boardId: Long, commentId: Long) {
+    /**
+     * 게시글별 댓글 ID 리스트에서 삭제
+     */
+    override fun delete(
+        boardId: Long,
+        commentId: Long,
+    ) {
         try {
             redisTemplate.opsForZSet().remove(getBoardCommentsKey(boardId), toPaddedString(commentId))
         } catch (e: Exception) {
-            log.error("게시글별 댓글 ID 리스트 삭제 실패: boardId=${boardId}, commentId=${commentId}", e)
+            log.error("게시글별 댓글 ID 리스트 삭제 실패: boardId=$boardId, commentId=$commentId", e)
             throw e
         }
     }
 
-    override fun readAllByBoard(boardId: Long, pageable: Pageable): Page<Long> {
-        try {
-            val key = getBoardCommentsKey(boardId)
-            val offset = pageable.offset
-            val pageSize = pageable.pageSize.toLong()
-            
-            val totalSize = redisTemplate.opsForZSet().size(key) ?: 0
-            
-            val content = redisTemplate.opsForZSet()
-                .reverseRange(key, offset, offset + pageSize - 1)
-                ?.map { it.toLong() } ?: emptyList()
-                
-            return PageImpl(content, pageable, totalSize)
-        } catch (e: Exception) {
-            log.error("게시글별 댓글 ID 리스트 조회 실패: boardId=${boardId}, pageable=${pageable}", e)
-            throw e
-        }
-    }
+    // --------------------------
+    // 파이프라인 관련 메소드
+    // --------------------------
 
-    override fun readAllByBoardInfiniteScroll(boardId: Long, lastCommentId: Long?, limit: Long): List<Long> {
-        try {
-            val key = getBoardCommentsKey(boardId)
-            return if (lastCommentId == null) {
-                redisTemplate.opsForZSet()
-                    .reverseRange(key, 0, limit - 1)
-                    ?.map { it.toLong() } ?: emptyList()
-            } else {
-                val lastCommentScore = redisTemplate.opsForZSet().score(key, toPaddedString(lastCommentId))
-                if (lastCommentScore == null) {
-                    emptyList()
-                } else {
-                    redisTemplate.opsForZSet()
-                        .reverseRangeByScore(key, 0.0, lastCommentScore - 0.000001, 0, limit)
-                        ?.map { it.toLong() } ?: emptyList()
-                }
-            }
-        } catch (e: Exception) {
-            log.error("무한 스크롤 게시글별 댓글 ID 리스트 조회 실패: boardId=${boardId}, lastCommentId=${lastCommentId}, limit=${limit}", e)
-            throw e
-        }
-    }
-
-    fun getCommentCount(boardId: Long): Long {
-        try {
-            return redisTemplate.opsForZSet().size(getBoardCommentsKey(boardId)) ?: 0
-        } catch (e: Exception) {
-            log.error("게시글 댓글 수 조회 실패: boardId=${boardId}", e)
-            throw e
-        }
-    }
-
-    override fun getBoardCommentsKey(boardId: Long): String = 
-        BOARD_COMMENTS_KEY_FORMAT.format(boardId)
-
-    private fun toPaddedString(id: Long): String {
-        return "%019d".format(id)
-    }
-
-    // ----------------------------
-    // A) 읽기 (Query) 로직
-    // ----------------------------
-    override fun readCommentsByBoardId(boardId: Long, pageable: Pageable): Page<Long> {
-        val key = getBoardCommentsKey(boardId)
-        val offset = pageable.offset
-        val pageSize = pageable.pageSize.toLong()
-        
-        val totalSize = redisTemplate.opsForZSet().size(key) ?: 0
-        
-        val content = redisTemplate.opsForZSet()
-            .reverseRangeByScore(key, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, offset, pageSize)
-            ?.map { it.toLong() } ?: emptyList()
-            
-        return PageImpl(content, pageable, totalSize)
-    }
-    
-    override fun readCommentsByBoardIdByCursor(boardId: Long, lastCommentId: Long?, limit: Long): List<Long> {
-        val key = getBoardCommentsKey(boardId)
-        
-        if (lastCommentId == null) {
-            return redisTemplate.opsForZSet()
-                .reverseRange(key, 0, limit - 1)
-                ?.map { it.toLong() } ?: emptyList()
-        }
-
-        val result = redisTemplate.execute(
-            cursorPaginationScript,
-            listOf(key),
-            lastCommentId.toString(),
-            limit.toString()
-        )
-
-        return result.mapNotNull { (it as? String)?.toLongOrNull() }
-    }
-    
-    // -----------------------------
-    // B) 쓰기 (파이프라인, eventTs 기반)
-    // -----------------------------
+    /**
+     * 댓글 추가 (파이프라인 사용)
+     */
     override fun addCommentInPipeline(
         conn: StringRedisConnection,
         boardId: Long,
         commentId: Long,
-        score: Double
+        score: Double,
     ) {
         val key = getBoardCommentsKey(boardId)
         conn.zAdd(key, score, commentId.toString())
         conn.zRemRange(key, 0, -(COMMENT_LIMIT_SIZE + 1))
     }
-    
+
+    /**
+     * 댓글 삭제 (파이프라인 사용)
+     */
     override fun removeCommentInPipeline(
-        conn: StringRedisConnection, 
-        boardId: Long, 
-        commentId: Long
+        conn: StringRedisConnection,
+        boardId: Long,
+        commentId: Long,
     ) {
         val key = getBoardCommentsKey(boardId)
         conn.zRem(key, commentId.toString())
     }
+
+    // --------------------------
+    // 유틸리티 메소드
+    // --------------------------
+    private fun toPaddedString(id: Long): String = "%019d".format(id)
 }

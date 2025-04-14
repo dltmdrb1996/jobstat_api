@@ -12,55 +12,44 @@ import jakarta.validation.Validator
 import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.Positive
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
+/**
+ * 랭킹 기준으로 게시글 ID 목록을 커서 기반 페이징으로 조회하는 유스케이스
+ * - 특정 게시글 ID 이후부터 조회수나 좋아요 수 기준으로 인기 게시글 ID 목록 반환
+ */
 @Service
 internal class GetRankingBoardIdsByCursorUseCase(
     private val boardService: BoardService,
-    validator: Validator
+    validator: Validator,
 ) : ValidUseCase<GetRankingBoardIdsByCursorUseCase.Request, BoardIdsResponse>(validator) {
-
-    @Transactional(readOnly = true)
-    override fun invoke(request: Request): BoardIdsResponse {
-        return super.invoke(request)
-    }
-
     override fun execute(request: Request): BoardIdsResponse {
+        val ids: List<Long> =
+            boardService.getBoardIdsRankedByMetricAfter(
+                metric = request.metric,
+                period = request.period,
+                lastBoardId = request.lastBoardId,
+                limit = request.limit,
+            )
 
-        val ids: List<Long> = boardService.getBoardIdsRankedByMetricAfter( // lastScore 인자 제거됨 (BoardService 인터페이스 및 구현체 변경 필요)
-            metric = request.metric,
-            period = request.period,
-            lastBoardId = request.lastBoardId,
-            // lastScore = request.lastScore, // 제거
-            limit = request.limit
-        )
-
-        // hasNext 로직은 limit 기준으로 유지
         val hasNext = ids.size >= request.limit
 
         return BoardIdsResponse(
             ids = ids.map { it.toString() },
-            hasNext = hasNext
+            hasNext = hasNext,
         )
     }
 
-    @Schema(description = "랭킹별 게시글 ID 목록 (Cursor - ID 기반) 조회 요청") // 설명 수정
+    @Schema(description = "랭킹별 게시글 ID 목록 (커서 기반) 조회 요청")
     data class Request(
-        @field:Schema(description = "랭킹 유형 (LIKES, VIEWS)", required = true, implementation = BoardRankingMetric::class)
-        val metric: BoardRankingMetric, // Changed to Enum
-
-        @field:Schema(description = "기간 (DAY, WEEK, MONTH)", required = true, implementation = BoardRankingPeriod::class)
-        val period: BoardRankingPeriod,   // Changed to Enum
-
-        @field:Schema(description = "마지막 게시글 ID (페이징 기준)", required = false) // 설명 수정
+        @field:Schema(description = "랭킹 유형 (LIKES: 좋아요 수, VIEWS: 조회수)", required = true, implementation = BoardRankingMetric::class)
+        val metric: BoardRankingMetric,
+        @field:Schema(description = "기간 (DAY: 일간, WEEK: 주간, MONTH: 월간)", required = true, implementation = BoardRankingPeriod::class)
+        val period: BoardRankingPeriod,
+        @field:Schema(description = "마지막 게시글 ID (이 ID 이후부터 조회)", required = false)
         val lastBoardId: Long?,
-
-        // lastScore 필드 제거
-        // @field:Schema(description = "마지막 게시글 점수 (페이징 기준)", required = false)
-        // val lastScore: Double?,
-
         @field:Schema(description = "조회 개수", example = "20", defaultValue = "20")
-        @field:Positive @field:Max(100) // Limit validation remains useful
-        val limit: Int = BoardConstants.DEFAULT_PAGE_SIZE
+        @field:Positive
+        @field:Max(100)
+        val limit: Int = BoardConstants.DEFAULT_PAGE_SIZE,
     )
 }

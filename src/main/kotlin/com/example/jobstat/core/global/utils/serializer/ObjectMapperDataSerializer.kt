@@ -5,54 +5,54 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.stereotype.Component
 
 class ObjectMapperDataSerializer(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) : DataSerializer {
-
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    override fun <T : Any> deserialize(data: String, clazz: Class<T>): T? {
-        return try {
+    override fun <T : Any> deserialize(
+        data: String,
+        clazz: Class<T>,
+    ): T? =
+        try {
             objectMapper.readValue(data, clazz)
         } catch (e: JsonProcessingException) {
-            log.error("[ObjectMapperDataSerializer.deserialize] ${clazz.simpleName} e = ${e.message}",)
+            log.error("[ObjectMapperDataSerializer.deserialize] ${clazz.simpleName} e = ${e.message}")
             null
         }
-    }
 
-    override fun <T : Any> deserialize(data: Any, clazz: Class<T>): T? {
-        return objectMapper.convertValue(data, clazz)
-    }
+    override fun <T : Any> deserialize(
+        data: Any,
+        clazz: Class<T>,
+    ): T? = objectMapper.convertValue(data, clazz)
 
-    override fun serialize(obj: Any): String? {
-        return try {
+    override fun serialize(obj: Any): String? =
+        try {
             objectMapper.writeValueAsString(obj)
         } catch (e: JsonProcessingException) {
             log.error("[ObjectMapperDataSerializer.serialize] ${obj.javaClass.simpleName} e = ${e.message}")
             null
         }
-    }
 
     // 추가 편의 기능 - 컬렉션 타입 역직렬화를 위한 메서드
-    fun <T> deserializeCollection(data: String, typeReference: TypeReference<T>): T? {
-        return try {
+    fun <T> deserializeCollection(
+        data: String,
+        typeReference: TypeReference<T>,
+    ): T? =
+        try {
             objectMapper.readValue(data, typeReference)
         } catch (e: JsonProcessingException) {
             log.error("[ObjectMapperDataSerializer.deserializeCollection] ${typeReference.type} e = ${e.message}")
             null
         }
-    }
 
     // prettyPrint 기능 제공
-    fun prettyPrint(obj: Any): String? {
-        return try {
+    fun prettyPrint(obj: Any): String? =
+        try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj)
         } catch (e: JsonProcessingException) {
             log.error("[ObjectMapperDataSerializer.prettyPrint] ${obj.javaClass.simpleName} e = ${e.message}")
             null
         }
-    }
 }

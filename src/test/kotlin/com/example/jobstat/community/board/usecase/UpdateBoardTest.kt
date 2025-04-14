@@ -1,28 +1,28 @@
-//package com.example.jobstat.community.board.usecase
+// package com.example.jobstat.community.board.usecase
 //
-//import com.example.jobstat.community.event.CommunityEventPublisher
-//import com.example.jobstat.community.board.entity.Board
-//import com.example.jobstat.community.board.service.BoardService
-//import com.example.jobstat.community.board.usecase.command.UpdateBoard
-//import com.example.jobstat.core.error.AppException
-//import com.example.jobstat.core.security.PasswordUtil
-//import com.example.jobstat.core.global.utils.SecurityUtils
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.Test
-//import org.junit.jupiter.api.extension.ExtendWith
-//import org.mockito.Mock
-//import org.mockito.Mockito.*
-//import org.mockito.junit.jupiter.MockitoExtension
-//import org.springframework.test.context.ActiveProfiles
-//import java.time.LocalDateTime
-//import java.util.*
-//import kotlin.test.assertEquals
-//import kotlin.test.assertFailsWith
+// import com.example.jobstat.community.event.CommunityEventPublisher
+// import com.example.jobstat.community.board.entity.Board
+// import com.example.jobstat.community.board.service.BoardService
+// import com.example.jobstat.community.board.usecase.command.UpdateBoard
+// import com.example.jobstat.core.error.AppException
+// import com.example.jobstat.core.security.PasswordUtil
+// import com.example.jobstat.core.global.utils.SecurityUtils
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.Test
+// import org.junit.jupiter.api.extension.ExtendWith
+// import org.mockito.Mock
+// import org.mockito.Mockito.*
+// import org.mockito.junit.jupiter.MockitoExtension
+// import org.springframework.test.context.ActiveProfiles
+// import java.time.LocalDateTime
+// import java.util.*
+// import kotlin.test.assertEquals
+// import kotlin.test.assertFailsWith
 //
-//@ExtendWith(MockitoExtension::class)
-//@ActiveProfiles("test")
-//class UpdateBoardTest {
+// @ExtendWith(MockitoExtension::class)
+// @ActiveProfiles("test")
+// class UpdateBoardTest {
 //
 //    @Mock
 //    private lateinit var boardService: BoardService
@@ -241,4 +241,4 @@
 //        verify(boardService, never()).updateBoard(any(), any(), any())
 //        verify(eventPublisher, never()).publishBoardUpdated(any(), any(), any(), any())
 //    }
-//}
+// }

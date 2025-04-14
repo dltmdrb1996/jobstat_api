@@ -6,10 +6,10 @@ import com.example.jobstat.statistics_read.rankings.model.RankingPage
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisService
 import io.swagger.v3.oas.annotations.media.Schema
-import org.springframework.transaction.annotation.Transactional
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GetRankingPage(
@@ -17,14 +17,16 @@ class GetRankingPage(
     validator: Validator,
 ) : ValidUseCase<GetRankingPage.Request, GetRankingPage.Response>(validator) {
     @Transactional
-    override fun execute(request: Request): Response = with(request) {
-        // 순위 페이지 조회 및 응답 생성
-        rankingAnalysisService.findRankingPage(
-            rankingType = rankingType,
-            baseDate = baseDate,
-            page = page,
-        ).let(::Response)
-    }
+    override fun execute(request: Request): Response =
+        with(request) {
+            // 순위 페이지 조회 및 응답 생성
+            rankingAnalysisService
+                .findRankingPage(
+                    rankingType = rankingType,
+                    baseDate = baseDate,
+                    page = page,
+                ).let(::Response)
+        }
 
     data class Request(
         @field:NotNull val rankingType: RankingType,

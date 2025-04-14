@@ -10,19 +10,26 @@ interface CommentCountRepository {
      * 게시글별 댓글 총 개수 조회
      */
     fun getCommentCountByBoardId(boardId: Long): Long
-    
+
     /**
      * 전체 댓글 개수 조회
      */
     fun getTotalCount(): Long
-    
+
     /**
      * 파이프라인에서 게시글별 댓글 카운트 증감
      */
-    fun applyBoardCommentCountInPipeline(conn: StringRedisConnection, boardId: Long, delta: Long)
-    
+    fun applyBoardCommentCountInPipeline(
+        conn: StringRedisConnection,
+        boardId: Long,
+        delta: Long,
+    )
+
     /**
      * 파이프라인에서 전체 댓글 카운트 증감
      */
-    fun applyTotalCountInPipeline(conn: StringRedisConnection, delta: Long)
-} 
+    fun applyTotalCountInPipeline(
+        conn: StringRedisConnection,
+        delta: Long,
+    )
+}

@@ -14,7 +14,6 @@ internal class Comment protected constructor(
     board: Board,
     userId: Long?,
 ) : AuditableEntitySnow() {
-
     @Column(nullable = false, length = CommentConstants.MAX_CONTENT_LENGTH)
     var content: String = content
         protected set

@@ -17,6 +17,5 @@ data class BoardUnlikedEventPayload(
     @JsonProperty("userId")
     val userId: Long,
     @JsonProperty("likeCount")
-    val likeCount: Int
+    val likeCount: Int,
 ) : EventPayload
-

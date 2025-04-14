@@ -1,27 +1,27 @@
-//package com.example.jobstat.community.usecase
+// package com.example.jobstat.community.usecase
 //
-//import com.example.jobstat.community.board.service.BoardServiceImpl
-//import com.example.jobstat.community.board.usecase.command.CreateBoard
-//import com.example.jobstat.community.fake.CategoryFixture
-//import com.example.jobstat.community.fake.repository.FakeBoardRepository
-//import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-//import com.example.jobstat.core.error.AppException
-//import com.example.jobstat.core.error.ErrorCode
-//import com.example.jobstat.core.global.utils.SecurityUtils
-//import com.example.jobstat.utils.FakePasswordUtil
-//import jakarta.validation.ConstraintViolationException
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Nested
-//import org.junit.jupiter.api.Test
-//import org.mockito.kotlin.mock
-//import org.mockito.kotlin.verify
-//import org.mockito.kotlin.whenever
-//import kotlin.test.*
+// import com.example.jobstat.community.board.service.BoardServiceImpl
+// import com.example.jobstat.community.board.usecase.command.CreateBoard
+// import com.example.jobstat.community.fake.CategoryFixture
+// import com.example.jobstat.community.fake.repository.FakeBoardRepository
+// import com.example.jobstat.community.fake.repository.FakeCategoryRepository
+// import com.example.jobstat.core.error.AppException
+// import com.example.jobstat.core.error.ErrorCode
+// import com.example.jobstat.core.global.utils.SecurityUtils
+// import com.example.jobstat.utils.FakePasswordUtil
+// import jakarta.validation.ConstraintViolationException
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Nested
+// import org.junit.jupiter.api.Test
+// import org.mockito.kotlin.mock
+// import org.mockito.kotlin.verify
+// import org.mockito.kotlin.whenever
+// import kotlin.test.*
 //
-//@DisplayName("CreateBoard UseCase 테스트")
-//class CreateBoardTest {
+// @DisplayName("CreateBoard UseCase 테스트")
+// class CreateBoardTest {
 //    private lateinit var boardRepository: FakeBoardRepository
 //    private lateinit var categoryRepository: FakeCategoryRepository
 //    private lateinit var boardService: BoardServiceImpl
@@ -192,4 +192,4 @@
 //            }
 //        }
 //    }
-//}
+// }

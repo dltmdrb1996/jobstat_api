@@ -40,9 +40,7 @@ class AppConfig {
     fun objectMapper(): ObjectMapper = OBJECT_MAPPER
 
     @Bean
-    fun dataSerializer(objectMapper: ObjectMapper): DataSerializer {
-        return ObjectMapperDataSerializer(objectMapper)
-    }
+    fun dataSerializer(objectMapper: ObjectMapper): DataSerializer = ObjectMapperDataSerializer(objectMapper)
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {

@@ -25,23 +25,18 @@ internal interface EmailVerificationJpaRepository : JpaRepository<EmailVerificat
 internal class EmailVerificationRepositoryImpl(
     private val emailVerificationJpaRepository: EmailVerificationJpaRepository,
 ) : EmailVerificationRepository {
-    override fun save(emailVerification: EmailVerification): EmailVerification = 
-        emailVerificationJpaRepository.save(emailVerification)
+    override fun save(emailVerification: EmailVerification): EmailVerification = emailVerificationJpaRepository.save(emailVerification)
 
-    override fun findById(id: Long): EmailVerification = 
-        emailVerificationJpaRepository.findById(id).orThrowNotFound("id", id)
+    override fun findById(id: Long): EmailVerification = emailVerificationJpaRepository.findById(id).orThrowNotFound("id", id)
 
-    override fun findLatestByEmail(email: String): EmailVerification? = 
-        emailVerificationJpaRepository.findTopByEmailOrderByIdDesc(email)
+    override fun findLatestByEmail(email: String): EmailVerification? = emailVerificationJpaRepository.findTopByEmailOrderByIdDesc(email)
 
     override fun existsByEmailAndCode(
         email: String,
         code: String,
     ): Boolean = emailVerificationJpaRepository.existsByEmailAndCode(email, code)
 
-    override fun delete(emailVerification: EmailVerification) = 
-        emailVerificationJpaRepository.delete(emailVerification)
+    override fun delete(emailVerification: EmailVerification) = emailVerificationJpaRepository.delete(emailVerification)
 
-    override fun deleteExpired() = 
-        emailVerificationJpaRepository.deleteAllExpired(LocalDateTime.now())
+    override fun deleteExpired() = emailVerificationJpaRepository.deleteAllExpired(LocalDateTime.now())
 }

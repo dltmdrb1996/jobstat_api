@@ -14,6 +14,9 @@ internal class CommentServiceImpl(
     private val commentRepository: CommentRepository,
     private val boardRepository: BoardRepository,
 ) : CommentService {
+    // ===================================================
+    // 댓글 생성 및 수정/삭제 관련 메소드
+    // ===================================================
 
     @Transactional
     override fun createComment(
@@ -25,22 +28,62 @@ internal class CommentServiceImpl(
     ): Comment {
         // 게시글 조회 및 댓글 생성
         return boardRepository.findById(boardId).let { board ->
-            Comment.create(
-                content = content,
-                author = author,
-                password = password,
-                board = board,
-                userId = userId,
-            ).let(commentRepository::save)
+            Comment
+                .create(
+                    content = content,
+                    author = author,
+                    password = password,
+                    board = board,
+                    userId = userId,
+                ).let(commentRepository::save)
         }
     }
 
+    @Transactional
+    override fun updateComment(
+        id: Long,
+        content: String,
+    ): Comment =
+        getCommentById(id).apply {
+            updateContent(content)
+        }
+
+    @Transactional
+    override fun deleteComment(id: Long) {
+        getCommentById(id).also { comment ->
+            commentRepository.deleteById(comment.id)
+            comment.board.removeComment(comment)
+        }
+    }
+
+    // ===================================================
+    // 댓글 조회 관련 메소드 (ID 기반)
+    // ===================================================
+
     override fun getCommentById(id: Long): Comment = commentRepository.findById(id)
-      
+
+    override fun getCommentsByIds(ids: List<Long>): List<Comment> = commentRepository.findAllByIds(ids)
+
+    // ===================================================
+    // 댓글 조회 관련 메소드 (게시글 기반)
+    // ===================================================
+
     override fun getCommentsByBoardId(
         boardId: Long,
         pageable: Pageable,
     ): Page<Comment> = commentRepository.findByBoardId(boardId, pageable)
+
+    override fun getCommentsByBoardIdAfter(
+        boardId: Long,
+        lastCommentId: Long?,
+        limit: Int,
+    ): List<Comment> = commentRepository.findCommentsByBoardIdAfter(boardId, lastCommentId, limit)
+
+    override fun countCommentsByBoardId(boardId: Long): Long = commentRepository.countByBoardId(boardId)
+
+    // ===================================================
+    // 댓글 조회 관련 메소드 (작성자 기반)
+    // ===================================================
 
     override fun getCommentsByAuthor(
         author: String,
@@ -53,44 +96,14 @@ internal class CommentServiceImpl(
         pageable: Pageable,
     ): Page<Comment> = commentRepository.findByBoardIdAndAuthor(boardId, author, pageable)
 
-    @Transactional
-    override fun updateComment(
-        id: Long,
-        content: String,
-    ): Comment = getCommentById(id).apply {
-        updateContent(content)
-    }
-
-    @Transactional
-    override fun deleteComment(id: Long) {
-        getCommentById(id).also { comment ->
-            commentRepository.deleteById(comment.id)
-            comment.board.removeComment(comment)
-        }
-    }
-    
-    override fun countCommentsByBoardId(boardId: Long): Long =
-        commentRepository.countByBoardId(boardId)
-
     override fun hasCommentedOnBoard(
         boardId: Long,
         author: String,
     ): Boolean = commentRepository.existsByBoardIdAndAuthor(boardId, author)
-    
-    override fun getCommentsByIds(ids: List<Long>): List<Comment> = 
-        commentRepository.findAllByIds(ids)
-        
-    override fun getCommentsByBoardIdAfter(
-        boardId: Long, 
-        lastCommentId: Long?, 
-        limit: Int
-    ): List<Comment> = 
-        commentRepository.findCommentsByBoardIdAfter(boardId, lastCommentId, limit)
-    
+
     override fun getCommentsByAuthorAfter(
-        author: String, 
-        lastCommentId: Long?, 
-        limit: Int
-    ): List<Comment> = 
-        commentRepository.findCommentsByAuthorAfter(author, lastCommentId, limit)
+        author: String,
+        lastCommentId: Long?,
+        limit: Int,
+    ): List<Comment> = commentRepository.findCommentsByAuthorAfter(author, lastCommentId, limit)
 }

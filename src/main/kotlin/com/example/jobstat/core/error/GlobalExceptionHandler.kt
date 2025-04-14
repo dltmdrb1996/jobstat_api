@@ -37,37 +37,45 @@ class GlobalExceptionHandler(
             }
 
         // 에러 타입에 따라 로깅 레벨 조정
-        if(isDev) ex.printStackTrace()
+        if (isDev) ex.printStackTrace()
         when {
             appException.isServerError() -> {
-                log.error("Server Error [{}]: {} - {}",
+                log.error(
+                    "Server Error [{}]: {} - {}",
                     errorId,
                     appException.message,
-                    appException.detailInfo()
+                    appException.detailInfo(),
                 )
                 if (isProd) captureEvent(appException, errorId)
             }
             else -> {
-                log.warn("Client Error [{}]: {} - {}",
+                log.warn(
+                    "Client Error [{}]: {} - {}",
                     errorId,
                     appException.message,
-                    appException.detailInfo()
+                    appException.detailInfo(),
                 )
             }
         }
 
         try {
             // 프로덕션 환경에서는 기본 오류 메시지만 표시
-            val errorMessage = if (isProd) {
-                "${appException.message} [ErrorID: $errorId]"
-            } else {
-                // 개발 환경에서는 상세 정보 표시
-                val details = appException.detailInfo().toMutableMap()
-                details["errorId"] = errorId
-                details["exceptionClass"] = ex.javaClass.name
-                details["stackTrace"] = ex.stackTraceToString().lines().take(10).joinToString("\n")
-                details.toString()
-            }
+            val errorMessage =
+                if (isProd) {
+                    "${appException.message} [ErrorID: $errorId]"
+                } else {
+                    // 개발 환경에서는 상세 정보 표시
+                    val details = appException.detailInfo().toMutableMap()
+                    details["errorId"] = errorId
+                    details["exceptionClass"] = ex.javaClass.name
+                    details["stackTrace"] =
+                        ex
+                            .stackTraceToString()
+                            .lines()
+                            .take(10)
+                            .joinToString("\n")
+                    details.toString()
+                }
 
             return ApiResponse.fail(appException.httpStatus, errorMessage)
         } finally {
@@ -76,7 +84,10 @@ class GlobalExceptionHandler(
         }
     }
 
-    private fun captureEvent(ex: AppException, errorId: String) {
+    private fun captureEvent(
+        ex: AppException,
+        errorId: String,
+    ) {
         Sentry.withScope { scope ->
             scope.setLevel(SentryLevel.ERROR)
             scope.setExtra("detailInfo", ex.detailInfo().toString())

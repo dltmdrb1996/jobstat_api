@@ -13,18 +13,18 @@ import org.springframework.stereotype.Component
  */
 @Component
 class CommunityReadEventPublisher(
-    outboxEventPublisher: OutboxEventPublisher // OutboxPublisher 주입
+    outboxEventPublisher: OutboxEventPublisher, // OutboxPublisher 주입
 ) : AbstractEventPublisher(outboxEventPublisher) {
-
     private val log = LoggerFactory.getLogger(this::class.java)
 
     // 이 퍼블리셔는 BOARD_VIEWED 이벤트만 발행한다고 가정
     override fun getSupportedEventTypes(): Set<EventType> = SUPPORTED_EVENT_TYPES
 
     companion object {
-        private val SUPPORTED_EVENT_TYPES = setOf(
-            EventType.BOARD_INC_VIEW
-        )
+        private val SUPPORTED_EVENT_TYPES =
+            setOf(
+                EventType.BOARD_INC_VIEW,
+            )
     }
 
     fun publishIncViewed(
@@ -32,14 +32,14 @@ class CommunityReadEventPublisher(
         delta: Int,
         eventTs: Long = System.currentTimeMillis(),
     ) {
-        log.info("게시글 조회수 증가 이벤트 발행 준비: boardId=${boardId}")
+        log.info("게시글 조회수 증가 이벤트 발행 준비: boardId=$boardId")
         log.info("@@@ 게시글 조회수 증가 이벤트 발행 준비: boardId=${EventType.BOARD_INC_VIEW}")
-        val payload = IncViewEventPayload(
-            boardId = boardId,
-            eventTs = eventTs,
-            delta = delta, // 이벤트 페이로드에 증가할 조회수 포함
-        )
+        val payload =
+            IncViewEventPayload(
+                boardId = boardId,
+                eventTs = eventTs,
+                delta = delta, // 이벤트 페이로드에 증가할 조회수 포함
+            )
         publish(EventType.BOARD_INC_VIEW, payload)
     }
-
 }

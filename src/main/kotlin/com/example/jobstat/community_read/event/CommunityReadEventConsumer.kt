@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component
 class CommunityReadEventConsumer : AbstractEventConsumer() {
     @Value("\${kafka.consumer.community-read.topic:community-read}") // 토픽명 설정 주입
     private lateinit var topic: String
+
     @Value("\${kafka.consumer.community-read.group-id:community-read-group}") // 그룹 ID 설정 주입
     private lateinit var groupId: String
 
@@ -21,22 +22,23 @@ class CommunityReadEventConsumer : AbstractEventConsumer() {
      */
     @RetryableTopic(
         attempts = "\${kafka.consumer.community-read.retry.attempts:3}",
-        backoff = Backoff(
-            delayExpression = "\${kafka.consumer.community-read.retry.delay-ms:1000}",
-            multiplierExpression = "\${kafka.consumer.community-read.retry.multiplier:2.0}"
-        ),
+        backoff =
+            Backoff(
+                delayExpression = "\${kafka.consumer.community-read.retry.delay-ms:1000}",
+                multiplierExpression = "\${kafka.consumer.community-read.retry.multiplier:2.0}",
+            ),
         dltTopicSuffix = "\${kafka.consumer.common.dlt-suffix:.DLT}",
         autoCreateTopics = "\${kafka.consumer.common.auto-create-dlt:false}",
     )
     @KafkaListener(
         topics = ["\${kafka.consumer.community-read.topic:community-read}"],
         groupId = "\${kafka.consumer.community-read.group-id:community-read-group}",
-        containerFactory = "kafkaListenerContainerFactory"
+        containerFactory = "kafkaListenerContainerFactory",
     )
     fun receiveEvent(event: String) {
         log.info(
-            "[{}] Kafka 메시지 수신 시도: topic=${topic}, groupId=${groupId}",
-            this::class.simpleName
+            "[{}] Kafka 메시지 수신 시도: topic=$topic, groupId=$groupId",
+            this::class.simpleName,
         )
         super.consumeEvent(event)
     }

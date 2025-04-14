@@ -1,15 +1,15 @@
-//package com.example.jobstat.community.fake.repository
+// package com.example.jobstat.community.fake.repository
 //
-//import com.example.jobstat.community.board.entity.BoardCategory
-//import com.example.jobstat.community.board.repository.CategoryRepository
-//import com.example.jobstat.community.fake.CategoryFixture
-//import com.example.jobstat.core.error.AppException
-//import com.example.jobstat.core.error.ErrorCode
-//import com.example.jobstat.utils.IndexManager
-//import com.example.jobstat.utils.base.BaseFakeRepository
-//import jakarta.persistence.EntityNotFoundException
+// import com.example.jobstat.community.board.entity.BoardCategory
+// import com.example.jobstat.community.board.repository.CategoryRepository
+// import com.example.jobstat.community.fake.CategoryFixture
+// import com.example.jobstat.core.error.AppException
+// import com.example.jobstat.core.error.ErrorCode
+// import com.example.jobstat.utils.IndexManager
+// import com.example.jobstat.utils.base.BaseFakeRepository
+// import jakarta.persistence.EntityNotFoundException
 //
-//internal class FakeCategoryRepository : CategoryRepository {
+// internal class FakeCategoryRepository : CategoryRepository {
 //    private val baseRepo =
 //        object : BaseFakeRepository<com.example.jobstat.community.board.entity.BoardCategory, CategoryFixture>() {
 //            override fun fixture() = CategoryFixture.aCategory()
@@ -76,4 +76,4 @@
 //        baseRepo.clear()
 //        nameIndex.clear()
 //    }
-//}
+// }

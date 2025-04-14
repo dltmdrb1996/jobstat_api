@@ -1,19 +1,19 @@
-//package com.example.jobstat.community.service
+// package com.example.jobstat.community.service
 //
-//import com.example.jobstat.community.board.entity.Board
-//import com.example.jobstat.comment.service.CommentService
-//import com.example.jobstat.comment.service.CommentServiceImpl
-//import com.example.jobstat.community.fake.BoardFixture
-//import com.example.jobstat.community.fake.repository.FakeBoardRepository
-//import com.example.jobstat.community.fake.repository.FakeCommentRepository
-//import jakarta.persistence.EntityNotFoundException
-//import org.junit.jupiter.api.*
-//import org.junit.jupiter.api.Assertions.*
-//import org.springframework.data.domain.PageRequest
-//import kotlin.test.assertFailsWith
+// import com.example.jobstat.community.board.entity.Board
+// import com.example.jobstat.comment.service.CommentService
+// import com.example.jobstat.comment.service.CommentServiceImpl
+// import com.example.jobstat.community.fake.BoardFixture
+// import com.example.jobstat.community.fake.repository.FakeBoardRepository
+// import com.example.jobstat.community.fake.repository.FakeCommentRepository
+// import jakarta.persistence.EntityNotFoundException
+// import org.junit.jupiter.api.*
+// import org.junit.jupiter.api.Assertions.*
+// import org.springframework.data.domain.PageRequest
+// import kotlin.test.assertFailsWith
 //
-//@DisplayName("CommentService 테스트")
-//class CommentServiceTest {
+// @DisplayName("CommentService 테스트")
+// class CommentServiceTest {
 //    private lateinit var commentRepository: FakeCommentRepository
 //    private lateinit var boardRepository: FakeBoardRepository
 //    private lateinit var commentService: CommentService
@@ -475,4 +475,4 @@
 //
 //        assertEquals(2, testBoard.commentCount)
 //    }
-//}
+// }

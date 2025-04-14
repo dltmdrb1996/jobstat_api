@@ -2,7 +2,6 @@ package com.example.jobstat.community.board.service
 
 import com.example.jobstat.community.board.entity.BoardCategory
 
-
 internal interface CategoryService {
     fun createCategory(
         name: String,

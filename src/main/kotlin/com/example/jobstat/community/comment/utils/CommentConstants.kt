@@ -15,13 +15,13 @@ object CommentConstants {
     // 비밀번호 길이 제한
     const val MIN_PASSWORD_LENGTH = 4
     const val MAX_PASSWORD_LENGTH = 15
-    
+
     // 암호화된 비밀번호 저장 길이
     const val ENCODED_PASSWORD_LENGTH = 100
-    
+
     // 페이지네이션 기본값
     const val DEFAULT_PAGE_SIZE = 20
-    
+
     // 에러 메시지
     object ErrorMessages {
         const val CONTENT_REQUIRED = "댓글 내용은 필수입니다"

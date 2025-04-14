@@ -13,8 +13,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import java.time.Instant
 
 @NoRepositoryBean
-interface ReferenceMongoRepository<T : BaseReferenceDocument, ID : Any> :
-    com.example.jobstat.core.base.repository.BaseMongoRepository<T, ID> {
+interface ReferenceMongoRepository<T : BaseReferenceDocument, ID : Any> : com.example.jobstat.core.base.repository.BaseMongoRepository<T, ID> {
     fun findByReferenceId(referenceId: Long): T?
 
     fun findByReferenceIds(referenceIds: List<Long>): List<T>

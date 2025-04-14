@@ -1,7 +1,7 @@
 package com.example.jobstat.core.global.utils.id_generator.sharded // 내부 구현용 패키지
 
-import kotlin.math.max
 import org.slf4j.LoggerFactory
+import kotlin.math.max
 
 /**
  * ShardedSnowflake 내부에서 사용할 코어 ID 생성 로직.
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
  */
 internal class SynchronizedSnowflakeCore(
     private val nodeIdForLog: Long, // 로깅이나 예외 메시지 표시용
-    private val sequenceBits: Int
+    private val sequenceBits: Int,
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 

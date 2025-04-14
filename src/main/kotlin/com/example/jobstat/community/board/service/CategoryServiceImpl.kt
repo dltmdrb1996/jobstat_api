@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional
 internal class CategoryServiceImpl(
     private val categoryRepository: CategoryRepository,
 ) : CategoryService {
-
     override fun createCategory(
         name: String,
         displayName: String,
@@ -21,7 +20,8 @@ internal class CategoryServiceImpl(
         if (categoryRepository.existsByName(name)) {
             throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE)
         }
-        return BoardCategory.create(name, displayName, description)
+        return BoardCategory
+            .create(name, displayName, description)
             .let(categoryRepository::save)
     }
 
@@ -36,9 +36,10 @@ internal class CategoryServiceImpl(
         name: String,
         displayName: String,
         description: String,
-    ): BoardCategory = categoryRepository.findById(id).apply {
-        updateCategory(name, displayName, description)
-    }
+    ): BoardCategory =
+        categoryRepository.findById(id).apply {
+            updateCategory(name, displayName, description)
+        }
 
     override fun deleteCategory(id: Long) {
         categoryRepository.deleteById(id)

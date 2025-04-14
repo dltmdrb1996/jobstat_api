@@ -183,8 +183,9 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
                 )
             }
 
-        collection.bulkWrite(writes,
-            com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.UNORDERED_BULK_OPTIONS
+        collection.bulkWrite(
+            writes,
+            com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.UNORDERED_BULK_OPTIONS,
         )
         return entities
     }
@@ -207,8 +208,9 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
                 )
             }
 
-        return collection.bulkWrite(writes,
-            com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.UNORDERED_BULK_OPTIONS
+        return collection.bulkWrite(
+            writes,
+            com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.UNORDERED_BULK_OPTIONS,
         )
     }
 

@@ -5,7 +5,6 @@ import com.example.jobstat.core.event.EventType
 import com.example.jobstat.core.global.utils.serializer.DataSerializer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.kafka.support.Acknowledgment
 
 /**
  * 제네릭 타입 기반 이벤트 컨슈머 추상 클래스.
@@ -23,8 +22,7 @@ abstract class AbstractEventConsumer {
     protected lateinit var dataSerializer: DataSerializer
 
     /** 이 컨슈머가 지원하는 이벤트 타입 반환 (EventHandlerRegistry 기반) */
-    open fun getSupportedEventTypes(): Set<EventType> =
-        handlerRegistry.getSupportedEventTypes() // 핸들러 레지스트리가 실제 지원하는 타입 반환
+    open fun getSupportedEventTypes(): Set<EventType> = handlerRegistry.getSupportedEventTypes() // 핸들러 레지스트리가 실제 지원하는 타입 반환
 
     /**
      * 이벤트 수신 및 처리 기본 메서드.
@@ -41,7 +39,8 @@ abstract class AbstractEventConsumer {
         } catch (e: Exception) {
             log.error(
                 "[{}] 이벤트 파싱 중 예외 발생 (기타): rawJson=${jsonEvent.take(500)}, error=${e.message}. 메시지 재시도/DLT 처리 예정.",
-                this::class.simpleName, e
+                this::class.simpleName,
+                e,
             )
 
             throw e
@@ -51,28 +50,28 @@ abstract class AbstractEventConsumer {
         val eventId = event.eventId
 
         log.info(
-            "[{}] 이벤트 수신 및 파싱 완료: eventId=${eventId}, type=${eventType}, topic=${eventType.topic}",
-            this::class.simpleName
+            "[{}] 이벤트 수신 및 파싱 완료: eventId=$eventId, type=$eventType, topic=${eventType.topic}",
+            this::class.simpleName,
         )
 
         try {
             log.info(
-                "[{}] 이벤트 처리 시작: eventId=${eventId}, type=${eventType}, payloadType=${event.payload::class.simpleName}",
-                this::class.simpleName
+                "[{}] 이벤트 처리 시작: eventId=$eventId, type=$eventType, payloadType=${event.payload::class.simpleName}",
+                this::class.simpleName,
             )
 
             handlerRegistry.processEvent(event)
 
             log.info(
-                "[{}] 이벤트 처리 성공: eventId=${eventId}, type=${eventType}. (자동 Acknowledge 예정)",
-                this::class.simpleName
+                "[{}] 이벤트 처리 성공: eventId=$eventId, type=$eventType. (자동 Acknowledge 예정)",
+                this::class.simpleName,
             )
         } catch (e: Exception) {
             log.error(
-                "[{}] 이벤트 처리 중 오류 발생 (재시도/DLT 처리 예정): eventId=${eventId}, type=${eventType}, error=${e.message}",
-                this::class.simpleName
+                "[{}] 이벤트 처리 중 오류 발생 (재시도/DLT 처리 예정): eventId=$eventId, type=$eventType, error=${e.message}",
+                this::class.simpleName,
             )
-            log.debug("[{}] eventId=${eventId} 예외 스택 트레이스: ", this::class.simpleName, e)
+            log.debug("[{}] eventId=$eventId 예외 스택 트레이스: ", this::class.simpleName, e)
 
             throw e
         }

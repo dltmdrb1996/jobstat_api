@@ -1,26 +1,26 @@
-//package com.example.jobstat.community.repository
+// package com.example.jobstat.community.repository
 //
-//import com.example.jobstat.community.board.entity.Board
-//import com.example.jobstat.community.board.entity.BoardCategory
-//import com.example.jobstat.community.board.repository.BoardRepository
-//import com.example.jobstat.community.board.repository.CategoryRepository
-//import com.example.jobstat.community.comment.entity.Comment
-//import com.example.jobstat.comment.repository.CommentRepository
-//import com.example.jobstat.utils.base.JpaIntegrationTestSupport
-//import org.junit.jupiter.api.Assertions.assertFalse
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Nested
-//import org.junit.jupiter.api.Test
-//import org.springframework.beans.factory.annotation.Autowired
-//import org.springframework.data.domain.PageRequest
-//import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
-//import kotlin.test.assertEquals
-//import kotlin.test.assertFailsWith
-//import kotlin.test.assertTrue
+// import com.example.jobstat.community.board.entity.Board
+// import com.example.jobstat.community.board.entity.BoardCategory
+// import com.example.jobstat.community.board.repository.BoardRepository
+// import com.example.jobstat.community.board.repository.CategoryRepository
+// import com.example.jobstat.community.comment.entity.Comment
+// import com.example.jobstat.comment.repository.CommentRepository
+// import com.example.jobstat.utils.base.JpaIntegrationTestSupport
+// import org.junit.jupiter.api.Assertions.assertFalse
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Nested
+// import org.junit.jupiter.api.Test
+// import org.springframework.beans.factory.annotation.Autowired
+// import org.springframework.data.domain.PageRequest
+// import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
+// import kotlin.test.assertEquals
+// import kotlin.test.assertFailsWith
+// import kotlin.test.assertTrue
 //
-//@DisplayName("BoardRepository 통합 테스트")
-//class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
+// @DisplayName("BoardRepository 통합 테스트")
+// class BoardRepositoryIntegrationTest : JpaIntegrationTestSupport() {
 //    @Autowired
 //    private lateinit var boardRepository: BoardRepository
 //
@@ -565,4 +565,4 @@
 //            assertEquals(comment.content, boardsWithComments[0].comments[0].content)
 //        }
 //    }
-//}
+// }

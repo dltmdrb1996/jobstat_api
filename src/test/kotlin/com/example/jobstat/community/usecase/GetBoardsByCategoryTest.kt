@@ -1,19 +1,19 @@
-//package com.example.jobstat.community.usecase
+// package com.example.jobstat.community.usecase
 //
-//import com.example.jobstat.community.board.service.BoardService
-//import com.example.jobstat.community.board.service.BoardServiceImpl
-//import com.example.jobstat.community.board.usecase.get.GetBoardsByCategory
-//import com.example.jobstat.community.fake.CategoryFixture
-//import com.example.jobstat.community.fake.repository.FakeBoardRepository
-//import com.example.jobstat.community.fake.repository.FakeCategoryRepository
-//import jakarta.validation.Validation
-//import org.junit.jupiter.api.BeforeEach
-//import org.junit.jupiter.api.DisplayName
-//import org.junit.jupiter.api.Test
-//import kotlin.test.assertEquals
+// import com.example.jobstat.community.board.service.BoardService
+// import com.example.jobstat.community.board.service.BoardServiceImpl
+// import com.example.jobstat.community.board.usecase.get.GetBoardsByCategory
+// import com.example.jobstat.community.fake.CategoryFixture
+// import com.example.jobstat.community.fake.repository.FakeBoardRepository
+// import com.example.jobstat.community.fake.repository.FakeCategoryRepository
+// import jakarta.validation.Validation
+// import org.junit.jupiter.api.BeforeEach
+// import org.junit.jupiter.api.DisplayName
+// import org.junit.jupiter.api.Test
+// import kotlin.test.assertEquals
 //
-//@DisplayName("GetBoardsByCategory Usecase 테스트")
-//class GetBoardsByCategoryTest {
+// @DisplayName("GetBoardsByCategory Usecase 테스트")
+// class GetBoardsByCategoryTest {
 //    private lateinit var boardRepository: FakeBoardRepository
 //    private lateinit var categoryRepository: FakeCategoryRepository
 //    private lateinit var boardService: BoardService
@@ -63,4 +63,4 @@
 //        // user1가 작성한 게시글 수 (idx 0,2,4 → 3개)
 //        assertEquals(3, response.items.totalElements)
 //    }
-//}
+// }

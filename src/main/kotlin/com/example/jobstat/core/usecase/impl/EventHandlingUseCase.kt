@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory
  * EventType을 제네릭 파라미터로 받아 전략 패턴 구현을 간소화
  */
 abstract class EventHandlingUseCase<T : EventType, P : EventPayload, R> {
-
     protected val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
     // 이 핸들러가 처리하는 이벤트 타입 (제네릭 타입)
@@ -29,7 +28,6 @@ abstract class EventHandlingUseCase<T : EventType, P : EventPayload, R> {
         validatePayload(typedPayload)
         return execute(typedPayload)
     }
-
 
     /**
      * 페이로드 유효성 검사

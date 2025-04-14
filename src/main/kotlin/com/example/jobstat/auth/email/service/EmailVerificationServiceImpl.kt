@@ -13,8 +13,7 @@ internal class EmailVerificationServiceImpl(
         // 새 이메일 인증 객체 생성 및 저장
         EmailVerification.create(email).let(emailVerificationRepository::save)
 
-    override fun findLatestByEmail(email: String): EmailVerification? = 
-        emailVerificationRepository.findLatestByEmail(email)
+    override fun findLatestByEmail(email: String): EmailVerification? = emailVerificationRepository.findLatestByEmail(email)
 
     override fun matchesCode(
         verification: ReadEmailVerification,
