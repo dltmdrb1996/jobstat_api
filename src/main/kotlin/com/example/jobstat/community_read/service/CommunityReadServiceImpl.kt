@@ -141,45 +141,77 @@ class CommunityReadServiceImpl(
             logMessage = "카테고리 $categoryId 게시글 커서 (LastID: $lastBoardId, Limit: $limit)",
         )
 
-    // 랭킹별 게시글 조회 (오프셋 기반)
     override fun getRankedBoardsByOffset(
         metric: BoardRankingMetric,
         period: BoardRankingPeriod,
         pageable: Pageable,
     ): Page<BoardReadModel> {
-        val (cacheReader, dbFetcher) = getRankedBoardIdFetchers(metric, period, pageable)
-        return getPageWithFallbackInternal(
-            readFromCache = cacheReader,
-            fetchFromDb = dbFetcher,
-            fetchDetails = ::getBoardByIdsWithFetch,
-            pageable = pageable,
-            logMessagePrefix = "${period.name} ${metric.name} 랭킹 게시글 오프셋",
-        )
+        val logMessagePrefix = "${period.name} ${metric.name} 랭킹 게시글 오프셋 (Cache Only)"
+        log.debug("{}: 캐시에서 ID 목록 조회를 시작합니다. Pageable: {}", logMessagePrefix, pageable)
+
+        val idPageFromCache: Page<Long> = when (metric) {
+            BoardRankingMetric.LIKES -> when (period) {
+                BoardRankingPeriod.DAY -> boardIdListRepository.readAllByLikesDayByOffset(pageable)
+                BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByLikesWeekByOffset(pageable)
+                BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByLikesMonthByOffset(pageable)
+            }
+            BoardRankingMetric.VIEWS -> when (period) {
+                BoardRankingPeriod.DAY -> boardIdListRepository.readAllByViewsDayByOffset(pageable)
+                BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByViewsWeekByOffset(pageable)
+                BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByViewsMonthByOffset(pageable)
+            }
+        }
+
+        val boardIds = idPageFromCache.content
+
+        if (boardIds.isEmpty()) {
+            log.debug("{}: 캐시에서 ID를 찾을 수 없습니다.", logMessagePrefix)
+            return PageImpl(emptyList(), pageable, idPageFromCache.totalElements)
+        }
+
+        log.debug("{}: 캐시에서 찾은 ID {}개에 대한 상세 정보를 조회합니다.", logMessagePrefix, boardIds.size)
+        val boardDetails = getBoardByIdsWithFetch(boardIds) // Uses the existing detail fetching logic
+
+        return PageImpl(boardDetails, pageable, idPageFromCache.totalElements)
     }
 
-    // 랭킹별 게시글 조회 (커서 기반)
+    // 랭킹별 게시글 조회 (커서 기반) - 캐시 전용 조회로 변경
     override fun getRankedBoardsByCursor(
         metric: BoardRankingMetric,
         period: BoardRankingPeriod,
         lastBoardId: Long?,
-        lastScore: Double?,
         limit: Long,
     ): List<BoardReadModel> {
-        val (cacheReader, dbFallbackFetcher) = getRankedBoardIdFetchersCursor(metric, period, lastBoardId, lastScore, limit)
+        val logMessage = "${period.name} ${metric.name} 랭킹 게시글 커서 (Cache Only, LastID: $lastBoardId, Limit: $limit)"
+        log.debug("{}: 캐시에서 ID 목록 조회를 시작합니다.", logMessage)
 
-        return getItemsWithFallbackInternal(
-            readFromCache = cacheReader,
-            fetchFromDb = dbFallbackFetcher, // cachedIds를 올바르게 사용하는 람다 전달
-            fetchDetails = ::getBoardByIdsWithFetch,
-            limit = limit,
-            logMessage = "${period.name} ${metric.name} 랭킹 게시글 커서 (LastID: $lastBoardId, LastScore: $lastScore, Limit: $limit)",
-        )
+        val idsFromCache: List<Long> = when (metric) {
+            BoardRankingMetric.LIKES -> when (period) {
+                BoardRankingPeriod.DAY -> boardIdListRepository.readAllByLikesDayByCursor(lastBoardId, limit)
+                BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByLikesWeekByCursor(lastBoardId, limit)
+                BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByLikesMonthByCursor(lastBoardId, limit)
+            }
+            BoardRankingMetric.VIEWS -> when (period) {
+                BoardRankingPeriod.DAY -> boardIdListRepository.readAllByViewsDayByCursor(lastBoardId, limit)
+                BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByViewsWeekByCursor(lastBoardId, limit)
+                BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByViewsMonthByCursor(lastBoardId, limit)
+            }
+        }
+
+        if (idsFromCache.isEmpty()) {
+            log.debug("${logMessage}: 캐시에서 ID를 찾을 수 없습니다.")
+            return emptyList()
+        }
+
+        log.debug("${logMessage}: 캐시에서 찾은 ID ${idsFromCache.size}개에 대한 상세 정보를 조회합니다.")
+        val boardDetails = getBoardByIdsWithFetch(idsFromCache) // Uses the existing detail fetching logic
+
+        return boardDetails
     }
 
     // --------------------------
     // 댓글 관련 조회 메소드
     // --------------------------
-    // 단일 댓글 조회
     override fun getCommentById(commentId: Long): CommentReadModel = commentDetailRepository.findCommentDetail(commentId) ?: fetchAndCacheComment(commentId)
 
     private fun fetchAndCacheComment(commentId: Long): CommentReadModel {
@@ -372,7 +404,7 @@ class CommunityReadServiceImpl(
         val limitInt = limit.toInt() // take()를 위해 Int 사용
 
         if (idsFromCache.size < limitInt) {
-            log.debug("{}: 캐시 미스 또는 불충분한 크기 (찾음: {}, 요청: {}). 폴백을 실행합니다.", logMessage, idsFromCache.size, limitInt)
+            log.debug("$logMessage: 캐시 미스 또는 불충분한 크기 (찾음: $idsFromCache, 요청: $limitInt). 폴백을 실행합니다.")
 
             // 캐시된 ID들을 폴백 함수에 전달
             val idsFromDb = fetchFromDb(idsFromCache)
@@ -380,20 +412,20 @@ class CommunityReadServiceImpl(
             val mergedIds = (idsFromCache + idsFromDb).distinct().take(limitInt)
 
             if (mergedIds.isEmpty()) {
-                log.debug("{}: 캐시나 폴백에서 ID를 찾을 수 없습니다.", logMessage)
+                log.debug("${logMessage}: 캐시나 폴백에서 ID를 찾을 수 없습니다.")
                 return emptyList()
             }
 
-            log.debug("{}: 병합된 ID {}개에 대한 상세 정보를 조회합니다.", logMessage, mergedIds.size)
+            log.debug("${logMessage}: 병합된 ID ${mergedIds.size}개에 대한 상세 정보를 조회합니다.")
             return fetchDetails(mergedIds)
         } else {
             // 충분한 데이터로 캐시 히트
             if (idsFromCache.isEmpty()) {
-                log.debug("{}: 캐시 히트되었지만, ID를 찾을 수 없습니다.", logMessage)
+                log.debug("${logMessage}: 캐시 히트되었지만, ID를 찾을 수 없습니다.")
                 return emptyList()
             }
 
-            log.debug("{}: 캐시 히트 및 충분한 크기 (찾음: {}). 상세 정보를 조회합니다.", logMessage, idsFromCache.size)
+            log.debug("${logMessage}: 캐시 히트 크기 (찾음: ${idsFromCache.size}). 상세 정보를 조회합니다.")
             return fetchDetails(idsFromCache)
         }
     }
@@ -432,118 +464,74 @@ class CommunityReadServiceImpl(
         return boardClient.fetchCategoryBoardIdsAfter(categoryId, lastBoardId, limit) ?: emptyList()
     }
 
-    private fun fetchBoardIdsByLikes(
-        period: String,
-        pageable: Pageable,
-    ): List<Long> {
-        log.debug("DB 조회: 좋아요 순 게시글 ID 목록 period={}, page={}, size={}", period, pageable.pageNumber, pageable.pageSize)
-        return boardClient.fetchBoardIdsByLikes(period, pageable.pageNumber, pageable.pageSize) ?: emptyList()
-    }
 
-    private fun fetchBoardIdsByLikesAfter(
-        period: String,
-        lastBoardId: Long?,
-        lastScore: Double?,
-        limit: Int,
-    ): List<Long> {
-        log.debug("DB 조회: ID {}, score {} 이후 좋아요 순 게시글 ID 목록 period={}, limit={}", lastBoardId, lastScore, period, limit)
-        return boardClient.fetchBoardIdsByLikesAfter(period, lastBoardId, lastScore, limit) ?: emptyList()
-    }
-
-    private fun fetchBoardIdsByViews(
-        period: String,
-        pageable: Pageable,
-    ): List<Long> {
-        log.debug("DB 조회: 조회수 순 게시글 ID 목록 period={}, page={}, size={}", period, pageable.pageNumber, pageable.pageSize)
-        return boardClient.fetchBoardIdsByViews(period, pageable.pageNumber, pageable.pageSize) ?: emptyList()
-    }
-
-    private fun fetchBoardIdsByViewsAfter(
-        period: String,
-        lastBoardId: Long?,
-        lastScore: Double?,
-        limit: Int,
-    ): List<Long> {
-        log.debug("DB 조회: ID {}, score {} 이후 조회수 순 게시글 ID 목록 period={}, limit={}", lastBoardId, lastScore, period, limit)
-        return boardClient.fetchBoardIdsByViewsAfter(period, lastBoardId, lastScore, limit) ?: emptyList()
-    }
-
-    // --------------------------
-    // 랭킹 게시글 조회 헬퍼 메소드
-    // --------------------------
-    private fun getRankedBoardIdFetchers(
-        metric: BoardRankingMetric,
-        period: BoardRankingPeriod,
-        pageable: Pageable,
-    ): Pair<() -> Page<Long>, () -> List<Long>> {
-        val periodStr = period.toParamString()
-        val cacheReader: () -> Page<Long> =
-            when (metric) {
-                BoardRankingMetric.LIKES ->
-                    when (period) {
-                        BoardRankingPeriod.DAY -> { -> boardIdListRepository.readAllByLikesDayByOffset(pageable) }
-                        BoardRankingPeriod.WEEK -> { -> boardIdListRepository.readAllByLikesWeekByOffset(pageable) }
-                        BoardRankingPeriod.MONTH -> { -> boardIdListRepository.readAllByLikesMonthByOffset(pageable) }
-                    }
-                BoardRankingMetric.VIEWS ->
-                    when (period) {
-                        BoardRankingPeriod.DAY -> { -> boardIdListRepository.readAllByViewsDayByOffset(pageable) }
-                        BoardRankingPeriod.WEEK -> { -> boardIdListRepository.readAllByViewsWeekByOffset(pageable) }
-                        BoardRankingPeriod.MONTH -> { -> boardIdListRepository.readAllByViewsMonthByOffset(pageable) }
-                    }
-            }
-        val dbFetcher: () -> List<Long> =
-            when (metric) {
-                BoardRankingMetric.LIKES -> { -> fetchBoardIdsByLikes(periodStr, pageable) }
-                BoardRankingMetric.VIEWS -> { -> fetchBoardIdsByViews(periodStr, pageable) }
-            }
-        return Pair(cacheReader, dbFetcher)
-    }
-
-    private fun getRankedBoardIdFetchersCursor(
-        metric: BoardRankingMetric,
-        period: BoardRankingPeriod,
-        lastBoardId: Long?,
-        lastScore: Double?,
-        limit: Long,
-    ): Pair<() -> List<Long>, (List<Long>) -> List<Long>> {
-        val periodStr = period.toParamString()
-        val limitInt = limit.toInt()
-
-        val cacheReader: () -> List<Long> =
-            when (metric) {
-                BoardRankingMetric.LIKES ->
-                    when (period) {
-                        BoardRankingPeriod.DAY -> { -> boardIdListRepository.readAllByLikesDayByCursor(lastBoardId, limit) }
-                        BoardRankingPeriod.WEEK -> { -> boardIdListRepository.readAllByLikesWeekByCursor(lastBoardId, limit) }
-                        BoardRankingPeriod.MONTH -> { -> boardIdListRepository.readAllByLikesMonthByCursor(lastBoardId, limit) }
-                    }
-                BoardRankingMetric.VIEWS ->
-                    when (period) {
-                        BoardRankingPeriod.DAY -> { -> boardIdListRepository.readAllByViewsDayByCursor(lastBoardId, limit) }
-                        BoardRankingPeriod.WEEK -> { -> boardIdListRepository.readAllByViewsWeekByCursor(lastBoardId, limit) }
-                        BoardRankingPeriod.MONTH -> { -> boardIdListRepository.readAllByViewsMonthByCursor(lastBoardId, limit) }
-                    }
-            }
-
-        val dbFallbackFetcher: (List<Long>) -> List<Long> = { cachedIds ->
-            val lastIdFromCache = cachedIds.lastOrNull()
-            val effectiveLastId = lastIdFromCache ?: lastBoardId // 캐시 결과를 우선 사용
-            log.debug("${period.name} ${metric.name} 랭킹 게시글 커서 폴백, command 서버에서 ID: {}, Score: {} 이후로 조회합니다.", effectiveLastId, lastScore)
-            if (effectiveLastId != null) {
-                when (metric) {
-                    BoardRankingMetric.LIKES -> fetchBoardIdsByLikesAfter(periodStr, effectiveLastId, lastScore, limitInt)
-                    BoardRankingMetric.VIEWS -> fetchBoardIdsByViewsAfter(periodStr, effectiveLastId, lastScore, limitInt)
-                }
-            } else {
-                // 첫 페이지 조회
-                when (metric) {
-                    BoardRankingMetric.LIKES -> fetchBoardIdsByLikes(periodStr, PageRequest.of(0, limitInt))
-                    BoardRankingMetric.VIEWS -> fetchBoardIdsByViews(periodStr, PageRequest.of(0, limitInt))
-                }
-            }
-        }
-
-        return Pair(cacheReader, dbFallbackFetcher)
-    }
+//    // --------------------------
+//    // 랭킹 게시글 조회 헬퍼 메소드
+//    // --------------------------
+//    private fun getRankedBoardIdFetchers(
+//        metric: BoardRankingMetric,
+//        period: BoardRankingPeriod,
+//        pageable: Pageable,
+//    ): Pair<() -> Page<Long>, () -> List<Long>> {
+//        val periodStr = period.name
+//        val cacheReader: () -> Page<Long> =
+//            when (metric) {
+//                BoardRankingMetric.LIKES ->
+//                    when (period) {
+//                        BoardRankingPeriod.DAY -> { -> boardIdListRepository.readAllByLikesDayByOffset(pageable) }
+//                        BoardRankingPeriod.WEEK -> { -> boardIdListRepository.readAllByLikesWeekByOffset(pageable) }
+//                        BoardRankingPeriod.MONTH -> { -> boardIdListRepository.readAllByLikesMonthByOffset(pageable) }
+//                    }
+//                BoardRankingMetric.VIEWS ->
+//                    when (period) {
+//                        BoardRankingPeriod.DAY -> { -> boardIdListRepository.readAllByViewsDayByOffset(pageable) }
+//                        BoardRankingPeriod.WEEK -> { -> boardIdListRepository.readAllByViewsWeekByOffset(pageable) }
+//                        BoardRankingPeriod.MONTH -> { -> boardIdListRepository.readAllByViewsMonthByOffset(pageable) }
+//                    }
+//            }
+//        val dbFetcher: () -> List<Long> = {
+//            boardClient.fetchBoardIdsByRank(metric, periodStr, pageable.pageNumber, pageable.pageSize) ?: emptyList()
+//        }
+//        return Pair(cacheReader, dbFetcher)
+//    }
+//
+//    private fun getRankedBoardIdFetchersCursor(
+//        metric: BoardRankingMetric,
+//        period: BoardRankingPeriod,
+//        lastBoardId: Long?,
+//        limit: Long,
+//    ): Pair<() -> List<Long>, (List<Long>) -> List<Long>> {
+//        val periodStr = period.name
+//        val limitInt = limit.toInt()
+//
+//        val cacheReader: () -> List<Long> =
+//            when (metric) {
+//                BoardRankingMetric.LIKES ->
+//                    when (period) {
+//                        BoardRankingPeriod.DAY -> { -> boardIdListRepository.readAllByLikesDayByCursor(lastBoardId, limit) }
+//                        BoardRankingPeriod.WEEK -> { -> boardIdListRepository.readAllByLikesWeekByCursor(lastBoardId, limit) }
+//                        BoardRankingPeriod.MONTH -> { -> boardIdListRepository.readAllByLikesMonthByCursor(lastBoardId, limit) }
+//                    }
+//                BoardRankingMetric.VIEWS ->
+//                    when (period) {
+//                        BoardRankingPeriod.DAY -> { -> boardIdListRepository.readAllByViewsDayByCursor(lastBoardId, limit) }
+//                        BoardRankingPeriod.WEEK -> { -> boardIdListRepository.readAllByViewsWeekByCursor(lastBoardId, limit) }
+//                        BoardRankingPeriod.MONTH -> { -> boardIdListRepository.readAllByViewsMonthByCursor(lastBoardId, limit) }
+//                    }
+//            }
+//
+//        val dbFallbackFetcher: (List<Long>) -> List<Long> = { cachedIds ->
+//            val lastIdFromCache = cachedIds.lastOrNull()
+//            val effectiveLastId = lastIdFromCache ?: lastBoardId // 캐시 결과를 우선 사용
+//            log.debug("${period.name} ${metric.name} 랭킹 게시글 커서 폴백, command 서버에서 ID: {} 이후로 조회합니다.", effectiveLastId) // lastScore 로깅 제거
+//            if (effectiveLastId != null) {
+//                boardClient.fetchBoardIdsByRankAfter(metric, periodStr, effectiveLastId, limitInt) ?: emptyList()
+//            } else {
+//                log.debug("${period.name} ${metric.name} 랭킹 게시글 커서 폴백 (첫 페이지), command 서버에서 조회합니다.")
+//                boardClient.fetchBoardIdsByRank(metric, periodStr, 0, limitInt) ?: emptyList()
+//            }
+//        }
+//
+//        return Pair(cacheReader, dbFallbackFetcher)
+//    }
 }

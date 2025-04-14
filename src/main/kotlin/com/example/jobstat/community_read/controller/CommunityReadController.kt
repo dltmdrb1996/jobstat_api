@@ -2,6 +2,8 @@
 package com.example.jobstat.community_read.controller
 
 import com.example.jobstat.community_read.usecase.query.* // 모든 UseCase import
+import com.example.jobstat.core.error.AppException
+import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.global.wrapper.ApiResponse
 import com.example.jobstat.core.security.annotation.Public
 import com.example.jobstat.core.state.BoardRankingMetric
@@ -182,18 +184,34 @@ class CommunityReadController(
     )
     @SwaggerResponse(responseCode = "400", description = "유효하지 않은 랭킹 지표 또는 기간", content = [Content()])
     fun getRankedBoardsByOffset(
-        @Parameter(description = "랭킹 지표 (LIKES, VIEWS)", required = true, example = "LIKES") @PathVariable metric: BoardRankingMetric,
-        @Parameter(description = "랭킹 기간 (DAY, WEEK, MONTH)", required = true, example = "WEEK") @PathVariable period: BoardRankingPeriod,
-        @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") page: Int,
-        @Parameter(description = "페이지 크기", example = "20") @RequestParam(defaultValue = "20") size: Int,
-    ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> { // 명확한 반환 타입
-        log.info("조회 요청: 랭킹 게시글 목록 (페이지 기반) metric=$metric, period=$period, page=$page, size=$size")
-        val metricStr = metric.name.lowercase()
-        val periodStr = period.name.lowercase()
+        @Parameter(description = "랭킹 지표 (LIKES, VIEWS)", required = true, example = "LIKES")
+        @PathVariable metric: String, // <<< String으로 변경
+        @Parameter(description = "랭킹 기간 (DAY, WEEK, MONTH)", required = true, example = "WEEK")
+        @PathVariable period: String, // <<< String으로 변경
+        @Parameter(description = "페이지 번호", example = "0")
+        @RequestParam(defaultValue = "0") page: Int,
+        @Parameter(description = "페이지 크기", example = "20")
+        @RequestParam(defaultValue = "20") size: Int,
+    ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> {
+        val metricEnum = try {
+            BoardRankingMetric.fromString(metric)
+        } catch (e: IllegalArgumentException) {
+            throw AppException.fromErrorCode(
+                ErrorCode.INVALID_ARGUMENT, detailInfo = "Invalid metric: $metric"
+            )
+        }
+        val periodEnum = try {
+            BoardRankingPeriod.fromString(period)
+        } catch (e: IllegalArgumentException) {
+            throw AppException.fromErrorCode(
+                ErrorCode.INVALID_ARGUMENT, detailInfo = "Invalid period: $period"
+            )
+        }
+
         val request =
             GetBoardListByOffsetUseCase.Request(
-                type = metricStr,
-                period = periodStr,
+                type = metricEnum.name.lowercase(), // "likes" or "views"
+                period = periodEnum.name.lowercase(), // "day", "week", "month"
                 page = page,
                 size = size,
             )
@@ -213,20 +231,38 @@ class CommunityReadController(
     )
     @SwaggerResponse(responseCode = "400", description = "유효하지 않은 랭킹 지표 또는 기간", content = [Content()])
     fun getRankedBoardsByCursor(
-        @Parameter(description = "랭킹 지표 (LIKES, VIEWS)", required = true, example = "LIKES") @PathVariable metric: BoardRankingMetric,
-        @Parameter(description = "랭킹 기간 (DAY, WEEK, MONTH)", required = true, example = "WEEK") @PathVariable period: BoardRankingPeriod,
-        @Parameter(description = "마지막으로 조회한 게시글 ID (첫 페이지는 null)", example = "100") @RequestParam(required = false) lastId: Long?,
-        @Parameter(description = "조회할 개수", example = "20") @RequestParam(defaultValue = "20") limit: Int, // 파라미터 이름 limit으로 변경
-    ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> { // 명확한 반환 타입
+        @Parameter(description = "랭킹 지표 (LIKES, VIEWS)", required = true, example = "LIKES")
+        @PathVariable metric: String,
+        @Parameter(description = "랭킹 기간 (DAY, WEEK, MONTH)", required = true, example = "WEEK")
+        @PathVariable period: String,
+        @Parameter(description = "마지막으로 조회한 게시글 ID (첫 페이지는 null)", example = "100")
+        @RequestParam(required = false) lastId: Long?,
+        @Parameter(description = "조회할 개수", example = "20")
+        @RequestParam(defaultValue = "20") limit: Int,
+    ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> {
         log.info("조회 요청: 랭킹 게시글 목록 (커서 기반) metric=$metric, period=$period, lastId=$lastId, limit=$limit")
-        val metricStr = metric.name.lowercase()
-        val periodStr = period.name.lowercase()
+
+        val metricEnum = try {
+            BoardRankingMetric.fromString(metric)
+        } catch (e: IllegalArgumentException) {
+            throw AppException.fromErrorCode(
+                ErrorCode.INVALID_ARGUMENT, detailInfo = "Invalid metric: $metric"
+            )
+        }
+        val periodEnum = try {
+            BoardRankingPeriod.fromString(period)
+        } catch (e: IllegalArgumentException) {
+            throw AppException.fromErrorCode(
+                ErrorCode.INVALID_ARGUMENT, detailInfo = "Invalid metric: $metric"
+            )
+        }
+
         val request =
             GetBoardListByCursorUseCase.Request(
-                type = metricStr,
-                period = periodStr,
+                type = metricEnum.name.lowercase(), // "likes" or "views"
+                period = periodEnum.name.lowercase(), // "day", "week", "month"
                 lastId = lastId,
-                limit = limit.toLong(), // UseCase Request 타입에 맞게 조정
+                limit = limit.toLong(),
             )
         return ApiResponse.ok(getBoardListByCursorUseCase(request))
     }

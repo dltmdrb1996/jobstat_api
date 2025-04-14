@@ -1,9 +1,11 @@
+// file: src/main/kotlin/com/example/jobstat/community_read/client/BoardClient.kt
 package com.example.jobstat.community_read.client
 
 import com.example.jobstat.community_read.client.response.*
 import com.example.jobstat.community_read.model.BoardReadModel
 import com.example.jobstat.core.base.BaseClient
 import com.example.jobstat.core.global.wrapper.ApiResponse // 서버 ApiResponse Wrapper import
+import com.example.jobstat.core.state.BoardRankingMetric // BoardRankingMetric import
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference // Import
 import org.springframework.stereotype.Component
@@ -21,7 +23,6 @@ class BoardClient : BaseClient() {
 
     override fun getServiceUrl(): String = boardServiceUrl
 
-    // --- ParameterizedTypeReference 캐싱 ---
     companion object {
         private val ID_LIST_RESPONSE_TYPE =
             object : ParameterizedTypeReference<ApiResponse<FetchBoardIdsResponse>>() {}
@@ -32,33 +33,24 @@ class BoardClient : BaseClient() {
         private val BOARD_BULK_RESPONSE_TYPE =
             object : ParameterizedTypeReference<ApiResponse<FetchBoardsByIdsResponse>>() {}
     }
-    // --- 캐싱 끝 ---
 
-    // commentPage 파라미터 추가
     fun fetchBoardById(
         boardId: Long,
         commentPage: Int? = null,
     ): BoardReadModel? {
-        val logContext = "BoardGetClient.getBoardById"
+        val logContext = "BoardClient.fetchBoardById"
         try {
-            // 캐싱된 타입 참조 사용
             val typeRef = BOARD_DETAIL_RESPONSE_TYPE
-
-            // URI 빌더 생성
             val uriBuilder = UriComponentsBuilder.fromPath("/api/v1/boards/$boardId")
-
-            // commentPage 파라미터가 있으면 추가
             commentPage?.let { uriBuilder.queryParam("commentPage", it) }
 
-            // restClient 직접 사용
             val responseWrapper: ApiResponse<FetchBoardByIdResponse>? =
                 restClient
                     .get()
-                    .uri(uriBuilder.build().toUriString()) // 빌드된 URI 사용
+                    .uri(uriBuilder.build().toUriString())
                     .retrieve()
                     .body(typeRef)
 
-            // 결과 처리
             if (responseWrapper?.data != null) {
                 return FetchBoardByIdResponse.from(responseWrapper.data)
             } else {
@@ -75,7 +67,7 @@ class BoardClient : BaseClient() {
     }
 
     fun fetchBoardsByIds(boardIds: List<Long>): List<BoardReadModel>? {
-        val logContext = "BoardGetClient.getBoardsByIds"
+        val logContext = "BoardClient.fetchBoardsByIds"
         if (boardIds.isEmpty()) return emptyList()
 
         val request = mapOf("boardIds" to boardIds)
@@ -85,12 +77,11 @@ class BoardClient : BaseClient() {
             val responseWrapper: ApiResponse<FetchBoardsByIdsResponse>? =
                 restClient
                     .post()
-                    .uri("/api/v1/boards/bulk")
+                    .uri("/api/v1/boards/bulk") // 경로는 Controller와 일치
                     .body(request)
                     .retrieve()
                     .body(typeRef)
 
-            // 결과 처리
             if (responseWrapper?.data != null) {
                 return FetchBoardsByIdsResponse.from(responseWrapper.data)
             } else {
@@ -106,21 +97,20 @@ class BoardClient : BaseClient() {
         }
     }
 
-    // === ID 목록 조회 메소드들 (동일 패턴 적용) ===
-    // 참고: Controller의 `/boards`, `/authors/{author}/boards/stats`, `/boards-fetch`, `/boards-fetch/infinite-scroll` 등의 API는
-    // 현재 BoardClient에 직접 호출하는 메소드가 구현되어 있지 않습니다. 필요시 추가 구현이 필요합니다.
+    // === ID 목록 조회 메소드들 (Controller 기준으로 수정 및 통합) ===
 
-    // 참고: 아래 ID 목록 조회 메소드들은 Controller에서 제공하는 categoryId, author 필터를 사용하지 않습니다. 필요시 파라미터 추가가 필요합니다.
+    // 최신순 ID 목록 (Offset)
     fun fetchLatestBoardIds(
         page: Int,
         limit: Int,
     ): List<Long>? =
         executeIdListGetRequest(
-            logContext = "BoardGetClient.fetchLatestBoardIds",
-            path = "/api/v1/boards-fetch/ids",
-            queryParams = mapOf("page" to page, "size" to limit),
+            logContext = "BoardClient.fetchLatestBoardIds",
+            path = "/api/v1/boards-fetch/ids", // Controller 경로와 일치
+            queryParams = mapOf("page" to page, "size" to limit), // Controller 파라미터명과 일치
         )
 
+    // 최신순 ID 목록 (Cursor)
     fun fetchLatestBoardIdsAfter(
         lastBoardId: Long?,
         limit: Int,
@@ -128,87 +118,77 @@ class BoardClient : BaseClient() {
         val queryParams = mutableMapOf<String, Any?>("limit" to limit)
         if (lastBoardId != null) queryParams["lastBoardId"] = lastBoardId
         return executeIdListGetRequest(
-            logContext = "BoardGetClient.fetchLatestBoardIdsAfter",
-            path = "/api/v1/boards-fetch/ids/after",
+            logContext = "BoardClient.fetchLatestBoardIdsAfter",
+            path = "/api/v1/boards-fetch/ids/after", // Controller 경로와 일치
             queryParams = queryParams,
         )
     }
 
+    // 카테고리별 ID 목록 (Offset) - 수정됨
     fun fetchCategoryBoardIds(
         categoryId: Long,
         page: Int,
         limit: Int,
     ): List<Long>? =
         executeIdListGetRequest(
-            logContext = "BoardGetClient.fetchCategoryBoardIds",
-            path = "/api/v1/boards-fetch/category/$categoryId/ids",
-            queryParams = mapOf("page" to page, "size" to limit),
+            logContext = "BoardClient.fetchCategoryBoardIds",
+            path = "/api/v1/boards-fetch/ids", // Controller 경로 수정됨 (Query Param 사용)
+            queryParams = mapOf(
+                "categoryId" to categoryId, // Query Parameter로 categoryId 추가
+                "page" to page,
+                "size" to limit
+            ),
         )
 
+    // 카테고리별 ID 목록 (Cursor) - 수정됨
     fun fetchCategoryBoardIdsAfter(
         categoryId: Long,
         lastBoardId: Long?,
         limit: Int,
     ): List<Long>? {
-        val queryParams = mutableMapOf<String, Any?>("limit" to limit)
+        val queryParams = mutableMapOf<String, Any?>(
+            "categoryId" to categoryId, // Query Parameter로 categoryId 추가
+            "limit" to limit
+        )
         if (lastBoardId != null) queryParams["lastBoardId"] = lastBoardId
         return executeIdListGetRequest(
-            logContext = "BoardGetClient.fetchCategoryBoardIdsAfter",
-            path = "/api/v1/boards-fetch/category/$categoryId/ids/after",
+            logContext = "BoardClient.fetchCategoryBoardIdsAfter",
+            path = "/api/v1/boards-fetch/ids/after", // Controller 경로 수정됨 (Query Param 사용)
             queryParams = queryParams,
         )
     }
 
-    fun fetchBoardIdsByLikes(
+    // --- 랭킹별 ID 목록 조회 메소드 통합 ---
+
+    // 랭킹별 ID 목록 (Offset) - 통합됨
+    fun fetchBoardIdsByRank(
+        metric: BoardRankingMetric,
         period: String,
         page: Int,
         limit: Int,
-    ): List<Long>? =
+    ): List<Long> =
         executeIdListGetRequest(
-            logContext = "BoardGetClient.fetchBoardIdsByLikes",
-            path = "/api/v1/boards-fetch/ranks/likes/$period/ids",
+            logContext = "BoardClient.fetchBoardIdsByRank",
+            // Controller 경로에 맞게 metric 값을 Path Variable로 사용
+            path = "/api/v1/boards-fetch/ranks/${metric.name}/$period/ids", // metric.name 사용 (Enum 이름을 String으로 변환)
             queryParams = mapOf("page" to page, "size" to limit),
-        )
+        ) ?: emptyList()
 
-    fun fetchBoardIdsByLikesAfter(
+    // 랭킹별 ID 목록 (Cursor) - 통합됨
+    fun fetchBoardIdsByRankAfter(
+        metric: BoardRankingMetric,
         period: String,
         lastBoardId: Long?,
-        lastScore: Double?,
         limit: Int,
     ): List<Long>? {
         val queryParams = mutableMapOf<String, Any?>("limit" to limit)
         if (lastBoardId != null) queryParams["lastBoardId"] = lastBoardId
-        if (lastScore != null) queryParams["lastScore"] = lastScore
-        return executeIdListGetRequest(
-            logContext = "BoardGetClient.fetchBoardIdsByLikesAfter",
-            path = "/api/v1/boards-fetch/ranks/likes/$period/ids/after",
-            queryParams = queryParams,
-        )
-    }
+        // lastScore 파라미터 추가 로직 제거됨
 
-    fun fetchBoardIdsByViews(
-        period: String,
-        page: Int,
-        limit: Int,
-    ): List<Long>? =
-        executeIdListGetRequest(
-            logContext = "BoardGetClient.fetchBoardIdsByViews",
-            path = "/api/v1/boards-fetch/ranks/views/$period/ids",
-            queryParams = mapOf("page" to page, "size" to limit),
-        )
-
-    fun fetchBoardIdsByViewsAfter(
-        period: String,
-        lastBoardId: Long?,
-        lastScore: Double?,
-        limit: Int,
-    ): List<Long>? {
-        val queryParams = mutableMapOf<String, Any?>("limit" to limit)
-        if (lastBoardId != null) queryParams["lastBoardId"] = lastBoardId
-        if (lastScore != null) queryParams["lastScore"] = lastScore
         return executeIdListGetRequest(
-            logContext = "BoardGetClient.fetchBoardIdsByViewsAfter",
-            path = "/api/v1/boards-fetch/ranks/views/$period/ids/after",
+            logContext = "BoardClient.fetchBoardIdsByRankAfter",
+            // Controller 경로에 맞게 metric 값을 Path Variable로 사용
+            path = "/api/v1/boards-fetch/ranks/${metric.name}/$period/ids/after", // metric.name 사용
             queryParams = queryParams,
         )
     }
@@ -224,17 +204,15 @@ class BoardClient : BaseClient() {
         queryParams: Map<String, Any?>,
     ): List<Long>? {
         try {
-            // 캐싱된 ID 목록 응답 타입 참조 사용
             val typeRef = ID_LIST_RESPONSE_TYPE
 
             val responseWrapper: ApiResponse<FetchBoardIdsResponse>? =
                 restClient
                     .get()
-                    .uri(buildUri(path, queryParams)) // buildUri 사용
+                    .uri(buildUri(path, queryParams)) // buildUri 사용 (Query Parameter 처리)
                     .retrieve()
                     .body(typeRef)
 
-            // 결과 처리
             if (responseWrapper?.data != null) {
                 return FetchBoardIdsResponse.from(responseWrapper.data)
             } else {

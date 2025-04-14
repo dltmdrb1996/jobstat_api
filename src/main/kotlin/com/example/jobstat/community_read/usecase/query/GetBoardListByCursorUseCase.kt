@@ -78,7 +78,6 @@ class GetBoardListByCursorUseCase(
                     metric = metric,
                     period = periodEnum,
                     lastBoardId = request.lastId,
-                    lastScore = null,
                     limit = request.limit,
                 )
             }
@@ -103,7 +102,6 @@ class GetBoardListByCursorUseCase(
         val type: String,
         @field:Schema(description = "기간 (전체: all, 일간: day, 주간: week, 월간: month, 카테고리 ID: 숫자)", example = "week", allowableValues = ["all", "day", "week", "month", "{categoryId}"])
         val period: String, // categoryId 또는 기간 문자열
-        // lastId는 null일 수 있어야 첫 페이지 조회가 가능
         @field:Schema(description = "마지막으로 조회한 게시글 ID (첫 페이지는 null)", example = "100")
         @field:Positive(message = "마지막 게시글 ID는 양수여야 합니다")
         val lastId: Long?, // Nullable로 변경

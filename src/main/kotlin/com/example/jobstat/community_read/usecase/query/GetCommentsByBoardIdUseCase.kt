@@ -7,6 +7,7 @@ import com.example.jobstat.core.usecase.impl.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Positive
+import jakarta.validation.constraints.PositiveOrZero
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
@@ -70,7 +71,7 @@ class GetCommentsByBoardIdUseCase(
             defaultValue = "0",
             minimum = "0",
         )
-        @field:Positive(message = "페이지 번호는 양수여야 합니다")
+        @PositiveOrZero
         val page: Int = 0,
         @field:Schema(
             description = "페이지 크기",

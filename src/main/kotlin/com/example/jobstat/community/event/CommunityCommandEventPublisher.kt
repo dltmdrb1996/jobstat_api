@@ -62,9 +62,6 @@ internal class CommunityCommandEventPublisher(
         publish(EventType.BOARD_CREATED, payload)
     }
 
-    /**
-     * 게시글 수정 이벤트 발행
-     */
     fun publishBoardUpdated(board: Board) {
         val payload =
             BoardUpdatedEventPayload(
@@ -77,9 +74,6 @@ internal class CommunityCommandEventPublisher(
         publish(EventType.BOARD_UPDATED, payload)
     }
 
-    /**
-     * 게시글 삭제 이벤트 발행
-     */
     fun publishBoardDeleted(
         boardId: Long,
         userId: Long? = null,
@@ -96,9 +90,6 @@ internal class CommunityCommandEventPublisher(
         publish(EventType.BOARD_DELETED, payload)
     }
 
-    /**
-     * 게시글 좋아요 이벤트 발행
-     */
     fun publishBoardLiked(
         boardId: Long,
         createdAt: LocalDateTime,
@@ -117,9 +108,6 @@ internal class CommunityCommandEventPublisher(
         publish(EventType.BOARD_LIKED, payload)
     }
 
-    /**
-     * 게시글 좋아요 취소 이벤트 발행
-     */
     fun publishBoardUnliked(
         boardId: Long,
         createdAt: LocalDateTime,
@@ -139,9 +127,6 @@ internal class CommunityCommandEventPublisher(
         publish(EventType.BOARD_UNLIKED, payload)
     }
 
-    /**
-     * 게시글 조회수 업데이트 이벤트 발행
-     */
     fun publishBoardViewed(
         boardId: Long,
         createdAt: LocalDateTime,
@@ -158,9 +143,6 @@ internal class CommunityCommandEventPublisher(
         publish(EventType.BOARD_VIEWED, payload)
     }
 
-    /**
-     * 댓글 생성 이벤트 발행
-     */
     fun publishCommentCreated(
         comment: Comment,
         boardId: Long,
@@ -179,9 +161,6 @@ internal class CommunityCommandEventPublisher(
         publish(EventType.COMMENT_CREATED, payload)
     }
 
-    /**
-     * 댓글 수정 이벤트 발행
-     */
     fun publishCommentUpdated(
         comment: Comment,
         boardId: Long,
@@ -197,9 +176,6 @@ internal class CommunityCommandEventPublisher(
         publish(EventType.COMMENT_UPDATED, payload)
     }
 
-    /**
-     * 댓글 삭제 이벤트 발행
-     */
     fun publishCommentDeleted(
         commentId: Long,
         boardId: Long,

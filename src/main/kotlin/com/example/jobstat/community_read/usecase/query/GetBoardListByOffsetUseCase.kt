@@ -29,22 +29,15 @@ class GetBoardListByOffsetUseCase(
 ) : ValidUseCase<GetBoardListByOffsetUseCase.Request, GetBoardListByOffsetUseCase.Response>(validator) {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    // ===================================================
-    // 유스케이스 실행 메소드
-    // ===================================================
-
     override fun execute(request: Request): Response {
         log.info(
             "게시글 목록 페이지 기반 조회: type=${request.type}, period=${request.period}, page=${request.page}, size=${request.size}",
         )
 
-        // 페이징 객체 생성
         val pageable = PageRequest.of(request.page, request.size)
 
-        // 조회 유형에 따른 처리
         val boardsPage = executeByListType(request, pageable)
 
-        // 응답 생성
         return Response(
             items = BoardResponseDto.from(boardsPage.content),
             totalCount = boardsPage.totalElements,
@@ -55,13 +48,6 @@ class GetBoardListByOffsetUseCase(
         )
     }
 
-    // ===================================================
-    // 내부 구현 메소드
-    // ===================================================
-
-    /**
-     * 조회 유형에 따라 적절한 서비스 메소드 호출
-     */
     private fun executeByListType(
         request: Request,
         pageable: PageRequest,
@@ -88,13 +74,6 @@ class GetBoardListByOffsetUseCase(
         )
     }
 
-    // ===================================================
-    // 요청 및 응답 모델
-    // ===================================================
-
-    /**
-     * 게시글 목록 페이지 기반 조회 요청 모델
-     */
     @Schema(name = "GetTopBoardsByOffsetRequest", description = "게시글 목록 페이지 기반 조회 요청 모델")
     data class Request(
         @field:Schema(description = "조회 유형 (최신순: latest, 좋아요: likes, 조회수: views, 카테고리: category)", example = "likes", allowableValues = ["latest", "likes", "views", "category"], required = true)
@@ -103,7 +82,6 @@ class GetBoardListByOffsetUseCase(
         @field:Schema(description = "기간 (전체: all, 일간: day, 주간: week, 월간: month, 카테고리 ID: 숫자)", example = "week", allowableValues = ["all", "day", "week", "month", "{categoryId}"])
         val period: String, // categoryId 또는 기간 문자열
         @field:Schema(description = "페이지 번호", example = "0", defaultValue = "0", minimum = "0")
-        @field:Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다")
         val page: Int = 0,
         @field:Schema(description = "페이지 크기", example = "20", defaultValue = "20", minimum = "1", maximum = "100")
         @field:Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다")

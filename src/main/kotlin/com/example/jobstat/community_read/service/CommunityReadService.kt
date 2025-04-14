@@ -64,7 +64,6 @@ interface CommunityReadService {
         metric: BoardRankingMetric,
         period: BoardRankingPeriod,
         lastBoardId: Long?,
-        lastScore: Double?,
         limit: Long,
     ): List<BoardReadModel>
 
