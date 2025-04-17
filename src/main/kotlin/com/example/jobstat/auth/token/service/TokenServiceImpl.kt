@@ -19,24 +19,31 @@ internal class TokenServiceImpl(
         userId: Long,
         expirationInSeconds: Long,
     ) {
+        // 사용자 키 생성 및 리프레시 토큰 저장
         val userKey = "$REFRESH_TOKEN_PREFIX$userId"
-        // 새로운 리프레시 토큰을 저장합니다 (기존 토큰이 있다면 자동으로 덮어씁니다)
-        stringRedisTemplate.opsForValue().set(userKey, refreshToken, expirationInSeconds, TimeUnit.SECONDS)
+        stringRedisTemplate
+            .opsForValue()
+            .set(userKey, refreshToken, expirationInSeconds, TimeUnit.SECONDS)
     }
 
     override fun getUserIdFromToken(refreshToken: String): Long {
-        val userIdKey =
-            findUserKeyByRefreshToken(refreshToken)
-                ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 리프레시 토큰입니다.")
-
-        return extractUserIdFromKey(userIdKey)
+        // 리프레시 토큰으로 사용자 키 찾기
+        return findUserKeyByRefreshToken(refreshToken)
+            ?.let { userIdKey -> extractUserIdFromKey(userIdKey) }
+            ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 리프레시 토큰입니다.")
     }
 
+    /**
+     * 리프레시 토큰으로 사용자 키를 찾습니다
+     */
     private fun findUserKeyByRefreshToken(refreshToken: String): String? =
         stringRedisTemplate
             .keys("$REFRESH_TOKEN_PREFIX*")
             .find { key -> stringRedisTemplate.opsForValue().get(key) == refreshToken }
 
+    /**
+     * 사용자 키에서 사용자 ID를 추출합니다
+     */
     private fun extractUserIdFromKey(userIdKey: String): Long = userIdKey.substringAfter(REFRESH_TOKEN_PREFIX).toLong()
 
     override fun removeToken(userId: Long) {
@@ -45,7 +52,9 @@ internal class TokenServiceImpl(
     }
 
     override fun invalidateRefreshToken(refreshToken: String) {
-        val userId = getUserIdFromToken(refreshToken)
-        removeToken(userId)
+        // 리프레시 토큰으로 사용자 ID를 찾아 토큰 삭제
+        getUserIdFromToken(refreshToken).also { userId ->
+            removeToken(userId)
+        }
     }
 }

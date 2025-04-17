@@ -6,10 +6,11 @@ import com.example.jobstat.core.security.AccessPayload
 import com.example.jobstat.core.security.JwtTokenGenerator
 import com.example.jobstat.core.security.RefreshPayload
 import com.example.jobstat.core.usecase.impl.ValidUseCase
-import jakarta.transaction.Transactional
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 internal class RefreshToken(
@@ -19,22 +20,60 @@ internal class RefreshToken(
     validator: Validator,
 ) : ValidUseCase<RefreshToken.Request, RefreshToken.Response>(validator) {
     @Transactional
-    override fun execute(request: Request): Response {
-        val id = tokenService.getUserIdFromToken(request.refreshToken)
-        val user = userService.getUserWithRoles(id)
-        val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, user.getRolesString()))
-        val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, user.getRolesString()))
-        tokenService.saveToken(refreshToken, id, jwtTokenGenerator.getRefreshTokenExpiration())
-        return Response(accessToken, refreshToken)
-    }
+    override fun invoke(request: Request): Response = super.invoke(request)
 
+    override fun execute(request: Request): Response =
+        with(request) {
+            // 리프레시 토큰으로부터 사용자 ID 조회
+            tokenService.getUserIdFromToken(refreshToken).let { userId ->
+                // 사용자 정보 및 역할 조회
+                userService.getUserWithRoles(userId).let { user ->
+                    // 토큰 페이로드 생성
+                    val roles = user.getRolesString()
+                    val refreshPayload = RefreshPayload(user.id, roles)
+                    val accessPayload = AccessPayload(user.id, roles)
+
+                    // 새 토큰 생성
+                    val newRefreshToken = jwtTokenGenerator.createRefreshToken(refreshPayload)
+                    val newAccessToken = jwtTokenGenerator.createAccessToken(accessPayload)
+
+                    // 리프레시 토큰 저장
+                    tokenService.saveToken(newRefreshToken, userId, jwtTokenGenerator.getRefreshTokenExpiration())
+
+                    // 응답 반환
+                    Response(newAccessToken, newRefreshToken)
+                }
+            }
+        }
+
+    @Schema(
+        name = "RefreshTokenRequest",
+        description = "토큰 갱신 요청 모델",
+    )
     data class Request(
+        @field:Schema(
+            description = "현재 리프레시 토큰",
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+            required = true,
+        )
         @field:NotBlank(message = "리프레시 토큰은 필수 값입니다")
         val refreshToken: String,
     )
 
+    @Schema(
+        name = "RefreshTokenResponse",
+        description = "토큰 갱신 응답 모델",
+    )
     data class Response(
+        @field:Schema(
+            description = "새로 발급된 액세스 토큰",
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        )
         val accessToken: String,
+        @field:Schema(
+            description = "새로 발급된 리프레시 토큰",
+            example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        )
         val refreshToken: String,
     )
 }

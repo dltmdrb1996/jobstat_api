@@ -25,10 +25,8 @@ class RateLimitAspect {
         val now = Instant.now().epochSecond
         val requests = requestCountMap.computeIfAbsent(key) { ConcurrentLinkedQueue() }
 
-        // 만료된 요청 제거
         requests.removeIf { timestamp -> now - timestamp > rateLimit.duration }
 
-        // 요청 수 체크
         if (requests.size >= rateLimit.limit) {
             throw AppException.fromErrorCode(
                 ErrorCode.TOO_MANY_REQUESTS,
@@ -36,7 +34,6 @@ class RateLimitAspect {
             )
         }
 
-        // 새 요청 추가
         requests.offer(now)
 
         return joinPoint.proceed()

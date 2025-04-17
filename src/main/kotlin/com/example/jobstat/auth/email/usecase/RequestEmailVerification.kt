@@ -6,11 +6,12 @@ import com.example.jobstat.auth.user.service.UserService
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.usecase.impl.ValidUseCase
-import jakarta.transaction.Transactional
+import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 internal class RequestEmailVerification(
@@ -20,14 +21,25 @@ internal class RequestEmailVerification(
     validator: Validator,
 ) : ValidUseCase<RequestEmailVerification.Request, Unit>(validator) {
     @Transactional
-    override fun execute(request: Request) {
-        // 1. 이메일 중복 체크
-        if (!userService.validateEmail(request.email)) {
-            throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 이메일입니다.")
+    override fun execute(request: Request): Unit =
+        with(request) {
+            validateEmailAvailability(email)
+
+            checkPreviousVerification(email)
+
+            emailVerificationService
+                .create(email)
+                .also { verification -> emailService.sendVerificationEmail(email, verification.code) }
         }
 
-        // 2. 이전 인증 코드 체크
-        emailVerificationService.findLatestByEmail(request.email)?.let { verification ->
+    private fun validateEmailAvailability(email: String) {
+        if (!userService.validateEmail(email)) {
+            throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "이미 사용중인 이메일입니다.")
+        }
+    }
+
+    private fun checkPreviousVerification(email: String) {
+        emailVerificationService.findLatestByEmail(email)?.let { verification ->
             if (verification.isValid()) {
                 throw AppException.fromErrorCode(
                     ErrorCode.VERIFICATION_CODE_ALREADY_SENT,
@@ -35,17 +47,20 @@ internal class RequestEmailVerification(
                 )
             }
         }
-
-        // 3. 새 인증 코드 생성
-        val verification = emailVerificationService.create(request.email)
-
-        // 4. 이메일 발송
-        emailService.sendVerificationEmail(request.email, verification.code)
     }
 
+    @Schema(
+        name = "RequestEmailVerificationRequest",
+        description = "이메일 인증 요청 모델",
+    )
     data class Request(
-        @field:NotBlank
-        @field:Email
+        @field:Schema(
+            description = "인증할 이메일 주소",
+            example = "user@example.com",
+            required = true,
+        )
+        @field:NotBlank(message = "이메일은 필수 입력값입니다")
+        @field:Email(message = "유효한 이메일 형식이 아닙니다")
         val email: String,
     )
 }

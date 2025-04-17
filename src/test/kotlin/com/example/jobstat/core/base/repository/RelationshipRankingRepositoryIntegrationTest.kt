@@ -4,8 +4,8 @@ import com.example.jobstat.core.base.mongo.SnapshotPeriod
 import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
 import com.example.jobstat.core.state.BaseDate
 import com.example.jobstat.core.state.EntityType
-import com.example.jobstat.statistics.rankings.document.IndustrySkillRankingsDocument
-import com.example.jobstat.statistics.rankings.repository.IndustrySkillRankingsRepositoryImpl
+import com.example.jobstat.statistics_read.rankings.document.IndustrySkillRankingsDocument
+import com.example.jobstat.statistics_read.rankings.repository.IndustrySkillRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -100,7 +100,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @BeforeEach
     override fun setup() {
-        val baseDate = createBaseDateString(2024, 1) // "202401" 형식으로 저장
+        val baseDate = createBaseDateString(2024, 1)
         val totalPages = (totalRecords + batchSize - 1) / batchSize
 
         for (page in 1..totalPages) {

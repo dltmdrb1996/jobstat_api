@@ -1,6 +1,6 @@
 package com.example.jobstat.auth.email.entity
 
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.AuditableEntitySnow
 import jakarta.persistence.*
 import java.time.LocalDateTime
 import kotlin.random.Random
@@ -14,14 +14,13 @@ interface ReadEmailVerification {
     fun isValid(): Boolean
 }
 
-// 이메일 인증 엔티티
 @Entity
 @Table(name = "email_verifications")
 class EmailVerification(
     email: String,
     code: String,
     expiresAt: LocalDateTime,
-) : BaseEntity(),
+) : AuditableEntitySnow(),
     ReadEmailVerification {
     @Column(nullable = false)
     override val email: String = email
@@ -32,7 +31,6 @@ class EmailVerification(
     @Column(nullable = false)
     override val expiresAt: LocalDateTime = expiresAt
 
-    // 인증 코드 유효성 검사
     override fun isValid() = expiresAt.isAfter(LocalDateTime.now())
 
     companion object {

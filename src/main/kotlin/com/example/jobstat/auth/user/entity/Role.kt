@@ -1,14 +1,8 @@
 package com.example.jobstat.auth.user.entity
 
 import com.example.jobstat.auth.user.UserConstants
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.AuditableEntitySnow
 import jakarta.persistence.*
-
-interface ReadRole {
-    val id: Long
-    val name: String
-    val users: Set<ReadUser>
-}
 
 @Entity
 @Table(
@@ -19,10 +13,9 @@ interface ReadRole {
 )
 internal class Role private constructor(
     name: String,
-) : BaseEntity(),
-    ReadRole {
+) : AuditableEntitySnow() {
     @Column(nullable = false, unique = true, length = UserConstants.MAX_ROLE_NAME_LENGTH)
-    override var name: String = name
+    var name: String = name
         protected set
 
     @OneToMany(
@@ -33,8 +26,8 @@ internal class Role private constructor(
     )
     private val _userRoles: MutableSet<UserRole> = mutableSetOf()
 
-    override val users: Set<User>
-        get() = _userRoles.mapNotNull { it.user }.toSet()
+    val users: Set<User>
+        get() = _userRoles.map { it.user }.toSet()
 
     fun getUserRole(user: User): UserRole? = _userRoles.find { it.user.id == user.id }
 
@@ -60,7 +53,6 @@ internal class Role private constructor(
     companion object {
         fun create(
             name: String,
-            id: Long = 0L,
         ): Role {
             require(name.isNotBlank()) { UserConstants.ErrorMessages.INVALID_ROLE }
             return Role(name)

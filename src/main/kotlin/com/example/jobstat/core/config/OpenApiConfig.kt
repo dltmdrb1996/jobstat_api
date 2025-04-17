@@ -1,6 +1,6 @@
 package com.example.jobstat.core.config
 
-import com.example.jobstat.core.converter.CustomModelConverter
+import com.example.jobstat.core.base.mongo.converter.CustomModelConverter
 import io.swagger.v3.core.converter.ModelConverters
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
@@ -35,7 +35,7 @@ class OpenApiConfig(
             .info(
                 Info()
                     .title("JobStat API")
-                    .version("v1")
+                    .version("v2")
                     .description("JobStat 애플리케이션의 API 문서"),
             ).servers(
                 listOf(

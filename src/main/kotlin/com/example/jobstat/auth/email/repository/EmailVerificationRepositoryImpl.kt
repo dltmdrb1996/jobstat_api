@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.email.repository
 
 import com.example.jobstat.auth.email.entity.EmailVerification
-import com.example.jobstat.core.extension.orThrowNotFound
+import com.example.jobstat.core.global.extension.orThrowNotFound
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -36,11 +36,7 @@ internal class EmailVerificationRepositoryImpl(
         code: String,
     ): Boolean = emailVerificationJpaRepository.existsByEmailAndCode(email, code)
 
-    override fun delete(emailVerification: EmailVerification) {
-        emailVerificationJpaRepository.delete(emailVerification)
-    }
+    override fun delete(emailVerification: EmailVerification) = emailVerificationJpaRepository.delete(emailVerification)
 
-    override fun deleteExpired() {
-        emailVerificationJpaRepository.deleteAllExpired(LocalDateTime.now())
-    }
+    override fun deleteExpired() = emailVerificationJpaRepository.deleteAllExpired(LocalDateTime.now())
 }

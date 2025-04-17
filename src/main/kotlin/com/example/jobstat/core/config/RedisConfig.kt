@@ -16,9 +16,6 @@ class RedisConfig(
     @Value("\${spring.data.redis.database}") private val dataIndex: Int,
     @Value("\${spring.data.redis.password}") private val password: String,
 ) {
-    private val rankingTtl = java.time.Duration.ofDays(32)
-    private val defaultTtl = java.time.Duration.ofMinutes(30)
-
     @Bean
     fun createLettuceConnectionFactory(): RedisConnectionFactory {
         val redisStandaloneConfiguration = RedisStandaloneConfiguration()

@@ -11,7 +11,6 @@ internal class RoleFixture private constructor(
     override fun create(): Role {
         val role = Role.create(name = name)
         if (id > 0L) {
-            // 직접 ID를 넣어주고 싶다면 Reflection으로 강제 세팅
             setIdByReflection(role, id)
         }
         return role

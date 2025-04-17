@@ -1,27 +1,9 @@
 package com.example.jobstat.community.board.entity
 
-import com.example.jobstat.community.board.BoardConstants
+import com.example.jobstat.community.board.utils.BoardConstants
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.community.comment.entity.ReadComment
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.base.AuditableEntitySnow
 import jakarta.persistence.*
-import java.time.LocalDateTime
-
-interface ReadBoard {
-    val id: Long
-    val title: String
-    val userId: Long?
-    val content: String
-    val author: String
-    val password: String?
-    val viewCount: Int
-    val likeCount: Int
-    val category: ReadBoardCategory
-    val commentCount: Int
-    val comments: List<ReadComment>
-    val createdAt: LocalDateTime
-    val updatedAt: LocalDateTime
-}
 
 @Entity
 @Table(name = "boards")
@@ -32,47 +14,46 @@ internal class Board protected constructor(
     password: String?,
     category: BoardCategory,
     userId: Long?,
-) : BaseEntity(),
-    ReadBoard {
+) : AuditableEntitySnow() {
     @Column(nullable = false, length = BoardConstants.MAX_TITLE_LENGTH)
-    override var title: String = title
+    var title: String = title
         protected set
 
     @Column(nullable = false, length = BoardConstants.MAX_CONTENT_LENGTH)
-    override var content: String = content
+    var content: String = content
         protected set
 
     @Column(nullable = true)
-    override var userId: Long? = userId
+    var userId: Long? = userId
         protected set
 
     @Column(nullable = false, length = BoardConstants.MAX_AUTHOR_LENGTH)
-    override var author: String = author
+    var author: String = author
         protected set
 
     @Column(length = BoardConstants.ENCODED_PASSWORD_LENGTH)
-    override var password: String? = password
+    var password: String? = password
         protected set
 
     @Column(nullable = false)
-    override var viewCount: Int = 0
+    var viewCount: Int = 0
         protected set
 
     @Column(nullable = false)
-    override var likeCount: Int = 0
+    var likeCount: Int = 0
         protected set
 
     @Column(nullable = false)
-    override var commentCount: Int = 0
+    var commentCount: Int = 0
         protected set
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
-    override var category: BoardCategory = category
+    var category: BoardCategory = category
         protected set
 
-    @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true)
-    override var comments: MutableList<Comment> = mutableListOf()
+    @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    var comments: MutableList<Comment> = mutableListOf()
         protected set
 
     fun updateContent(
@@ -105,12 +86,12 @@ internal class Board protected constructor(
         commentCount--
     }
 
-    fun incrementViewCount() {
-        viewCount++
+    fun incrementViewCount(count: Int = 1) {
+        viewCount += count
     }
 
-    fun incrementLikeCount() {
-        likeCount++
+    fun incrementLikeCount(count: Int = 1) {
+        likeCount += count
     }
 
     companion object {

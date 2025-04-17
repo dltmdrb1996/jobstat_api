@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- 공통 속성 -->
     <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-}] %-5level %logger{36} - %msg%n"/>
 
-    <!-- 콘솔 어펜더 (local, dev 등에서 사용) -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
@@ -14,10 +12,8 @@
         <property name="LOG_FILE_PATH" value="./logs/local"/>
         <property name="LOG_FILE_NAME" value="local-app"/>
 
-        <!-- 로컬 환경 파일 어펜더 (prudent 모드 유지) -->
         <appender name="LOCAL_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <prudent>true</prudent>
-            <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
+            <prudent>true</prudent> <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
             <encoder>
                 <pattern>${LOG_PATTERN}</pattern>
             </encoder>
@@ -29,7 +25,6 @@
             </rollingPolicy>
         </appender>
 
-        <!-- 로컬 환경 에러 파일 어펜더 (prudent 모드 유지) -->
         <appender name="LOCAL_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/local-error.log</file>
@@ -40,6 +35,7 @@
                 <fileNamePattern>${LOG_FILE_PATH}/local-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <maxFileSize>10MB</maxFileSize>
                 <maxHistory>30</maxHistory>
+                <totalSizeCap>500MB</totalSizeCap>
             </rollingPolicy>
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                 <level>ERROR</level>
@@ -60,7 +56,7 @@
             <appender-ref ref="CONSOLE"/>
         </logger>
 
-        <logger name="org.hibernate.type.descriptor.sql" level="TRACE" additivity="false">
+        <logger name="org.hibernate.type.descriptor.sql" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
     </springProfile>
@@ -69,10 +65,8 @@
         <property name="LOG_FILE_PATH" value="./logs/dev"/>
         <property name="LOG_FILE_NAME" value="dev-app"/>
 
-        <!-- 개발 환경 파일 어펜더 (prudent 모드 유지) -->
         <appender name="DEV_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <prudent>true</prudent>
-            <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
+            <prudent>true</prudent> <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
             <encoder>
                 <pattern>${LOG_PATTERN}</pattern>
             </encoder>
@@ -84,7 +78,6 @@
             </rollingPolicy>
         </appender>
 
-        <!-- 개발 환경 에러 파일 어펜더 (prudent 모드 유지) -->
         <appender name="DEV_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/dev-error.log</file>
@@ -95,6 +88,7 @@
                 <fileNamePattern>${LOG_FILE_PATH}/dev-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
                 <maxFileSize>10MB</maxFileSize>
                 <maxHistory>30</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
             </rollingPolicy>
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                 <level>ERROR</level>
@@ -114,8 +108,7 @@
         <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
-
-        <logger name="org.hibernate.type.descriptor.sql" level="TRACE" additivity="false">
+        <logger name="org.hibernate.type.descriptor.sql" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
     </springProfile>
@@ -124,7 +117,6 @@
         <property name="LOG_FILE_PATH" value="./logs/prod"/>
         <property name="LOG_FILE_NAME" value="prod-app"/>
 
-        <!-- 프로덕션 환경 파일 어펜더 (prudent 모드 제거) -->
         <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
             <encoder>
@@ -132,13 +124,12 @@
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <maxFileSize>10MB</maxFileSize>
+                <maxFileSize>50MB</maxFileSize>
                 <maxHistory>30</maxHistory>
                 <totalSizeCap>3GB</totalSizeCap>
             </rollingPolicy>
         </appender>
 
-        <!-- 프로덕션 환경 에러 파일 어펜더 (prudent 모드 제거) -->
         <appender name="PROD_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <file>${LOG_FILE_PATH}/prod-error.log</file>
             <encoder>
@@ -146,35 +137,31 @@
             </encoder>
             <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
                 <fileNamePattern>${LOG_FILE_PATH}/prod-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <maxFileSize>10MB</maxFileSize>
+                <maxFileSize>50MB</maxFileSize>
                 <maxHistory>30</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
             </rollingPolicy>
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                 <level>ERROR</level>
             </filter>
         </appender>
 
-        <!-- 프로덕션 환경 루트 로거: 콘솔 어펜더 제거 -->
-        <root level="ERROR">
+        <root level="INFO">
             <appender-ref ref="PROD_FILE"/>
             <appender-ref ref="PROD_ERROR_FILE"/>
         </root>
 
-        <!-- 애플리케이션 로거 -->
-        <logger name="com.example.jobstat" level="ERROR" additivity="false">
+        <logger name="com.example.jobstat" level="INFO" additivity="false">
             <appender-ref ref="PROD_FILE"/>
             <appender-ref ref="PROD_ERROR_FILE"/>
         </logger>
 
-        <!-- 외부 라이브러리 로깅 제한 -->
-        <logger name="org.springframework" level="OFF"/>
-        <logger name="org.hibernate" level="OFF"/>
-        <logger name="org.apache" level="OFF"/>
-        <logger name="io.lettuce" level="OFF"/>
-        <logger name="com.zaxxer.hikari" level="ERROR"/>
-        <logger name="org.hibernate.SQL" level="OFF"/>
-        <logger name="org.hibernate.type" level="OFF"/>
-        <logger name="org.springframework.security" level="ERROR"/>
-        <logger name="com.example.jobstat.core.security.JwtTokenFilter" level="ERROR"/>
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/> <logger name="org.apache" level="WARN"/>
+        <logger name="io.lettuce" level="WARN"/>
+        <logger name="com.zaxxer.hikari" level="WARN"/>
+        <logger name="org.springframework.security" level="WARN"/>
+        <logger name="com.example.jobstat.core.security.JwtTokenFilter" level="WARN"/>
+
     </springProfile>
 </configuration>

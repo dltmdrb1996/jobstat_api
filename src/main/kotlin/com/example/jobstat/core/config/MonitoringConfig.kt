@@ -39,15 +39,12 @@ class MonitoringConfig(
             val cpuLoad = osBean.cpuLoad * 100
 
             if (cpuLoad > CPU_THRESHOLD) {
-                // 로그 레벨 변경
 //                (LoggerFactory.getILoggerFactory() as LoggerContext).apply {
 //                    getLogger(Logger.ROOT_LOGGER_NAME).level = Level.DEBUG
 //                }
 
-                // 시스템 정보 수집
                 val systemInfo = collectSystemInfo(osBean)
 
-                // Sentry에 이벤트 전송
                 Sentry.withScope { scope ->
                     scope.level = SentryLevel.WARNING
                     scope.setExtra("cpu_usage", cpuLoad.toString())

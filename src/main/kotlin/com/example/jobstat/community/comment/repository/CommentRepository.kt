@@ -5,11 +5,19 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 internal interface CommentRepository {
-    fun findAll(pageable: Pageable): Page<Comment>
-
     fun save(comment: Comment): Comment
 
+    fun deleteById(id: Long)
+
+    fun delete(comment: Comment)
+
+    fun deleteByBoardId(boardId: Long)
+
+    fun findAll(pageable: Pageable): Page<Comment>
+
     fun findById(id: Long): Comment
+
+    fun findAllByIds(ids: List<Long>): List<Comment>
 
     fun findByBoardId(
         boardId: Long,
@@ -21,7 +29,11 @@ internal interface CommentRepository {
         pageable: Pageable,
     ): List<Comment>
 
-    fun deleteById(id: Long)
+    fun findCommentsByBoardIdAfter(
+        boardId: Long,
+        lastCommentId: Long?,
+        limit: Int,
+    ): List<Comment>
 
     fun countByBoardId(boardId: Long): Long
 
@@ -41,5 +53,11 @@ internal interface CommentRepository {
         author: String,
     ): Boolean
 
-    fun deleteByBoardId(boardId: Long)
+    fun findCommentsByAuthorAfter(
+        author: String,
+        lastCommentId: Long?,
+        limit: Int,
+    ): List<Comment>
+
+    fun existsById(id: Long): Boolean
 }

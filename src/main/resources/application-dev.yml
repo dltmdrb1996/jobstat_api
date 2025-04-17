@@ -70,13 +70,3 @@ batch:
   chunk-size: 500
   job-size: 100
 
-logging:
-  #  level:
-  #    io.lettuce.core: DEBUG
-  #    org.springframework.data.redis: DEBUG
-  file:
-    name: logs/application.log
-  logback:
-    rollingpolicy:
-      max-file-size: 10MB
-      max-history: 30

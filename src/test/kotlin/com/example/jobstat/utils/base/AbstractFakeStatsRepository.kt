@@ -3,7 +3,7 @@ package com.example.jobstat.utils.base
 import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
 import com.example.jobstat.core.base.repository.StatsMongoRepository
 import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.statistics.fake.AbstractFakeTimeSeriesRepository
+import com.example.jobstat.statistics_read.fake.AbstractFakeTimeSeriesRepository
 
 abstract class AbstractFakeStatsRepository<T : BaseStatsDocument> :
     AbstractFakeTimeSeriesRepository<T>(),

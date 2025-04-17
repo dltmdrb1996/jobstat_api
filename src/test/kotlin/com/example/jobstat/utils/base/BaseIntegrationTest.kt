@@ -4,12 +4,8 @@ import com.example.jobstat.utils.TestMetrics
 import com.example.jobstat.utils.TestUtils
 import com.example.jobstat.utils.config.DockerTestConfig
 import com.example.jobstat.utils.config.TestMongoConfig
-import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_DATABASE
-import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_PASSWORD
-import com.example.jobstat.utils.config.TestMongoConfig.Companion.MONGO_USERNAME
-import com.example.jobstat.utils.config.TestMongoConfig.Companion.mongoContainer
 import com.example.jobstat.utils.config.TestMysqlConfig
-import jakarta.transaction.Transactional
+import com.example.jobstat.utils.config.TestRedisConfig
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -21,25 +17,33 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.springframework.test.context.TestPropertySource
+import org.springframework.transaction.annotation.Transactional
 import kotlin.system.measureTimeMillis
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @ActiveProfiles("test")
-@Import(value = [TestMysqlConfig::class, TestMongoConfig::class, DockerTestConfig::class])
+@Import(
+    value = [
+        TestMysqlConfig::class,
+        TestMongoConfig::class,
+        TestRedisConfig::class,
+        DockerTestConfig::class,
+    ],
+)
 @TestPropertySource(
     properties = [
         "spring.batch.jdbc.initialize-schema=always",
         "spring.batch.job.enabled=false",
         "batch.chunk-size=2000",
         "batch.max-threads=10",
-        "jwt.secret=test-jwt-secret-key-that-is-long-enough-for-hmac-sha256", // 더 길게
+        "jwt.secret=test-jwt-secret-key-that-is-long-enough-for-hmac-sha256",
         "spring.jpa.hibernate.ddl-auto=create",
         "spring.jpa.show-sql=true",
         "spring.jpa.properties.hibernate.format_sql=true",
-        "spring.data.redis.username=default",
-        "spring.data.redis.password=default",
-        "ddns.domain=http://localhost:8080", // 테스트용 도메인 추가
+        "spring.data.redis.username=",
+        "spring.data.redis.password=",
+        "ddns.domain=http://localhost:8080",
         "spring.mail.username=test@gamil.com",
         "spring.mail.password=test-password",
         "ADMIN_USERNAME=admin",
@@ -59,27 +63,45 @@ abstract class BaseIntegrationTest {
     }
 
     companion object {
-        private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+        private val log: Logger by lazy { LoggerFactory.getLogger(BaseIntegrationTest::class.java) }
+
+        @JvmStatic
+        @DynamicPropertySource // MongoDB 동적 속성
+        fun mongoProperties(registry: DynamicPropertyRegistry) {
+            val container = TestMongoConfig.mongoContainer
+            if (!container.isRunning) {
+                log.warn("Mongo container is not running for property source setup!")
+                return
+            }
+            val host = container.host
+            val port = container.firstMappedPort
+            val database = TestMongoConfig.MONGO_DATABASE
+            val username = TestMongoConfig.MONGO_USERNAME
+            val password = TestMongoConfig.MONGO_PASSWORD
+
+            val uri = "mongodb://$username:$password@$host:$port/$database?authSource=admin"
+            registry.add("spring.data.mongodb.uri") { uri }
+            log.info("Dynamically set MongoDB URI: {}", uri)
+        }
+
+        @JvmStatic
+        @DynamicPropertySource
+        fun redisProperties(registry: DynamicPropertyRegistry) {
+            val container = TestRedisConfig.redisContainer
+            if (!container.isRunning) {
+                log.warn("Redis container is not running for property source setup!")
+                return
+            }
+            val host = container.host
+            val port = container.getMappedPort(TestRedisConfig.REDIS_PORT)
+            registry.add("spring.data.redis.host") { host }
+            registry.add("spring.data.redis.port") { port.toString() } // 포트는 문자열로 전달
+            log.info("Dynamically set Redis Host: {}, Port: {}", host, port)
+        }
     }
 }
 
 abstract class BatchOperationTestSupport : BaseIntegrationTest() {
-    companion object {
-        @JvmStatic
-        @DynamicPropertySource
-        fun mongoProperties(registry: DynamicPropertyRegistry) {
-            val host = mongoContainer.host
-            val port = mongoContainer.firstMappedPort
-            val database = MONGO_DATABASE
-            val username = MONGO_USERNAME
-            val password = MONGO_PASSWORD
-
-            // Construct the URI with credentials
-            val uri = "mongodb://$username:$password@$host:$port/$database?authSource=admin"
-            registry.add("spring.data.mongodb.uri") { uri }
-        }
-    }
-
     protected val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
     protected val executionTimes = mutableMapOf<String, Double>()
     var testStartTime: Long = 0
@@ -108,7 +130,7 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
         val timeInSeconds = timeInMillis / 1000.0
         executionTimes[operationName] = timeInSeconds
 
-        val recordsPerSecond = if (recordCount > 0) recordCount / timeInSeconds else 0.0
+        val recordsPerSecond = if (recordCount > 0 && timeInSeconds > 0) recordCount / timeInSeconds else 0.0
         return TestMetrics(operationName, recordCount, timeInSeconds, recordsPerSecond)
     }
 
@@ -139,11 +161,16 @@ abstract class BatchOperationTestSupport : BaseIntegrationTest() {
                 lastException = e
                 log.warn("Attempt $attempt failed: ${e.message}")
                 if (attempt < maxAttempts) {
-                    Thread.sleep(delayMs)
+                    try {
+                        Thread.sleep(delayMs)
+                    } catch (ie: InterruptedException) {
+                        Thread.currentThread().interrupt()
+                        throw RuntimeException("Retry interrupted", ie)
+                    }
                 }
                 attempt++
             }
         }
-        throw lastException ?: RuntimeException("Operation failed after $maxAttempts attempts")
+        throw RuntimeException("Operation failed after $maxAttempts attempts", lastException)
     }
 }

@@ -2,12 +2,12 @@ package com.example.jobstat.auth.user.repository
 
 import com.example.jobstat.auth.user.entity.*
 import com.example.jobstat.utils.base.JpaIntegrationTestSupport
+import org.hibernate.exception.ConstraintViolationException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException
 import java.time.LocalDate
 import kotlin.test.*
@@ -65,12 +65,17 @@ class RoleRepositoryTest : JpaIntegrationTestSupport() {
         @Test
         @DisplayName("중복된 이름으로 역할을 생성할 수 없다 (Unique 제약 확인)")
         fun createRoleWithDuplicateNameFails() {
-            // Given
-            saveAndGetAfterCommit(testRole) { roleRepository.save(it) }
+            // Given: 첫 번째 역할 저장 및 DB 반영 확인
+            // testRole 변수가 미리 정의되어 있다고 가정
+            val existingRoleName = testRole.name
+            saveAndGetAfterCommit(Role.create(existingRoleName)) { roleRepository.save(it) }
 
-            // When & Then
-            assertFailsWith<DataIntegrityViolationException> {
-                roleRepository.save(Role.create(testRole.name))
+            // When & Then: 동일한 이름으로 두 번째 역할 저장을 시도하고 즉시 flush
+            assertFailsWith<ConstraintViolationException> {
+                // 동일한 이름으로 새 Role 객체 생성 후 저장 시도
+                roleRepository.save(Role.create(existingRoleName))
+                // save 호출 후 즉시 flush하여 DB에 INSERT 시도 -> Unique 제약 위반 유도
+                flushAndClear() // 또는 entityManager.flush() 만 호출해도 됨
             }
         }
     }

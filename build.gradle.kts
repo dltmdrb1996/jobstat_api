@@ -46,6 +46,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.kafka:spring-kafka:3.3.4")
 
     // Database
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -106,6 +107,8 @@ dependencies {
     testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:2.1.0")
 //    testImplementation("io.mockk:mockk:1.13.16")
+
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign:4.2.1") // 실제 최신 버전 확인 필요
 
     // 컨테이너 테스트 관련
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")

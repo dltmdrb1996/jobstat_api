@@ -1,27 +1,10 @@
 package com.example.jobstat.auth.user.entity
 
 import com.example.jobstat.auth.user.UserConstants
-import com.example.jobstat.core.base.Address
-import com.example.jobstat.core.base.SoftDeleteBaseEntity
+import com.example.jobstat.core.base.SoftDeleteBaseAutoIncEntity
+import com.example.jobstat.core.state.Address
 import jakarta.persistence.*
 import java.time.LocalDate
-
-interface ReadUser {
-    val id: Long
-    val username: String
-    val email: String
-    val birthDate: LocalDate
-    val address: Address?
-    val password: String
-    val isActive: Boolean
-    val roles: Set<ReadRole>
-
-    fun getRolesString(): List<String> = roles.map { it.name }
-
-    fun hasRole(roleName: String): Boolean
-
-    fun isAdmin(): Boolean
-}
 
 @Entity
 @Table(
@@ -35,15 +18,14 @@ internal class User private constructor(
     email: String,
     password: String,
     birthDate: LocalDate,
-) : SoftDeleteBaseEntity(),
-    ReadUser {
+) : SoftDeleteBaseAutoIncEntity() {
     @Column(
         name = "username",
         nullable = false,
         unique = true,
         length = UserConstants.MAX_USERNAME_LENGTH,
     )
-    override var username: String = username
+    var username: String = username
         protected set
 
     @Column(
@@ -52,7 +34,7 @@ internal class User private constructor(
         unique = true,
         length = UserConstants.MAX_EMAIL_LENGTH,
     )
-    override var email: String = email
+    var email: String = email
         protected set
 
     @Column(
@@ -60,19 +42,19 @@ internal class User private constructor(
         nullable = false,
         length = UserConstants.MAX_PASSWORD_LENGTH,
     )
-    override var password: String = password
+    var password: String = password
         protected set
 
     @Column(name = "birth_date", nullable = false)
-    override var birthDate: LocalDate = birthDate
+    var birthDate: LocalDate = birthDate
         protected set
 
     @Embedded
-    override var address: Address? = null
+    var address: Address? = null
         protected set
 
     @Column(name = "is_active", nullable = false)
-    override var isActive: Boolean = true
+    var isActive: Boolean = true
         protected set
 
     @OneToMany(
@@ -83,12 +65,12 @@ internal class User private constructor(
     )
     private val userRoles: MutableSet<UserRole> = mutableSetOf()
 
-    override val roles: Set<Role>
+    val roles: Set<Role>
         get() = userRoles.map { it.role }.toSet()
 
-    override fun hasRole(roleName: String): Boolean = roles.any { it.name.equals(roleName, ignoreCase = true) }
+    fun hasRole(roleName: String): Boolean = roles.any { it.name.equals(roleName, ignoreCase = true) }
 
-    override fun isAdmin(): Boolean = hasRole("ADMIN")
+    fun isAdmin(): Boolean = hasRole("ADMIN")
 
     fun hasRole(role: Role): Boolean = userRoles.any { it.role.id == role.id }
 
@@ -143,6 +125,8 @@ internal class User private constructor(
     fun disableAccount() {
         isActive = false
     }
+
+    fun getRolesString(): List<String> = roles.map { it.name }
 
     override fun restore() {
         super.restore()

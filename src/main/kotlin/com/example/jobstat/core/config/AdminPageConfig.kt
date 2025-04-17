@@ -42,7 +42,6 @@ class AdminPageConfig(
         val user =
             User
                 .withUsername(adminUsername)
-                // bcrypt 암호화 적용
                 .password(passwordUtil.encode(adminPassword))
                 .roles("ADMIN")
                 .build()

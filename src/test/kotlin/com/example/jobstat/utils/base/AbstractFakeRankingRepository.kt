@@ -3,7 +3,7 @@ package com.example.jobstat.utils.base
 import com.example.jobstat.core.base.mongo.ranking.BaseRankingDocument
 import com.example.jobstat.core.base.mongo.ranking.RankingEntry
 import com.example.jobstat.core.base.repository.BaseRankingRepository
-import com.example.jobstat.statistics.fake.AbstractFakeTimeSeriesRepository
+import com.example.jobstat.statistics_read.fake.AbstractFakeTimeSeriesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

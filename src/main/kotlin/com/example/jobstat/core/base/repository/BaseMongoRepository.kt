@@ -49,7 +49,7 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
     private val entityInformation: MongoEntityInformation<T, ID>,
     private val mongoOperations: MongoOperations,
 ) : SimpleMongoRepository<T, ID>(entityInformation, mongoOperations),
-    BaseMongoRepository<T, ID> {
+    com.example.jobstat.core.base.repository.BaseMongoRepository<T, ID> {
     companion object {
         const val OPTIMAL_BATCH_SIZE = 2000
         private val UNORDERED_BULK_OPTIONS =
@@ -76,7 +76,7 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
                     Filters.lte("createdAt", end),
                 ),
             ).hintString("createdAt") // createdAt 필드에 대해 {createdAt:1} 인덱스가 있다고 가정
-            .batchSize(OPTIMAL_BATCH_SIZE)
+            .batchSize(com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.OPTIMAL_BATCH_SIZE)
             // noCursorTimeout는 특별한 이유가 없으면 제거하여 리소스 점유 줄임
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
@@ -96,7 +96,7 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
             .find(Filters.`in`("_id", objectIds))
             .sort(Sorts.ascending("_id"))
             .hintString("_id_") // _id 인덱스 사용 명시
-            .batchSize(OPTIMAL_BATCH_SIZE)
+            .batchSize(com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.OPTIMAL_BATCH_SIZE)
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
@@ -112,7 +112,7 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
         val findIterable =
             collection
                 .find(filter)
-                .batchSize(OPTIMAL_BATCH_SIZE)
+                .batchSize(com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.OPTIMAL_BATCH_SIZE)
 
         // 정렬이 요청된 경우 정렬 적용
         val sortBson = queryToSort(query)
@@ -137,7 +137,7 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
             .find()
             .sort(Sorts.ascending("_id"))
             .hintString("_id_")
-            .batchSize(OPTIMAL_BATCH_SIZE)
+            .batchSize(com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.OPTIMAL_BATCH_SIZE)
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
@@ -183,7 +183,10 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
                 )
             }
 
-        collection.bulkWrite(writes, UNORDERED_BULK_OPTIONS)
+        collection.bulkWrite(
+            writes,
+            com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.UNORDERED_BULK_OPTIONS,
+        )
         return entities
     }
 
@@ -205,7 +208,10 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
                 )
             }
 
-        return collection.bulkWrite(writes, UNORDERED_BULK_OPTIONS)
+        return collection.bulkWrite(
+            writes,
+            com.example.jobstat.core.base.repository.BaseMongoRepositoryImpl.Companion.UNORDERED_BULK_OPTIONS,
+        )
     }
 
     override fun bulkDelete(ids: List<ID>): Int {

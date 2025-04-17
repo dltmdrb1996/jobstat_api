@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.user.repository
 
 import com.example.jobstat.auth.user.entity.User
-import com.example.jobstat.core.extension.orThrowNotFound
+import com.example.jobstat.core.global.extension.orThrowNotFound
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
@@ -26,21 +26,17 @@ internal class UserRepositoryImpl(
 ) : UserRepository {
     override fun save(user: User): User = userJpaRepository.save(user)
 
-    override fun findById(id: Long): User = userJpaRepository.findById(id).orThrowNotFound("아이디", id)
+    override fun findById(id: Long): User = userJpaRepository.findById(id).orThrowNotFound("User", id)
 
-    override fun findByUsername(username: String): User = userJpaRepository.findByUsername(username).orThrowNotFound("사용자 이름", username)
+    override fun findByUsername(username: String): User = userJpaRepository.findByUsername(username).orThrowNotFound("User", username)
 
-    override fun findByEmail(email: String): User = userJpaRepository.findByEmail(email).orThrowNotFound("이메일", email)
+    override fun findByEmail(email: String): User = userJpaRepository.findByEmail(email).orThrowNotFound("User", email)
 
     override fun findAll(): List<User> = userJpaRepository.findAll()
 
-    override fun deleteById(id: Long) {
-        userJpaRepository.deleteById(id)
-    }
+    override fun deleteById(id: Long) = userJpaRepository.deleteById(id)
 
-    override fun delete(user: User) {
-        userJpaRepository.delete(user)
-    }
+    override fun delete(user: User) = userJpaRepository.delete(user)
 
     override fun existsById(id: Long): Boolean = userJpaRepository.existsById(id)
 
@@ -48,9 +44,7 @@ internal class UserRepositoryImpl(
 
     override fun existsByEmail(email: String): Boolean = userJpaRepository.existsByEmail(email)
 
-    override fun findByIdWithRoles(id: Long): User = userJpaRepository.findByIdWithRoles(id).orThrowNotFound("아이디", id)
+    override fun findByIdWithRoles(id: Long): User = userJpaRepository.findByIdWithRoles(id).orThrowNotFound("User", id)
 
-    override fun deleteAll() {
-        userJpaRepository.deleteAll()
-    }
+    override fun deleteAll() = userJpaRepository.deleteAll()
 }

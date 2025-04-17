@@ -42,7 +42,6 @@ class FakeStringRedisTemplate : StringRedisTemplate() {
             store[key] = value
         }
 
-        // ValueOperations의 나머지 메서드들
         override fun setIfAbsent(
             key: String,
             value: String,

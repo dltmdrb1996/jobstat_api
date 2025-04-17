@@ -1,7 +1,6 @@
 package com.example.jobstat.community.board.service
 
 import com.example.jobstat.community.board.entity.BoardCategory
-import com.example.jobstat.community.board.entity.ReadBoardCategory
 import com.example.jobstat.community.board.repository.CategoryRepository
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
@@ -13,38 +12,41 @@ import org.springframework.transaction.annotation.Transactional
 internal class CategoryServiceImpl(
     private val categoryRepository: CategoryRepository,
 ) : CategoryService {
-    companion object {
-        private const val ERROR_DUPLICATE_CATEGORY = "이미 존재하는 카테고리 이름입니다"
-    }
-
     override fun createCategory(
         name: String,
         displayName: String,
         description: String,
-    ): ReadBoardCategory {
+    ): BoardCategory {
         if (categoryRepository.existsByName(name)) {
-            throw AppException.fromErrorCode(
-                ErrorCode.DUPLICATE_RESOURCE,
-                ERROR_DUPLICATE_CATEGORY,
-            )
+            throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE)
         }
-        return categoryRepository.save(BoardCategory.create(name, displayName, description))
+        return BoardCategory
+            .create(name, displayName, description)
+            .let(categoryRepository::save)
     }
 
     @Transactional(readOnly = true)
-    override fun getCategoryById(id: Long): ReadBoardCategory = categoryRepository.findById(id)
+    override fun getCategoryById(id: Long): BoardCategory = categoryRepository.findById(id)
 
     @Transactional(readOnly = true)
-    override fun getAllCategories(): List<ReadBoardCategory> = categoryRepository.findAll()
+    override fun getAllCategories(): List<BoardCategory> = categoryRepository.findAll()
 
     override fun updateCategory(
         id: Long,
         name: String,
         displayName: String,
         description: String,
-    ): ReadBoardCategory {
+    ): BoardCategory {
         val category = categoryRepository.findById(id)
-        category.updateCategory(name, displayName, description)
+
+        if (name != category.name && categoryRepository.existsByName(name)) {
+            throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "카테고리 이름 '$name'은(는) 이미 다른 카테고리에 존재합니다.")
+        }
+
+        category.apply {
+            updateCategory(name, displayName, description)
+        }
+
         return categoryRepository.save(category)
     }
 

@@ -15,32 +15,35 @@ internal class LoginAttemptServiceImpl(
             ?: throw IllegalStateException("Cache '${UserConstants.LOGIN_ATTEMPTS_CACHE_NAME}' not found")
 
     override fun incrementFailedAttempts(username: String) {
-        val attempts = getAttempts(username)
-        val attemptInfo =
+        getAttempts(username).let { attempts ->
             LoginAttemptInfo(
                 count = attempts.count + 1,
                 lastFailedAt = Instant.now(),
-                blockedUntil =
-                    if (attempts.count + 1 >= UserConstants.MAX_LOGIN_ATTEMPTS) {
-                        Instant.now().plusSeconds(UserConstants.LOGIN_LOCK_DURATION_MINUTES.toLong() * 60)
-                    } else {
-                        null
-                    },
-            )
-        cache.put(username, attemptInfo)
-    }
-
-    override fun isAccountLocked(username: String): Boolean {
-        val attempts = getAttempts(username)
-        return when {
-            attempts.blockedUntil == null -> false
-            attempts.blockedUntil.isBefore(Instant.now()) -> {
-                resetAttempts(username)
-                false
+                blockedUntil = calculateBlockedUntil(attempts.count + 1),
+            ).also {
+                cache.put(username, it)
             }
-            else -> true
         }
     }
+
+    private fun calculateBlockedUntil(failCount: Int): Instant? =
+        if (failCount >= UserConstants.MAX_LOGIN_ATTEMPTS) {
+            Instant.now().plusSeconds(UserConstants.LOGIN_LOCK_DURATION_MINUTES.toLong() * 60)
+        } else {
+            null
+        }
+
+    override fun isAccountLocked(username: String): Boolean =
+        getAttempts(username).let { attempts ->
+            when {
+                attempts.blockedUntil == null -> false
+                attempts.blockedUntil.isBefore(Instant.now()) -> {
+                    resetAttempts(username)
+                    false
+                }
+                else -> true
+            }
+        }
 
     override fun resetAttempts(username: String) {
         cache.evict(username)
