@@ -14,10 +14,6 @@ internal class CommentServiceImpl(
     private val commentRepository: CommentRepository,
     private val boardRepository: BoardRepository,
 ) : CommentService {
-    // ===================================================
-    // 댓글 생성 및 수정/삭제 관련 메소드
-    // ===================================================
-
     @Transactional
     override fun createComment(
         boardId: Long,
@@ -25,9 +21,8 @@ internal class CommentServiceImpl(
         author: String,
         password: String?,
         userId: Long?,
-    ): Comment {
-        // 게시글 조회 및 댓글 생성
-        return boardRepository.findById(boardId).let { board ->
+    ): Comment =
+        boardRepository.findById(boardId).let { board ->
             Comment
                 .create(
                     content = content,
@@ -37,7 +32,6 @@ internal class CommentServiceImpl(
                     userId = userId,
                 ).let(commentRepository::save)
         }
-    }
 
     @Transactional
     override fun updateComment(
@@ -56,17 +50,9 @@ internal class CommentServiceImpl(
         }
     }
 
-    // ===================================================
-    // 댓글 조회 관련 메소드 (ID 기반)
-    // ===================================================
-
     override fun getCommentById(id: Long): Comment = commentRepository.findById(id)
 
     override fun getCommentsByIds(ids: List<Long>): List<Comment> = commentRepository.findAllByIds(ids)
-
-    // ===================================================
-    // 댓글 조회 관련 메소드 (게시글 기반)
-    // ===================================================
 
     override fun getCommentsByBoardId(
         boardId: Long,
@@ -80,10 +66,6 @@ internal class CommentServiceImpl(
     ): List<Comment> = commentRepository.findCommentsByBoardIdAfter(boardId, lastCommentId, limit)
 
     override fun countCommentsByBoardId(boardId: Long): Long = commentRepository.countByBoardId(boardId)
-
-    // ===================================================
-    // 댓글 조회 관련 메소드 (작성자 기반)
-    // ===================================================
 
     override fun getCommentsByAuthor(
         author: String,

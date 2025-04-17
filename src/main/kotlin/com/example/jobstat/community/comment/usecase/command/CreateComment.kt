@@ -17,9 +17,6 @@ import jakarta.validation.constraints.Size
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-/**
- * 댓글 생성 유스케이스
- */
 @Service
 internal class CreateComment(
     private val commentService: CommentService,
@@ -29,10 +26,7 @@ internal class CreateComment(
     validator: Validator,
 ) : ValidUseCase<CreateComment.ExecuteRequest, CreateComment.Response>(validator) {
     @Transactional
-    override fun invoke(request: ExecuteRequest): Response {
-        // super.invoke는 내부적으로 validate(request) 후 execute(request)를 호출합니다.
-        return super.invoke(request)
-    }
+    override fun invoke(request: ExecuteRequest): Response = super.invoke(request)
 
     override fun execute(request: ExecuteRequest): Response {
         val userId = securityUtils.getCurrentUserId()
@@ -57,9 +51,6 @@ internal class CreateComment(
         return Response.from(createdComment)
     }
 
-    /**
-     * 비로그인 상태에서 비밀번호 설정 여부 검증
-     */
     private fun validatePasswordIfNotLoggedIn(
         userId: Long?,
         password: String?,
@@ -72,9 +63,6 @@ internal class CreateComment(
         }
     }
 
-    /**
-     * 비밀번호 처리 (로그인 상태면 null, 비로그인 상태면 암호화)
-     */
     private fun processPassword(
         userId: Long?,
         password: String?,
@@ -92,18 +80,12 @@ internal class CreateComment(
             maxLength = CommentConstants.MAX_CONTENT_LENGTH,
             required = true,
         )
-        @field:Size(
-            min = CommentConstants.MIN_CONTENT_LENGTH,
-            max = CommentConstants.MAX_CONTENT_LENGTH,
-            message = "댓글 내용은 ${CommentConstants.MIN_CONTENT_LENGTH}~${CommentConstants.MAX_CONTENT_LENGTH}자 사이여야 합니다",
-        )
         val content: String,
         @Schema(
             description = "작성자 이름",
             example = "홍길동",
             required = true,
         )
-        @field:NotBlank(message = "작성자 이름은 필수입니다")
         val author: String,
         @Schema(
             description = "비밀번호 (비로그인 사용자만 필요)",
@@ -111,11 +93,6 @@ internal class CreateComment(
             nullable = true,
             minLength = CommentConstants.MIN_PASSWORD_LENGTH,
             maxLength = CommentConstants.MAX_PASSWORD_LENGTH,
-        )
-        @field:Size(
-            min = CommentConstants.MIN_PASSWORD_LENGTH,
-            max = CommentConstants.MAX_PASSWORD_LENGTH,
-            message = "비밀번호는 ${CommentConstants.MIN_PASSWORD_LENGTH}~${CommentConstants.MAX_PASSWORD_LENGTH}자 사이여야 합니다",
         )
         val password: String?,
     ) {
@@ -166,8 +143,20 @@ internal class CreateComment(
 
     data class ExecuteRequest(
         val boardId: Long,
+        @field:NotBlank(message = "댓글 내용은 공백만으로 이루어질 수 없습니다")
+        @field:Size(
+            min = CommentConstants.MIN_CONTENT_LENGTH,
+            max = CommentConstants.MAX_CONTENT_LENGTH,
+            message = "댓글 내용은 ${CommentConstants.MIN_CONTENT_LENGTH}~${CommentConstants.MAX_CONTENT_LENGTH}자 사이여야 합니다",
+        )
         val content: String,
+        @field:NotBlank(message = "작성자 이름은 필수입니다")
         val author: String,
+        @field:Size(
+            min = CommentConstants.MIN_PASSWORD_LENGTH,
+            max = CommentConstants.MAX_PASSWORD_LENGTH,
+            message = "비밀번호는 ${CommentConstants.MIN_PASSWORD_LENGTH}~${CommentConstants.MAX_PASSWORD_LENGTH}자 사이여야 합니다",
+        )
         val password: String?,
     )
 }

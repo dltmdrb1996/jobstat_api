@@ -9,8 +9,8 @@ import org.springframework.data.redis.core.script.RedisScript
 class ReadSideLuaScriptConfig {
     companion object {
         const val SCRIPT_RESULT_SUCCESS: Long = 1L
-        const val SCRIPT_RESULT_SKIPPED: Long = 0L // 예: 오래된 이벤트
-        const val SCRIPT_RESULT_ERROR: Long = -1L // 스크립트 내부 로직 오류 등 (선택적)
+        const val SCRIPT_RESULT_SKIPPED: Long = 0L
+        const val SCRIPT_RESULT_ERROR: Long = -1L
     }
 
     @Bean
@@ -22,7 +22,7 @@ class ReadSideLuaScriptConfig {
             return redis.call('INCRBY', KEYS[1], tonumber(ARGV[1]))
             """.trimIndent(),
         )
-        script.setResultType(Long::class.java) // 결과는 Long
+        script.setResultType(Long::class.java)
         return script
     }
 
@@ -40,13 +40,13 @@ class ReadSideLuaScriptConfig {
             return new
             """.trimIndent(),
         )
-        script.setResultType(Long::class.java) // 결과는 Long
+        script.setResultType(Long::class.java)
         return script
     }
 
     @Bean
-    fun cursorPaginationScript(): RedisScript<List<*>> { // 반환 타입은 List<String>이지만, 제네릭 문제로 List<*> 사용 후 캐스팅
-        val script = DefaultRedisScript<List<*>>() // 또는 List::class.java
+    fun cursorPaginationScript(): RedisScript<List<*>> {
+        val script = DefaultRedisScript<List<*>>()
         script.setScriptText(
             """
             local rank = redis.call('ZREVRANK', KEYS[1], ARGV[1])
@@ -54,13 +54,13 @@ class ReadSideLuaScriptConfig {
             return redis.call('ZREVRANGE', KEYS[1], rank + 1, rank + tonumber(ARGV[2]))
             """.trimIndent(),
         )
-        script.setResultType(List::class.java) // Redis는 List를 반환
+        script.setResultType(List::class.java)
         return script
     }
 
     @Bean
     fun addCommentIfScoreDiffScript(): RedisScript<Long> {
-        val script = DefaultRedisScript<Long>() // ZADD 결과(추가된 수) 반환
+        val script = DefaultRedisScript<Long>()
         script.setScriptText(
             """
             -- KEYS[1]: commentListKey, ARGV[1]: score, ARGV[2]: member, ARGV[3]: limit
@@ -101,9 +101,9 @@ class ReadSideLuaScriptConfig {
 
     @Bean
     fun applyBoardCreationScript(): RedisScript<Long> {
-        // 외부 파일 사용 권장: script.setLocation(ClassPathResource("lua/applyBoardCreation.lua"))
         val script = DefaultRedisScript<Long>()
-        script.setScriptText("""
+        script.setScriptText(
+            """
             -- KEYS[1]: detailKey, KEYS[2]: allListKey, KEYS[3]: categoryListKey(없으면 ""), 
             -- KEYS[4]: countKey, KEYS[5]: eventTsKey
             -- ARGV[1]: boardJson, ARGV[2]: boardIdStr, ARGV[3]: categoryIdStr(없으면 ""), 
@@ -130,7 +130,8 @@ class ReadSideLuaScriptConfig {
             redis.call('EXPIRE', eventTsKey, tonumber(ARGV[8]))
 
             return 1 -- Success
-        """.trimIndent())
+            """.trimIndent(),
+        )
         script.resultType = Long::class.java
         return script
     }
@@ -138,7 +139,8 @@ class ReadSideLuaScriptConfig {
     @Bean
     fun applyBoardUpdateScript(): RedisScript<Long> {
         val script = DefaultRedisScript<Long>()
-        script.setScriptText("""
+        script.setScriptText(
+            """
             -- KEYS[1]: detailKey, KEYS[2]: eventTsKey
             -- ARGV[1]: updatedBoardJson, ARGV[2]: eventTs, ARGV[3]: tsTtlSeconds
             
@@ -154,7 +156,8 @@ class ReadSideLuaScriptConfig {
             redis.call('EXPIRE', eventTsKey, tonumber(ARGV[3]))
             
             return 1 -- Success
-         """.trimIndent())
+            """.trimIndent(),
+        )
         script.resultType = Long::class.java
         return script
     }
@@ -162,7 +165,8 @@ class ReadSideLuaScriptConfig {
     @Bean
     fun applyBoardDeletionScript(): RedisScript<Long> {
         val script = DefaultRedisScript<Long>()
-        script.setScriptText("""
+        script.setScriptText(
+            """
             -- KEYS[1]: detailKey, KEYS[2]: allListKey, KEYS[3]: categoryListKey(없으면 ""), 
             -- KEYS[4]: countKey, KEYS[5]: eventTsKey, 
             -- KEYS[6..N]: 연관된 댓글 키들 (선택적 - 댓글 동시 삭제 시)
@@ -189,18 +193,21 @@ class ReadSideLuaScriptConfig {
             redis.call('DEL', eventTsKey) -- 타임스탬프 키 제거
 
             return 1 -- Success
-        """.trimIndent())
+            """.trimIndent(),
+        )
         script.resultType = Long::class.java
         return script
     }
 
     @Bean fun applyBoardLikeUpdateScript(): RedisScript<Long> = applyBoardUpdateScript()
+
     @Bean fun applyBoardViewUpdateScript(): RedisScript<Long> = applyBoardUpdateScript()
 
     @Bean
     fun applyBoardRankingUpdateScript(): RedisScript<Long> {
         val script = DefaultRedisScript<Long>()
-        script.setScriptText("""
+        script.setScriptText(
+            """
             -- KEYS[1]: rankingKey, KEYS[2]: eventTsKey
             -- ARGV[1]: eventTs, ARGV[2]: tsTtlSeconds, ARGV[3]: rankingLimit, 
             -- ARGV[4..N]: boardId1, score1, boardId2, score2, ...
@@ -231,17 +238,17 @@ class ReadSideLuaScriptConfig {
             redis.call('EXPIRE', eventTsKey, tonumber(ARGV[2]))
 
             return 1 -- Success
-        """.trimIndent())
+            """.trimIndent(),
+        )
         script.resultType = Long::class.java
         return script
     }
 
-    // --- Comment Scripts (3개) ---
-
     @Bean
     fun applyCommentCreationScript(): RedisScript<Long> {
         val script = DefaultRedisScript<Long>()
-        script.setScriptText("""
+        script.setScriptText(
+            """
             -- KEYS[1]: commentDetailKey, KEYS[2]: boardCommentListKey, KEYS[3]: boardCommentCountKey, 
             -- KEYS[4]: totalCommentCountKey, KEYS[5]: commentEventTsKey, 
             -- KEYS[6]: boardDetailKey(게시글 댓글 수 업데이트용), KEYS[7]: boardEventTsKey(게시글 업데이트 확인용)
@@ -249,10 +256,10 @@ class ReadSideLuaScriptConfig {
             -- ARGV[6]: commentListLimit, ARGV[7]: tsTtlSeconds, ARGV[8]: updatedBoardJson (게시글 업데이트 필요시)
             
             local commentEventTsKey = KEYS[5]
-            local eventTs = tonumber(ARGV[5])
+            local eventTs = tonumber(ARGV[5]) -- *** eventTs 변수 정의 추가 ***
             local currentTs = tonumber(redis.call('HGET', commentEventTsKey, 'ts') or '0')
             if currentTs >= eventTs then return 0 end -- Skip
-
+            
             -- 1. 댓글 상세 저장
             redis.call('SET', KEYS[1], ARGV[1])
             -- 2. 게시글 댓글 목록 추가
@@ -261,24 +268,26 @@ class ReadSideLuaScriptConfig {
             -- 3. 카운터 증가
             redis.call('INCR', KEYS[3]) -- 게시글별 댓글 수
             redis.call('INCR', KEYS[4]) -- 전체 댓글 수
-
+            
             -- 4. 게시글 상세 정보 업데이트 (댓글 수) - 선택적
-            if KEYS[6] and ARGV[8] then
-                 -- 게시글의 eventTs도 확인하여 최신 상태일 때만 업데이트 (선택적 강화)
-                 local boardEventTsKey = KEYS[7]
-                 local boardCurrentTs = tonumber(redis.call('HGET', boardEventTsKey, 'ts') or '0')
-                 -- 댓글 이벤트가 게시글의 마지막 처리 이벤트보다 최신일 경우 갱신 시도 가능
-                 -- (주의: 이 로직은 게시글 업데이트 시나리오와 충돌 가능성 있으므로 정책 재검토 필요)
-                 -- 여기서는 게시글 eventTs 체크는 생략하고 무조건 업데이트 시도
-                 redis.call('SET', KEYS[6], ARGV[8])
+            if ARGV[8] ~= '' and ARGV[8] ~= nil then
+                local boardEventTsKey = KEYS[7]
+                local boardCurrentTs = tonumber(redis.call('HGET', boardEventTsKey, 'ts') or '0')
+                if eventTs > boardCurrentTs then
+                     redis.call('SET', KEYS[6], ARGV[8]) -- 게시글 상세 업데이트 (댓글 수, eventTs 포함)
+                     redis.call('HSET', boardEventTsKey, 'ts', eventTs) -- 게시글 TS 추적 정보도 업데이트
+                     -- 게시글 TS 키의 TTL 설정 (댓글 TS TTL인 ARGV[7] 사용 - 정책 확인 필요)
+                     redis.call('EXPIRE', boardEventTsKey, tonumber(ARGV[7]))
+                end
             end
-
+            
             -- 5. 댓글 이벤트 타임스탬프 업데이트
             redis.call('HSET', commentEventTsKey, 'ts', eventTs)
             redis.call('EXPIRE', commentEventTsKey, tonumber(ARGV[7]))
-
+            
             return 1 -- Success
-        """.trimIndent())
+            """.trimIndent(),
+        )
         script.resultType = Long::class.java
         return script
     }
@@ -286,7 +295,8 @@ class ReadSideLuaScriptConfig {
     @Bean
     fun applyCommentUpdateScript(): RedisScript<Long> {
         val script = DefaultRedisScript<Long>()
-        script.setScriptText("""
+        script.setScriptText(
+            """
             -- KEYS[1]: commentDetailKey, KEYS[2]: commentEventTsKey
             -- ARGV[1]: updatedCommentJson, ARGV[2]: eventTs, ARGV[3]: tsTtlSeconds
             
@@ -302,7 +312,8 @@ class ReadSideLuaScriptConfig {
             redis.call('EXPIRE', eventTsKey, tonumber(ARGV[3]))
             
             return 1 -- Success
-         """.trimIndent())
+            """.trimIndent(),
+        )
         script.resultType = Long::class.java
         return script
     }
@@ -310,17 +321,18 @@ class ReadSideLuaScriptConfig {
     @Bean
     fun applyCommentDeletionScript(): RedisScript<Long> {
         val script = DefaultRedisScript<Long>()
-        script.setScriptText("""
+        script.setScriptText(
+            """
             -- KEYS[1]: commentDetailKey, KEYS[2]: boardCommentListKey, KEYS[3]: boardCommentCountKey, 
             -- KEYS[4]: totalCommentCountKey, KEYS[5]: commentEventTsKey, 
             -- KEYS[6]: boardDetailKey(게시글 댓글 수 업데이트용), KEYS[7]: boardEventTsKey(게시글 업데이트 확인용)
             -- ARGV[1]: commentIdStr, ARGV[2]: boardIdStr, ARGV[3]: eventTs, ARGV[4]: updatedBoardJson (게시글 업데이트 필요시)
 
             local commentEventTsKey = KEYS[5]
-            local eventTs = tonumber(ARGV[3])
+            local eventTs = tonumber(ARGV[3]) -- *** eventTs 변수 정의 추가 ***
             local currentTs = tonumber(redis.call('HGET', commentEventTsKey, 'ts') or '0')
             if currentTs >= eventTs then return 0 end -- Skip
-
+            
             -- 1. 댓글 상세 삭제
             redis.call('DEL', KEYS[1])
             -- 2. 게시글 댓글 목록에서 제거
@@ -330,18 +342,24 @@ class ReadSideLuaScriptConfig {
             if bcCount < 0 then redis.call('SET', KEYS[3], '0') end
             local tcCount = redis.call('DECR', KEYS[4])
             if tcCount < 0 then redis.call('SET', KEYS[4], '0') end
-
+            
             -- 4. 게시글 상세 정보 업데이트 (댓글 수) - 선택적
-            if KEYS[6] and ARGV[4] then
-                 -- 댓글 삭제는 비교적 안전하게 게시글 업데이트 가능 (게시글 eventTs 체크 생략)
-                 redis.call('SET', KEYS[6], ARGV[4])
+            if ARGV[4] ~= '' and ARGV[4] ~= nil then
+                local boardEventTsKey = KEYS[7]
+                local boardCurrentTs = tonumber(redis.call('HGET', boardEventTsKey, 'ts') or '0')
+                if eventTs > boardCurrentTs then
+                     redis.call('SET', KEYS[6], ARGV[4]) -- 게시글 상세 업데이트 (댓글 수, eventTs 포함)
+                     redis.call('HSET', boardEventTsKey, 'ts', eventTs) -- 게시글 TS 추적 정보도 업데이트
+                     -- *** 게시글 TS 키의 TTL 설정 로직 없음 (정책 확정 필요) ***
+                end
             end
-
+            
             -- 5. 댓글 이벤트 타임스탬프 키 삭제
-            redis.call('DEL', commentEventTsKey) 
-
+            redis.call('DEL', commentEventTsKey)
+            
             return 1 -- Success
-        """.trimIndent())
+            """.trimIndent(),
+        )
         script.resultType = Long::class.java
         return script
     }

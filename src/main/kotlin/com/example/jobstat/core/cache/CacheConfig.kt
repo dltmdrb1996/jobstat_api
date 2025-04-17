@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import java.time.Duration
 
-// @EnableScheduling
 @EnableCaching
 @Configuration
 class CacheConfig : CachingConfigurer {
@@ -31,9 +30,6 @@ class CacheConfig : CachingConfigurer {
         const val LOGIN_ATTEMPTS_CACHE = "loginAttempts"
     }
 
-    /**
-     * Spring CacheManager - 애노테이션 기반 캐싱 및 StatsBulkCacheManager에서 공유해서 사용
-     */
     @Bean
     override fun cacheManager(): CacheManager {
         // SimpleCacheManager 생성
@@ -68,32 +64,8 @@ class CacheConfig : CachingConfigurer {
             ),
         )
 
-        // 모든 캐시를 CacheManager에 등록
         simpleCacheManager.setCaches(caches)
 
         return simpleCacheManager
     }
-
-//    /**
-//     * 캐시 통계 로깅 기능
-//     */
-//    @Scheduled(fixedRate = 5000) // 1분마다 로깅
-//    fun logCacheStats() {
-//        val cacheManager = cacheManager()
-//        cacheManager.cacheNames.forEach { cacheName ->
-//            val cache = cacheManager.getCache(cacheName)
-//            if (cache is CaffeineCache) {
-//                val stats = cache.nativeCache.stats()
-//                log.info(
-//                    """
-//                    캐시 '$cacheName' 통계:
-//                    - 히트: ${stats.hitCount()}
-//                    - 미스: ${stats.missCount()}
-//                    - 히트율: ${String.format("%.2f", stats.hitRate() * 100)}%
-//                    - 제거: ${stats.evictionCount()}
-//                    """.trimIndent(),
-//                )
-//            }
-//        }
-//    }
 }

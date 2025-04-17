@@ -7,7 +7,6 @@ import java.time.LocalDateTime
 
 @Repository
 interface OutboxRepository : JpaRepository<Outbox, Long> {
-    // 특정 시간 이전에 생성된 처리되지 않은 이벤트 조회
     fun findByRetryCountLessThanAndCreatedAtLessThanEqual(
         retryCount: Int,
         createdAt: LocalDateTime,

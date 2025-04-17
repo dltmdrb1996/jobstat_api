@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl
 import org.springframework.scheduling.annotation.EnableAsync
 
 @Configuration
-@EnableAsync // @Async 어노테이션 활성화
+@EnableAsync
 class MailConfig(
     private val environment: Environment,
 ) {

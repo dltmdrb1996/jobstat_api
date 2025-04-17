@@ -26,7 +26,7 @@ internal class BoardCategory protected constructor(
         protected set
 
     @OneToMany(mappedBy = "category", cascade = [CascadeType.ALL], orphanRemoval = true)
-    var boards: MutableSet<com.example.jobstat.community.board.entity.Board> = mutableSetOf()
+    var boards: MutableSet<Board> = mutableSetOf()
         protected set
 
     fun updateName(name: String) {

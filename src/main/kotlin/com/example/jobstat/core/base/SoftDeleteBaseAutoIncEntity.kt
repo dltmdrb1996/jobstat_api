@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @MappedSuperclass
-abstract class SoftDeleteBaseAutoIncEntity : BaseAutoIncEntity() {
+abstract class SoftDeleteBaseAutoIncEntity : AuditableEntitySnow() {
     @Column(nullable = false)
     protected var _deleted: Boolean = false
 

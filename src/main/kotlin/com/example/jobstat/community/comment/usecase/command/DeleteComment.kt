@@ -16,11 +16,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-/**
- * 댓글 삭제 유스케이스
- * 로그인 사용자는 자신의 댓글만 삭제 가능
- * 비로그인 사용자는 비밀번호 검증 후 삭제 가능
- */
 @Service
 internal class DeleteComment(
     private val commentService: CommentService,
@@ -38,6 +33,8 @@ internal class DeleteComment(
         // 댓글 조회 및 권한 검증
         val comment = commentService.getCommentById(request.commentId)
 
+        log.info("password: ${request.password}")
+        log.info("comment.password: ${comment.password}")
         // 접근 권한 검증
         validatePermission(comment, request.password)
 
@@ -54,9 +51,6 @@ internal class DeleteComment(
         return Response(success = true)
     }
 
-    /**
-     * 댓글 삭제 권한 검증
-     */
     private fun validatePermission(
         comment: Comment,
         password: String?,
@@ -70,9 +64,6 @@ internal class DeleteComment(
         }
     }
 
-    /**
-     * 비회원 댓글 삭제 권한 검증 (비밀번호 검증)
-     */
     private fun validatePasswordAccess(
         comment: Comment,
         password: String?,
@@ -95,9 +86,6 @@ internal class DeleteComment(
         log.info("[DeleteComment] 비회원 댓글 ${comment.id}번이 비밀번호로 삭제되었습니다")
     }
 
-    /**
-     * 회원 댓글 삭제 권한 검증
-     */
     private fun validateMemberAccess(comment: Comment) {
         // 현재 사용자 ID 확인
         val currentUserId =

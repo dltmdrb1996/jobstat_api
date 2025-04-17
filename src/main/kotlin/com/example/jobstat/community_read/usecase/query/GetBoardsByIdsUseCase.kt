@@ -10,10 +10,6 @@ import jakarta.validation.constraints.Size
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
-/**
- * 게시글 ID 목록으로 게시글 조회 유스케이스
- * 여러 게시글 ID를 한 번에 조회하여 효율적인 데이터 조회 지원
- */
 @Service
 class GetBoardsByIdsUseCase(
     private val communityReadService: CommunityReadService,
@@ -21,31 +17,18 @@ class GetBoardsByIdsUseCase(
 ) : ValidUseCase<GetBoardsByIdsUseCase.Request, GetBoardsByIdsUseCase.Response>(validator) {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    // ===================================================
-    // 유스케이스 실행 메소드
-    // ===================================================
-
     override fun execute(request: Request): Response {
         log.info("게시글 ID 목록으로 조회 요청: boardIds=${request.boardIds}")
 
-        // 게시글 조회
         val boards = communityReadService.getBoardByIdsWithFetch(request.boardIds)
         log.info("게시글 조회 완료: 총 ${boards.size}개")
 
-        // 응답 생성
         return Response(
             items = BoardResponseDto.from(boards),
             totalCount = boards.size.toLong(),
         )
     }
 
-    // ===================================================
-    // 요청 및 응답 모델
-    // ===================================================
-
-    /**
-     * 요청 데이터 클래스
-     */
     @Schema(
         name = "GetBoardsByIdsRequest",
         description = "게시글 ID 목록 조회 요청 모델",
@@ -61,9 +44,6 @@ class GetBoardsByIdsUseCase(
         val boardIds: List<Long>,
     )
 
-    /**
-     * 응답 데이터 클래스
-     */
     @Schema(
         name = "GetBoardsByIdsResponse",
         description = "게시글 ID 목록 조회 응답 모델",

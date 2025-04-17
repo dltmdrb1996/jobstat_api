@@ -10,17 +10,12 @@ import org.springframework.stereotype.Component
 
 @Component
 class CommunityReadEventConsumer : AbstractEventConsumer() {
-    @Value("\${kafka.consumer.community-read.topic:community-read}") // 토픽명 설정 주입
+    @Value("\${kafka.consumer.community-read.topic:community-read}")
     private lateinit var topic: String
 
-    @Value("\${kafka.consumer.community-read.group-id:community-read-group}") // 그룹 ID 설정 주입
+    @Value("\${kafka.consumer.community-read.group-id:community-read-group}")
     private lateinit var groupId: String
 
-    /**
-     * Kafka에서 이벤트를 수신하는 리스너 메서드입니다.
-     * consumeEvent 호출 중 예외가 발생하면 @RetryableTopic 설정에 따라 재시도됩니다.
-     * 최종 실패 시 메시지는 DLT 토픽 ({TOPIC}{DLT_SUFFIX})으로 전송됩니다.
-     */
     @RetryableTopic(
         attempts = "\${kafka.consumer.community-read.retry.attempts:3}",
         backoff =
@@ -36,7 +31,10 @@ class CommunityReadEventConsumer : AbstractEventConsumer() {
         groupId = "\${kafka.consumer.community-read.group-id:community-read-group}",
         containerFactory = "kafkaListenerContainerFactory",
     )
-    fun receiveEvent(event: String, ack: Acknowledgment) {
+    fun receiveEvent(
+        event: String,
+        ack: Acknowledgment,
+    ) {
         log.info(
             "[{}] Kafka 메시지 수신 시도: topic=$topic, groupId=$groupId",
             this::class.simpleName,

@@ -36,10 +36,19 @@ internal class CategoryServiceImpl(
         name: String,
         displayName: String,
         description: String,
-    ): BoardCategory =
-        categoryRepository.findById(id).apply {
+    ): BoardCategory {
+        val category = categoryRepository.findById(id)
+
+        if (name != category.name && categoryRepository.existsByName(name)) {
+            throw AppException.fromErrorCode(ErrorCode.DUPLICATE_RESOURCE, "카테고리 이름 '$name'은(는) 이미 다른 카테고리에 존재합니다.")
+        }
+
+        category.apply {
             updateCategory(name, displayName, description)
         }
+
+        return categoryRepository.save(category)
+    }
 
     override fun deleteCategory(id: Long) {
         categoryRepository.deleteById(id)

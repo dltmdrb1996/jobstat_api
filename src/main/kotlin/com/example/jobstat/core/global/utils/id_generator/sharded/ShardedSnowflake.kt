@@ -18,9 +18,9 @@ class ShardedSnowflake(
     private val log = LoggerFactory.getLogger(javaClass)
 
     companion object {
-        val DEFAULT_SHARD_COUNT: Int = 16 // 기본 샤드 수 (2의 거듭제곱 권장)
-        const val TOTAL_SEQUENCE_BITS = 12 // 노드 ID 뒤의 총 비트 수
-        const val NODE_ID_BITS = 10 // 노드 ID 비트 수
+        val DEFAULT_SHARD_COUNT: Int = 16
+        const val TOTAL_SEQUENCE_BITS = 12
+        const val NODE_ID_BITS = 10
 
         // 최대 노드 ID 계산
         const val MAX_NODE_ID = (1L shl NODE_ID_BITS) - 1

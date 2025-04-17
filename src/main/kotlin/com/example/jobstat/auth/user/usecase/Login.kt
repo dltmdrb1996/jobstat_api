@@ -133,26 +133,11 @@ internal class Login(
         userId: Long,
         roles: List<String>,
     ): TokenInfo {
-        // 사용자 권한 조회
-        val getRolesStartTime = Instant.now()
-        val rolesString = roles.joinToString(", ")
-        val getRolesEndTime = Instant.now()
-        log.info("사용자 권한 조회 소요시간: {}ms", Duration.between(getRolesStartTime, getRolesEndTime).toMillis())
-        log.debug("사용자 ${userId}가 다음 권한으로 로그인했습니다: $rolesString")
-
-        // 토큰 생성
-        val tokenGenerationStartTime = Instant.now()
         val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(userId, roles))
         val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(userId, roles))
-        val tokenGenerationEndTime = Instant.now()
-        log.info("토큰 생성 소요시간: {}ms", Duration.between(tokenGenerationStartTime, tokenGenerationEndTime).toMillis())
-
-        // 토큰 저장
-        val tokenSaveStartTime = Instant.now()
         val expiration = jwtTokenGenerator.getRefreshTokenExpiration()
+
         tokenService.saveToken(refreshToken, userId, expiration)
-        val tokenSaveEndTime = Instant.now()
-        log.info("토큰 저장 소요시간: {}ms", Duration.between(tokenSaveStartTime, tokenSaveEndTime).toMillis())
 
         return TokenInfo(
             accessToken = accessToken,

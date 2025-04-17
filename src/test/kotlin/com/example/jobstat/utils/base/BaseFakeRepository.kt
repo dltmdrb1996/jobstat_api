@@ -1,18 +1,14 @@
 package com.example.jobstat.utils.base
 
-import com.example.jobstat.core.base.BaseAutoIncEntity
+import com.example.jobstat.core.base.BaseEntity
 import com.example.jobstat.utils.TestFixture
 import jakarta.persistence.EntityNotFoundException
 import java.lang.reflect.Field
+import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
-/**
- * FakeRepository의 기본 뼈대 클래스.
- * - ID 시퀀스(sequence) 관리
- * - store(메모리 맵)에 엔티티 보관
- */
-abstract class BaseFakeRepository<T : BaseAutoIncEntity, F : TestFixture<T>> {
+abstract class BaseFakeRepository<T : BaseEntity, F : TestFixture<T>> {
     protected val store = ConcurrentHashMap<Long, T>()
     private val sequence = AtomicLong(0)
 
@@ -29,10 +25,8 @@ abstract class BaseFakeRepository<T : BaseAutoIncEntity, F : TestFixture<T>> {
     open fun save(entity: T): T {
         val finalEntity =
             if (!isValidId(entity.id)) {
-                // 신규 엔티티 처리: ID를 할당
                 createNewEntity(entity)
             } else {
-                // 업데이트 로직: 원본 객체를 그대로 반영
                 updateEntity(entity)
             }
         store[finalEntity.id] = finalEntity
@@ -63,7 +57,7 @@ abstract class BaseFakeRepository<T : BaseAutoIncEntity, F : TestFixture<T>> {
 
     fun nextId(): Long = sequence.incrementAndGet()
 
-    protected open fun isValidId(id: Long): Boolean = (id > 0)
+    open fun isValidId(id: Long): Boolean = (id > 0)
 
     protected abstract fun createNewEntity(entity: T): T
 
@@ -77,16 +71,59 @@ abstract class BaseFakeRepository<T : BaseAutoIncEntity, F : TestFixture<T>> {
 
     protected open fun clearAdditionalState() {}
 
-    protected fun setEntityId(
+    fun setEntityId(
         entity: T,
         newId: Long,
     ) {
-        try {
-            val idField: Field = BaseAutoIncEntity::class.java.getDeclaredField("id")
-            idField.isAccessible = true
-            idField.set(entity, newId)
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to set ID via reflection: ${e.message}", e)
+        setEntityField(entity, "id", newId)
+    }
+
+    fun setCreatedAt(
+        entity: T,
+        newCreatedAt: LocalDateTime,
+    ) {
+        setEntityField(entity, "createdAt", newCreatedAt)
+    }
+
+    private fun findFieldRecursive(
+        clazz: Class<*>,
+        fieldName: String,
+    ): Field? {
+        var currentClass: Class<*>? = clazz
+        while (currentClass != null && currentClass != Any::class.java) {
+            try {
+                return currentClass.getDeclaredField(fieldName)
+            } catch (e: NoSuchFieldException) {
+                currentClass = currentClass.superclass
+            }
+        }
+        return null
+    }
+
+    fun <T : Any, V> setEntityField(
+        entity: T,
+        fieldName: String,
+        newValue: V,
+    ) {
+        val field = findFieldRecursive(entity::class.java, fieldName)
+
+        if (field != null) {
+            try {
+                field.isAccessible = true
+                field.set(entity, newValue)
+            } catch (e: IllegalAccessException) {
+                System.err.println("Error setting field '$fieldName' via reflection (Illegal Access) for ${entity::class.java.name}: ${e.message}")
+                throw RuntimeException("Failed to set field '$fieldName' for ${entity::class.java.name} due to access restrictions", e)
+            } catch (e: IllegalArgumentException) {
+                System.err.println("Error setting field '$fieldName' via reflection (Illegal Argument - type mismatch?) for ${entity::class.java.name}: ${e.message}")
+                throw RuntimeException("Failed to set field '$fieldName' for ${entity::class.java.name} due to type mismatch or other argument issue", e)
+            } catch (e: Exception) {
+                System.err.println("Error setting field '$fieldName' via reflection for ${entity::class.java.name}: ${e.message}")
+                throw RuntimeException("Failed to set field '$fieldName' for ${entity::class.java.name} via reflection", e)
+            }
+        } else {
+            // 필드를 찾지 못한 경우 명시적인 예외 발생
+            throw NoSuchFieldException("Field '$fieldName' not found in the class hierarchy of ${entity::class.java.name}")
         }
     }
 }

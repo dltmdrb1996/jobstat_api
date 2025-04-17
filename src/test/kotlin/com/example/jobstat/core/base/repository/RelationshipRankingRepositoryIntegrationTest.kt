@@ -100,7 +100,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
 
     @BeforeEach
     override fun setup() {
-        val baseDate = createBaseDateString(2024, 1) // "202401" 형식으로 저장
+        val baseDate = createBaseDateString(2024, 1)
         val totalPages = (totalRecords + batchSize - 1) / batchSize
 
         for (page in 1..totalPages) {

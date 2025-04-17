@@ -12,10 +12,6 @@ import com.example.jobstat.core.state.BoardRankingPeriod
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
-/**
- * 커뮤니티 관련 이벤트 발행을 담당하는 퍼블리셔
- * 게시판 및 댓글 서비스에서 발생하는 모든 이벤트를 관리
- */
 @Component
 internal class CommunityCommandEventPublisher(
     outboxEventPublisher: OutboxEventPublisher,

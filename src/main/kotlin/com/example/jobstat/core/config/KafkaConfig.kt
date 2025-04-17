@@ -13,7 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.listener.ContainerProperties
 
 @Configuration
-@ComponentScan("com.example.jobstat.core.event.outbox") // 필요에 따라 패키지를 조정하세요
+@ComponentScan("com.example.jobstat.core.event.outbox")
 class KafkaConfig {
     @Value("\${spring.kafka.bootstrap-servers}")
     private lateinit var bootstrapServers: String
@@ -26,7 +26,6 @@ class KafkaConfig {
         val factory = ConcurrentKafkaListenerContainerFactory<String, String>()
         factory.consumerFactory = consumerFactory
         factory.containerProperties.ackMode = ContainerProperties.AckMode.MANUAL_IMMEDIATE
-//        factory.containerProperties.ackMode = ContainerProperties.AckMode.RECORD
         return factory
     }
 

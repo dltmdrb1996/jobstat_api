@@ -39,8 +39,8 @@ internal class RankingSyncScheduler(
                     val rankingEntries =
                         results.map {
                             BoardRankingUpdatedEventPayload.RankingEntry(
-                                boardId = it.getBoardId(),
-                                score = it.getScore().toDouble(), // Long 카운트를 Double 점수로 변환
+                                boardId = it.boardId,
+                                score = it.score.toDouble(), // Long 카운트를 Double 점수로 변환
                             )
                         }
 

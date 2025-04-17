@@ -14,7 +14,6 @@ interface ReadEmailVerification {
     fun isValid(): Boolean
 }
 
-// 이메일 인증 엔티티
 @Entity
 @Table(name = "email_verifications")
 class EmailVerification(
@@ -32,7 +31,6 @@ class EmailVerification(
     @Column(nullable = false)
     override val expiresAt: LocalDateTime = expiresAt
 
-    // 인증 코드 유효성 검사
     override fun isValid() = expiresAt.isAfter(LocalDateTime.now())
 
     companion object {

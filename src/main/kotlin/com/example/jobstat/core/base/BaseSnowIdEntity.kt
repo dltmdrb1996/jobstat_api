@@ -6,11 +6,10 @@ import org.hibernate.proxy.HibernateProxy
 import java.util.Objects
 
 @MappedSuperclass
-abstract class BaseSnowIdEntity {
+abstract class BaseSnowIdEntity : BaseEntity {
     @Id
     @SnowflakeId
-    @Column(name = "id", nullable = false, updatable = false)
-    val id: Long = 0L
+    override val id: Long = 0L
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

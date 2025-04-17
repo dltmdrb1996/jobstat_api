@@ -37,21 +37,22 @@ internal class DeleteBoard(
     override fun invoke(request: ExecuteRequest): Response = super.invoke(request)
 
     override fun execute(request: ExecuteRequest): Response {
-        boardService.getBoard(request.boardId).apply {
-            // 접근 권한 검증
-            validatePermission(this, request.password)
+        val boardToDelete = boardService.getBoard(request.boardId)
+        val boardId = boardToDelete.id
+        val categoryId = boardToDelete.category.id
+        val userId = boardToDelete.userId
 
-            boardService.deleteBoard(id)
+        validatePermission(boardToDelete, request.password)
 
-            // 관련 카운터 정보 정리
-            counterService.cleanupBoardCounters(id)
+        boardService.deleteBoard(boardId)
 
-            // 삭제 이벤트 발행
-            communityCommandEventPublisher.publishBoardDeleted(
-                boardId = id,
-                categoryId = category.id,
-            )
-        }
+        counterService.cleanupBoardCounters(boardId)
+
+        communityCommandEventPublisher.publishBoardDeleted(
+            boardId = boardId,
+            userId = userId,
+            categoryId = categoryId,
+        )
 
         return Response(success = true)
     }

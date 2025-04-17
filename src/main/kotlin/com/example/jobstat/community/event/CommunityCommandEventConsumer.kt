@@ -35,7 +35,10 @@ class CommunityCommandEventConsumer : AbstractEventConsumer() {
         groupId = "\${kafka.consumer.community-command.group-id:community-command-group}",
         containerFactory = "kafkaListenerContainerFactory",
     )
-    fun receiveBoardEvent(event: String, ack: Acknowledgment) {
+    fun receiveBoardEvent(
+        event: String,
+        ack: Acknowledgment,
+    ) {
         log.info(
             "[{}] Kafka 메시지 수신 시도 (Board Command): topic={}, groupId={}",
             this::class.simpleName,

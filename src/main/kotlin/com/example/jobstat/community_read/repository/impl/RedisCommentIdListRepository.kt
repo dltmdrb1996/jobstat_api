@@ -17,22 +17,13 @@ class RedisCommentIdListRepository(
 ) : CommentIdListRepository {
     companion object {
         const val COMMENT_LIMIT_SIZE = 100L
-        // 키 포맷 정의
         const val BOARD_COMMENTS_KEY_FORMAT = "community-read::board::%s::comment-list"
 
-        fun getBoardCommentsKey(boardId: Long): String =
-            BOARD_COMMENTS_KEY_FORMAT.format(boardId)
+        fun getBoardCommentsKey(boardId: Long): String = BOARD_COMMENTS_KEY_FORMAT.format(boardId)
     }
 
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    // --------------------------
-    // 조회 관련 메소드
-    // --------------------------
-
-    /**
-     * 게시글별 댓글 ID 리스트 조회
-     */
     override fun readAllByBoard(
         boardId: Long,
         pageable: Pageable,
@@ -57,9 +48,6 @@ class RedisCommentIdListRepository(
         }
     }
 
-    /**
-     * 무한 스크롤 방식의 게시글별 댓글 ID 리스트 조회
-     */
     override fun readAllByBoardInfiniteScroll(
         boardId: Long,
         lastCommentId: Long?,
@@ -89,9 +77,6 @@ class RedisCommentIdListRepository(
         }
     }
 
-    /**
-     * 게시글별 댓글 ID 목록 조회 (Pageable 기반)
-     */
     override fun readCommentsByBoardId(
         boardId: Long,
         pageable: Pageable,
@@ -111,9 +96,6 @@ class RedisCommentIdListRepository(
         return PageImpl(content, pageable, totalSize)
     }
 
-    /**
-     * 게시글별 댓글 ID 목록 조회 (커서 기반)
-     */
     override fun readCommentsByBoardIdByCursor(
         boardId: Long,
         lastCommentId: Long?,
@@ -139,14 +121,8 @@ class RedisCommentIdListRepository(
         return result.mapNotNull { (it as? String)?.toLongOrNull() }
     }
 
-    /**
-     * 게시글별 댓글 목록 키 반환
-     */
     override fun getBoardCommentsKey(boardId: Long): String = BOARD_COMMENTS_KEY_FORMAT.format(boardId)
 
-    /**
-     * 게시글 댓글 수 조회
-     */
     fun getCommentCount(boardId: Long): Long {
         try {
             return redisTemplate.opsForZSet().size(getBoardCommentsKey(boardId)) ?: 0
@@ -156,13 +132,6 @@ class RedisCommentIdListRepository(
         }
     }
 
-    // --------------------------
-    // 수정 관련 메소드
-    // --------------------------
-
-    /**
-     * 게시글별 댓글 ID 리스트에 추가
-     */
     override fun add(
         boardId: Long,
         commentId: Long,
@@ -186,9 +155,6 @@ class RedisCommentIdListRepository(
         }
     }
 
-    /**
-     * 게시글별 댓글 ID 리스트에서 삭제
-     */
     override fun delete(
         boardId: Long,
         commentId: Long,
@@ -201,13 +167,6 @@ class RedisCommentIdListRepository(
         }
     }
 
-    // --------------------------
-    // 파이프라인 관련 메소드
-    // --------------------------
-
-    /**
-     * 댓글 추가 (파이프라인 사용)
-     */
     override fun addCommentInPipeline(
         conn: StringRedisConnection,
         boardId: Long,
@@ -219,9 +178,6 @@ class RedisCommentIdListRepository(
         conn.zRemRange(key, 0, -(COMMENT_LIMIT_SIZE + 1))
     }
 
-    /**
-     * 댓글 삭제 (파이프라인 사용)
-     */
     override fun removeCommentInPipeline(
         conn: StringRedisConnection,
         boardId: Long,
@@ -231,8 +187,5 @@ class RedisCommentIdListRepository(
         conn.zRem(key, commentId.toString())
     }
 
-    // --------------------------
-    // 유틸리티 메소드
-    // --------------------------
     private fun toPaddedString(id: Long): String = "%019d".format(id)
 }

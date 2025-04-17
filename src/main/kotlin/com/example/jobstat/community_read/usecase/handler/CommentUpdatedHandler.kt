@@ -8,9 +8,6 @@ import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
-/**
- * 댓글 수정 이벤트 핸들러
- */
 @Component
 class CommentUpdatedHandler(
     @Qualifier("communityEventHandlerVerLua")

@@ -2,10 +2,6 @@ package com.example.jobstat.community_read.model
 
 import java.time.LocalDateTime
 
-/**
- * 게시글 읽기 모델
- * Redis에 저장될 게시글 데이터 구조
- */
 data class BoardReadModel(
     val id: Long,
     val categoryId: Long,

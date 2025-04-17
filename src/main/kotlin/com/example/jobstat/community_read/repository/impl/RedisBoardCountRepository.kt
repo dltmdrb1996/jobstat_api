@@ -17,25 +17,12 @@ class RedisBoardCountRepository(
         const val BOARD_COUNT_STATE_KEY = "community-read::board-count::state"
     }
 
-    // 조회 관련 메소드
+    override fun getTotalCount(): Long = redisTemplate.opsForValue().get(BOARD_TOTAL_COUNT_KEY)?.toLongOrNull() ?: 0L
 
-    /**
-     * 게시글 총 개수 조회
-     */
-    override fun getTotalCount(): Long = redisTemplate.opsForValue().get(BOARD_TOTAL_COUNT_KEY)?.toLong() ?: 0
-
-    // 수정 관련 메소드 (파이프라인)
-
-    /**
-     * 파이프라인을 통한 게시글 개수 증감
-     */
     override fun applyCountInPipeline(
         conn: StringRedisConnection,
         delta: Long,
     ) {
-        val currentCountStr = conn.get(BOARD_TOTAL_COUNT_KEY) ?: "0"
-        val currentCount = currentCountStr.toLong()
-        val newCount = currentCount + delta
-        conn.set(BOARD_TOTAL_COUNT_KEY, newCount.toString())
+        conn.incrBy(BOARD_TOTAL_COUNT_KEY, delta)
     }
 }

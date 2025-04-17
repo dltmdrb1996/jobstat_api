@@ -10,10 +10,10 @@ import java.util.Objects
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-abstract class BaseAutoIncEntity {
+abstract class BaseAutoIncEntity : BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0L
+    override val id: Long = 0L
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

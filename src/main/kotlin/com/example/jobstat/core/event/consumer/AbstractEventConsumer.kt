@@ -22,66 +22,43 @@ abstract class AbstractEventConsumer {
     @Autowired
     protected lateinit var dataSerializer: DataSerializer
 
-    /** 이 컨슈머가 지원하는 이벤트 타입 반환 (EventHandlerRegistry 기반) */
-    open fun getSupportedEventTypes(): Set<EventType> = handlerRegistry.getSupportedEventTypes() // 핸들러 레지스트리가 실제 지원하는 타입 반환
+    open fun getSupportedEventTypes(): Set<EventType> = handlerRegistry.getSupportedEventTypes()
 
-    /**
-     * 이벤트 수신 및 처리 기본 메서드.
-     * 실제 Kafka 리스너 메서드(@KafkaListener + @RetryableTopic)에서 호출됩니다.
-     * 성공 시 자동 Acknowledge (Spring Kafka), 실패 시 예외를 던져 재시도/DLT 처리 유도.
-     */
-    protected fun consumeEvent(jsonEvent: String, ack: Acknowledgment) { // Acknowledgment 파라미터 추가
+    protected fun consumeEvent(
+        jsonEvent: String,
+        ack: Acknowledgment,
+    ) {
         lateinit var event: Event<*>
 
         try {
-            // 1. 이벤트 파싱
             try {
                 event = Event.fromJson(jsonEvent, dataSerializer)
                 log.debug("[{}] 이벤트 파싱 성공: eventId=${event.eventId}, type=${event.type}", this::class.simpleName)
             } catch (e: Exception) {
-                log.error(
-                    "[{}] 이벤트 파싱 중 예외 발생 (기타): rawJson=${jsonEvent.take(500)}, error=${e.message}. 메시지 재시도/DLT 처리 예정.",
-                    this::class.simpleName,
-                    e,
-                )
-                throw e // 파싱 실패 시 예외를 던져 재시도 유도 (Ack 호출 안 됨)
+                log.error("[${this::class.simpleName}] 이벤트 파싱 중 예외 발생 (기타): rawJson=${jsonEvent.take(500)}, error=${e.message}. 메시지 재시도/DLT 처리 예정.", e)
+                throw e
             }
 
             val eventType = event.type
             val eventId = event.eventId
 
-            log.info(
-                "[{}] 이벤트 수신 및 파싱 완료: eventId=$eventId, type=$eventType, topic=${eventType.topic}",
-                this::class.simpleName,
-            )
+            log.info("[${this::class.simpleName}] 이벤트 수신 및 파싱 완료: eventId=$eventId, type=$eventType, topic=${eventType.topic}")
 
-            // 2. 이벤트 핸들링
             try {
-                log.info(
-                    "[{}] 이벤트 처리 시작: eventId=$eventId, type=$eventType, payloadType=${event.payload::class.simpleName}",
-                    this::class.simpleName,
-                )
-                handlerRegistry.processEvent(event) // 핸들러 로직 실행
-                log.info(
-                    "[{}] 이벤트 처리 성공: eventId=$eventId, type=$eventType.",
-                    this::class.simpleName,
-                )
+                log.info("[${this::class.simpleName}}] 이벤트 처리 시작: eventId=$eventId, type=$eventType, payloadType=${event.payload::class.simpleName}")
+                handlerRegistry.processEvent(event)
+                log.info("[${this::class.simpleName}] 이벤트 처리 성공: eventId=$eventId, type=$eventType.")
             } catch (e: Exception) {
-                log.error(
-                    "[{}] 이벤트 처리 중 오류 발생 (재시도/DLT 처리 예정): eventId=$eventId, type=$eventType, error=${e.message}",
-                    this::class.simpleName,
-                )
-                log.debug("[{}] eventId=$eventId 예외 스택 트레이스: ", this::class.simpleName, e)
-                throw e // 핸들링 실패 시 예외를 던져 재시도 유도 (Ack 호출 안 됨)
+                log.error("[${this::class.simpleName}] 이벤트 처리 중 오류 발생 (재시도/DLT 처리 예정): eventId=$eventId, type=$eventType, error=${e.message}")
+                log.debug("[${this::class.simpleName}] eventId=$eventId 예외 스택 트레이스: ", e)
+                throw e
             }
 
-            // 3. 모든 처리 성공 시 수동 Acknowledge
             ack.acknowledge()
-            log.info("[{}] Kafka 메시지 수동 Acknowledge 완료: eventId=$eventId, type=$eventType", this::class.simpleName)
-
+            log.info("[${this::class.simpleName}] Kafka 메시지 수동 Acknowledge 완료: eventId=$eventId, type=$eventType")
         } catch (e: Exception) {
-            log.warn("[{}] consumeEvent 처리 중 예외 발생하여 Ack 미수행 (재시도/DLT 처리 예정). Error: {}", this::class.simpleName, e.message)
-            log.error("[{}] 최종 예외를 Kafka 리스너 컨테이너로 전파합니다.", this::class.simpleName, e)
+            log.warn("[${this::class.simpleName}] consumeEvent 처리 중 예외 발생하여 Ack 미수행 (재시도/DLT 처리 예정). Error: {}", e.message)
+            log.error("[${this::class.simpleName}] 최종 예외를 Kafka 리스너 컨테이너로 전파합니다.", e)
             throw e
         }
     }

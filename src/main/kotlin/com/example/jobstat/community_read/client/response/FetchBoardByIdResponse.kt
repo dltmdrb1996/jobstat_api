@@ -4,7 +4,6 @@ import com.example.jobstat.community_read.model.BoardReadModel // BoardReadModel
 import java.time.LocalDateTime
 
 data class FetchBoardByIdResponse(
-    // id 타입을 String으로 변경
     val id: String,
     val userId: Long?,
     val categoryId: Long,
@@ -21,7 +20,6 @@ data class FetchBoardByIdResponse(
     companion object {
         fun from(response: FetchBoardByIdResponse): BoardReadModel =
             BoardReadModel(
-                // BoardReadModel의 id가 String이라고 가정하고 할당
                 id = response.id.toLong(),
                 createdAt = response.createdAt,
                 title = response.title,
@@ -33,8 +31,6 @@ data class FetchBoardByIdResponse(
                 commentCount = response.commentCount,
                 userId = response.userId,
                 eventTs = response.eventTs,
-                // BoardReadModel에 userLiked 필드가 있다면 추가
-                // userLiked = response.userLiked
             )
     }
 }

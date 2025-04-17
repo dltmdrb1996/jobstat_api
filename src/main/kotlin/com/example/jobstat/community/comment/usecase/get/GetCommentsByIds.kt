@@ -10,9 +10,6 @@ import jakarta.validation.constraints.NotEmpty
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-/**
- * 다중 댓글 ID 기반 조회 유스케이스
- */
 @Service
 internal class GetCommentsByIds(
     private val commentService: CommentService,
@@ -29,9 +26,6 @@ internal class GetCommentsByIds(
         return Response(commentItems)
     }
 
-    /**
-     * 댓글 엔티티를 응답 모델로 변환
-     */
     private fun mapToCommentItem(comment: Comment): CommentItem =
         CommentMapperUtils.mapToCommentDto(
             comment,

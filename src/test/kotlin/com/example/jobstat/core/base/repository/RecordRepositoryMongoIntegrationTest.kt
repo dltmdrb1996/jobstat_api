@@ -25,7 +25,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
     private val performanceMetrics = hashMapOf<String, Double>()
 
     override fun cleanupTestData() {
-        // MongoDB 데이터 정리
         recordRepository.deleteAll()
     }
 
@@ -63,7 +62,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
             totalInserted += records.size
         }
 
-        // DB에서 전체 데이터 조회하여 allRecords 구성
         Assertions.assertEquals(totalRecords, totalInserted, "Records count mismatch")
 
         val endTime = System.currentTimeMillis()
@@ -78,7 +76,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
     fun testFindAllByQuery() {
         startTime = System.currentTimeMillis()
 
-        // 전체 데이터 조회 테스트
         val query = Query()
         val records = recordRepository.findAllByQuery(query)
         allRecords.addAll(records)
@@ -105,7 +102,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
         val recordIds = allRecords.mapNotNull { it.id }
         log.debug("Attempting to find ${recordIds.size} records")
 
-//        val foundRecords = recordRepository.findAllFast()
         var totalFound = 0
         for (batch in recordIds.chunked(batchSize)) {
             val foundRecords = recordRepository.bulkFindByIds(batch)
@@ -128,7 +124,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
     fun testFindByCreatedAtBetween() {
         startTime = System.currentTimeMillis()
 
-        // 전체 기간에 대한 조회 테스트
         val oldestRecord = allRecords.minByOrNull { it.createdAt ?: Instant.MAX }
         val newestRecord = allRecords.maxByOrNull { it.createdAt ?: Instant.MIN }
 
@@ -185,11 +180,9 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
     fun testBulkUpsert() {
         startTime = System.currentTimeMillis()
 
-        // 현재 DB의 전체 레코드 수 확인
         val beforeCount = recordRepository.findAllByQuery(Query()).size
         log.debug("Records before upsert: $beforeCount")
 
-        // 기존 레코드만 업데이트 (새 레코드 생성 없음)
         val recordsToUpsert =
             allRecords.map { record ->
                 record.update(
@@ -209,7 +202,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
             totalModified += result.modifiedCount
             log.debug("Upserted batch - Modified: ${result.modifiedCount}, Upserts: ${result.upserts.size}")
 
-            // 새로운 레코드가 생성되지 않았는지 확인
             Assertions.assertEquals(
                 0,
                 result.upserts.size,
@@ -217,11 +209,9 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
             )
         }
 
-        // 최종 DB의 전체 레코드 수 확인
         val afterCount = recordRepository.findAllByQuery(Query()).size
         log.debug("Records after upsert: $afterCount")
 
-        // 검증
         Assertions.assertEquals(
             beforeCount,
             afterCount,
@@ -233,7 +223,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
             "Total records should remain at $totalRecords (found: $afterCount)",
         )
 
-        // 업데이트된 레코드 확인
         val updatedRecords = recordRepository.findAllByQuery(Query())
         val sampleRecord = updatedRecords.first()
         Assertions.assertTrue(
@@ -270,7 +259,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
         log.debug("Total records deleted: $totalDeleted")
         Assertions.assertTrue(totalDeleted > 0, "No records were deleted")
 
-        // Verify deletion
         val remainingRecords = recordRepository.findAllByQuery(Query())
         log.debug("Remaining records after deletion: ${remainingRecords.size}")
         Assertions.assertTrue(remainingRecords.isEmpty(), "Some records still exist after deletion")

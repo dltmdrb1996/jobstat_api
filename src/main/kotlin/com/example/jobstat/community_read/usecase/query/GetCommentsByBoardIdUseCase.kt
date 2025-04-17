@@ -12,10 +12,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
-/**
- * 게시글별 댓글 조회 유스케이스
- * 특정 게시글에 달린 댓글 목록을 페이지 단위로 조회
- */
 @Service
 class GetCommentsByBoardIdUseCase(
     private val communityReadService: CommunityReadService,
@@ -23,22 +19,15 @@ class GetCommentsByBoardIdUseCase(
 ) : ValidUseCase<GetCommentsByBoardIdUseCase.Request, GetCommentsByBoardIdUseCase.Response>(validator) {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    // ===================================================
-    // 유스케이스 실행 메소드
-    // ===================================================
-
     override fun execute(request: Request): Response =
         with(request) {
             log.info("게시글별 댓글 조회 요청: boardId=$boardId, page=$page, size=$size")
 
-            // Pageable 객체 생성
             val pageable = PageRequest.of(page, size)
 
-            // 서비스 계층 호출하여 댓글 목록 조회
             val commentsPage = communityReadService.getCommentsByBoardIdByOffset(boardId, pageable)
             log.info("게시글별 댓글 조회 완료: boardId=$boardId, 댓글 수=${commentsPage.totalElements}개")
 
-            // 응답 생성
             Response(
                 items = CommentResponseDto.from(commentsPage.content),
                 totalCount = commentsPage.totalElements,
@@ -46,13 +35,6 @@ class GetCommentsByBoardIdUseCase(
             )
         }
 
-    // ===================================================
-    // 요청 및 응답 모델
-    // ===================================================
-
-    /**
-     * 요청 데이터 클래스
-     */
     @Schema(
         name = "GetCommentsByBoardIdRequest",
         description = "게시글별 댓글 목록 조회 요청 모델",
@@ -84,9 +66,6 @@ class GetCommentsByBoardIdUseCase(
         val size: Int = CommunityReadConstants.DEFAULT_COMMENT_PAGE_SIZE,
     )
 
-    /**
-     * 응답 데이터 클래스
-     */
     @Schema(
         name = "GetCommentsByBoardIdResponse",
         description = "게시글별 댓글 목록 조회 응답 모델",

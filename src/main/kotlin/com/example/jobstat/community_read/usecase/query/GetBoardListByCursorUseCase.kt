@@ -16,10 +16,6 @@ import jakarta.validation.constraints.Positive
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
-/**
- * 커서 기반 게시글 목록 조회 유스케이스
- * 페이징 대신 커서 방식을 사용하여 대용량 데이터를 효율적으로 조회
- */
 @Service
 class GetBoardListByCursorUseCase(
     private val communityReadService: CommunityReadService,
@@ -27,23 +23,16 @@ class GetBoardListByCursorUseCase(
 ) : ValidUseCase<GetBoardListByCursorUseCase.Request, GetBoardListByCursorUseCase.Response>(validator) {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    // ===================================================
-    // 유스케이스 실행 메소드
-    // ===================================================
-
     override fun execute(request: Request): Response {
         log.info(
             "게시글 목록 커서 기반 조회: type=${request.type}, period=${request.period}, lastId=${request.lastId}, limit=${request.limit}",
         )
 
-        // 조회 유형에 따른 처리
         val result = executeByListType(request)
 
-        // 다음 페이지 여부 및 커서 계산
         val hasNext = result.size >= request.limit
         val nextCursor = if (hasNext) result.lastOrNull()?.id else null
 
-        // 응답 생성
         return Response(
             items = BoardResponseDto.from(result),
             hasNext = hasNext,
@@ -52,13 +41,6 @@ class GetBoardListByCursorUseCase(
         )
     }
 
-    // ===================================================
-    // 내부 구현 메소드
-    // ===================================================
-
-    /**
-     * 조회 유형에 따라 적절한 서비스 메소드 호출
-     */
     private fun executeByListType(request: Request) =
         when (request.type.lowercase()) {
             "latest" -> communityReadService.getLatestBoardsByCursor(request.lastId, request.limit)
@@ -88,13 +70,6 @@ class GetBoardListByCursorUseCase(
             )
         }
 
-    // ===================================================
-    // 요청 및 응답 모델
-    // ===================================================
-
-    /**
-     * 게시글 목록 커서 기반 조회 요청 모델
-     */
     @Schema(name = "GetTopBoardsByCursorRequest", description = "게시글 목록 커서 기반 조회 요청 모델")
     data class Request(
         @field:Schema(description = "조회 유형 (최신순: latest, 좋아요: likes, 조회수: views, 카테고리: category)", example = "likes", allowableValues = ["latest", "likes", "views", "category"], required = true)
@@ -111,9 +86,6 @@ class GetBoardListByCursorUseCase(
         val limit: Long = 20,
     )
 
-    /**
-     * 게시글 목록 커서 기반 조회 응답 모델
-     */
     @Schema(name = "GetTopBoardsByCursorResponse", description = "게시글 목록 커서 기반 조회 응답 모델")
     data class Response(
         @field:Schema(description = "게시글 목록") val items: List<BoardResponseDto>,

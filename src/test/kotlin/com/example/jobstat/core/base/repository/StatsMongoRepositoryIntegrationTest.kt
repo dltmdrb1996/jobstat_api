@@ -250,7 +250,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         startTime = System.currentTimeMillis()
         allRecords.clear()
 
-        // MongoDB에서 기존 데이터 모두 삭제
         skillStatsRepository.deleteAll()
 
         val baseDates =
@@ -265,7 +264,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         for (baseDate in baseDates) {
             val records =
                 (1..totalRecords / 12).mapIndexed { idx, it ->
-                    // 사용되지 않은 새로운 entityId 생성
                     createSkillStatsDocument(
                         entityId = idx.toLong(),
                         baseDate = baseDate,
@@ -304,7 +302,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         Assertions.assertTrue(results.isNotEmpty())
         Assertions.assertTrue(results.all { it.entityId == entityId })
-        // Verify results are ordered by date descending
         log.debug("results: ${results.first()}")
         Assertions.assertEquals(
             results.map { it.baseDate },
@@ -384,7 +381,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                     it.baseDate <= endDate.toString()
             },
         )
-        // Verify results are ordered by date ascending
         Assertions.assertEquals(
             results.map { it.baseDate },
             results.map { it.baseDate }.sorted(),

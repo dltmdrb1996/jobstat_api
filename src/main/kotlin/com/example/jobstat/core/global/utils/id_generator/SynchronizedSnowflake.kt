@@ -3,13 +3,9 @@ package com.example.jobstat.core.global.utils.id_generator // 실제 패키지 �
 import org.slf4j.LoggerFactory
 import kotlin.math.max
 
-/**
- * Synchronized 키워드를 사용하여 ID 유일성을 보장하는 단순 Snowflake ID 생성기.
- * SnowflakeGenerator 인터페이스를 구현한다. 샤딩 미사용 시 기본 선택지.
- */
 class SynchronizedSnowflake(
     private val nodeId: Long = 0L,
-) : SnowflakeGenerator { // 인터페이스 구현
+) : SnowflakeGenerator {
     private val log = LoggerFactory.getLogger(javaClass)
 
     companion object {

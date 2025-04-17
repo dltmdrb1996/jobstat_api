@@ -19,16 +19,13 @@ internal class VerifyEmail(
 ) : ValidUseCase<VerifyEmail.Request, Unit>(validator) {
     @Transactional
     override fun execute(request: Request) {
-        // 최근 이메일 인증 정보 조회
         emailVerificationService
             .findLatestByEmail(request.email)
             ?.let { verification ->
-                // 인증 코드 만료 검증
                 if (!verification.isValid()) {
                     throw AppException.fromErrorCode(ErrorCode.VERIFICATION_EXPIRED, "만료된 인증 코드입니다.")
                 }
 
-                // 인증 코드 일치 검증
                 if (!emailVerificationService.matchesCode(verification, request.code)) {
                     throw AppException.fromErrorCode(ErrorCode.INVALID_VERIFICATION_CODE, "잘못된 인증 코드입니다.")
                 }

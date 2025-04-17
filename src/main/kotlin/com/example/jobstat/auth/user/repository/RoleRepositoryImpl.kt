@@ -38,9 +38,9 @@ internal class RoleRepositoryImpl(
 ) : RoleRepository {
     override fun save(role: Role): Role = roleJpaRepository.save(role)
 
-    override fun findById(id: Long): Role = roleJpaRepository.findByIdWithUsers(id).orThrowNotFound("역할", id)
+    override fun findById(id: Long): Role = roleJpaRepository.findByIdWithUsers(id).orThrowNotFound("Role", id)
 
-    override fun findByName(name: String): Role = roleJpaRepository.findByName(name).orThrowNotFound("역할", name)
+    override fun findByName(name: String): Role = roleJpaRepository.findByName(name).orThrowNotFound("Role", name)
 
     override fun findAll(): List<Role> = roleJpaRepository.findAll()
 

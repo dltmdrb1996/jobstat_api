@@ -31,7 +31,6 @@ internal class SynchronizedSnowflakeCore(
     private var sequence: Long = 0L
 
     init {
-        // sequenceBits 유효성 검사 등 필요시 추가
         log.trace("Initialized SynchronizedSnowflakeCore instance for Node [{}], SequenceBits: {}", nodeIdForLog, sequenceBits)
     }
 

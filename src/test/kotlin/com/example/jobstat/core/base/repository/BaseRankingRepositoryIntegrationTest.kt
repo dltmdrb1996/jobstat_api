@@ -36,7 +36,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     ): SkillGrowthRankingsDocument {
         val actualPageSize =
             if (page * batchSize > totalRecords) {
-                totalRecords % batchSize // 마지막 페이지의 실제 크기
+                totalRecords % batchSize
             } else {
                 batchSize
             }
@@ -58,7 +58,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         for (page in 1..totalPages) {
             val startRank = (page - 1) * batchSize + 1
             val document = createTestDataForPage(baseDate, page, startRank)
-            if (document.rankings.isNotEmpty()) { // 빈 페이지는 저장하지 않음
+            if (document.rankings.isNotEmpty()) {
                 allRecords.add(document)
                 skillGrowthRankingsRepository.save(document)
             }
@@ -90,7 +90,7 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     @DisplayName("모든 페이지를 조회할 수 있다")
     fun testFindAllPages() {
         val baseDate = "202401"
-        val expectedPages = (totalRecords + batchSize - 1) / batchSize // 올림 처리
+        val expectedPages = (totalRecords + batchSize - 1) / batchSize
 
         runBlocking {
             val results =
@@ -127,7 +127,6 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val result = skillGrowthRankingsRepository.findByRankRange(baseDate, startRank, endRank)
 
-        // 결과 검증
         assertNotNull(result)
         assertTrue(result.isNotEmpty())
         assertEquals((endRank - startRank + 1), result.size)
@@ -161,7 +160,6 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         val endDate = "202402"
         val limit = 10
 
-        // 추가 테스트 데이터 생성 (다른 날짜의 데이터)
         val endDateDocument =
             createTestDataForPage(endDate, 1, 1).copy(
                 rankings =
@@ -174,7 +172,6 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         val result = skillGrowthRankingsRepository.findTopMovers(startDate, endDate, limit)
 
         assertEquals(limit, result.size)
-        // 랭크 변화가 내림차순으로 정렬되어있는지 확인
         assertEquals(
             result.map { it.rankChange },
             result.map { it.rankChange }.sortedByDescending { it },
@@ -189,12 +186,11 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         val endDate = "202402"
         val limit = 10
 
-        // 테스트 데이터 생성 - 음수 rankChange를 가진 데이터 포함
         val endDateDocument =
             createTestDataForPage(endDate, 1, 1).copy(
                 rankings =
                     createTestRankings(1).map {
-                        it.copy(rankChange = Random.nextInt(-20, -5)) // 명확한 음수값 설정
+                        it.copy(rankChange = Random.nextInt(-20, -5))
                     },
             )
         skillGrowthRankingsRepository.save(endDateDocument)
@@ -215,7 +211,6 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         val months = 3
         val maxRankChange = 5
 
-        // 여러 달의 테스트 데이터 생성
         for (month in 2..months) {
             val baseDate = "2024${month.toString().padStart(2, '0')}"
             val document =
@@ -276,7 +271,6 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
     fun testPerformance() {
         startTime = System.currentTimeMillis()
 
-        // 각 작업의 수행 시간 측정
         measureTime {
             testFindByPage()
             testFindAllPages()
@@ -292,7 +286,6 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
             log.debug("Total test execution time: ${duration.inWholeSeconds} seconds")
         }
 
-        // 성능 기준 검증
         performanceMetrics.forEach { (operation, time) ->
             assertTrue(
                 time <
@@ -366,11 +359,9 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         val year = baseDate.substring(0, 4).toInt()
         val month = baseDate.substring(4, 6).toInt()
 
-        // LocalDateTime을 사용하여 날짜 계산
         val startDateTime = LocalDateTime.of(year, month, 1, 0, 0)
         val endDateTime = startDateTime.plusMonths(1).minusSeconds(1)
 
-        // LocalDateTime을 Instant로 변환
         val startDate = startDateTime.toInstant(ZoneOffset.UTC)
         val endDate = endDateTime.toInstant(ZoneOffset.UTC)
 

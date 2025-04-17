@@ -82,7 +82,7 @@ class LoginTest {
             // 검증
             assertNotNull(response.accessToken)
             assertNotNull(response.refreshToken)
-            assertEquals(user.id, response.user.id)
+            assertEquals(user.id, response.user.id.toLong())
             assertEquals(user.email, response.user.email)
             assertEquals(user.username, response.user.username)
             assertTrue(response.expiresAt.isAfter(Instant.now()))

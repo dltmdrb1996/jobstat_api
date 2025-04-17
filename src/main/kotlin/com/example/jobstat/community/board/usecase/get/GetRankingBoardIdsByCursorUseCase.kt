@@ -1,4 +1,3 @@
-// file: src/main/kotlin/com/example/jobstat/community/board/usecase/get/GetRankingBoardIdsByCursorUseCase.kt
 package com.example.jobstat.community.board.usecase.get
 
 import com.example.jobstat.community.board.service.BoardService

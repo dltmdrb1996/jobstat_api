@@ -54,7 +54,7 @@ class EventHandlerRegistry(
     fun processEvent(event: Event<out EventPayload>) {
         val eventType = event.type
         val eventId = event.eventId
-        val targetHandlers = getHandlersForEventType(eventType) // Get handlers for this specific event
+        val targetHandlers = getHandlersForEventType(eventType)
 
         log.info(
             "이벤트 처리 위임 시작: eventId=$eventId, type=$eventType, 등록된 핸들러=${targetHandlers.size}개",

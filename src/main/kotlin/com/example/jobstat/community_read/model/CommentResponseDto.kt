@@ -25,9 +25,9 @@ data class CommentResponseDto(
     companion object {
         fun from(comment: CommentReadModel): CommentResponseDto =
             CommentResponseDto(
-                id = comment.id.toString(), // Long -> String 변환
-                boardId = comment.boardId.toString(), // Long -> String 변환
-                userId = comment.userId?.toString(), // Long? -> String? 변환
+                id = comment.id.toString(),
+                boardId = comment.boardId.toString(),
+                userId = comment.userId?.toString(),
                 author = comment.author,
                 content = comment.content,
                 createdAt = comment.createdAt,

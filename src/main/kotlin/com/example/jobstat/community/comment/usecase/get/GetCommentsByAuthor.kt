@@ -13,9 +13,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-/**
- * 작성자별 댓글 목록 조회 유스케이스
- */
 @Service
 internal class GetCommentsByAuthor(
     private val commentService: CommentService,
@@ -35,9 +32,6 @@ internal class GetCommentsByAuthor(
                 }
         }
 
-    /**
-     * 댓글 엔티티를 응답 모델로 변환
-     */
     private fun mapToCommentListItem(comment: Comment): CommentListItem =
         CommentMapperUtils.mapToCommentDto(
             comment,

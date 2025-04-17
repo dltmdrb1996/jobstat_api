@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 class FakePasswordUtil : PasswordUtil {
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    override fun encode(password: String): String = "encoded:$password"
+    override fun encode(password: String): String = "en:$password"
 
     override fun matches(
         rawPassword: String,

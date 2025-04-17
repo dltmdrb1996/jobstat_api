@@ -38,7 +38,6 @@ class RedisBoardIdListRepository(
         const val BOARDS_BY_VIEWS_WEEK_KEY = "community-read::views::week::board-list"
         const val BOARDS_BY_VIEWS_MONTH_KEY = "community-read::views::month::board-list"
 
-        // 내부 상태 키 (마지막 업데이트 시각 등을 저장)
         private fun listStateKey(boardId: Long) = "board:list::$boardId"
 
         val likeRankingKeys =
@@ -62,18 +61,12 @@ class RedisBoardIdListRepository(
                 BoardRankingMetric.LIKES -> likeRankingKeys[period]
                 BoardRankingMetric.VIEWS -> viewRankingKeys[period]
             }
+
+        fun getCategoryKey(categoryId: Long) = CATEGORY_BOARDS_KEY_FORMAT.format(categoryId)
     }
 
-    // --------------------------
-    // 키 관련 메소드
-    // --------------------------
     override fun getAllBoardsKey() = ALL_BOARDS_KEY
 
-    override fun getCategoryKey(categoryId: Long) = CATEGORY_BOARDS_KEY_FORMAT.format(categoryId)
-
-    // --------------------------
-    // 타임라인 조회 메소드
-    // --------------------------
     override fun readAllByTimeByOffset(pageable: Pageable): Page<Long> {
         val offset = pageable.offset
         val pageSize = pageable.pageSize.toLong()
@@ -112,9 +105,6 @@ class RedisBoardIdListRepository(
         return result.mapNotNull { (it as? String)?.toLongOrNull() }
     }
 
-    // --------------------------
-    // 카테고리 조회 메소드
-    // --------------------------
     override fun readAllByCategoryByOffset(
         categoryId: Long,
         pageable: Pageable,
@@ -159,9 +149,6 @@ class RedisBoardIdListRepository(
         return result.mapNotNull { (it as? String)?.toLongOrNull() }
     }
 
-    // --------------------------
-    // 좋아요 랭킹 조회 메소드
-    // --------------------------
     override fun readAllByLikesDayByOffset(pageable: Pageable): Page<Long> {
         val offset = pageable.offset
         val pageSize = pageable.pageSize.toLong()
@@ -273,9 +260,6 @@ class RedisBoardIdListRepository(
         return result.mapNotNull { (it as? String)?.toLongOrNull() }
     }
 
-    // --------------------------
-    // 조회수 랭킹 조회 메소드
-    // --------------------------
     override fun readAllByViewsDayByOffset(pageable: Pageable): Page<Long> {
         val offset = pageable.offset
         val pageSize = pageable.pageSize.toLong()
@@ -387,9 +371,6 @@ class RedisBoardIdListRepository(
         return result.mapNotNull { (it as? String)?.toLongOrNull() }
     }
 
-    // -----------------------------
-    // B) 쓰기 (파이프라인, eventTs 기반)
-    // -----------------------------
     override fun addBoardInPipeline(
         conn: StringRedisConnection,
         boardId: Long,
@@ -427,26 +408,21 @@ class RedisBoardIdListRepository(
         key: String,
         rankings: List<BoardRankingUpdatedEventPayload.RankingEntry>,
     ) {
-        // 1. 기존 랭킹 리스트 삭제
         conn.del(key)
 
-        // 2. 새로운 랭킹 항목이 있으면 모두 추가
         if (rankings.isNotEmpty()) {
             val stringTuples: Set<StringTuple> =
                 rankings
                     .map { entry ->
                         DefaultStringTuple(
-                            entry.boardId.toString(), // 멤버(값)를 String으로
-                            entry.score, // 점수를 Double로
+                            entry.boardId.toString(),
+                            entry.score,
                         )
-                    }.toSet() // Set으로 변환
+                    }.toSet()
 
-            // Set<StringTuple>을 사용하는 zAdd 메소드 호출
             conn.zAdd(key, stringTuples)
 
-            // 3. 최대 크기로 리스트 제한
             conn.zRemRange(key, 0, -(RANKING_LIMIT_SIZE + 1))
         }
-        // rankings가 비어있는 경우 DEL 명령이 리스트를 삭제
     }
 }

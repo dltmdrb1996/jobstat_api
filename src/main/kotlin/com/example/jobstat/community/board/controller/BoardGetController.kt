@@ -34,7 +34,6 @@ internal class BoardGetController(
     private val getAuthorBoardIdsByCursorUseCase: GetAuthorBoardIdsByCursorUseCase,
     private val getRankingBoardIdsByCursorUseCase: GetRankingBoardIdsByCursorUseCase,
 ) {
-
     @Public
     @GetMapping("/boards/{boardId}")
     @Operation(
@@ -98,26 +97,29 @@ internal class BoardGetController(
     ): ResponseEntity<ApiResponse<BoardIdsResponse>> =
         when {
             categoryId != null -> {
-                val request = GetCategoryBoardIdsByOffsetUseCase.Request(
-                    categoryId,
-                    page ?: 0,
-                    size ?: BoardConstants.DEFAULT_PAGE_SIZE
-                )
+                val request =
+                    GetCategoryBoardIdsByOffsetUseCase.Request(
+                        categoryId,
+                        page ?: 0,
+                        size ?: BoardConstants.DEFAULT_PAGE_SIZE,
+                    )
                 ApiResponse.ok(getCategoryBoardIdsByOffsetUseCase(request))
             }
             author != null -> {
-                val request = GetAuthorBoardIdsByOffsetUseCase.Request(
-                    author,
-                    page ?: 0,
-                    size ?: BoardConstants.DEFAULT_PAGE_SIZE
-                )
+                val request =
+                    GetAuthorBoardIdsByOffsetUseCase.Request(
+                        author,
+                        page ?: 0,
+                        size ?: BoardConstants.DEFAULT_PAGE_SIZE,
+                    )
                 ApiResponse.ok(getAuthorBoardIdsByOffsetUseCase(request))
             }
             else -> { // 기본: 최신순
-                val request = GetLatestBoardIdsByOffsetUseCase.Request(
-                    page ?: 0,
-                    size ?: BoardConstants.DEFAULT_PAGE_SIZE
-                )
+                val request =
+                    GetLatestBoardIdsByOffsetUseCase.Request(
+                        page ?: 0,
+                        size ?: BoardConstants.DEFAULT_PAGE_SIZE,
+                    )
                 ApiResponse.ok(getLatestBoardIdsByOffsetUseCase(request))
             }
         }
@@ -141,26 +143,29 @@ internal class BoardGetController(
     ): ResponseEntity<ApiResponse<BoardIdsResponse>> =
         when {
             categoryId != null -> {
-                val request = GetCategoryBoardIdsByCursorUseCase.Request(
-                    categoryId,
-                    lastBoardId,
-                    limit ?: BoardConstants.DEFAULT_PAGE_SIZE
-                )
+                val request =
+                    GetCategoryBoardIdsByCursorUseCase.Request(
+                        categoryId,
+                        lastBoardId,
+                        limit ?: BoardConstants.DEFAULT_PAGE_SIZE,
+                    )
                 ApiResponse.ok(getCategoryBoardIdsByCursorUseCase(request))
             }
             author != null -> {
-                val request = GetAuthorBoardIdsByCursorUseCase.Request(
-                    author,
-                    lastBoardId,
-                    limit ?: BoardConstants.DEFAULT_PAGE_SIZE
-                )
+                val request =
+                    GetAuthorBoardIdsByCursorUseCase.Request(
+                        author,
+                        lastBoardId,
+                        limit ?: BoardConstants.DEFAULT_PAGE_SIZE,
+                    )
                 ApiResponse.ok(getAuthorBoardIdsByCursorUseCase(request))
             }
             else -> { // 기본: 최신순
-                val request = GetLatestBoardIdsByCursorUseCase.Request(
-                    lastBoardId,
-                    limit ?: BoardConstants.DEFAULT_PAGE_SIZE
-                )
+                val request =
+                    GetLatestBoardIdsByCursorUseCase.Request(
+                        lastBoardId,
+                        limit ?: BoardConstants.DEFAULT_PAGE_SIZE,
+                    )
                 ApiResponse.ok(getLatestBoardIdsByCursorUseCase(request))
             }
         }
@@ -175,12 +180,12 @@ internal class BoardGetController(
     @SwaggerResponse(
         responseCode = "200",
         description = "랭킹별 게시글 ID 목록 조회 성공",
-        content = [Content(schema = Schema(implementation = BoardIdsResponse::class))]
+        content = [Content(schema = Schema(implementation = BoardIdsResponse::class))],
     )
     @SwaggerResponse(
         responseCode = "400",
         description = "유효하지 않은 랭킹 유형 또는 기간",
-        content = [Content(mediaType = "application/json")]
+        content = [Content(mediaType = "application/json")],
     )
     fun fetchRankingBoardIds(
         @Parameter(description = "랭킹 유형 (LIKES, VIEWS)", example = "LIKES", required = true)
@@ -192,27 +197,29 @@ internal class BoardGetController(
         @Parameter(description = "페이지 크기", example = "20")
         @RequestParam(required = false) size: Int?,
     ): ResponseEntity<ApiResponse<BoardIdsResponse>> {
-        val metricEnum = try {
-            BoardRankingMetric.fromString(metric)
-        } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("Invalid metric: $metric")
-        }
-        val periodEnum = try {
-            BoardRankingPeriod.fromString(period)
-        } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("Invalid period: $period")
-        }
+        val metricEnum =
+            try {
+                BoardRankingMetric.fromString(metric)
+            } catch (e: IllegalArgumentException) {
+                throw IllegalArgumentException("Invalid metric: $metric")
+            }
+        val periodEnum =
+            try {
+                BoardRankingPeriod.fromString(period)
+            } catch (e: IllegalArgumentException) {
+                throw IllegalArgumentException("Invalid period: $period")
+            }
 
-        val request = GetRankingBoardIdsByOffsetUseCase.Request(
-            metric = metricEnum,
-            period = periodEnum,
-            page = page ?: 0,
-            size = size ?: BoardConstants.DEFAULT_PAGE_SIZE,
-        )
+        val request =
+            GetRankingBoardIdsByOffsetUseCase.Request(
+                metric = metricEnum,
+                period = periodEnum,
+                page = page ?: 0,
+                size = size ?: BoardConstants.DEFAULT_PAGE_SIZE,
+            )
         return ApiResponse.ok(getRankingBoardIdsByOffsetUseCase(request))
     }
 
-    // --- 랭킹별 게시글 ID 목록 조회 (Cursor) ---
     @Public
     @GetMapping("/boards-fetch/ranks/{metric}/{period}/ids/after")
     @Operation(
@@ -222,12 +229,12 @@ internal class BoardGetController(
     @SwaggerResponse(
         responseCode = "200",
         description = "랭킹별 게시글 ID 목록 커서 조회 성공",
-        content = [Content(schema = Schema(implementation = BoardIdsResponse::class))]
+        content = [Content(schema = Schema(implementation = BoardIdsResponse::class))],
     )
     @SwaggerResponse(
         responseCode = "400",
         description = "유효하지 않은 랭킹 유형 또는 기간",
-        content = [Content(mediaType = "application/json")]
+        content = [Content(mediaType = "application/json")],
     )
     fun fetchRankingBoardIdsAfter(
         @Parameter(description = "랭킹 유형 (LIKES, VIEWS)", example = "LIKES", required = true)
@@ -239,23 +246,26 @@ internal class BoardGetController(
         @Parameter(description = "조회 개수", example = "20")
         @RequestParam(required = false) limit: Int?,
     ): ResponseEntity<ApiResponse<BoardIdsResponse>> {
-        val metricEnum = try {
-            BoardRankingMetric.fromString(metric)
-        } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("Invalid metric: $metric")
-        }
-        val periodEnum = try {
-            BoardRankingPeriod.fromString(period)
-        } catch (e: IllegalArgumentException) {
-            throw IllegalArgumentException("Invalid period: $period")
-        }
+        val metricEnum =
+            try {
+                BoardRankingMetric.fromString(metric)
+            } catch (e: IllegalArgumentException) {
+                throw IllegalArgumentException("Invalid metric: $metric")
+            }
+        val periodEnum =
+            try {
+                BoardRankingPeriod.fromString(period)
+            } catch (e: IllegalArgumentException) {
+                throw IllegalArgumentException("Invalid period: $period")
+            }
 
-        val request = GetRankingBoardIdsByCursorUseCase.Request(
-            metric = metricEnum,
-            period = periodEnum,
-            lastBoardId = lastBoardId,
-            limit = limit ?: BoardConstants.DEFAULT_PAGE_SIZE,
-        )
+        val request =
+            GetRankingBoardIdsByCursorUseCase.Request(
+                metric = metricEnum,
+                period = periodEnum,
+                lastBoardId = lastBoardId,
+                limit = limit ?: BoardConstants.DEFAULT_PAGE_SIZE,
+            )
         return ApiResponse.ok(getRankingBoardIdsByCursorUseCase(request))
     }
 }

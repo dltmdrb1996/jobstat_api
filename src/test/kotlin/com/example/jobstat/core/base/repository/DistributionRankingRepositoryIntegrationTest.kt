@@ -42,7 +42,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
             companySizeEducationRepository.save(document)
         }
 
-        // 다른 날짜의 데이터 추가 (트렌드 분석용)
         val nextMonthDate = "202402"
         val nextMonthDoc = createTestDocument(nextMonthDate, 1)
         companySizeEducationRepository.save(nextMonthDoc)
@@ -116,24 +115,21 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     }
 
     private fun createRandomDistribution(dominantCategory: String? = null): Map<String, Double> {
-        // 기본 가중치 설정
         val weights =
             educationLevels.associateWith {
                 if (it == dominantCategory) {
-                    Random.nextDouble(0.4, 0.6) // dominant category에 높은 가중치
+                    Random.nextDouble(0.4, 0.6)
                 } else {
-                    Random.nextDouble(0.05, 0.15) // 나머지 카테고리에 낮은 가중치
+                    Random.nextDouble(0.05, 0.15)
                 }
             }
 
-        // 정규화
         val sum = weights.values.sum()
         return weights.mapValues { it.value / sum }
     }
 
     private fun createTestRankingEntry(rank: Int): CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry {
         val entityId = rank.toLong()
-        // BACHELOR를 dominant category로 설정하여 분포 생성
         val dominantCategory = "BACHELOR"
         val distribution = createRandomDistribution(dominantCategory)
 
@@ -293,7 +289,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one matching distribution")
 
-        // 유사도 검증
         results.forEach { entry ->
             val similarity = calculateSimilarity(pattern, entry.distribution)
             assertTrue(
@@ -321,7 +316,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         results.forEach { entry ->
             assertEquals(category, entry.dominantCategory, "Each entry should have the specified dominant category")
             assertTrue(
-                (entry.distribution[category] ?: 0.0) > 0.35, // 임계값을 조정
+                (entry.distribution[category] ?: 0.0) > 0.35,
                 "Dominant category should have significant distribution value (actual: ${entry.distribution[category]})",
             )
         }

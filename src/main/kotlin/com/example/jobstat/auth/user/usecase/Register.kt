@@ -39,7 +39,6 @@ internal class Register(
                     val refreshToken = jwtTokenGenerator.createRefreshToken(RefreshPayload(user.id, roles))
                     val accessToken = jwtTokenGenerator.createAccessToken(AccessPayload(user.id, roles))
 
-                    // 토큰 저장 및 응답 생성
                     tokenService.saveToken(refreshToken, user.id, jwtTokenGenerator.getRefreshTokenExpiration())
                     Response(accessToken, refreshToken)
                 }

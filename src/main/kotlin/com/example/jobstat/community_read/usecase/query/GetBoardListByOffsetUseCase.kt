@@ -1,4 +1,3 @@
-// file: src/main/kotlin/com/example/jobstat/community_read/usecase/query/GetTopBoardsByOffsetUseCase.kt
 package com.example.jobstat.community_read.usecase.query
 
 import com.example.jobstat.community_read.model.BoardResponseDto
@@ -16,12 +15,7 @@ import jakarta.validation.constraints.Pattern
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-// import org.springframework.transaction.annotation.Transactional // Read 서비스는 보통 필요 없음
 
-/**
- * 페이지 기반 게시글 목록 조회 유스케이스
- * 오프셋(페이지 번호) 기반으로 게시글 목록을 조회
- */
 @Service
 class GetBoardListByOffsetUseCase(
     private val communityReadService: CommunityReadService,
@@ -41,7 +35,7 @@ class GetBoardListByOffsetUseCase(
         return Response(
             items = BoardResponseDto.from(boardsPage.content),
             totalCount = boardsPage.totalElements,
-            period = request.period, // 응답에는 요청받은 문자열 그대로 전달
+            period = request.period,
             page = request.page,
             size = request.size,
             hasNext = boardsPage.hasNext(),
@@ -89,9 +83,6 @@ class GetBoardListByOffsetUseCase(
         val size: Int = 20,
     )
 
-    /**
-     * 게시글 목록 페이지 기반 조회 응답 모델
-     */
     @Schema(name = "GetTopBoardsByOffsetResponse", description = "게시글 목록 페이지 기반 조회 응답 모델")
     data class Response(
         @field:Schema(description = "게시글 목록") val items: List<BoardResponseDto>,

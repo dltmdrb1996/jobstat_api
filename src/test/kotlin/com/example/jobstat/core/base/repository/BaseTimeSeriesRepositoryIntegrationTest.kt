@@ -45,7 +45,6 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
         val year = baseDate.substring(0, 4).toInt()
         val month = baseDate.substring(4, 6).toInt()
 
-        // 해당 월의 첫날 00:00:00
         val startDate = Instant.parse("$year-${month.toString().padStart(2, '0')}-01T00:00:00Z")
 
         // 다음 달의 첫날을 구한 후 1초를 빼서 해당 월의 마지막 날 23:59:59로 설정
@@ -111,7 +110,6 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         Assertions.assertEquals(totalRecords, totalInserted, "Records count mismatch")
 
-        // Verify snapshot periods
         val sampleRecord = allRecords.first()
         Assertions.assertTrue(sampleRecord.period.durationInDays in 28..31)
 
@@ -163,7 +161,6 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
         Assertions.assertTrue(
             records.all { it.baseDate >= startDate.toString() && it.baseDate <= endDate.toString() },
         )
-        // Verify all records have valid snapshot periods
         Assertions.assertTrue(
             records.all { it.period.durationInDays in 28..31 },
         )
@@ -215,7 +212,6 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
             latestRecords[0].baseDate >= latestRecords[1].baseDate &&
                 latestRecords[1].baseDate >= latestRecords[2].baseDate,
         )
-        // Verify snapshot periods are in correct order too
         Assertions.assertTrue(
             latestRecords[0].period.startDate >= latestRecords[1].period.startDate &&
                 latestRecords[1].period.startDate >= latestRecords[2].period.startDate,

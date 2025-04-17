@@ -35,7 +35,6 @@ class ObjectMapperDataSerializer(
             null
         }
 
-    // 추가 편의 기능 - 컬렉션 타입 역직렬화를 위한 메서드
     fun <T> deserializeCollection(
         data: String,
         typeReference: TypeReference<T>,
@@ -47,7 +46,6 @@ class ObjectMapperDataSerializer(
             null
         }
 
-    // prettyPrint 기능 제공
     fun prettyPrint(obj: Any): String? =
         try {
             objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj)

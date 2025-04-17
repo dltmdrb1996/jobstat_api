@@ -9,9 +9,7 @@ import org.springframework.stereotype.Service
 internal class EmailVerificationServiceImpl(
     private val emailVerificationRepository: EmailVerificationRepository,
 ) : EmailVerificationService {
-    override fun create(email: String): EmailVerification =
-        // 새 이메일 인증 객체 생성 및 저장
-        EmailVerification.create(email).let(emailVerificationRepository::save)
+    override fun create(email: String): EmailVerification = EmailVerification.create(email).let(emailVerificationRepository::save)
 
     override fun findLatestByEmail(email: String): EmailVerification? = emailVerificationRepository.findLatestByEmail(email)
 

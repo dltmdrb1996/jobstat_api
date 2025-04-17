@@ -42,7 +42,6 @@ internal class LikeBoard(
                 dbLikeCount = board.likeCount,
             )
 
-        // 읽기 모델 이벤트 발행
         communityCommandEventPublisher.publishBoardLiked(
             boardId = board.id,
             createdAt = board.createdAt,

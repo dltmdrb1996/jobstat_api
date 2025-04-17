@@ -68,12 +68,12 @@ internal class Board protected constructor(
         this.content = newContent
     }
 
-    fun addComment(comment: com.example.jobstat.community.comment.entity.Comment) {
+    fun addComment(comment: Comment) {
         comments.add(comment)
         incrementCommentCount()
     }
 
-    fun removeComment(comment: com.example.jobstat.community.comment.entity.Comment) {
+    fun removeComment(comment: Comment) {
         comments.remove(comment)
         decrementCommentCount()
     }

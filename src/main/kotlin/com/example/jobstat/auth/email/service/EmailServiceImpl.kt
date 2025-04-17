@@ -23,7 +23,6 @@ class EmailServiceImpl(
         code: String,
     ) {
         try {
-            // 이메일 메시지 생성 및 전송
             SimpleMailMessage()
                 .apply {
                     setFrom(fromEmail)

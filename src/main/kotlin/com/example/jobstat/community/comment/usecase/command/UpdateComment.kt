@@ -16,9 +16,6 @@ import jakarta.validation.constraints.Size
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-/**
- * 댓글 수정 유스케이스
- */
 @Service
 internal class UpdateComment(
     private val commentService: CommentService,
@@ -33,10 +30,8 @@ internal class UpdateComment(
     override fun execute(request: ExecuteRequest): Response {
         val comment = commentService.getCommentById(request.commentId)
 
-        // 수정 권한 검증
         validateUpdatePermission(comment, request.password)
 
-        // 댓글 업데이트
         val updated =
             commentService.updateComment(
                 id = request.commentId,
@@ -51,9 +46,6 @@ internal class UpdateComment(
         return createResponse(updated)
     }
 
-    /**
-     * 댓글 엔티티를 응답 모델로 변환
-     */
     private fun createResponse(comment: Comment): Response =
         CommentMapperUtils.mapToCommentDtoWithStringDates(
             comment,
@@ -69,9 +61,6 @@ internal class UpdateComment(
             },
         )
 
-    /**
-     * 댓글 수정 권한 검증
-     */
     private fun validateUpdatePermission(
         comment: Comment,
         password: String?,
@@ -83,9 +72,6 @@ internal class UpdateComment(
         }
     }
 
-    /**
-     * 비회원 댓글 수정 권한 검증 (비밀번호 검증)
-     */
     private fun validateGuestPermission(
         comment: Comment,
         password: String?,
@@ -105,9 +91,6 @@ internal class UpdateComment(
         }
     }
 
-    /**
-     * 회원 댓글 수정 권한 검증
-     */
     private fun validateMemberPermission(comment: Comment) {
         val currentUserId =
             securityUtils.getCurrentUserId()
@@ -136,11 +119,6 @@ internal class UpdateComment(
             minLength = 1,
             maxLength = 1000,
         )
-        @field:NotBlank(message = "댓글 내용은 필수입니다")
-        @field:Size(
-            max = 1000,
-            message = "댓글 내용은 최대 1000자까지 입력 가능합니다",
-        )
         val content: String,
         @Schema(
             description = "비밀번호 (비회원 댓글 수정 시 필수)",
@@ -148,11 +126,6 @@ internal class UpdateComment(
             nullable = true,
             minLength = 4,
             maxLength = 15,
-        )
-        @field:Size(
-            min = 4,
-            max = 15,
-            message = "비밀번호는 4~15자 사이여야 합니다",
         )
         val password: String?,
     ) {

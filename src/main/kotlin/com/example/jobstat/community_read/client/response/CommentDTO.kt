@@ -4,9 +4,6 @@ import com.example.jobstat.community_read.model.CommentReadModel
 import com.example.jobstat.core.global.extension.toEpochMilli
 import java.time.LocalDateTime
 
-/**
- * 외부 시스템에서 받아온 댓글 데이터를 위한 DTO
- */
 data class CommentDTO(
     val id: Long,
     val boardId: Long,

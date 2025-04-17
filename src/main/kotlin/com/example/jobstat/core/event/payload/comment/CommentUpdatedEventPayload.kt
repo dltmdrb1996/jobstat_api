@@ -4,9 +4,6 @@ import com.example.jobstat.core.event.EventPayload
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.time.LocalDateTime
 
-/**
- * 댓글 수정 이벤트 페이로드
- */
 data class CommentUpdatedEventPayload(
     @JsonProperty("commentId")
     val commentId: Long,

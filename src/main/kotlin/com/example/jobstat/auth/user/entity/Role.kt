@@ -27,7 +27,7 @@ internal class Role private constructor(
     private val _userRoles: MutableSet<UserRole> = mutableSetOf()
 
     val users: Set<User>
-        get() = _userRoles.mapNotNull { it.user }.toSet()
+        get() = _userRoles.map { it.user }.toSet()
 
     fun getUserRole(user: User): UserRole? = _userRoles.find { it.user.id == user.id }
 
@@ -53,7 +53,6 @@ internal class Role private constructor(
     companion object {
         fun create(
             name: String,
-            id: Long = 0L,
         ): Role {
             require(name.isNotBlank()) { UserConstants.ErrorMessages.INVALID_ROLE }
             return Role(name)

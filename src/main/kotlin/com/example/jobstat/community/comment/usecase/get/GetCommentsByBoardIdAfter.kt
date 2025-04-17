@@ -9,9 +9,6 @@ import jakarta.validation.Validator
 import jakarta.validation.constraints.Positive
 import org.springframework.stereotype.Service
 
-/**
- * 게시글별 커서 기반 댓글 목록 조회 유스케이스
- */
 @Service
 internal class GetCommentsByBoardIdAfter(
     private val commentService: CommentService,

@@ -11,9 +11,6 @@ import jakarta.validation.constraints.Positive
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-/**
- * 댓글 상세 조회 유스케이스
- */
 @Service
 internal class GetCommentDetail(
     private val commentService: CommentService,

@@ -31,12 +31,12 @@ data class BoardResponseDto(
     companion object {
         fun from(board: BoardReadModel): BoardResponseDto =
             BoardResponseDto(
-                id = board.id.toString(), // BoardReadModel의 ID는 이미 String
-                categoryId = board.categoryId.toString(), // Long -> String 변환
+                id = board.id.toString(),
+                categoryId = board.categoryId.toString(),
                 title = board.title,
                 content = board.content,
                 author = board.author,
-                userId = board.userId?.toString(), // Long? -> String? 변환
+                userId = board.userId?.toString(),
                 viewCount = board.viewCount,
                 likeCount = board.likeCount,
                 commentCount = board.commentCount,

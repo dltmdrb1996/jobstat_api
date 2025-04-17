@@ -1,4 +1,3 @@
-// BoardCommandController.kt
 package com.example.jobstat.community.board.controller
 
 import com.example.jobstat.community.board.usecase.command.CreateBoard

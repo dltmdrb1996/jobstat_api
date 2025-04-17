@@ -28,9 +28,7 @@ internal class UpdateUserPassword(
 
     override fun execute(request: Request): Unit =
         with(request) {
-            // 사용자 조회 및 현재 비밀번호 검증
             userService.getUserById(userId).let { user ->
-                // 현재 비밀번호 확인
                 if (!passwordUtil.matches(currentPassword, user.password)) {
                     throw AppException.fromErrorCode(
                         ErrorCode.AUTHENTICATION_FAILURE,
@@ -38,7 +36,6 @@ internal class UpdateUserPassword(
                     )
                 }
 
-                // 새 비밀번호로 업데이트
                 userService.updateUser(
                     mapOf(
                         "id" to userId,

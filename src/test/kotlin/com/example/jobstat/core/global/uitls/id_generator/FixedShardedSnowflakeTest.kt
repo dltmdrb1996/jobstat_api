@@ -1,6 +1,5 @@
-package com.example.jobstat.core.global.uitls.id_generator // 테스트 대상 클래스와 동일 패키지 가정
+package com.example.jobstat.core.global.uitls.id_generator
 
-// 테스트 대상 클래스 import (경로는 실제 프로젝트에 맞게 조정)
 import com.example.jobstat.core.global.utils.id_generator.sharded.ShardedSnowflake.Companion.NODE_ID_BITS
 import com.example.jobstat.core.global.utils.id_generator.sharded.SynchronizedSnowflakeCore
 import org.junit.jupiter.api.*
@@ -21,21 +20,15 @@ class FixedShardedSnowflakeTest {
         private const val DEFAULT_NODE_ID = 1L
         private const val DEFAULT_SHARD_COUNT = 16 // 테스트 시 사용할 기본 샤드 수
 
-        // Reflection용 상수
-        private const val CORE_LAST_TIMESTAMP_FIELD_NAME = "lastTimestamp" // Synchronized 버전의 필드 이름
-        private const val CORE_EPOCH_MILLIS_FIELD_NAME = "epochMillis" // Synchronized 버전의 필드 이름 (epochStartMillis -> epochMillis로 변경되었을 수 있으니 확인)
+        private const val CORE_LAST_TIMESTAMP_FIELD_NAME = "lastTimestamp"
+        private const val CORE_EPOCH_MILLIS_FIELD_NAME = "epochMillis"
 
-        // -> 이전 코드 확인 결과 epochMillis 가 맞음.
-        // Shard ID 비트 계산 (ShardedSnowflake 내부 로직과 일치해야 함)
-        private val SHARD_ID_BITS = FixedShardedSnowflake.NODE_ID_BITS // companion object 접근
+        private val SHARD_ID_BITS = FixedShardedSnowflake.NODE_ID_BITS
         private val CORE_SEQUENCE_BITS = FixedShardedSnowflake.TOTAL_SEQUENCE_BITS
     }
 
-    // --- ID 정합성(유일성) 테스트 ---
-    // 목적: 수정된 ShardedSnowflake가 높은 부하에서도 ID 중복을 발생시키지 않는지 확인
-    // 예상 결과: 성공 (오류/중복 0건)
     @ParameterizedTest
-    @ValueSource(ints = [1, 8, 64, 128, 256]) // 스레드 수
+    @ValueSource(ints = [1, 8, 64, 128, 256])
     @DisplayName("[Fixed Sharded] 멀티 스레드 - ID 유일성 검증")
     @Timeout(value = 60, unit = TimeUnit.SECONDS) // 시간 충분히 부여
     fun testFixedSharded_MultiThreadUniqueness(threadCount: Int) {
@@ -59,7 +52,7 @@ class FixedShardedSnowflakeTest {
             runConcurrentTest(threadCount) { latch ->
                 try {
                     repeat(idsPerThread) {
-                        val id = shardedSnowflake.nextId() // 수정된 ShardedSnowflake 사용
+                        val id = shardedSnowflake.nextId()
                         if (allIds.put(id, true) != null) {
                             // 중복 발생 시 즉시 테스트 실패 처리도 고려 가능
                             log.error("##### [Fixed Sharded 유일성] 중복 ID 감지됨!: {}", id)
@@ -89,10 +82,6 @@ class FixedShardedSnowflakeTest {
         )
     }
 
-    // --- 시간 역행 테스트 ---
-    // 목적: 내부 코어의 시계가 역행하는 상황을 시뮬레이션했을 때,
-    //      Synchronized Core의 max() 처리 로직 덕분에 예외가 발생하지 않고 정상 처리되는지 확인
-    // 예상 결과: 성공 (예외 발생 없음)
     @Test
     @DisplayName("[Fixed Sharded] 시간 역행 처리 테스트 (내부 Core 조작, 예외 미발생 검증)")
     fun testFixedSharded_ClockBackwards_NoException() {
@@ -111,8 +100,6 @@ class FixedShardedSnowflakeTest {
         log.info("[Fixed Sharded 시간 역행] 내부 Core (인덱스 0, Hash: {}) 조작 시작...", targetCore.hashCode())
 
         // 3. 선택된 Core의 내부 상태 조작 (lastTimestamp 필드 사용)
-        // KMutableProperty1 사용 시 Kotlin Reflection 의존성 필요할 수 있음
-        // 여기서는 Java Reflection 방식으로 필드 직접 접근 시도 (Kotlin 컴파일러가 backing field 생성)
         val lastTimestampField = SynchronizedSnowflakeCore::class.java.getDeclaredField(CORE_LAST_TIMESTAMP_FIELD_NAME).apply { isAccessible = true }
         val epochMillisField = SynchronizedSnowflakeCore::class.java.getDeclaredField(CORE_EPOCH_MILLIS_FIELD_NAME).apply { isAccessible = true }
 
@@ -130,7 +117,6 @@ class FixedShardedSnowflakeTest {
         log.info("[Fixed Sharded 시간 역행] 내부 Core의 lastTimestamp 강제 변경: {} -> {}", previousTimestamp, futureTimestamp)
 
         // 4. ShardedSnowflake.nextId() 반복 호출하여 예외가 발생하지 않는지 확인
-        // Round-robin으로 분배되므로, 최대 shardCount + alpha 만큼 호출
         val maxAttempts = shardCount * 2
         assertDoesNotThrow(
             "내부 Core의 시계 역행 상황(lastTimestamp 조작) 시 예외가 발생해서는 안 됩니다 (max() 처리 기대).",
@@ -140,21 +126,15 @@ class FixedShardedSnowflakeTest {
                     val id = shardedSnowflake.nextId()
                     val generatedTimestamp = (id shr (NODE_ID_BITS + SHARD_ID_BITS + CORE_SEQUENCE_BITS)) // 최종 ID에서 타임스탬프 추출
                     log.debug("[Fixed Sharded 시간 역행] 시도 {}: ID {} 생성됨 (Timestamp: {})", i, id, generatedTimestamp)
-                    // 추가 검증: 생성된 ID의 타임스탬프가 조작된 futureTimestamp 근처인지 확인 가능 (선택 사항)
-                    // if (i <= shardCount && generatedTimestamp < futureTimestamp - 1) {
-                    //     log.warn("Generated timestamp {} is unexpectedly lower than future timestamp {}", generatedTimestamp, futureTimestamp)
-                    // }
                 } catch (e: Exception) {
-                    // 어떤 예외든 발생하면 테스트 실패
                     log.error("[Fixed Sharded 시간 역행] 시도 {} 중 예상치 못한 예외 발생!", i, e)
-                    throw e // assertDoesNotThrow 가 잡도록 예외 다시 던짐
+                    throw e
                 }
             }
         }
 
         log.info("[Fixed Sharded 시간 역행] 예외 없이 {}회 ID 생성 완료.", maxAttempts)
 
-        // (선택) 조작된 상태 원상 복구 시도
         try {
             lastTimestampField.setLong(targetCore, previousTimestamp)
             log.info("[Fixed Sharded 시간 역행] 내부 Core의 lastTimestamp 원상 복구 시도 완료.")
@@ -163,7 +143,6 @@ class FixedShardedSnowflakeTest {
         }
     }
 
-    // --- Helper Methods ---
     private fun runConcurrentTest(
         threadCount: Int,
         task: (CountDownLatch) -> Unit,

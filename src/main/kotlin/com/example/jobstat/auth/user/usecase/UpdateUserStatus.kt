@@ -21,7 +21,6 @@ internal class UpdateUserStatus(
 
     override fun execute(request: Request): Unit =
         with(request) {
-            // 사용자 상태 업데이트
             userService.updateUser(
                 mapOf(
                     "id" to userId,

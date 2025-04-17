@@ -7,11 +7,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class BoardRankingUpdatedEventPayload(
     @JsonProperty("metric")
-    val metric: BoardRankingMetric, // LIKES or VIEWS
+    val metric: BoardRankingMetric,
     @JsonProperty("period")
-    val period: BoardRankingPeriod, // DAY, WEEK, MONTH
+    val period: BoardRankingPeriod,
     @JsonProperty("rankings")
-    val rankings: List<RankingEntry>, // List of board IDs and their scores
+    val rankings: List<RankingEntry>,
     @JsonProperty("eventTs")
     val eventTs: Long,
 ) : EventPayload {
@@ -19,6 +19,6 @@ data class BoardRankingUpdatedEventPayload(
         @JsonProperty("boardId")
         val boardId: Long,
         @JsonProperty("score")
-        val score: Double, // The calculated score (like count or view count for the period)
+        val score: Double,
     )
 }

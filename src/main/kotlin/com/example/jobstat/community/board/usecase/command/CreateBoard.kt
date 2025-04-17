@@ -30,9 +30,6 @@ internal class CreateBoard(
     private val communityCommandEventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
 ) : ValidUseCase<CreateBoard.Request, CreateBoard.Response>(validator) {
-    /**
-     * 트랜잭션 내에서 요청 처리
-     */
     @Transactional
     override fun invoke(request: Request): Response = super.invoke(request)
 

@@ -25,10 +25,6 @@ internal class CacheCleanupScheduler(
 ) {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    // ===================================================
-    // 정기 캐시 정리 스케줄러 (기간별)
-    // ===================================================
-
     /**
      * 일간 캐시 정리 (매일 새벽 1시에 실행)
      * 하루가 지난 게시글을 일간 좋아요/조회수 순위 목록에서 제거
@@ -39,17 +35,14 @@ internal class CacheCleanupScheduler(
             log.info("[캐시 정리 스케줄러] 일간 캐시 정리 시작")
             val startTime = System.currentTimeMillis()
 
-            // 게시글 스캔 및 필터링
             val dayAgo = Instant.now().minus(1, ChronoUnit.DAYS).toEpochMilli()
 
-            // 일간 좋아요 순위 정리
             cleanupExpiredElements(
                 RedisBoardIdListRepository.BOARDS_BY_LIKES_DAY_KEY,
                 dayAgo,
                 "일간 좋아요 순위",
             )
 
-            // 일간 조회수 순위 정리
             cleanupExpiredElements(
                 RedisBoardIdListRepository.BOARDS_BY_VIEWS_DAY_KEY,
                 dayAgo,
@@ -73,17 +66,14 @@ internal class CacheCleanupScheduler(
             log.info("[캐시 정리 스케줄러] 주간 캐시 정리 시작")
             val startTime = System.currentTimeMillis()
 
-            // 게시글 스캔 및 필터링
             val weekAgo = Instant.now().minus(7, ChronoUnit.DAYS).toEpochMilli()
 
-            // 주간 좋아요 순위 정리
             cleanupExpiredElements(
                 RedisBoardIdListRepository.BOARDS_BY_LIKES_WEEK_KEY,
                 weekAgo,
                 "주간 좋아요 순위",
             )
 
-            // 주간 조회수 순위 정리
             cleanupExpiredElements(
                 RedisBoardIdListRepository.BOARDS_BY_VIEWS_WEEK_KEY,
                 weekAgo,
@@ -107,17 +97,14 @@ internal class CacheCleanupScheduler(
             log.info("[캐시 정리 스케줄러] 월간 캐시 정리 시작")
             val startTime = System.currentTimeMillis()
 
-            // 게시글 스캔 및 필터링
             val monthAgo = Instant.now().minus(30, ChronoUnit.DAYS).toEpochMilli()
 
-            // 월간 좋아요 순위 정리
             cleanupExpiredElements(
                 RedisBoardIdListRepository.BOARDS_BY_LIKES_MONTH_KEY,
                 monthAgo,
                 "월간 좋아요 순위",
             )
 
-            // 월간 조회수 순위 정리
             cleanupExpiredElements(
                 RedisBoardIdListRepository.BOARDS_BY_VIEWS_MONTH_KEY,
                 monthAgo,
@@ -130,10 +117,6 @@ internal class CacheCleanupScheduler(
             log.error("[캐시 정리 스케줄러] 월간 캐시 정리 중 오류 발생", e)
         }
     }
-
-    // ===================================================
-    // 전체 캐시 관리
-    // ===================================================
 
     /**
      * 모든 캐시 정리 (매일 새벽 4시에 실행)

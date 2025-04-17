@@ -1,7 +1,6 @@
 package com.example.jobstat.community_read.usecase.query
 
 import com.example.jobstat.community_read.event.CommunityReadEventPublisher
-import com.example.jobstat.community_read.model.BoardReadModel
 import com.example.jobstat.community_read.model.BoardResponseDto
 import com.example.jobstat.community_read.model.CommentResponseDto
 import com.example.jobstat.community_read.service.CommunityReadService
@@ -14,21 +13,13 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
-/**
- * 게시글 상세 정보 조회 유스케이스
- * 게시글 ID를 기반으로 상세 정보를 조회하고 필요시 댓글 정보도 함께 제공
- */
 @Service
 class GetBoardDetailById(
     private val communityReadService: CommunityReadService,
-    private val communityReadEventPublisher: CommunityReadEventPublisher, // 이벤트 발행자 주입
+    private val communityReadEventPublisher: CommunityReadEventPublisher,
     validator: Validator,
 ) : ValidUseCase<GetBoardDetailById.Request, GetBoardDetailById.Response>(validator) {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
-
-    // ===================================================
-    // 유스케이스 실행 메소드
-    // ===================================================
 
     @Transactional
     override fun invoke(request: Request): Response = super.invoke(request)
@@ -106,7 +97,7 @@ class GetBoardDetailById(
                     boardId = boardId,
                     includeComments = includeComments,
                     commentPageSize = commentPageSize,
-            )
+                )
         }
     }
 

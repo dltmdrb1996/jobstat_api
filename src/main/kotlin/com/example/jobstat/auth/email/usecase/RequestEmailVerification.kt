@@ -23,13 +23,10 @@ internal class RequestEmailVerification(
     @Transactional
     override fun execute(request: Request): Unit =
         with(request) {
-            // 이메일 중복 확인
             validateEmailAvailability(email)
 
-            // 이전 인증 코드 확인
             checkPreviousVerification(email)
 
-            // 새 인증 코드 생성 및 발송
             emailVerificationService
                 .create(email)
                 .also { verification -> emailService.sendVerificationEmail(email, verification.code) }

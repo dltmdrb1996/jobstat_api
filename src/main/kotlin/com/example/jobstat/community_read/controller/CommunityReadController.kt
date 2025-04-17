@@ -1,4 +1,3 @@
-// file: src/main/kotlin/com/example/jobstat/community_read/controller/CommunityReadController.kt
 package com.example.jobstat.community_read.controller
 
 import com.example.jobstat.community_read.usecase.query.* // 모든 UseCase import
@@ -31,7 +30,6 @@ class CommunityReadController(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    // --- 게시글 상세 조회 ---
     @GetMapping("/{id}")
     @Operation(
         summary = "게시글 상세 조회",
@@ -57,13 +55,12 @@ class CommunityReadController(
                 GetBoardDetailById.Request.create(
                     boardId = id,
                     includeComments = includeComments,
-                    commentPageSize = commentPageSize
-                )
-            )
+                    commentPageSize = commentPageSize,
+                ),
+            ),
         )
     }
 
-    // --- 최신 게시글 목록 (Offset) ---
     @GetMapping
     @Operation(
         summary = "최신 게시글 목록 조회 (Offset)",
@@ -72,24 +69,23 @@ class CommunityReadController(
     @SwaggerResponse(
         responseCode = "200",
         description = "최신 게시글 목록 조회 성공 (Offset)",
-        content = [Content(schema = Schema(implementation = GetBoardListByOffsetUseCase.Response::class))], // 수정된 UseCase 응답 타입
+        content = [Content(schema = Schema(implementation = GetBoardListByOffsetUseCase.Response::class))],
     )
     fun getLatestBoardsByOffset(
         @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "페이지 크기", example = "20") @RequestParam(defaultValue = "20") size: Int,
-    ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> { // 명확한 반환 타입
+    ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> {
         log.info("조회 요청: 최신 게시글 목록 (페이지 기반) page=$page, size=$size")
         val request =
             GetBoardListByOffsetUseCase.Request(
                 type = "latest",
-                period = "all", // 최신순은 특정 기간이 없음
+                period = "all",
                 page = page,
                 size = size,
             )
         return ApiResponse.ok(getBoardListByOffsetUseCase(request))
     }
 
-    // --- 최신 게시글 목록 (Cursor) ---
     @GetMapping("/after")
     @Operation(
         summary = "최신 게시글 목록 조회 (Cursor)",
@@ -98,24 +94,23 @@ class CommunityReadController(
     @SwaggerResponse(
         responseCode = "200",
         description = "최신 게시글 목록 조회 성공 (Cursor)",
-        content = [Content(schema = Schema(implementation = GetBoardListByCursorUseCase.Response::class))], // 수정된 UseCase 응답 타입
+        content = [Content(schema = Schema(implementation = GetBoardListByCursorUseCase.Response::class))],
     )
     fun getLatestBoardsByCursor(
         @Parameter(description = "마지막으로 조회한 게시글 ID (첫 페이지는 null)", example = "100") @RequestParam(required = false) lastId: Long?,
-        @Parameter(description = "조회할 개수", example = "20") @RequestParam(defaultValue = "20") limit: Int, // 파라미터 이름 limit으로 변경 (UseCase와 일치)
-    ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> { // 명확한 반환 타입
+        @Parameter(description = "조회할 개수", example = "20") @RequestParam(defaultValue = "20") limit: Int,
+    ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> {
         log.info("조회 요청: 최신 게시글 목록 (커서 기반) lastId=$lastId, limit=$limit")
         val request =
             GetBoardListByCursorUseCase.Request(
                 type = "latest",
-                period = "all", // 최신순은 특정 기간이 없음
+                period = "all",
                 lastId = lastId,
-                limit = limit.toLong(), // UseCase Request는 Long 타입 limit을 기대할 수 있음 (필요시 조정)
+                limit = limit.toLong(),
             )
         return ApiResponse.ok(getBoardListByCursorUseCase(request))
     }
 
-    // --- 카테고리별 게시글 목록 (Offset) ---
     @GetMapping("/category/{categoryId}")
     @Operation(
         summary = "카테고리별 게시글 목록 조회 (Offset)",
@@ -130,20 +125,19 @@ class CommunityReadController(
         @Parameter(description = "카테고리 ID", required = true, example = "1") @PathVariable categoryId: Long,
         @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "페이지 크기", example = "20") @RequestParam(defaultValue = "20") size: Int,
-    ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> { // 명확한 반환 타입
+    ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> {
         log.info("조회 요청: 카테고리 게시글 목록 (페이지 기반) categoryId=$categoryId, page=$page, size=$size")
         val categoryIdStr = categoryId.toString()
         val request =
             GetBoardListByOffsetUseCase.Request(
                 type = "category",
-                period = categoryIdStr, // 카테고리 ID를 period 필드에 전달
+                period = categoryIdStr,
                 page = page,
                 size = size,
             )
         return ApiResponse.ok(getBoardListByOffsetUseCase(request))
     }
 
-    // --- 카테고리별 게시글 목록 (Cursor) ---
     @GetMapping("/category/{categoryId}/after")
     @Operation(
         summary = "카테고리별 게시글 목록 조회 (Cursor)",
@@ -157,21 +151,20 @@ class CommunityReadController(
     fun getBoardsByCategoryByCursor(
         @Parameter(description = "카테고리 ID", required = true, example = "1") @PathVariable categoryId: Long,
         @Parameter(description = "마지막으로 조회한 게시글 ID (첫 페이지는 null)", example = "100") @RequestParam(required = false) lastId: Long?,
-        @Parameter(description = "조회할 개수", example = "20") @RequestParam(defaultValue = "20") limit: Int, // 파라미터 이름 limit으로 변경
-    ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> { // 명확한 반환 타입
+        @Parameter(description = "조회할 개수", example = "20") @RequestParam(defaultValue = "20") limit: Int,
+    ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> {
         log.info("조회 요청: 카테고리 게시글 목록 (커서 기반) categoryId=$categoryId, lastId=$lastId, limit=$limit")
         val categoryIdStr = categoryId.toString()
         val request =
             GetBoardListByCursorUseCase.Request(
                 type = "category",
-                period = categoryIdStr, // 카테고리 ID를 period 필드에 전달
+                period = categoryIdStr,
                 lastId = lastId,
-                limit = limit.toLong(), // UseCase Request 타입에 맞게 조정
+                limit = limit.toLong(),
             )
         return ApiResponse.ok(getBoardListByCursorUseCase(request))
     }
 
-    // --- 랭킹별 게시글 목록 (Offset) ---
     @GetMapping("/ranking/{metric}/{period}")
     @Operation(
         summary = "랭킹별 게시글 목록 조회 (Offset)",
@@ -185,40 +178,42 @@ class CommunityReadController(
     @SwaggerResponse(responseCode = "400", description = "유효하지 않은 랭킹 지표 또는 기간", content = [Content()])
     fun getRankedBoardsByOffset(
         @Parameter(description = "랭킹 지표 (LIKES, VIEWS)", required = true, example = "LIKES")
-        @PathVariable metric: String, // <<< String으로 변경
+        @PathVariable metric: String,
         @Parameter(description = "랭킹 기간 (DAY, WEEK, MONTH)", required = true, example = "WEEK")
-        @PathVariable period: String, // <<< String으로 변경
+        @PathVariable period: String,
         @Parameter(description = "페이지 번호", example = "0")
         @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "페이지 크기", example = "20")
         @RequestParam(defaultValue = "20") size: Int,
     ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> {
-        val metricEnum = try {
-            BoardRankingMetric.fromString(metric)
-        } catch (e: IllegalArgumentException) {
-            throw AppException.fromErrorCode(
-                ErrorCode.INVALID_ARGUMENT, detailInfo = "Invalid metric: $metric"
-            )
-        }
-        val periodEnum = try {
-            BoardRankingPeriod.fromString(period)
-        } catch (e: IllegalArgumentException) {
-            throw AppException.fromErrorCode(
-                ErrorCode.INVALID_ARGUMENT, detailInfo = "Invalid period: $period"
-            )
-        }
+        val metricEnum =
+            try {
+                BoardRankingMetric.fromString(metric)
+            } catch (e: IllegalArgumentException) {
+                throw AppException.fromErrorCode(
+                    ErrorCode.INVALID_ARGUMENT,
+                    detailInfo = "Invalid metric: $metric",
+                )
+            }
+        val periodEnum =
+            try {
+                BoardRankingPeriod.fromString(period)
+            } catch (e: IllegalArgumentException) {
+                throw AppException.fromErrorCode(
+                    ErrorCode.INVALID_ARGUMENT,
+                    detailInfo = "Invalid period: $period",
+                )
+            }
 
         val request =
             GetBoardListByOffsetUseCase.Request(
-                type = metricEnum.name.lowercase(), // "likes" or "views"
-                period = periodEnum.name.lowercase(), // "day", "week", "month"
-                page = page,
+                type = metricEnum.name.lowercase(),
+                period = periodEnum.name.lowercase(),
                 size = size,
             )
         return ApiResponse.ok(getBoardListByOffsetUseCase(request))
     }
 
-    // --- 랭킹별 게시글 목록 (Cursor) ---
     @GetMapping("/ranking/{metric}/{period}/after")
     @Operation(
         summary = "랭킹별 게시글 목록 조회 (Cursor)",
@@ -242,32 +237,35 @@ class CommunityReadController(
     ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> {
         log.info("조회 요청: 랭킹 게시글 목록 (커서 기반) metric=$metric, period=$period, lastId=$lastId, limit=$limit")
 
-        val metricEnum = try {
-            BoardRankingMetric.fromString(metric)
-        } catch (e: IllegalArgumentException) {
-            throw AppException.fromErrorCode(
-                ErrorCode.INVALID_ARGUMENT, detailInfo = "Invalid metric: $metric"
-            )
-        }
-        val periodEnum = try {
-            BoardRankingPeriod.fromString(period)
-        } catch (e: IllegalArgumentException) {
-            throw AppException.fromErrorCode(
-                ErrorCode.INVALID_ARGUMENT, detailInfo = "Invalid metric: $metric"
-            )
-        }
+        val metricEnum =
+            try {
+                BoardRankingMetric.fromString(metric)
+            } catch (e: IllegalArgumentException) {
+                throw AppException.fromErrorCode(
+                    ErrorCode.INVALID_ARGUMENT,
+                    detailInfo = "Invalid metric: $metric",
+                )
+            }
+        val periodEnum =
+            try {
+                BoardRankingPeriod.fromString(period)
+            } catch (e: IllegalArgumentException) {
+                throw AppException.fromErrorCode(
+                    ErrorCode.INVALID_ARGUMENT,
+                    detailInfo = "Invalid metric: $metric",
+                )
+            }
 
         val request =
             GetBoardListByCursorUseCase.Request(
-                type = metricEnum.name.lowercase(), // "likes" or "views"
-                period = periodEnum.name.lowercase(), // "day", "week", "month"
+                type = metricEnum.name.lowercase(),
+                period = periodEnum.name.lowercase(),
                 lastId = lastId,
                 limit = limit.toLong(),
             )
         return ApiResponse.ok(getBoardListByCursorUseCase(request))
     }
 
-    // --- 댓글 목록 조회 (Offset만 존재 가정) ---
     @GetMapping("/{boardId}/comments")
     @Operation(summary = "게시글 댓글 목록 조회 (Offset)")
     @SwaggerResponse(
@@ -291,7 +289,6 @@ class CommunityReadController(
         return ApiResponse.ok(getCommentsByBoardId(request))
     }
 
-    // --- 게시글 벌크 조회 ---
     @PostMapping("/bulk")
     @Operation(summary = "게시글 ID 목록으로 게시글 조회")
     @SwaggerResponse(

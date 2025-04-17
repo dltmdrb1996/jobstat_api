@@ -1,10 +1,10 @@
 package com.example.jobstat.community.board.service
 
 import com.example.jobstat.community.board.entity.Board
-import com.example.jobstat.community.board.repository.BoardRankingQueryResult
 import com.example.jobstat.community.board.repository.BoardRepository
 import com.example.jobstat.community.board.repository.CategoryRepository
 import com.example.jobstat.community.board.utils.BoardConstants
+import com.example.jobstat.community.board.utils.model.BoardRankingQueryResult
 import com.example.jobstat.core.constants.CoreConstants
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
@@ -18,16 +18,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
-/**
- * 게시글 관련 비즈니스 로직을 처리하는 서비스 구현체
- */
 @Service
 internal class BoardServiceImpl(
     private val boardRepository: BoardRepository,
     private val categoryRepository: CategoryRepository,
 ) : BoardService {
-    // ========== 게시글 CRUD 작업 ==========
-
     @Transactional
     override fun createBoard(
         title: String,
@@ -56,15 +51,13 @@ internal class BoardServiceImpl(
     @Transactional
     override fun deleteBoard(id: Long) {
         if (!boardRepository.existsById(id)) {
-            AppException.fromErrorCode(
+            throw AppException.fromErrorCode(
                 errorCode = ErrorCode.RESOURCE_NOT_FOUND,
                 message = "게시글이 존재하지 않습니다.",
             )
         }
         boardRepository.deleteById(id)
     }
-
-    // ========== 기본 게시글 조회 작업 ==========
 
     @Transactional(readOnly = true)
     override fun getBoard(id: Long): Board = getBoardEntityWithNotFoundCheck(id)
@@ -112,8 +105,6 @@ internal class BoardServiceImpl(
     @Transactional(readOnly = true)
     override fun getBoardsByIds(ids: List<Long>): List<Board> = boardRepository.findAllByIds(ids)
 
-    // ========== 커서 기반 페이징 조회 작업 ==========
-
     @Transactional(readOnly = true)
     override fun getBoardsAfter(
         lastBoardId: Long?,
@@ -141,8 +132,6 @@ internal class BoardServiceImpl(
         limit: Int,
     ): List<Board> = boardRepository.searchBoardsAfter(keyword, lastBoardId, limit)
 
-    // ========== 랭킹 관련 작업 ==========
-
     @Transactional(readOnly = true)
     override fun getBoardIdsRankedByMetric(
         metric: BoardRankingMetric,
@@ -165,9 +154,17 @@ internal class BoardServiceImpl(
     ): List<Long> {
         val (startTime, endTime) = calculateBoardRankingPeriod(period)
 
+        val lastScore: Int? =
+            lastBoardId?.let { id ->
+                when (metric) {
+                    BoardRankingMetric.LIKES -> boardRepository.findLikeCountById(id)
+                    BoardRankingMetric.VIEWS -> boardRepository.findViewCountById(id)
+                }
+            }
+
         return when (metric) {
-            BoardRankingMetric.LIKES -> boardRepository.findBoardIdsRankedByLikesAfter(startTime, endTime, lastBoardId, limit)
-            BoardRankingMetric.VIEWS -> boardRepository.findBoardIdsRankedByViewsAfter(startTime, endTime, lastBoardId, limit)
+            BoardRankingMetric.LIKES -> boardRepository.findBoardIdsRankedByLikesAfter(startTime, endTime, lastScore, lastBoardId, limit)
+            BoardRankingMetric.VIEWS -> boardRepository.findBoardIdsRankedByViewsAfter(startTime, endTime, lastScore, lastBoardId, limit)
         }
     }
 
@@ -186,27 +183,19 @@ internal class BoardServiceImpl(
         }
     }
 
-    // ========== 유틸리티 메서드 ==========
-
-    /**
-     * 기간 Enum('DAY', 'WEEK', 'MONTH')을 기준으로 시작/종료 LocalDateTime 계산
-     */
     private fun calculateBoardRankingPeriod(period: BoardRankingPeriod): Pair<LocalDateTime, LocalDateTime> {
         val now = LocalDateTime.now()
         val endTime = now
 
         val startTime =
             when (period) {
-                BoardRankingPeriod.DAY -> now.minusDays(1) // Typically last 24 hours
+                BoardRankingPeriod.DAY -> now.minusDays(1)
                 BoardRankingPeriod.WEEK -> now.minusDays(7)
-                BoardRankingPeriod.MONTH -> now.minusMonths(1) // Or minusDays(30) depending on definition
+                BoardRankingPeriod.MONTH -> now.minusMonths(1)
             }
         return Pair(startTime, endTime)
     }
 
-    /**
-     * ID로 게시글 조회 후 없으면 예외 발생
-     */
     private fun getBoardEntityWithNotFoundCheck(id: Long): Board =
         boardRepository.findById(id).orThrowNotFound(
             entityName = "Board",

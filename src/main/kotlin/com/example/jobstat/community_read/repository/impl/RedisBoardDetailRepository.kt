@@ -2,6 +2,9 @@ package com.example.jobstat.community_read.repository.impl
 
 import com.example.jobstat.community_read.model.BoardReadModel
 import com.example.jobstat.community_read.repository.BoardDetailRepository
+import com.example.jobstat.community_read.repository.impl.RedisCommentCountRepository.Companion.getBoardCommentCountKey
+import com.example.jobstat.community_read.repository.impl.RedisCommunityEventUpdateRepository.Companion.boardEventTsKey
+import com.example.jobstat.community_read.service.CommunityEventHandlerVerPipe.Companion.EVENT_TS_TTL_SECONDS
 import com.example.jobstat.core.error.AppException
 import com.example.jobstat.core.error.ErrorCode
 import com.example.jobstat.core.global.utils.serializer.DataSerializer
@@ -18,28 +21,17 @@ class RedisBoardDetailRepository(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     companion object {
-        // 키 포맷 정의
         fun detailKey(boardId: Long) = "board:detail:json::$boardId"
 
         fun detailStateKey(boardId: Long) = "board:detailstate::$boardId"
     }
 
-    // --------------------------
-    // 조회 관련 메소드
-    // --------------------------
-
-    /**
-     * 게시글 상세 정보 조회
-     */
     override fun findBoardDetail(boardId: Long): BoardReadModel? =
         redisTemplate
             .opsForValue()
             .get(detailKey(boardId))
             ?.let { dataSerializer.deserialize(it, BoardReadModel::class) }
 
-    /**
-     * 여러 게시글 상세 정보 조회
-     */
     override fun findBoardDetails(boardIds: List<Long>): Map<Long, BoardReadModel> {
         if (boardIds.isEmpty()) return emptyMap()
 
@@ -57,13 +49,6 @@ class RedisBoardDetailRepository(
         return resultMap
     }
 
-    // --------------------------
-    // 저장 관련 메소드
-    // --------------------------
-
-    /**
-     * 게시글 상세 정보 저장
-     */
     override fun saveBoardDetail(
         board: BoardReadModel,
         eventTs: Long,
@@ -75,9 +60,6 @@ class RedisBoardDetailRepository(
         }
     }
 
-    /**
-     * 여러 게시글 상세 정보 저장
-     */
     override fun saveBoardDetails(
         boards: List<BoardReadModel>,
         eventTs: Long,
@@ -92,13 +74,6 @@ class RedisBoardDetailRepository(
         }
     }
 
-    // --------------------------
-    // 파이프라인 관련 메소드
-    // --------------------------
-
-    /**
-     * 파이프라인에서 게시글 상세 정보 저장
-     */
     override fun saveBoardDetailInPipeline(
         conn: StringRedisConnection,
         board: BoardReadModel,
@@ -106,7 +81,15 @@ class RedisBoardDetailRepository(
         val json =
             dataSerializer.serialize(board)
                 ?: throw AppException.fromErrorCode(ErrorCode.SERIALIZATION_FAILURE)
-        conn.set(detailKey(board.id), json)
-        log.debug("게시글 상세 정보 저장/업데이트 (SET): boardId=${board.id}")
+        val key = detailKey(board.id)
+        val tsKey = boardEventTsKey(board.id) // 타임스탬프 키
+
+        val commentCountKey = getBoardCommentCountKey(board.id)
+        val commentCountValue = board.commentCount.toString()
+
+        conn.set(key, json)
+        conn.set(commentCountKey, commentCountValue)
+        conn.hSet(tsKey, "ts", board.eventTs.toString())
+        conn.expire(tsKey, EVENT_TS_TTL_SECONDS)
     }
 }

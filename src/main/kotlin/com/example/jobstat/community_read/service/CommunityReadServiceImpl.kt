@@ -31,10 +31,6 @@ class CommunityReadServiceImpl(
 ) : CommunityReadService {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    // --------------------------
-    // 게시글 관련 조회 메소드
-    // --------------------------
-    // 단일 게시글 조회
     override fun getBoardByIdWithFetch(boardId: Long): BoardReadModel = boardDetailRepository.findBoardDetail(boardId) ?: fetchAndCacheBoard(boardId)
 
     private fun fetchAndCacheBoard(boardId: Long): BoardReadModel {
@@ -47,18 +43,14 @@ class CommunityReadServiceImpl(
     }
 
     override fun getBoardByIdWithComments(boardId: Long): BoardReadModel {
-        val board = getBoardByIdWithFetch(boardId) // 내부적으로 캐시 우선 조회 사용
+        val board = getBoardByIdWithFetch(boardId)
 
-        // 댓글 데이터 페이지 크기 (필요시 설정 가능하게 변경 고려)
         val commentIdsPage = commentIdListRepository.readCommentsByBoardId(boardId, PageRequest.of(0, 100))
-        val commentIds = commentIdsPage.content // 첫 페이지에서 ID 가져오기
+        val commentIds = commentIdsPage.content
 
         if (commentIds.isNotEmpty()) {
-            // 댓글들의 상세 정보 조회 (내부적으로 캐시 우선 조회 사용)
             board.comments = getCommentsByIds(commentIds)
         }
-        // 참고: 이 로직은 댓글의 *첫* 페이지만 가져옵니다. 더 많은 댓글이 필요하다면,
-        // API 디자인 조정이 필요하거나 호출자가 댓글을 별도로 페이징해야 할 수 있습니다.
         return board
     }
 
@@ -68,21 +60,19 @@ class CommunityReadServiceImpl(
             findInCache = boardDetailRepository::findBoardDetails,
             fetchFromSource = boardClient::fetchBoardsByIds,
             saveToCache = boardDetailRepository::saveBoardDetails,
-            idExtractor = { board -> board.id }, // 게시글 ID 추출기 제공
+            idExtractor = { board -> board.id },
             entityName = "게시글",
         )
 
-    // 최신 게시글 조회 (오프셋 기반)
     override fun getLatestBoardsByOffset(pageable: Pageable): Page<BoardReadModel> =
         getPageWithFallbackInternal(
             readFromCache = { boardIdListRepository.readAllByTimeByOffset(pageable) },
-            fetchFromDb = { fetchLatestBoardIds(pageable) }, // 원본 pageable 기반의 폴백(대체) 조회
+            fetchFromDb = { fetchLatestBoardIds(pageable) },
             fetchDetails = ::getBoardByIdsWithFetch,
             pageable = pageable,
             logMessagePrefix = "최신 게시글 오프셋",
         )
 
-    // 최신 게시글 조회 (커서 기반)
     override fun getLatestBoardsByCursor(
         lastBoardId: Long?,
         limit: Long,
@@ -90,14 +80,13 @@ class CommunityReadServiceImpl(
         getItemsWithFallbackInternal(
             readFromCache = { boardIdListRepository.readAllByTimeByCursor(lastBoardId, limit) },
             fetchFromDb = { cachedIds ->
-                // 캐시에서 찾은 ID들을 받음
                 val lastIdFromCache = cachedIds.lastOrNull()
-                val effectiveLastId = lastIdFromCache ?: lastBoardId // DB 커서 결정
+                val effectiveLastId = lastIdFromCache ?: lastBoardId
                 log.debug("최신 게시글 커서 폴백 (Limit: {}), command 서버에서 ID {} 이후로 조회합니다.", limit, effectiveLastId)
                 if (effectiveLastId != null) {
                     fetchLatestBoardIdsAfter(effectiveLastId, limit.toInt())
                 } else {
-                    fetchLatestBoardIds(PageRequest.of(0, limit.toInt())) // 커서가 없으면 첫 페이지 조회
+                    fetchLatestBoardIds(PageRequest.of(0, limit.toInt()))
                 }
             },
             fetchDetails = ::getBoardByIdsWithFetch,
@@ -105,7 +94,6 @@ class CommunityReadServiceImpl(
             logMessage = "최신 게시글 커서 (LastID: $lastBoardId, Limit: $limit)",
         )
 
-    // 카테고리별 게시글 조회 (오프셋 기반)
     override fun getCategoryBoardsByOffset(
         categoryId: Long,
         pageable: Pageable,
@@ -118,7 +106,6 @@ class CommunityReadServiceImpl(
             logMessagePrefix = "카테고리 $categoryId 게시글 오프셋",
         )
 
-    // 카테고리별 게시글 조회 (커서 기반)
     override fun getCategoryBoardsByCursor(
         categoryId: Long,
         lastBoardId: Long?,
@@ -149,18 +136,21 @@ class CommunityReadServiceImpl(
         val logMessagePrefix = "${period.name} ${metric.name} 랭킹 게시글 오프셋 (Cache Only)"
         log.debug("{}: 캐시에서 ID 목록 조회를 시작합니다. Pageable: {}", logMessagePrefix, pageable)
 
-        val idPageFromCache: Page<Long> = when (metric) {
-            BoardRankingMetric.LIKES -> when (period) {
-                BoardRankingPeriod.DAY -> boardIdListRepository.readAllByLikesDayByOffset(pageable)
-                BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByLikesWeekByOffset(pageable)
-                BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByLikesMonthByOffset(pageable)
+        val idPageFromCache: Page<Long> =
+            when (metric) {
+                BoardRankingMetric.LIKES ->
+                    when (period) {
+                        BoardRankingPeriod.DAY -> boardIdListRepository.readAllByLikesDayByOffset(pageable)
+                        BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByLikesWeekByOffset(pageable)
+                        BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByLikesMonthByOffset(pageable)
+                    }
+                BoardRankingMetric.VIEWS ->
+                    when (period) {
+                        BoardRankingPeriod.DAY -> boardIdListRepository.readAllByViewsDayByOffset(pageable)
+                        BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByViewsWeekByOffset(pageable)
+                        BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByViewsMonthByOffset(pageable)
+                    }
             }
-            BoardRankingMetric.VIEWS -> when (period) {
-                BoardRankingPeriod.DAY -> boardIdListRepository.readAllByViewsDayByOffset(pageable)
-                BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByViewsWeekByOffset(pageable)
-                BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByViewsMonthByOffset(pageable)
-            }
-        }
 
         val boardIds = idPageFromCache.content
 
@@ -175,7 +165,6 @@ class CommunityReadServiceImpl(
         return PageImpl(boardDetails, pageable, idPageFromCache.totalElements)
     }
 
-    // 랭킹별 게시글 조회 (커서 기반) - 캐시 전용 조회로 변경
     override fun getRankedBoardsByCursor(
         metric: BoardRankingMetric,
         period: BoardRankingPeriod,
@@ -185,33 +174,33 @@ class CommunityReadServiceImpl(
         val logMessage = "${period.name} ${metric.name} 랭킹 게시글 커서 (Cache Only, LastID: $lastBoardId, Limit: $limit)"
         log.debug("{}: 캐시에서 ID 목록 조회를 시작합니다.", logMessage)
 
-        val idsFromCache: List<Long> = when (metric) {
-            BoardRankingMetric.LIKES -> when (period) {
-                BoardRankingPeriod.DAY -> boardIdListRepository.readAllByLikesDayByCursor(lastBoardId, limit)
-                BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByLikesWeekByCursor(lastBoardId, limit)
-                BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByLikesMonthByCursor(lastBoardId, limit)
+        val idsFromCache: List<Long> =
+            when (metric) {
+                BoardRankingMetric.LIKES ->
+                    when (period) {
+                        BoardRankingPeriod.DAY -> boardIdListRepository.readAllByLikesDayByCursor(lastBoardId, limit)
+                        BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByLikesWeekByCursor(lastBoardId, limit)
+                        BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByLikesMonthByCursor(lastBoardId, limit)
+                    }
+                BoardRankingMetric.VIEWS ->
+                    when (period) {
+                        BoardRankingPeriod.DAY -> boardIdListRepository.readAllByViewsDayByCursor(lastBoardId, limit)
+                        BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByViewsWeekByCursor(lastBoardId, limit)
+                        BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByViewsMonthByCursor(lastBoardId, limit)
+                    }
             }
-            BoardRankingMetric.VIEWS -> when (period) {
-                BoardRankingPeriod.DAY -> boardIdListRepository.readAllByViewsDayByCursor(lastBoardId, limit)
-                BoardRankingPeriod.WEEK -> boardIdListRepository.readAllByViewsWeekByCursor(lastBoardId, limit)
-                BoardRankingPeriod.MONTH -> boardIdListRepository.readAllByViewsMonthByCursor(lastBoardId, limit)
-            }
-        }
 
         if (idsFromCache.isEmpty()) {
-            log.debug("${logMessage}: 캐시에서 ID를 찾을 수 없습니다.")
+            log.debug("$logMessage: 캐시에서 ID를 찾을 수 없습니다.")
             return emptyList()
         }
 
-        log.debug("${logMessage}: 캐시에서 찾은 ID ${idsFromCache.size}개에 대한 상세 정보를 조회합니다.")
+        log.debug("$logMessage: 캐시에서 찾은 ID ${idsFromCache.size}개에 대한 상세 정보를 조회합니다.")
         val boardDetails = getBoardByIdsWithFetch(idsFromCache) // Uses the existing detail fetching logic
 
         return boardDetails
     }
 
-    // --------------------------
-    // 댓글 관련 조회 메소드
-    // --------------------------
     override fun getCommentById(commentId: Long): CommentReadModel = commentDetailRepository.findCommentDetail(commentId) ?: fetchAndCacheComment(commentId)
 
     private fun fetchAndCacheComment(commentId: Long): CommentReadModel {
@@ -219,7 +208,6 @@ class CommunityReadServiceImpl(
         val fromDb =
             commentClient.fetchCommentById(commentId)
                 ?: throw AppException.fromErrorCode(ErrorCode.RESOURCE_NOT_FOUND, "댓글을 찾을 수 없습니다: $commentId")
-        // 이벤트 타임스탬프 활용 (캐시 시간 기반 로직용)
         commentDetailRepository.saveCommentDetail(fromDb, fromDb.eventTs)
         return fromDb
     }
@@ -230,36 +218,32 @@ class CommunityReadServiceImpl(
             findInCache = commentDetailRepository::findCommentDetails,
             fetchFromSource = commentClient::fetchCommentsByIds,
             saveToCache = commentDetailRepository::saveCommentDetails,
-            idExtractor = { comment -> comment.id }, // 댓글 ID 추출기 제공
+            idExtractor = { comment -> comment.id },
             entityName = "댓글",
         )
 
-    // 게시글별 댓글 조회 (오프셋 기반)
     override fun getCommentsByBoardIdByOffset(
         boardId: Long,
         pageable: Pageable,
     ): Page<CommentReadModel> {
-        // 'isLast' 확인 포함된 댓글 특화 폴백 로직
         val pageFromCache = commentIdListRepository.readCommentsByBoardId(boardId, pageable)
         val pageSize = pageable.pageSize
         val needsFallback = pageFromCache.isEmpty || (pageFromCache.content.size < pageSize && !pageFromCache.isLast)
 
         return getPageWithFallbackInternal(
-            readFromCache = { pageFromCache }, // 이미 읽은 페이지 전달
+            readFromCache = { pageFromCache },
             fetchFromDb = {
-                // Command 서버로부터 폴백(대체) ID 목록 조회
                 log.debug("댓글 ID 캐시 폴백 (BoardID: {}, Page: {}), command 서버에서 조회합니다.", boardId, pageable.pageNumber)
                 val fallbackResponse = commentClient.fetchCommentIdsByBoardId(boardId, pageable.pageNumber, pageSize)
                 fallbackResponse?.let { FetchCommentIdsResponse.from(it) } ?: emptyList()
             },
-            fetchDetails = ::getCommentsByIds, // 댓글 상세 정보 조회기 사용
+            fetchDetails = ::getCommentsByIds,
             pageable = pageable,
             logMessagePrefix = "게시글 $boardId 댓글 오프셋",
-            forceFallback = needsFallback, // 미리 계산된 폴백 조건 전달
+            forceFallback = needsFallback,
         )
     }
 
-    // 게시글별 댓글 조회 (커서 기반)
     override fun getCommentsByBoardIdByCursor(
         boardId: Long,
         lastCommentId: Long?,
@@ -271,18 +255,13 @@ class CommunityReadServiceImpl(
                 val lastIdFromCache = cachedIds.lastOrNull()
                 val effectiveLastId = lastIdFromCache ?: lastCommentId
                 log.debug("게시글 {} 댓글 커서 폴백 (Limit: {}), command 서버에서 ID {} 이후로 조회합니다.", boardId, limit, effectiveLastId)
-                // Command 서버로부터 폴백(대체) ID 목록 조회
                 val fallbackResponse = commentClient.fetchCommentIdsByBoardIdAfter(boardId, effectiveLastId, limit.toInt())
                 fallbackResponse?.let { FetchCommentIdsResponse.from(it) } ?: emptyList()
             },
-            fetchDetails = ::getCommentsByIds, // 댓글 상세 정보 조회기 사용
+            fetchDetails = ::getCommentsByIds,
             limit = limit,
             logMessage = "게시글 $boardId 댓글 커서 (LastID: $lastCommentId, Limit: $limit)",
         )
-
-    // --------------------------
-    // 공통 유틸리티 메소드
-    // --------------------------
 
     /**
      * ID 목록에 대한 상세 정보를 조회하며, 캐시 우선 조회 전략을 활용합니다.
@@ -300,7 +279,7 @@ class CommunityReadServiceImpl(
         findInCache: (List<Long>) -> Map<Long, T>,
         fetchFromSource: (List<Long>) -> List<T>?,
         saveToCache: (List<T>, Long) -> Unit,
-        idExtractor: (T) -> Long, // T로부터 ID를 가져오는 함수
+        idExtractor: (T) -> Long,
         entityName: String,
     ): List<T> {
         if (ids.isEmpty()) return emptyList()
@@ -324,8 +303,7 @@ class CommunityReadServiceImpl(
             }
         }
 
-        // 제공된 idExtractor를 사용하여 원본 순서 유지
-        val resultMap = results.associateBy { idExtractor(it) } // idExtractor 사용
+        val resultMap = results.associateBy { idExtractor(it) }
         return ids.mapNotNull { resultMap[it] }
     }
 
@@ -412,28 +390,24 @@ class CommunityReadServiceImpl(
             val mergedIds = (idsFromCache + idsFromDb).distinct().take(limitInt)
 
             if (mergedIds.isEmpty()) {
-                log.debug("${logMessage}: 캐시나 폴백에서 ID를 찾을 수 없습니다.")
+                log.debug("$logMessage: 캐시나 폴백에서 ID를 찾을 수 없습니다.")
                 return emptyList()
             }
 
-            log.debug("${logMessage}: 병합된 ID ${mergedIds.size}개에 대한 상세 정보를 조회합니다.")
+            log.debug("$logMessage: 병합된 ID ${mergedIds.size}개에 대한 상세 정보를 조회합니다.")
             return fetchDetails(mergedIds)
         } else {
             // 충분한 데이터로 캐시 히트
             if (idsFromCache.isEmpty()) {
-                log.debug("${logMessage}: 캐시 히트되었지만, ID를 찾을 수 없습니다.")
+                log.debug("$logMessage: 캐시 히트되었지만, ID를 찾을 수 없습니다.")
                 return emptyList()
             }
 
-            log.debug("${logMessage}: 캐시 히트 크기 (찾음: ${idsFromCache.size}). 상세 정보를 조회합니다.")
+            log.debug("$logMessage: 캐시 히트 크기 (찾음: ${idsFromCache.size}). 상세 정보를 조회합니다.")
             return fetchDetails(idsFromCache)
         }
     }
 
-    // --------------------------
-    // 내부 ID 조회 메소드
-    // --------------------------
-    // 게시글 ID 조회 메소드
     private fun fetchLatestBoardIds(pageable: Pageable): List<Long> {
         log.debug("DB 조회: 최신 게시글 ID 목록 page={}, size={}", pageable.pageNumber, pageable.pageSize)
         return boardClient.fetchLatestBoardIds(pageable.pageNumber, pageable.pageSize) ?: emptyList()
@@ -463,7 +437,6 @@ class CommunityReadServiceImpl(
         log.debug("DB 조회: ID {} 이후 카테고리 {} 게시글 ID 목록 limit={}", lastBoardId, categoryId, limit)
         return boardClient.fetchCategoryBoardIdsAfter(categoryId, lastBoardId, limit) ?: emptyList()
     }
-
 
 //    // --------------------------
 //    // 랭킹 게시글 조회 헬퍼 메소드
