@@ -199,8 +199,8 @@ kafka:
         multiplier: 2.0
     community-command:
       topic: community-command
-      group-id: community-command-consumer-group-${spring.profiles.active:dev} # Command 서비스 컨슈머 그룹 ID (프로파일 포함, Read 그룹과 달라야 함)
-      retry: # 재시도 설정 (Read 서비스와 동일하게 설정하거나 필요에 따라 조정 가능)
-        attempts: 3             # 재시도 횟수
-        delay-ms: 1000          # 초기 재시도 지연 시간 (ms)
-        multiplier: 2.0         # 재시도 지연 시간 배수
+      group-id: community-command-consumer-group-${spring.profiles.active:dev}
+      retry:
+        attempts: 3
+        delay-ms: 1000
+        multiplier: 2.0
