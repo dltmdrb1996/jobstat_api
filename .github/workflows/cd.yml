@@ -130,6 +130,7 @@ jobs:
             ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
             REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
             REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
+            KAFKA_SERVERS=${{ secrets.KAFKA_SERVERS }}
             EOL
             
             chmod 600 .env
