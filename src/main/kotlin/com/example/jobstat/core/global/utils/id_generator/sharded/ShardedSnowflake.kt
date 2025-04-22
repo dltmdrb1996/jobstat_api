@@ -72,7 +72,7 @@ class ShardedSnowflake(
                 SynchronizedSnowflakeCore(nodeId, this.coreSequenceBits)
             }
 
-        log.info(
+        log.debug(
             "Initialized ShardedSnowflake: NodeId={}, Shards={}, ShardBits={}, SequenceBitsPerCore={}",
             nodeId,
             this.shardCount,

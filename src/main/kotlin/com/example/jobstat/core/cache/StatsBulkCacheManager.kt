@@ -92,7 +92,7 @@ class StatsBulkCacheManagerImpl : StatsBulkCacheManager {
 //    @Scheduled(fixedRate = 5000) // 1분마다 로깅
 //    fun logBulkCacheStats() {
 //        val stats = statsDocumentCache.stats()
-//        log.info(
+//        log.debug(
 //            """
 //        StatsDocument Bulk 캐시 통계:
 //        - 히트: ${stats.hitCount()}

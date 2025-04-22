@@ -47,7 +47,7 @@ class IdGeneratorConfig {
                     "Consider setting a unique SNOWFLAKE_NODE_ID environment variable or -Dsnowflake.node-id system property for each instance.",
             )
         } else {
-            log.info("Creating SynchronizedSnowflakeGenerator Bean with Node ID: {}", nodeId)
+            log.debug("Creating SynchronizedSnowflakeGenerator Bean with Node ID: {}", nodeId)
         }
         return SynchronizedSnowflake(nodeId)
     }
@@ -60,7 +60,7 @@ class IdGeneratorConfig {
             // ShardedSnowflake 구현에 따라 maxNodeId가 다를 수 있음
             "Configured Snowflake Node ID ($nodeId) for sharded generator is out of range (0-$maxNodeId)."
         }
-        log.info("Creating ShardedSnowflake Bean with Node ID: {}, Shard Count: {}", nodeId, shardCount)
+        log.debug("Creating ShardedSnowflake Bean with Node ID: {}, Shard Count: {}", nodeId, shardCount)
         // ShardedSnowflake 구현 시 nodeId 범위 검증 필요
         return ShardedSnowflake(nodeId, shardCount) // 실제 ShardedSnowflake 생성자 사용
     }

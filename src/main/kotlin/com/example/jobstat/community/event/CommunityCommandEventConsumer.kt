@@ -39,7 +39,7 @@ class CommunityCommandEventConsumer : AbstractEventConsumer() {
         event: String,
         ack: Acknowledgment,
     ) {
-        log.info(
+        log.debug(
             "[{}] Kafka 메시지 수신 시도 (Board Command): topic={}, groupId={}",
             this::class.simpleName,
             topic,

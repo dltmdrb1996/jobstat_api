@@ -27,7 +27,6 @@ internal class TokenServiceImpl(
     }
 
     override fun getUserIdFromToken(refreshToken: String): Long {
-        // 리프레시 토큰으로 사용자 키 찾기
         return findUserKeyByRefreshToken(refreshToken)
             ?.let { userIdKey -> extractUserIdFromKey(userIdKey) }
             ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 리프레시 토큰입니다.")

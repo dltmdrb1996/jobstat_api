@@ -81,7 +81,7 @@ abstract class BaseIntegrationTest {
 
             val uri = "mongodb://$username:$password@$host:$port/$database?authSource=admin"
             registry.add("spring.data.mongodb.uri") { uri }
-            log.info("Dynamically set MongoDB URI: {}", uri)
+            log.debug("Dynamically set MongoDB URI: {}", uri)
         }
 
         @JvmStatic
@@ -96,7 +96,7 @@ abstract class BaseIntegrationTest {
             val port = container.getMappedPort(TestRedisConfig.REDIS_PORT)
             registry.add("spring.data.redis.host") { host }
             registry.add("spring.data.redis.port") { port.toString() } // 포트는 문자열로 전달
-            log.info("Dynamically set Redis Host: {}, Port: {}", host, port)
+            log.debug("Dynamically set Redis Host: {}, Port: {}", host, port)
         }
     }
 }

@@ -59,6 +59,35 @@ class ReadSideLuaScriptConfig {
     }
 
     @Bean
+    fun cursorPaginationByScoreScript(): RedisScript<List<*>> { // 이름 변경 권장
+        val script = DefaultRedisScript<List<*>>()
+        script.setScriptText(
+            """
+            -- KEYS[1]: zsetKey
+            -- ARGV[1]: lastItemId (member)
+            -- ARGV[2]: limit
+    
+            local zsetKey = KEYS[1]
+            local lastItemId = ARGV[1]
+            local limit = tonumber(ARGV[2])
+    
+            local lastScore = redis.call('ZSCORE', zsetKey, lastItemId)
+    
+            if not lastScore then
+              redis.log(redis.LOG_WARNING, "Cursor pagination: lastItemId '" .. lastItemId .. "' not found in key '" .. zsetKey .. "'. Returning first page as fallback.")
+              return redis.call('ZREVRANGE', zsetKey, 0, limit - 1)
+            end
+    
+            local exclusiveMaxScore = '(' .. lastScore
+    
+            return redis.call('ZREVRANGEBYSCORE', zsetKey, exclusiveMaxScore, '-inf', 'LIMIT', 0, limit)
+            """.trimIndent(),
+        )
+        script.setResultType(List::class.java)
+        return script
+    }
+
+    @Bean
     fun addCommentIfScoreDiffScript(): RedisScript<Long> {
         val script = DefaultRedisScript<Long>()
         script.setScriptText(

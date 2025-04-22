@@ -49,7 +49,7 @@ class CommunityReadController(
         @RequestParam(required = false, defaultValue = "20")
         commentPageSize: Int,
     ): ResponseEntity<ApiResponse<GetBoardDetailById.Response>> {
-        log.info("조회 요청: 게시글 ID=$id")
+        log.debug("조회 요청: 게시글 ID=$id")
         return ApiResponse.ok(
             getBoardDetailById(
                 GetBoardDetailById.Request.create(
@@ -75,7 +75,7 @@ class CommunityReadController(
         @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "페이지 크기", example = "20") @RequestParam(defaultValue = "20") size: Int,
     ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> {
-        log.info("조회 요청: 최신 게시글 목록 (페이지 기반) page=$page, size=$size")
+        log.debug("조회 요청: 최신 게시글 목록 (페이지 기반) page=$page, size=$size")
         val request =
             GetBoardListByOffsetUseCase.Request(
                 type = "latest",
@@ -100,7 +100,7 @@ class CommunityReadController(
         @Parameter(description = "마지막으로 조회한 게시글 ID (첫 페이지는 null)", example = "100") @RequestParam(required = false) lastId: Long?,
         @Parameter(description = "조회할 개수", example = "20") @RequestParam(defaultValue = "20") limit: Int,
     ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> {
-        log.info("조회 요청: 최신 게시글 목록 (커서 기반) lastId=$lastId, limit=$limit")
+        log.debug("조회 요청: 최신 게시글 목록 (커서 기반) lastId=$lastId, limit=$limit")
         val request =
             GetBoardListByCursorUseCase.Request(
                 type = "latest",
@@ -126,7 +126,7 @@ class CommunityReadController(
         @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "페이지 크기", example = "20") @RequestParam(defaultValue = "20") size: Int,
     ): ResponseEntity<ApiResponse<GetBoardListByOffsetUseCase.Response>> {
-        log.info("조회 요청: 카테고리 게시글 목록 (페이지 기반) categoryId=$categoryId, page=$page, size=$size")
+        log.debug("조회 요청: 카테고리 게시글 목록 (페이지 기반) categoryId=$categoryId, page=$page, size=$size")
         val categoryIdStr = categoryId.toString()
         val request =
             GetBoardListByOffsetUseCase.Request(
@@ -153,7 +153,7 @@ class CommunityReadController(
         @Parameter(description = "마지막으로 조회한 게시글 ID (첫 페이지는 null)", example = "100") @RequestParam(required = false) lastId: Long?,
         @Parameter(description = "조회할 개수", example = "20") @RequestParam(defaultValue = "20") limit: Int,
     ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> {
-        log.info("조회 요청: 카테고리 게시글 목록 (커서 기반) categoryId=$categoryId, lastId=$lastId, limit=$limit")
+        log.debug("조회 요청: 카테고리 게시글 목록 (커서 기반) categoryId=$categoryId, lastId=$lastId, limit=$limit")
         val categoryIdStr = categoryId.toString()
         val request =
             GetBoardListByCursorUseCase.Request(
@@ -235,7 +235,7 @@ class CommunityReadController(
         @Parameter(description = "조회할 개수", example = "20")
         @RequestParam(defaultValue = "20") limit: Int,
     ): ResponseEntity<ApiResponse<GetBoardListByCursorUseCase.Response>> {
-        log.info("조회 요청: 랭킹 게시글 목록 (커서 기반) metric=$metric, period=$period, lastId=$lastId, limit=$limit")
+        log.debug("조회 요청: 랭킹 게시글 목록 (커서 기반) metric=$metric, period=$period, lastId=$lastId, limit=$limit")
 
         val metricEnum =
             try {
@@ -279,7 +279,7 @@ class CommunityReadController(
         @Parameter(description = "페이지 번호", example = "0") @RequestParam(defaultValue = "0") page: Int,
         @Parameter(description = "페이지 크기", example = "20") @RequestParam(defaultValue = "20") size: Int,
     ): ResponseEntity<ApiResponse<GetCommentsByBoardIdUseCase.Response>> {
-        log.info("조회 요청: 게시글 댓글 목록 boardId=$boardId, page=$page, size=$size")
+        log.debug("조회 요청: 게시글 댓글 목록 boardId=$boardId, page=$page, size=$size")
         val request =
             GetCommentsByBoardIdUseCase.Request(
                 boardId = boardId,
@@ -300,7 +300,7 @@ class CommunityReadController(
     fun getBoardsByIds(
         @Parameter(description = "게시글 ID 목록", required = true) @RequestBody request: GetBoardsByIdsUseCase.Request,
     ): ResponseEntity<ApiResponse<GetBoardsByIdsUseCase.Response>> {
-        log.info("조회 요청: 게시글 ID 목록 조회 boardIds=${request.boardIds}")
+        log.debug("조회 요청: 게시글 ID 목록 조회 boardIds=${request.boardIds}")
         return ApiResponse.ok(getBoardsByIds.invoke(request))
     }
 }

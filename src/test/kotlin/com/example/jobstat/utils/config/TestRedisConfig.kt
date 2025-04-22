@@ -27,12 +27,12 @@ class TestRedisConfig {
             try {
                 if (!redisContainer.isRunning) {
                     redisContainer.start()
-                    log.info("==== Test Redis Container Started ====")
-                    log.info("Redis Host: {}", redisContainer.host)
-                    log.info("Redis Port: {}", redisContainer.getMappedPort(REDIS_PORT))
-                    log.info("====================================")
+                    log.debug("==== Test Redis Container Started ====")
+                    log.debug("Redis Host: {}", redisContainer.host)
+                    log.debug("Redis Port: {}", redisContainer.getMappedPort(REDIS_PORT))
+                    log.debug("====================================")
                 } else {
-                    log.info("==== Test Redis Container Already Running ====")
+                    log.debug("==== Test Redis Container Already Running ====")
                 }
             } catch (e: Exception) {
                 log.error("Failed to start Redis container", e)

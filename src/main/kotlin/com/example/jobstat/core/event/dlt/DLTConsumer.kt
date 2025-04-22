@@ -42,13 +42,13 @@ class DLTConsumer(
         val kafkaKey = record.key()
         val originalTopic = getHeaderAsString(headers, KafkaHeaders.ORIGINAL_TOPIC) ?: getHeaderAsString(headers, KafkaHeaders.DLT_ORIGINAL_TOPIC) ?: "unknown" // Spring Kafka 버전에 따라 헤더 이름 다를 수 있음
 
-        log.info("DLT 메시지 수신: originalTopic=$originalTopic, key=$kafkaKey, partition=${record.partition()}, offset=${record.offset()}")
+        log.debug("DLT 메시지 수신: originalTopic=$originalTopic, key=$kafkaKey, partition=${record.partition()}, offset=${record.offset()}")
 
         try {
             val failureSource = getHeaderAsString(headers, CustomDltHeaders.X_FAILURE_SOURCE)
             val isOutboxFailure = failureSource != null
 
-            log.info(
+            log.debug(
                 "DLT 메시지 출처: ${if (isOutboxFailure) "Outbox 발행 실패" else "구독/핸들링 실패"} (Header: ${CustomDltHeaders.X_FAILURE_SOURCE}=$failureSource)",
             )
 
@@ -60,7 +60,7 @@ class DLTConsumer(
             val (parsedEventId, parsedEventType) = extractEventMetadata(originalPayload, kafkaKey ?: DEFAULT_EVENT_ID_PREFIX + System.currentTimeMillis())
 
             if (isOutboxFailure) {
-                log.info("DLT 메시지 출처: Outbox 발행 실패 (Header: ${CustomDltHeaders.X_FAILURE_SOURCE}=$failureSource)")
+                log.debug("DLT 메시지 출처: Outbox 발행 실패 (Header: ${CustomDltHeaders.X_FAILURE_SOURCE}=$failureSource)")
                 retryCount = getHeaderAsString(headers, CustomDltHeaders.X_RETRY_COUNT)?.toIntOrNull() ?: -1
                 lastError = getHeaderAsString(headers, CustomDltHeaders.X_LAST_ERROR) ?: "N/A"
                 eventId = parsedEventId
@@ -93,7 +93,7 @@ class DLTConsumer(
                 }
 
                 lastError = essentialInfo.take(500)
-                log.info("추출된 오류 정보: $lastError")
+                log.debug("추출된 오류 정보: $lastError")
 
                 retryCount = -1
                 eventId = parsedEventId
@@ -110,7 +110,7 @@ class DLTConsumer(
                     payload = originalPayload,
                 )
 
-            log.info(
+            log.debug(
                 "DLT 메시지를 DB에 성공적으로 저장: originalTopic=$originalTopic, eventId=$eventId, failureSource=${dltEvent.failureSource}, dbId=${dltEvent.id}",
             )
 

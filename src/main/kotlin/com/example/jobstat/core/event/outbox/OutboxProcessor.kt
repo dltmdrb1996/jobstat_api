@@ -45,7 +45,7 @@ class OutboxProcessor(
             return
         }
 
-        log.info("아웃박스 처리 시작 (스케줄러): id=${outbox.id}, type=${outbox.eventType}, retryCount=${outbox.retryCount}")
+        log.debug("아웃박스 처리 시작 (스케줄러): id=${outbox.id}, type=${outbox.eventType}, retryCount=${outbox.retryCount}")
         retryEventExecute(outbox)
     }
 
@@ -65,7 +65,7 @@ class OutboxProcessor(
             log.debug("Kafka 재전송 응답 수신: id=${outbox.id}, partition=${recordMetadata?.partition()}, offset=${recordMetadata?.offset()}")
 
             outboxRepository.deleteById(outbox.id)
-            log.info(
+            log.debug(
                 "이벤트 재시도 성공 및 Outbox 삭제: id=${outbox.id}, type=${outbox.eventType}, retryCount=${outbox.retryCount}",
             )
         } catch (e: Exception) {
@@ -95,7 +95,7 @@ class OutboxProcessor(
             try {
                 outbox.incrementRetryCount()
                 outboxRepository.save(outbox)
-                log.info(
+                log.debug(
                     "재시도 횟수 증가 (Dirty Check): id=${outbox.id}, type=${outbox.eventType}, newRetryCount=${outbox.retryCount}",
                 )
             } catch (e: Exception) {
@@ -138,9 +138,9 @@ class OutboxProcessor(
                     headers,
                 )
 
-            log.info("Outbox 실패 메시지 DLT 전송 시도: id=${outbox.id}, dltTopic=$dltTopic, eventId=$eventId")
+            log.debug("Outbox 실패 메시지 DLT 전송 시도: id=${outbox.id}, dltTopic=$dltTopic, eventId=$eventId")
             val sendResult = outboxKafkaTemplate.send(producerRecord).get(kafkaSendTimeoutSeconds, TimeUnit.SECONDS)
-            log.info("Outbox 실패 메시지 DLT 전송 성공: id=${outbox.id}, dltTopic=$dltTopic, offset=${sendResult.recordMetadata?.offset()}")
+            log.debug("Outbox 실패 메시지 DLT 전송 성공: id=${outbox.id}, dltTopic=$dltTopic, offset=${sendResult.recordMetadata?.offset()}")
             dltSendSuccessful = true
         } catch (e: Exception) {
             log.error(
@@ -155,7 +155,7 @@ class OutboxProcessor(
         try {
             if (dltSendSuccessful) {
                 outboxRepository.deleteById(outbox.id)
-                log.info("DLT 전송 성공 후 Outbox 레코드 삭제 완료: id=${outbox.id}")
+                log.debug("DLT 전송 성공 후 Outbox 레코드 삭제 완료: id=${outbox.id}")
             } else {
                 if (outbox.retryCount < finalRetryCount) { // 이미 업데이트된 경우는 제외
                     outbox.retryCount = finalRetryCount

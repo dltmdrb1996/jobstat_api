@@ -47,7 +47,7 @@ internal class CounterBatchService(
                     )
                 }
 
-                log.info(
+                log.debug(
                     "게시글 ID {} DB 카운터 반영: 조회수 {}{}, 좋아요 {}{}",
                     boardId,
                     if (viewCount >= 0) "+" else "",

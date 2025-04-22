@@ -16,12 +16,12 @@ internal class IncViewedHandler(
      * BoardViewed 이벤트를 수신하여 조회수를 증가시키는 로직 실행
      */
     override fun execute(payload: IncViewEventPayload) {
-        log.info("BoardViewed 이벤트 처리 시작: boardId={}", payload.boardId)
+        log.debug("BoardViewed 이벤트 처리 시작: boardId={}", payload.boardId)
 
         try {
             val newTotalViewCount = counterService.incrementViewCount(payload.boardId)
 
-            log.info(
+            log.debug(
                 "Redis 조회수 증가 및 Pending 처리 완료: boardId={}, newTotalRedisAndViewCount={}",
                 payload.boardId,
                 newTotalViewCount,

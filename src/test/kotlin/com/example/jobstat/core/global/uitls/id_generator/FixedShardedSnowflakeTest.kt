@@ -40,7 +40,7 @@ class FixedShardedSnowflakeTest {
         val shardedSnowflake = FixedShardedSnowflake(nodeId = DEFAULT_NODE_ID, shardCount = shardCount)
         val errors = AtomicLong(0)
 
-        log.info(
+        log.debug(
             "[Fixed Sharded 유일성 - {} 스레드, {} 샤드] 테스트 시작 (ID/스레드: {}, 총 예상 ID: {})",
             threadCount,
             shardCount,
@@ -74,7 +74,7 @@ class FixedShardedSnowflakeTest {
         // 최종 검증: 오류가 없고, 생성된 고유 ID 수가 예상과 정확히 일치해야 함
         assertEquals(0, errors.get(), "[Fixed Sharded 유일성] ID 생성 중 오류 또는 중복 발생")
         assertEquals(totalIdsExpected, allIds.size.toLong(), "[Fixed Sharded 유일성] 생성된 ID 개수가 예상과 다릅니다 (중복 발생 가능성).")
-        log.info(
+        log.debug(
             "[Fixed Sharded 유일성 - {} 스레드, {} 샤드] 테스트 통과 (생성된 ID: {})",
             threadCount,
             shardCount,
@@ -97,7 +97,7 @@ class FixedShardedSnowflakeTest {
 
         // 2. 조작할 내부 Core 선택 (예: 첫 번째 코어)
         val targetCore = cores[0]
-        log.info("[Fixed Sharded 시간 역행] 내부 Core (인덱스 0, Hash: {}) 조작 시작...", targetCore.hashCode())
+        log.debug("[Fixed Sharded 시간 역행] 내부 Core (인덱스 0, Hash: {}) 조작 시작...", targetCore.hashCode())
 
         // 3. 선택된 Core의 내부 상태 조작 (lastTimestamp 필드 사용)
         val lastTimestampField = SynchronizedSnowflakeCore::class.java.getDeclaredField(CORE_LAST_TIMESTAMP_FIELD_NAME).apply { isAccessible = true }
@@ -114,7 +114,7 @@ class FixedShardedSnowflakeTest {
 
         val previousTimestamp = lastTimestampField.getLong(targetCore)
         lastTimestampField.setLong(targetCore, futureTimestamp) // lastTimestamp 값을 미래로 설정
-        log.info("[Fixed Sharded 시간 역행] 내부 Core의 lastTimestamp 강제 변경: {} -> {}", previousTimestamp, futureTimestamp)
+        log.debug("[Fixed Sharded 시간 역행] 내부 Core의 lastTimestamp 강제 변경: {} -> {}", previousTimestamp, futureTimestamp)
 
         // 4. ShardedSnowflake.nextId() 반복 호출하여 예외가 발생하지 않는지 확인
         val maxAttempts = shardCount * 2
@@ -133,11 +133,11 @@ class FixedShardedSnowflakeTest {
             }
         }
 
-        log.info("[Fixed Sharded 시간 역행] 예외 없이 {}회 ID 생성 완료.", maxAttempts)
+        log.debug("[Fixed Sharded 시간 역행] 예외 없이 {}회 ID 생성 완료.", maxAttempts)
 
         try {
             lastTimestampField.setLong(targetCore, previousTimestamp)
-            log.info("[Fixed Sharded 시간 역행] 내부 Core의 lastTimestamp 원상 복구 시도 완료.")
+            log.debug("[Fixed Sharded 시간 역행] 내부 Core의 lastTimestamp 원상 복구 시도 완료.")
         } catch (e: Exception) {
             log.warn("내부 Core 상태 복구 중 오류 발생", e)
         }

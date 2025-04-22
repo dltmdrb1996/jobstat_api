@@ -27,7 +27,7 @@ internal class LikeBoard(
     override fun invoke(request: Request): Response = super.invoke(request)
 
     override fun execute(request: Request): Response {
-        log.info("게시글 좋아요 요청: boardId={}", request.boardId)
+        log.debug("게시글 좋아요 요청: boardId={}", request.boardId)
 
         val userId = getUserIdOrThrow()
         val userIdStr = userId.toString()
@@ -49,7 +49,7 @@ internal class LikeBoard(
             likeCount = likeCount,
         )
 
-        log.info(
+        log.debug(
             "게시글 좋아요 성공: boardId={}, userId={}, likeCount={}",
             request.boardId,
             userId,

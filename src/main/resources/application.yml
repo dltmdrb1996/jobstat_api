@@ -123,7 +123,7 @@ monitoring:
 jwt:
   secret: ${JWT_SECRET}
   accessTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION:999999}
-  refreshTokenExpiration: ${JWT_REFRESH_TOKEN_EXPIRATION:604800}
+  refreshTokenExpiration: ${JWT_REFRESH_TOKEN_EXPIRATION:9604800}
   tokenPrefix: "Bearer "
 
 app:

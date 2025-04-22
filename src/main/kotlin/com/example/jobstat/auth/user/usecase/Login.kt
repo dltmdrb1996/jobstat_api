@@ -50,7 +50,7 @@ internal class Login(
         val (accessToken, refreshToken, expiresAt) = generateAndSaveTokens(user.id, user.getRolesString())
 
         val totalEndTime = Instant.now()
-        log.info("전체 로그인 처리 소요시간: {}ms", Duration.between(totalStartTime, totalEndTime).toMillis())
+        log.debug("전체 로그인 처리 소요시간: {}ms", Duration.between(totalStartTime, totalEndTime).toMillis())
 
         // 응답 생성
         return Response(
@@ -95,7 +95,7 @@ internal class Login(
             }
 
         val getUserEndTime = Instant.now()
-        log.info("사용자 이메일 조회 소요시간: {}ms", Duration.between(getUserStartTime, getUserEndTime).toMillis())
+        log.debug("사용자 이메일 조회 소요시간: {}ms", Duration.between(getUserStartTime, getUserEndTime).toMillis())
 
         // 계정 활성화 확인
         if (!user.isActive) {
@@ -110,7 +110,7 @@ internal class Login(
         val passwordCheckStartTime = Instant.now()
         val passwordMatches = passwordUtil.matches(password, user.password)
         val passwordCheckEndTime = Instant.now()
-        log.info("비밀번호 검증 소요시간: {}ms", Duration.between(passwordCheckStartTime, passwordCheckEndTime).toMillis())
+        log.debug("비밀번호 검증 소요시간: {}ms", Duration.between(passwordCheckStartTime, passwordCheckEndTime).toMillis())
 
         if (!passwordMatches) {
             loginAttemptService.incrementFailedAttempts(email)
