@@ -61,7 +61,7 @@
         </logger>
     </springProfile>
 
-    <springProfile name="prod">
+    <springProfile name="dev">
         <property name="LOG_FILE_PATH" value="./logs/dev"/>
         <property name="LOG_FILE_NAME" value="dev-app"/>
 
@@ -113,55 +113,55 @@
         </logger>
     </springProfile>
 
-<!--    <springProfile name="prod">-->
-<!--        <property name="LOG_FILE_PATH" value="./logs/prod"/>-->
-<!--        <property name="LOG_FILE_NAME" value="prod-app"/>-->
+    <springProfile name="prod">
+        <property name="LOG_FILE_PATH" value="./logs/prod"/>
+        <property name="LOG_FILE_NAME" value="prod-app"/>
 
-<!--        <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
-<!--            <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>-->
-<!--            <encoder>-->
-<!--                <pattern>${LOG_PATTERN}</pattern>-->
-<!--            </encoder>-->
-<!--            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
-<!--                <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
-<!--                <maxFileSize>50MB</maxFileSize>-->
-<!--                <maxHistory>30</maxHistory>-->
-<!--                <totalSizeCap>3GB</totalSizeCap>-->
-<!--            </rollingPolicy>-->
-<!--        </appender>-->
+        <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>50MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>3GB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
 
-<!--        <appender name="PROD_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
-<!--            <file>${LOG_FILE_PATH}/prod-error.log</file>-->
-<!--            <encoder>-->
-<!--                <pattern>${LOG_PATTERN}</pattern>-->
-<!--            </encoder>-->
-<!--            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
-<!--                <fileNamePattern>${LOG_FILE_PATH}/prod-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>-->
-<!--                <maxFileSize>50MB</maxFileSize>-->
-<!--                <maxHistory>30</maxHistory>-->
-<!--                <totalSizeCap>1GB</totalSizeCap>-->
-<!--            </rollingPolicy>-->
-<!--            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">-->
-<!--                <level>ERROR</level>-->
-<!--            </filter>-->
-<!--        </appender>-->
+        <appender name="PROD_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE_PATH}/prod-error.log</file>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE_PATH}/prod-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>50MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
+            </rollingPolicy>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>ERROR</level>
+            </filter>
+        </appender>
 
-<!--        <root level="INFO">-->
-<!--            <appender-ref ref="PROD_FILE"/>-->
-<!--            <appender-ref ref="PROD_ERROR_FILE"/>-->
-<!--        </root>-->
+        <root level="INFO">
+            <appender-ref ref="PROD_FILE"/>
+            <appender-ref ref="PROD_ERROR_FILE"/>
+        </root>
 
-<!--        <logger name="com.example.jobstat" level="INFO" additivity="false">-->
-<!--            <appender-ref ref="PROD_FILE"/>-->
-<!--            <appender-ref ref="PROD_ERROR_FILE"/>-->
-<!--        </logger>-->
+        <logger name="com.example.jobstat" level="INFO" additivity="false">
+            <appender-ref ref="PROD_FILE"/>
+            <appender-ref ref="PROD_ERROR_FILE"/>
+        </logger>
 
-<!--        <logger name="org.springframework" level="WARN"/>-->
-<!--        <logger name="org.hibernate" level="WARN"/> <logger name="org.apache" level="WARN"/>-->
-<!--        <logger name="io.lettuce" level="WARN"/>-->
-<!--        <logger name="com.zaxxer.hikari" level="WARN"/>-->
-<!--        <logger name="org.springframework.security" level="WARN"/>-->
-<!--        <logger name="com.example.jobstat.core.security.JwtTokenFilter" level="WARN"/>-->
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/> <logger name="org.apache" level="WARN"/>
+        <logger name="io.lettuce" level="WARN"/>
+        <logger name="com.zaxxer.hikari" level="WARN"/>
+        <logger name="org.springframework.security" level="WARN"/>
+        <logger name="com.example.jobstat.core.security.JwtTokenFilter" level="WARN"/>
 
-<!--    </springProfile>-->
+    </springProfile>
 </configuration>
