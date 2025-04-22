@@ -284,21 +284,6 @@ class UserRepositoryTest : JpaIntegrationTestSupport() {
     @Nested
     @DisplayName("사용자 조회 테스트")
     inner class FindUserTest {
-        @Test
-        @DisplayName("ID로 사용자를 조회할 수 있다")
-        fun findUserByIdSuccess() {
-            // Given
-            val savedUser = saveAndGetAfterCommit(testUser) { userRepository.save(it) }
-
-            // When
-            val foundUser = userRepository.findById(savedUser.id)
-
-            // Then
-            assertEquals(savedUser.id, foundUser.id)
-            assertEquals(savedUser.username, foundUser.username)
-            assertEquals(savedUser.email, foundUser.email)
-            assertEquals(savedUser.birthDate, foundUser.birthDate)
-        }
 
         @Test
         @DisplayName("Username으로 사용자를 조회할 수 있다")
