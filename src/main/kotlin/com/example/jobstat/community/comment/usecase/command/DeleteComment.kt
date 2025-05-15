@@ -33,8 +33,8 @@ internal class DeleteComment(
         // 댓글 조회 및 권한 검증
         val comment = commentService.getCommentById(request.commentId)
 
-        log.info("password: ${request.password}")
-        log.info("comment.password: ${comment.password}")
+        log.debug("password: ${request.password}")
+        log.debug("comment.password: ${comment.password}")
         // 접근 권한 검증
         validatePermission(comment, request.password)
 
@@ -83,7 +83,7 @@ internal class DeleteComment(
             )
         }
 
-        log.info("[DeleteComment] 비회원 댓글 ${comment.id}번이 비밀번호로 삭제되었습니다")
+        log.debug("[DeleteComment] 비회원 댓글 ${comment.id}번이 비밀번호로 삭제되었습니다")
     }
 
     private fun validateMemberAccess(comment: Comment) {
@@ -98,7 +98,7 @@ internal class DeleteComment(
         when {
             // 관리자는 모든 댓글 삭제 가능
             securityUtils.isAdmin() -> {
-                log.info("[DeleteComment] 관리자 사용자 $currentUserId 댓글 ${comment.id}번을 삭제합니다")
+                log.debug("[DeleteComment] 관리자 사용자 $currentUserId 댓글 ${comment.id}번을 삭제합니다")
             }
             // 일반 사용자는 자신의 댓글만 삭제 가능
             comment.userId != currentUserId -> {

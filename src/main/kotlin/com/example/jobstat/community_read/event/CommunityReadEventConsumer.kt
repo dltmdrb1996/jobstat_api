@@ -35,7 +35,7 @@ class CommunityReadEventConsumer : AbstractEventConsumer() {
         event: String,
         ack: Acknowledgment,
     ) {
-        log.info(
+        log.debug(
             "[{}] Kafka 메시지 수신 시도: topic=$topic, groupId=$groupId",
             this::class.simpleName,
         )

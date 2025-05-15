@@ -47,10 +47,10 @@ class OutboxMessageRelay(
      */
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     fun saveOutboxOnEvent(outbox: Outbox) {
-        log.info("아웃박스 저장 시도 (BEFORE_COMMIT 리스너): id=${outbox.id}, type=${outbox.eventType}")
+        log.debug("아웃박스 저장 시도 (BEFORE_COMMIT 리스너): id=${outbox.id}, type=${outbox.eventType}")
         try {
             outboxRepository.save(outbox)
-            log.info("아웃박스 저장 성공 (BEFORE_COMMIT 리스너): id=${outbox.id}, type=${outbox.eventType}")
+            log.debug("아웃박스 저장 성공 (BEFORE_COMMIT 리스너): id=${outbox.id}, type=${outbox.eventType}")
         } catch (e: Exception) {
             log.error("아웃박스 저장 실패 (BEFORE_COMMIT 리스너): id=${outbox.id}, type=${outbox.eventType}, error=${e.message}", e)
             throw e
@@ -63,7 +63,7 @@ class OutboxMessageRelay(
      */
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun publishEventAsync(outbox: Outbox) {
-        log.info("트랜잭션 커밋 확인, 즉시 발행 시도 (비동기): id=${outbox.id}, type=${outbox.eventType}")
+        log.debug("트랜잭션 커밋 확인, 즉시 발행 시도 (비동기): id=${outbox.id}, type=${outbox.eventType}")
         coroutineScope.launch {
             try {
                 publishEventExecute(outbox)
@@ -74,7 +74,7 @@ class OutboxMessageRelay(
     }
 
     private suspend fun publishEventExecute(outbox: Outbox) {
-        log.info("즉시 발행 실행 (코루틴): id=${outbox.id}, type=${outbox.eventType}, topic=${outbox.eventType.topic}")
+        log.debug("즉시 발행 실행 (코루틴): id=${outbox.id}, type=${outbox.eventType}, topic=${outbox.eventType.topic}")
 
         try {
             log.debug("Kafka 메시지 발행 시도(코루틴): id=${outbox.id}, topic=${outbox.eventType.topic}, payloadSize=${outbox.event.length}")
@@ -83,12 +83,12 @@ class OutboxMessageRelay(
                 outboxKafkaTemplate.send(outbox.eventType.topic, outbox.id.toString(), outbox.event).await()
             }
 
-            log.info("즉시 발행 성공 (코루틴): id=${outbox.id}, type=${outbox.eventType}")
+            log.debug("즉시 발행 성공 (코루틴): id=${outbox.id}, type=${outbox.eventType}")
 
             withContext(Dispatchers.IO) {
                 try {
                     outboxRepository.deleteById(outbox.id)
-                    log.info("즉시 발행 성공 후 Outbox 삭제 완료: id=${outbox.id}")
+                    log.debug("즉시 발행 성공 후 Outbox 삭제 완료: id=${outbox.id}")
                 } catch (e: Exception) {
                     log.error("즉시 발행 성공 후 Outbox 삭제 실패 (컨슈머 멱등성 필요): id=${outbox.id}, error=${e.message}", e)
                 }
@@ -116,7 +116,7 @@ class OutboxMessageRelay(
                 )
 
             if (pendingOutboxes.isNotEmpty()) {
-                log.info("미처리 Outbox 메시지 발견: count=${pendingOutboxes.size}")
+                log.debug("미처리 Outbox 메시지 발견: count=${pendingOutboxes.size}")
 
                 pendingOutboxes.forEach { outbox ->
                     try {
@@ -129,7 +129,7 @@ class OutboxMessageRelay(
                         )
                     }
                 }
-                log.info("미처리 Outbox 메시지 처리 완료 시도: processedCount=${pendingOutboxes.size}")
+                log.debug("미처리 Outbox 메시지 처리 완료 시도: processedCount=${pendingOutboxes.size}")
             }
         } catch (e: Exception) {
             log.error("미처리 Outbox 메시지 스캔/처리 중 오류 발생: error=${e.message}", e)
@@ -137,8 +137,8 @@ class OutboxMessageRelay(
     }
 
     override fun destroy() {
-        log.info("OutboxMessageRelay 코루틴 스코프 취소 중...")
+        log.debug("OutboxMessageRelay 코루틴 스코프 취소 중...")
         coroutineScope.cancel()
-        log.info("OutboxMessageRelay 코루틴 스코프 취소 완료.")
+        log.debug("OutboxMessageRelay 코루틴 스코프 취소 완료.")
     }
 }

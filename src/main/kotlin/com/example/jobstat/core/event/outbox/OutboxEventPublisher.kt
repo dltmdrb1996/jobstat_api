@@ -21,7 +21,7 @@ class OutboxEventPublisher(
         type: EventType,
         payload: EventPayload,
     ) {
-        log.info("아웃박스 이벤트 생성: type=$type, payloadType=${payload::class.simpleName}")
+        log.debug("아웃박스 이벤트 생성: type=$type, payloadType=${payload::class.simpleName}")
 
         try {
             val eventId = eventIdGenerator.nextId()
@@ -42,10 +42,10 @@ class OutboxEventPublisher(
                     event = event,
                 )
 
-            log.info("아웃박스 이벤트 발행 요청: eventId=$eventId, type=$type")
+            log.debug("아웃박스 이벤트 발행 요청: eventId=$eventId, type=$type")
             applicationEventPublisher.publishEvent(outbox)
 
-            log.info("아웃박스 이벤트 발행 요청 완료: type=$type")
+            log.debug("아웃박스 이벤트 발행 요청 완료: type=$type")
         } catch (e: Exception) {
             log.error("아웃박스 이벤트 발행 중 오류: type=$type, error=${e.message}", e)
             throw e

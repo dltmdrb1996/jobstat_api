@@ -18,10 +18,10 @@ class GetBoardsByIdsUseCase(
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
     override fun execute(request: Request): Response {
-        log.info("게시글 ID 목록으로 조회 요청: boardIds=${request.boardIds}")
+        log.debug("게시글 ID 목록으로 조회 요청: boardIds=${request.boardIds}")
 
         val boards = communityReadService.getBoardByIdsWithFetch(request.boardIds)
-        log.info("게시글 조회 완료: 총 ${boards.size}개")
+        log.debug("게시글 조회 완료: 총 ${boards.size}개")
 
         return Response(
             items = BoardResponseDto.from(boards),

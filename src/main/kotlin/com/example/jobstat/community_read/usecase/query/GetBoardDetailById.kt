@@ -25,10 +25,10 @@ class GetBoardDetailById(
     override fun invoke(request: Request): Response = super.invoke(request)
 
     override fun execute(request: Request): Response {
-        log.info("게시글 상세 조회 요청 시작: boardId=${request.boardId}")
+        log.debug("게시글 상세 조회 요청 시작: boardId=${request.boardId}")
 
         val board = communityReadService.getBoardByIdWithFetch(request.boardId)
-        log.info("게시글 정보 조회 완료: boardId=${request.boardId}, title=${board.title}")
+        log.debug("게시글 정보 조회 완료: boardId=${request.boardId}, title=${board.title}")
 
         val commentsPage =
             if (request.includeComments) {
@@ -48,7 +48,7 @@ class GetBoardDetailById(
             log.error("게시글 조회수 증가 이벤트 발행 중 오류 발생: boardId=${request.boardId}. 조회 응답은 계속 진행.", e)
         }
 
-        log.info("게시글 상세 조회 처리 완료: boardId=${request.boardId}")
+        log.debug("게시글 상세 조회 처리 완료: boardId=${request.boardId}")
         return Response(
             board = BoardResponseDto.from(board),
             comments = CommentResponseDto.from(commentsPage?.content),
@@ -63,7 +63,7 @@ class GetBoardDetailById(
         name = "GetBoardDetailByIdRequest",
         description = "게시글 상세 조회 요청 모델",
     )
-    data class Request private constructor(
+    data class Request(
         @field:Schema(
             description = "조회할 게시글 ID",
             example = "1",

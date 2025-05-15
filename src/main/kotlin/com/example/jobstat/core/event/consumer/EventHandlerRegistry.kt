@@ -23,7 +23,7 @@ class EventHandlerRegistry(
 
     @PostConstruct
     fun init() {
-        log.info("이벤트 핸들러 레지스트리 초기화 시작: 총 ${handlers.size}개 핸들러 검색됨")
+        log.debug("이벤트 핸들러 레지스트리 초기화 시작: 총 ${handlers.size}개 핸들러 검색됨")
         handlers.forEach { handler ->
             registerHandler(handler)
         }
@@ -36,7 +36,7 @@ class EventHandlerRegistry(
             val handlerList = handlerMap.getOrPut(eventType) { mutableListOf() }
             if (!handlerList.contains(handler)) {
                 handlerList.add(handler)
-                log.info("이벤트 핸들러 등록: type=$eventType, handler=${handler.javaClass.simpleName}")
+                log.debug("이벤트 핸들러 등록: type=$eventType, handler=${handler.javaClass.simpleName}")
             }
         } catch (e: Exception) {
             log.error("핸들러 등록 중 오류 발생: handler=${handler.javaClass.simpleName}, error=${e.message}", e)
@@ -56,7 +56,7 @@ class EventHandlerRegistry(
         val eventId = event.eventId
         val targetHandlers = getHandlersForEventType(eventType)
 
-        log.info(
+        log.debug(
             "이벤트 처리 위임 시작: eventId=$eventId, type=$eventType, 등록된 핸들러=${targetHandlers.size}개",
         )
 
@@ -69,14 +69,14 @@ class EventHandlerRegistry(
 
         targetHandlers.forEach { handler ->
             val handlerName = handler.javaClass.simpleName
-            log.info("핸들러 실행 시도: eventId=$eventId, type=$eventType, handler=$handlerName")
+            log.debug("핸들러 실행 시도: eventId=$eventId, type=$eventType, handler=$handlerName")
             val startTime = System.currentTimeMillis()
 
             try {
                 handler.invoke(event)
 
                 val elapsedTime = System.currentTimeMillis() - startTime
-                log.info(
+                log.debug(
                     "핸들러 실행 성공: eventId=$eventId, type=$eventType, handler=$handlerName, 소요시간=${elapsedTime}ms",
                 )
             } catch (e: Exception) {
@@ -89,22 +89,22 @@ class EventHandlerRegistry(
             }
         }
 
-        log.info("이벤트에 대한 모든 핸들러 성공적으로 실행 완료: eventId=$eventId, type=$eventType")
+        log.debug("이벤트에 대한 모든 핸들러 성공적으로 실행 완료: eventId=$eventId, type=$eventType")
     }
 
     private fun logRegisteredHandlers() {
-        log.info("--- 이벤트 핸들러 등록 완료 ---")
+        log.debug("--- 이벤트 핸들러 등록 완료 ---")
         if (handlerMap.isEmpty()) {
             log.warn("등록된 이벤트 핸들러가 없습니다.")
             return
         }
-        log.info("총 ${handlerMap.size}개 이벤트 타입에 대한 핸들러 등록됨:")
+        log.debug("총 ${handlerMap.size}개 이벤트 타입에 대한 핸들러 등록됨:")
         handlerMap.entries.sortedBy { it.key.name }.forEach { (type, handlers) ->
-            log.info("  이벤트 타입 [$type]: ${handlers.size}개 핸들러")
+            log.debug("  이벤트 타입 [$type]: ${handlers.size}개 핸들러")
             handlers.forEach { handler ->
-                log.info("    - ${handler.javaClass.name}")
+                log.debug("    - ${handler.javaClass.name}")
             }
         }
-        log.info("--- 핸들러 레지스트리 초기화 완료 ---")
+        log.debug("--- 핸들러 레지스트리 초기화 완료 ---")
     }
 }

@@ -21,12 +21,12 @@ class GetCommentsByBoardIdUseCase(
 
     override fun execute(request: Request): Response =
         with(request) {
-            log.info("게시글별 댓글 조회 요청: boardId=$boardId, page=$page, size=$size")
+            log.debug("게시글별 댓글 조회 요청: boardId=$boardId, page=$page, size=$size")
 
             val pageable = PageRequest.of(page, size)
 
             val commentsPage = communityReadService.getCommentsByBoardIdByOffset(boardId, pageable)
-            log.info("게시글별 댓글 조회 완료: boardId=$boardId, 댓글 수=${commentsPage.totalElements}개")
+            log.debug("게시글별 댓글 조회 완료: boardId=$boardId, 댓글 수=${commentsPage.totalElements}개")
 
             Response(
                 items = CommentResponseDto.from(commentsPage.content),

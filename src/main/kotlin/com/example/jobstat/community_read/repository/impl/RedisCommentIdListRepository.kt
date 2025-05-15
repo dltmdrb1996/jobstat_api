@@ -141,7 +141,7 @@ class RedisCommentIdListRepository(
             val key = getBoardCommentsKey(boardId)
             val existingScore = redisTemplate.opsForZSet().score(key, toPaddedString(commentId))
             if (existingScore != null && existingScore == sortValue) {
-                log.info("댓글 ID ${commentId}는 이미 게시글 ${boardId}에 동일한 sortValue로 존재합니다.")
+                log.debug("댓글 ID ${commentId}는 이미 게시글 ${boardId}에 동일한 sortValue로 존재합니다.")
             } else {
                 redisTemplate.opsForZSet().add(key, toPaddedString(commentId), sortValue)
             }

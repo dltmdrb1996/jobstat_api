@@ -42,12 +42,12 @@ abstract class AbstractEventConsumer {
             val eventType = event.type
             val eventId = event.eventId
 
-            log.info("[${this::class.simpleName}] 이벤트 수신 및 파싱 완료: eventId=$eventId, type=$eventType, topic=${eventType.topic}")
+            log.debug("[${this::class.simpleName}] 이벤트 수신 및 파싱 완료: eventId=$eventId, type=$eventType, topic=${eventType.topic}")
 
             try {
-                log.info("[${this::class.simpleName}}] 이벤트 처리 시작: eventId=$eventId, type=$eventType, payloadType=${event.payload::class.simpleName}")
+                log.debug("[${this::class.simpleName}}] 이벤트 처리 시작: eventId=$eventId, type=$eventType, payloadType=${event.payload::class.simpleName}")
                 handlerRegistry.processEvent(event)
-                log.info("[${this::class.simpleName}] 이벤트 처리 성공: eventId=$eventId, type=$eventType.")
+                log.debug("[${this::class.simpleName}] 이벤트 처리 성공: eventId=$eventId, type=$eventType.")
             } catch (e: Exception) {
                 log.error("[${this::class.simpleName}] 이벤트 처리 중 오류 발생 (재시도/DLT 처리 예정): eventId=$eventId, type=$eventType, error=${e.message}")
                 log.debug("[${this::class.simpleName}] eventId=$eventId 예외 스택 트레이스: ", e)
@@ -55,7 +55,7 @@ abstract class AbstractEventConsumer {
             }
 
             ack.acknowledge()
-            log.info("[${this::class.simpleName}] Kafka 메시지 수동 Acknowledge 완료: eventId=$eventId, type=$eventType")
+            log.debug("[${this::class.simpleName}] Kafka 메시지 수동 Acknowledge 완료: eventId=$eventId, type=$eventType")
         } catch (e: Exception) {
             log.warn("[${this::class.simpleName}] consumeEvent 처리 중 예외 발생하여 Ack 미수행 (재시도/DLT 처리 예정). Error: {}", e.message)
             log.error("[${this::class.simpleName}] 최종 예외를 Kafka 리스너 컨테이너로 전파합니다.", e)

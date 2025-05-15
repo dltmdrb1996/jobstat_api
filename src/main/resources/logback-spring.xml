@@ -99,16 +99,16 @@
             <appender-ref ref="CONSOLE"/>
         </root>
 
-        <logger name="com.example.jobstat" level="DEBUG" additivity="false">
+        <logger name="com.example.jobstat" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="DEV_FILE"/>
             <appender-ref ref="DEV_ERROR_FILE"/>
         </logger>
 
-        <logger name="org.hibernate.SQL" level="DEBUG" additivity="false">
+        <logger name="org.hibernate.SQL" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
-        <logger name="org.hibernate.type.descriptor.sql" level="DEBUG" additivity="false">
+        <logger name="org.hibernate.type.descriptor.sql" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
     </springProfile>

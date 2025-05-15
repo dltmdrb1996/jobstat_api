@@ -40,7 +40,7 @@ class SynchronizedSnowflake(
         require(nodeId in 0..MAX_NODE_ID) {
             "Node ID must be between 0 and $MAX_NODE_ID. Provided: $nodeId"
         }
-        log.info("Initialized SynchronizedSnowflakeGenerator with Node ID: {}", nodeId)
+        log.debug("Initialized SynchronizedSnowflakeGenerator with Node ID: {}", nodeId)
     }
 
     /**

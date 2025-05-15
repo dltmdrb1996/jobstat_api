@@ -212,7 +212,7 @@ class CommunityEventHandlerVerPipe(
 
             updateEventTs(stringConn, eventTsEntityKey, payload.eventTs)
 
-            log.info("랭킹 리스트 '{}' 업데이트 완료 - {}개 항목", rankingKey, payload.rankings.size)
+            log.debug("랭킹 리스트 '{}' 업데이트 완료 - {}개 항목", rankingKey, payload.rankings.size)
             null
         }
     }

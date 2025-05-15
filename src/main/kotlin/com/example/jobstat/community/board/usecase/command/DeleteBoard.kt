@@ -85,7 +85,7 @@ internal class DeleteBoard(
             )
         }
 
-        log.info("비회원 게시글 {} 비밀번호 확인 후 삭제", board.id)
+        log.debug("비회원 게시글 {} 비밀번호 확인 후 삭제", board.id)
     }
 
     private fun validateMemberAccess(board: Board) {
@@ -98,7 +98,7 @@ internal class DeleteBoard(
 
         when {
             securityUtils.isAdmin() -> {
-                log.info("관리자 {} 사용자가 게시글 {} 삭제", currentUserId, board.id)
+                log.debug("관리자 {} 사용자가 게시글 {} 삭제", currentUserId, board.id)
             }
             board.userId != currentUserId -> {
                 throw AppException.fromErrorCode(

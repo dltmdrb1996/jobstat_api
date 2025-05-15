@@ -54,7 +54,7 @@ class RedisCommentDetailRepository(
             dataSerializer.serialize(comment)
                 ?: throw AppException.fromErrorCode(ErrorCode.SERIALIZATION_FAILURE)
         redisTemplate.opsForValue().set(detailKey(comment.id), json)
-        log.debug("댓글 상세 정보 저장/업데이트 (SET): commentId=${comment.id}")
+        log.info("댓글 상세 정보 저장/업데이트 (SET): commentId=${comment.id}")
     }
 
     override fun saveCommentDetails(

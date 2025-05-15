@@ -16,6 +16,6 @@ class TimeZoneConfig {
     @PostConstruct
     fun init() {
         TimeZone.setDefault(TimeZone.getTimeZone(KOREA_TIME_ZONE_ID))
-        log.info("애플리케이션 기본 시간대가 {}로 설정되었습니다.", TimeZone.getDefault().id)
+        log.debug("애플리케이션 기본 시간대가 {}로 설정되었습니다.", TimeZone.getDefault().id)
     }
 }

@@ -24,7 +24,6 @@ class GlobalExceptionHandler(
 
     @ExceptionHandler(Exception::class)
     fun handleException(ex: Exception): ResponseEntity<ApiResponse<Unit>> {
-        // 요청 추적을 위한 고유 ID 생성
         val errorId = UUID.randomUUID().toString()
         MDC.put("errorId", errorId)
 

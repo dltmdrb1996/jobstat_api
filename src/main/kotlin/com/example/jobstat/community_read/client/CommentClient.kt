@@ -102,7 +102,7 @@ class CommentClient : BaseClient() {
         val logContext = "CommentClient.fetchCommentIdsByBoardId"
         try {
             val typeRef = COMMENTS_BY_BOARD_ID_RESPONSE_TYPE
-            val uri = buildUri("/api/v1/boards/$boardId/comments", mapOf("page" to page, "size" to limit))
+            val uri = buildUri("/api/v1/boards/$boardId/comments", mapOf("page" to page))
 
             log.debug("[{}] Calling Fallback API (fetches full comment data): {}", logContext, uri)
 

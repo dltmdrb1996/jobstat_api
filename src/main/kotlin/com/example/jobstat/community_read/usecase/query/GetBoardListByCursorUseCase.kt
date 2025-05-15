@@ -24,7 +24,7 @@ class GetBoardListByCursorUseCase(
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
     override fun execute(request: Request): Response {
-        log.info(
+        log.debug(
             "게시글 목록 커서 기반 조회: type=${request.type}, period=${request.period}, lastId=${request.lastId}, limit=${request.limit}",
         )
 

@@ -14,17 +14,17 @@ abstract class AbstractEventPublisher(
         type: EventType,
         payload: EventPayload,
     ) {
-        log.info(
+        log.debug(
             "[{}] 이벤트 발행 시도: type=$type, payloadType=${payload::class.simpleName}",
             this::class.simpleName,
         )
 
         try {
             validateEventType(type)
-            log.info("[{}] 이벤트 타입 검증 성공: type=$type", this::class.simpleName)
+            log.debug("[{}] 이벤트 타입 검증 성공: type=$type", this::class.simpleName)
 
             outboxEventPublisher.publish(type, payload)
-            log.info("[{}] 이벤트 발행 요청 완료: type=$type", this::class.simpleName)
+            log.debug("[{}] 이벤트 발행 요청 완료: type=$type", this::class.simpleName)
         } catch (e: Exception) {
             log.error(
                 "[{}] 이벤트 발행 중 오류 발생: type=$type, error=${e.message}",

@@ -90,7 +90,7 @@ class RedisCounterRepository(
         boardId: Long,
         userId: String,
     ): Int {
-        log.info("게시글 좋아요 요청: boardId={}, userId={}", boardId, userId)
+        log.debug("게시글 좋아요 요청: boardId={}, userId={}", boardId, userId)
         val keys =
             listOf(
                 likeUsersKey(boardId),
@@ -124,7 +124,7 @@ class RedisCounterRepository(
         boardId: Long,
         userId: String,
     ): Int {
-        log.info("게시글 좋아요 취소 요청: boardId={}, userId={}", boardId, userId)
+        log.debug("게시글 좋아요 취소 요청: boardId={}, userId={}", boardId, userId)
         val keys =
             listOf(
                 likeUsersKey(boardId),

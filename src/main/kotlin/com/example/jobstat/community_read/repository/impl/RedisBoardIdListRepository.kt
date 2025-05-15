@@ -19,6 +19,7 @@ import org.springframework.stereotype.Repository
 class RedisBoardIdListRepository(
     private val redisTemplate: StringRedisTemplate,
     private val cursorPaginationScript: RedisScript<List<*>>,
+    private val cursorPaginationByScoreScript: RedisScript<List<*>>,
 ) : BoardIdListRepository {
     private val log = LoggerFactory.getLogger(this::class.java)
 
@@ -96,7 +97,7 @@ class RedisBoardIdListRepository(
         @Suppress("UNCHECKED_CAST")
         val result =
             redisTemplate.execute(
-                cursorPaginationScript,
+                cursorPaginationByScoreScript,
                 listOf(ALL_BOARDS_KEY),
                 lastBoardId.toString(),
                 limit.toString(),
@@ -140,7 +141,7 @@ class RedisBoardIdListRepository(
 
         val result =
             redisTemplate.execute(
-                cursorPaginationScript,
+                cursorPaginationByScoreScript,
                 listOf(key),
                 lastBoardId.toString(),
                 limit.toString(),
@@ -177,7 +178,7 @@ class RedisBoardIdListRepository(
 
         val result =
             redisTemplate.execute(
-                cursorPaginationScript,
+                cursorPaginationByScoreScript,
                 listOf(BOARDS_BY_LIKES_DAY_KEY),
                 lastBoardId.toString(),
                 limit.toString(),
@@ -214,7 +215,7 @@ class RedisBoardIdListRepository(
 
         val result =
             redisTemplate.execute(
-                cursorPaginationScript,
+                cursorPaginationByScoreScript,
                 listOf(BOARDS_BY_LIKES_WEEK_KEY),
                 lastBoardId.toString(),
                 limit.toString(),
@@ -251,7 +252,7 @@ class RedisBoardIdListRepository(
 
         val result =
             redisTemplate.execute(
-                cursorPaginationScript,
+                cursorPaginationByScoreScript,
                 listOf(BOARDS_BY_LIKES_MONTH_KEY),
                 lastBoardId.toString(),
                 limit.toString(),
@@ -288,7 +289,7 @@ class RedisBoardIdListRepository(
 
         val result =
             redisTemplate.execute(
-                cursorPaginationScript,
+                cursorPaginationByScoreScript,
                 listOf(BOARDS_BY_VIEWS_DAY_KEY),
                 lastBoardId.toString(),
                 limit.toString(),
@@ -325,7 +326,7 @@ class RedisBoardIdListRepository(
 
         val result =
             redisTemplate.execute(
-                cursorPaginationScript,
+                cursorPaginationByScoreScript,
                 listOf(BOARDS_BY_VIEWS_WEEK_KEY),
                 lastBoardId.toString(),
                 limit.toString(),
@@ -362,7 +363,7 @@ class RedisBoardIdListRepository(
 
         val result =
             redisTemplate.execute(
-                cursorPaginationScript,
+                cursorPaginationByScoreScript,
                 listOf(BOARDS_BY_VIEWS_MONTH_KEY),
                 lastBoardId.toString(),
                 limit.toString(),

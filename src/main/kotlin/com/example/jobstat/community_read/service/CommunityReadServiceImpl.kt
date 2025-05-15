@@ -34,7 +34,7 @@ class CommunityReadServiceImpl(
     override fun getBoardByIdWithFetch(boardId: Long): BoardReadModel = boardDetailRepository.findBoardDetail(boardId) ?: fetchAndCacheBoard(boardId)
 
     private fun fetchAndCacheBoard(boardId: Long): BoardReadModel {
-        log.debug("게시글 상세 캐시 미스: {}. Command 서버에서 조회합니다.", boardId)
+        log.info("게시글 상세 캐시 미스: {}. Command 서버에서 조회합니다.", boardId)
         val fromDb =
             boardClient.fetchBoardById(boardId)
                 ?: throw AppException.fromErrorCode(ErrorCode.RESOURCE_NOT_FOUND, "게시글을 찾을 수 없습니다: $boardId")
@@ -82,7 +82,7 @@ class CommunityReadServiceImpl(
             fetchFromDb = { cachedIds ->
                 val lastIdFromCache = cachedIds.lastOrNull()
                 val effectiveLastId = lastIdFromCache ?: lastBoardId
-                log.debug("최신 게시글 커서 폴백 (Limit: {}), command 서버에서 ID {} 이후로 조회합니다.", limit, effectiveLastId)
+                log.info("최신 게시글 커서 폴백 (Limit: {}), command 서버에서 ID {} 이후로 조회합니다.", limit, effectiveLastId)
                 if (effectiveLastId != null) {
                     fetchLatestBoardIdsAfter(effectiveLastId, limit.toInt())
                 } else {
@@ -116,7 +116,7 @@ class CommunityReadServiceImpl(
             fetchFromDb = { cachedIds ->
                 val lastIdFromCache = cachedIds.lastOrNull()
                 val effectiveLastId = lastIdFromCache ?: lastBoardId
-                log.debug("카테고리 {} 게시글 커서 폴백 (Limit: {}), command 서버에서 ID {} 이후로 조회합니다.", categoryId, limit, effectiveLastId)
+                log.info("카테고리 {} 게시글 커서 폴백 (Limit: {}), command 서버에서 ID {} 이후로 조회합니다.", categoryId, limit, effectiveLastId)
                 if (effectiveLastId != null) {
                     fetchCategoryBoardIdsAfter(categoryId, effectiveLastId, limit.toInt())
                 } else {
@@ -134,7 +134,7 @@ class CommunityReadServiceImpl(
         pageable: Pageable,
     ): Page<BoardReadModel> {
         val logMessagePrefix = "${period.name} ${metric.name} 랭킹 게시글 오프셋 (Cache Only)"
-        log.debug("{}: 캐시에서 ID 목록 조회를 시작합니다. Pageable: {}", logMessagePrefix, pageable)
+        log.info("{}: 캐시에서 ID 목록 조회를 시작합니다. Pageable: {}", logMessagePrefix, pageable)
 
         val idPageFromCache: Page<Long> =
             when (metric) {
@@ -155,11 +155,11 @@ class CommunityReadServiceImpl(
         val boardIds = idPageFromCache.content
 
         if (boardIds.isEmpty()) {
-            log.debug("{}: 캐시에서 ID를 찾을 수 없습니다.", logMessagePrefix)
+            log.info("{}: 캐시에서 ID를 찾을 수 없습니다.", logMessagePrefix)
             return PageImpl(emptyList(), pageable, idPageFromCache.totalElements)
         }
 
-        log.debug("{}: 캐시에서 찾은 ID {}개에 대한 상세 정보를 조회합니다.", logMessagePrefix, boardIds.size)
+        log.info("{}: 캐시에서 찾은 ID {}개에 대한 상세 정보를 조회합니다.", logMessagePrefix, boardIds.size)
         val boardDetails = getBoardByIdsWithFetch(boardIds) // Uses the existing detail fetching logic
 
         return PageImpl(boardDetails, pageable, idPageFromCache.totalElements)
@@ -172,7 +172,7 @@ class CommunityReadServiceImpl(
         limit: Long,
     ): List<BoardReadModel> {
         val logMessage = "${period.name} ${metric.name} 랭킹 게시글 커서 (Cache Only, LastID: $lastBoardId, Limit: $limit)"
-        log.debug("{}: 캐시에서 ID 목록 조회를 시작합니다.", logMessage)
+        log.info("{}: 캐시에서 ID 목록 조회를 시작합니다.", logMessage)
 
         val idsFromCache: List<Long> =
             when (metric) {
@@ -191,11 +191,11 @@ class CommunityReadServiceImpl(
             }
 
         if (idsFromCache.isEmpty()) {
-            log.debug("$logMessage: 캐시에서 ID를 찾을 수 없습니다.")
+            log.info("$logMessage: 캐시에서 ID를 찾을 수 없습니다.")
             return emptyList()
         }
 
-        log.debug("$logMessage: 캐시에서 찾은 ID ${idsFromCache.size}개에 대한 상세 정보를 조회합니다.")
+        log.info("$logMessage: 캐시에서 찾은 ID ${idsFromCache.size}개에 대한 상세 정보를 조회합니다.")
         val boardDetails = getBoardByIdsWithFetch(idsFromCache) // Uses the existing detail fetching logic
 
         return boardDetails
@@ -204,7 +204,7 @@ class CommunityReadServiceImpl(
     override fun getCommentById(commentId: Long): CommentReadModel = commentDetailRepository.findCommentDetail(commentId) ?: fetchAndCacheComment(commentId)
 
     private fun fetchAndCacheComment(commentId: Long): CommentReadModel {
-        log.debug("댓글 상세 캐시 미스: {}. Command 서버에서 조회합니다.", commentId)
+        log.info("댓글 상세 캐시 미스: {}. Command 서버에서 조회합니다.", commentId)
         val fromDb =
             commentClient.fetchCommentById(commentId)
                 ?: throw AppException.fromErrorCode(ErrorCode.RESOURCE_NOT_FOUND, "댓글을 찾을 수 없습니다: $commentId")
@@ -233,7 +233,7 @@ class CommunityReadServiceImpl(
         return getPageWithFallbackInternal(
             readFromCache = { pageFromCache },
             fetchFromDb = {
-                log.debug("댓글 ID 캐시 폴백 (BoardID: {}, Page: {}), command 서버에서 조회합니다.", boardId, pageable.pageNumber)
+                log.info("댓글 ID 캐시 폴백 (BoardID: {}, Page: {}), command 서버에서 조회합니다.", boardId, pageable.pageNumber)
                 val fallbackResponse = commentClient.fetchCommentIdsByBoardId(boardId, pageable.pageNumber, pageSize)
                 fallbackResponse?.let { FetchCommentIdsResponse.from(it) } ?: emptyList()
             },
@@ -254,7 +254,7 @@ class CommunityReadServiceImpl(
             fetchFromDb = { cachedIds ->
                 val lastIdFromCache = cachedIds.lastOrNull()
                 val effectiveLastId = lastIdFromCache ?: lastCommentId
-                log.debug("게시글 {} 댓글 커서 폴백 (Limit: {}), command 서버에서 ID {} 이후로 조회합니다.", boardId, limit, effectiveLastId)
+                log.info("게시글 {} 댓글 커서 폴백 (Limit: {}), command 서버에서 ID {} 이후로 조회합니다.", boardId, limit, effectiveLastId)
                 val fallbackResponse = commentClient.fetchCommentIdsByBoardIdAfter(boardId, effectiveLastId, limit.toInt())
                 fallbackResponse?.let { FetchCommentIdsResponse.from(it) } ?: emptyList()
             },
@@ -291,11 +291,11 @@ class CommunityReadServiceImpl(
 
         val missingIds = ids.filter { !foundIds.contains(it) }
         if (missingIds.isNotEmpty()) {
-            log.debug("{} 상세 캐시 미스 ID: {}. 원본에서 조회합니다.", entityName, missingIds)
+            log.info("{} 상세 캐시 미스 ID: {}. 원본에서 조회합니다.", entityName, missingIds)
             val fetchedItems = fetchFromSource(missingIds) ?: emptyList()
 
             if (fetchedItems.isNotEmpty()) {
-                log.debug("원본에서 {}개의 {} 상세 정보를 가져왔습니다. 캐시에 저장합니다.", fetchedItems.size, entityName)
+                log.info("원본에서 {}개의 {} 상세 정보를 가져왔습니다. 캐시에 저장합니다.", fetchedItems.size, entityName)
                 saveToCache(fetchedItems, System.currentTimeMillis())
                 results.addAll(fetchedItems)
             } else {
@@ -330,19 +330,19 @@ class CommunityReadServiceImpl(
         val needsFallback = forceFallback || pageFromCache.isEmpty || pageFromCache.content.size < pageable.pageSize
 
         if (needsFallback) {
-            log.debug("{}: 캐시 미스 또는 불충분한 크기 (찾음: {}, 요청: {}). 폴백을 실행합니다.", logMessagePrefix, pageFromCache.content.size, pageable.pageSize)
+            log.info("{}: 캐시 미스 또는 불충분한 크기 (찾음: {}, 요청: {}). 폴백을 실행합니다.", logMessagePrefix, pageFromCache.content.size, pageable.pageSize)
 
             val additionalIds = fetchFromDb()
             // 캐시 결과를 먼저 병합하고, 그 다음 폴백 결과 병합, 고유성 보장 및 크기 제한
             val mergedIds = (pageFromCache.content + additionalIds).distinct().take(pageable.pageSize)
 
             if (mergedIds.isEmpty()) {
-                log.debug("{}: 캐시나 폴백에서 ID를 찾을 수 없습니다.", logMessagePrefix)
+                log.info("{}: 캐시나 폴백에서 ID를 찾을 수 없습니다.", logMessagePrefix)
                 // 빈 페이지 반환, 캐시에 totalElements가 있었다면 원본 값 유지, 아니면 0
                 return PageImpl(emptyList(), pageable, if (pageFromCache.totalElements > 0 && pageFromCache.isEmpty) pageFromCache.totalElements else 0)
             }
 
-            log.debug("{}: 병합된 ID {}개에 대한 상세 정보를 조회합니다.", logMessagePrefix, mergedIds.size)
+            log.info("{}: 병합된 ID {}개에 대한 상세 정보를 조회합니다.", logMessagePrefix, mergedIds.size)
             val details = fetchDetails(mergedIds)
             // 폴백 후 캐시의 totalElements는 부정확할 수 있으나, 원본 로직 유지.
             // 더 정확한 개수는 별도의 DB 조회가 필요함.
@@ -350,12 +350,12 @@ class CommunityReadServiceImpl(
         } else {
             // 캐시 히트 또는 충분한 데이터
             if (pageFromCache.isEmpty) {
-                log.debug("{}: 캐시 히트되었지만, ID를 찾을 수 없습니다.", logMessagePrefix)
+                log.info("{}: 캐시 히트되었지만, ID를 찾을 수 없습니다.", logMessagePrefix)
                 // 캐시의 전체 개수가 있다면 존중
                 return PageImpl(emptyList(), pageable, pageFromCache.totalElements)
             }
 
-            log.debug("{}: 캐시 히트 및 충분한 크기 (찾음: {}). 상세 정보를 조회합니다.", logMessagePrefix, pageFromCache.content.size)
+            log.info("{}: 캐시 히트 및 충분한 크기 (찾음: {}). 상세 정보를 조회합니다.", logMessagePrefix, pageFromCache.content.size)
             val details = fetchDetails(pageFromCache.content)
             return PageImpl(details, pageable, pageFromCache.totalElements)
         }
@@ -382,7 +382,7 @@ class CommunityReadServiceImpl(
         val limitInt = limit.toInt() // take()를 위해 Int 사용
 
         if (idsFromCache.size < limitInt) {
-            log.debug("$logMessage: 캐시 미스 또는 불충분한 크기 (찾음: $idsFromCache, 요청: $limitInt). 폴백을 실행합니다.")
+            log.info("$logMessage: 캐시 미스 또는 불충분한 크기 (찾음: $idsFromCache, 요청: $limitInt). 폴백을 실행합니다.")
 
             // 캐시된 ID들을 폴백 함수에 전달
             val idsFromDb = fetchFromDb(idsFromCache)
@@ -390,26 +390,26 @@ class CommunityReadServiceImpl(
             val mergedIds = (idsFromCache + idsFromDb).distinct().take(limitInt)
 
             if (mergedIds.isEmpty()) {
-                log.debug("$logMessage: 캐시나 폴백에서 ID를 찾을 수 없습니다.")
+                log.info("$logMessage: 캐시나 폴백에서 ID를 찾을 수 없습니다.")
                 return emptyList()
             }
 
-            log.debug("$logMessage: 병합된 ID ${mergedIds.size}개에 대한 상세 정보를 조회합니다.")
+            log.info("$logMessage: 병합된 ID ${mergedIds.size}개에 대한 상세 정보를 조회합니다.")
             return fetchDetails(mergedIds)
         } else {
             // 충분한 데이터로 캐시 히트
             if (idsFromCache.isEmpty()) {
-                log.debug("$logMessage: 캐시 히트되었지만, ID를 찾을 수 없습니다.")
+                log.info("$logMessage: 캐시 히트되었지만, ID를 찾을 수 없습니다.")
                 return emptyList()
             }
 
-            log.debug("$logMessage: 캐시 히트 크기 (찾음: ${idsFromCache.size}). 상세 정보를 조회합니다.")
+            log.info("$logMessage: 캐시 히트 크기 (찾음: ${idsFromCache.size}). 상세 정보를 조회합니다.")
             return fetchDetails(idsFromCache)
         }
     }
 
     private fun fetchLatestBoardIds(pageable: Pageable): List<Long> {
-        log.debug("DB 조회: 최신 게시글 ID 목록 page={}, size={}", pageable.pageNumber, pageable.pageSize)
+        log.info("DB 조회: 최신 게시글 ID 목록 page={}, size={}", pageable.pageNumber, pageable.pageSize)
         return boardClient.fetchLatestBoardIds(pageable.pageNumber, pageable.pageSize) ?: emptyList()
     }
 
@@ -417,7 +417,7 @@ class CommunityReadServiceImpl(
         lastBoardId: Long?,
         limit: Int,
     ): List<Long> {
-        log.debug("DB 조회: ID {} 이후 최신 게시글 ID 목록 limit={}", lastBoardId, limit)
+        log.info("DB 조회: ID {} 이후 최신 게시글 ID 목록 limit={}", lastBoardId, limit)
         return boardClient.fetchLatestBoardIdsAfter(lastBoardId, limit) ?: emptyList()
     }
 
@@ -425,7 +425,7 @@ class CommunityReadServiceImpl(
         categoryId: Long,
         pageable: Pageable,
     ): List<Long> {
-        log.debug("DB 조회: 카테고리 {} 게시글 ID 목록 page={}, size={}", categoryId, pageable.pageNumber, pageable.pageSize)
+        log.info("DB 조회: 카테고리 {} 게시글 ID 목록 page={}, size={}", categoryId, pageable.pageNumber, pageable.pageSize)
         return boardClient.fetchCategoryBoardIds(categoryId, pageable.pageNumber, pageable.pageSize) ?: emptyList()
     }
 
@@ -434,7 +434,7 @@ class CommunityReadServiceImpl(
         lastBoardId: Long?,
         limit: Int,
     ): List<Long> {
-        log.debug("DB 조회: ID {} 이후 카테고리 {} 게시글 ID 목록 limit={}", lastBoardId, categoryId, limit)
+        log.info("DB 조회: ID {} 이후 카테고리 {} 게시글 ID 목록 limit={}", lastBoardId, categoryId, limit)
         return boardClient.fetchCategoryBoardIdsAfter(categoryId, lastBoardId, limit) ?: emptyList()
     }
 
@@ -496,11 +496,11 @@ class CommunityReadServiceImpl(
 //        val dbFallbackFetcher: (List<Long>) -> List<Long> = { cachedIds ->
 //            val lastIdFromCache = cachedIds.lastOrNull()
 //            val effectiveLastId = lastIdFromCache ?: lastBoardId // 캐시 결과를 우선 사용
-//            log.debug("${period.name} ${metric.name} 랭킹 게시글 커서 폴백, command 서버에서 ID: {} 이후로 조회합니다.", effectiveLastId) // lastScore 로깅 제거
+//            log.info("${period.name} ${metric.name} 랭킹 게시글 커서 폴백, command 서버에서 ID: {} 이후로 조회합니다.", effectiveLastId) // lastScore 로깅 제거
 //            if (effectiveLastId != null) {
 //                boardClient.fetchBoardIdsByRankAfter(metric, periodStr, effectiveLastId, limitInt) ?: emptyList()
 //            } else {
-//                log.debug("${period.name} ${metric.name} 랭킹 게시글 커서 폴백 (첫 페이지), command 서버에서 조회합니다.")
+//                log.info("${period.name} ${metric.name} 랭킹 게시글 커서 폴백 (첫 페이지), command 서버에서 조회합니다.")
 //                boardClient.fetchBoardIdsByRank(metric, periodStr, 0, limitInt) ?: emptyList()
 //            }
 //        }

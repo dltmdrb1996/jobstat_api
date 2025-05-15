@@ -24,7 +24,7 @@ internal class RankingSyncScheduler(
     @Scheduled(cron = "0 0 * * * *")
     @Transactional(readOnly = true)
     fun syncBoardRankings() {
-        log.info("게시글 랭킹 주기적 동기화 시작...")
+        log.debug("게시글 랭킹 주기적 동기화 시작...")
 
         val metrics = BoardRankingMetric.entries
         val periods = BoardRankingPeriod.entries
@@ -45,7 +45,7 @@ internal class RankingSyncScheduler(
                         }
 
                     if (rankingEntries.isNotEmpty()) {
-                        log.info("랭킹 업데이트 이벤트 발행 - 지표: {}, 기간: {}, 개수: {}", metric, period, rankingEntries.size)
+                        log.debug("랭킹 업데이트 이벤트 발행 - 지표: {}, 기간: {}, 개수: {}", metric, period, rankingEntries.size)
                         eventPublisher.publishBoardRankingUpdated(metric, period, rankingEntries)
                     } else {
                         log.debug("랭킹 데이터 없음 - 지표: {}, 기간: {}, 이벤트 발행 건너뜀", metric, period)
@@ -55,6 +55,6 @@ internal class RankingSyncScheduler(
                 }
             }
         }
-        log.info("게시글 랭킹 주기적 동기화 완료")
+        log.debug("게시글 랭킹 주기적 동기화 완료")
     }
 }

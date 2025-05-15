@@ -35,7 +35,7 @@ internal class CounterService(
     )
 
     fun cleanupBoardCounters(boardId: Long) {
-        log.info("게시글 ID {}의 카운터 정리 요청", boardId)
+        log.debug("게시글 ID {}의 카운터 정리 요청", boardId)
         try {
             counterRepository.deleteBoardCounters(boardId)
         } catch (e: Exception) {
@@ -150,17 +150,17 @@ internal class CounterService(
 
     @Scheduled(cron = "0 */5 * * * *")
     fun flushCountersToDatabase() {
-        log.info("Redis 카운터 DB 동기화 시작")
+        log.debug("Redis 카운터 DB 동기화 시작")
         val startTime = System.currentTimeMillis()
         var processedCount = 0
         try {
             val pendingBoardIdStrs = counterRepository.fetchPendingBoardIds()
             if (pendingBoardIdStrs.isEmpty()) {
-                log.info("DB 동기화 대상 게시글 없음")
+                log.debug("DB 동기화 대상 게시글 없음")
                 return
             }
             processedCount = pendingBoardIdStrs.size
-            log.info("총 {}개 게시글 업데이트 처리 시작", processedCount)
+            log.debug("총 {}개 게시글 업데이트 처리 시작", processedCount)
 
             val boardIds = pendingBoardIdStrs.mapNotNull { it.toLongOrNull() }
             val invalidIdStrs = pendingBoardIdStrs.filter { it.toLongOrNull() == null }
@@ -187,7 +187,7 @@ internal class CounterService(
                 // GetAndDelete 동시 수행
                 viewCounts = counterRepository.getAndDeleteCountsPipelined(viewCountKeys)
                 likeCounts = counterRepository.getAndDeleteCountsPipelined(likeCountKeys)
-                log.info("Redis Get&Delete 파이프라인 실행 완료 ({}개 boardId)", boardIds.size)
+                log.debug("Redis Get&Delete 파이프라인 실행 완료 ({}개 boardId)", boardIds.size)
             } catch (e: Exception) {
                 log.error("Redis Get&Delete 파이프라인 실행 중 오류 발생, 배치 중단", e)
                 return
@@ -215,7 +215,7 @@ internal class CounterService(
             finalizeProcessingResults(successfulStrs, failedStrs, allAttemptedIds)
 
             val duration = System.currentTimeMillis() - startTime
-            log.info("Redis 카운터 DB 동기화 완료 ({}개 처리 시도, {}ms 소요)", processedCount, duration)
+            log.debug("Redis 카운터 DB 동기화 완료 ({}개 처리 시도, {}ms 소요)", processedCount, duration)
         } catch (e: Exception) {
             // 예상치 못한 전체 배치 실패
             log.error("카운터 DB 동기화 전체 실패", e)
@@ -262,11 +262,11 @@ internal class CounterService(
         try {
             if (allProcessedIds.isNotEmpty()) {
                 counterRepository.removePendingBoardIds(allProcessedIds)
-                log.info("총 {}개 ID 처리 시도 후 Pending Set에서 제거 완료", allProcessedIds.size)
+                log.debug("총 {}개 ID 처리 시도 후 Pending Set에서 제거 완료", allProcessedIds.size)
             }
 
             if (successful.isNotEmpty()) {
-                log.info("{}개 게시글 카운터 DB 업데이트 성공", successful.size)
+                log.debug("{}개 게시글 카운터 DB 업데이트 성공", successful.size)
             }
             if (failed.isNotEmpty()) {
                 log.warn("{}개 게시글 카운터 DB 업데이트 실패 또는 건너뜀", failed.size)

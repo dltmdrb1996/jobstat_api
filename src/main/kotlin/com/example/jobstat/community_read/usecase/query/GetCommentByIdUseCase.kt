@@ -17,10 +17,10 @@ class GetCommentByIdUseCase(
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
     override fun execute(request: Request): Response {
-        log.info("댓글 상세 조회 요청: commentId=${request.commentId}")
+        log.debug("댓글 상세 조회 요청: commentId=${request.commentId}")
 
         val comment = communityReadService.getCommentById(request.commentId)
-        log.info("댓글 조회 완료: commentId=${request.commentId}")
+        log.debug("댓글 조회 완료: commentId=${request.commentId}")
 
         return Response(
             comment = CommentResponseDto.from(comment),
