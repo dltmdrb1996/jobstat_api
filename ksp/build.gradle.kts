@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
 	kotlin("jvm") version "2.1.0"
 }
@@ -6,13 +8,25 @@ group = "com.wildrew"
 version = "0.0.1-SNAPSHOT"
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    sourceCompatibility = JavaVersion.VERSION_21 // 루트와 일치 또는 ksp 모듈 특성에 맞게
+    targetCompatibility = JavaVersion.VERSION_21 // 루트와 일치 (중요)
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(24)) // 루트와 일치 (빌드/실행 JDK)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21) // !!! 매우 중요: 루트 모듈과 jvmTarget 일치 !!!
+        freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
+    sourceSets.main { // 이 블록은 기존대로 유지 가능 (Kotlin 소스 디렉토리 지정)
+        kotlin.srcDir("src/main/kotlin")
+    }
 }
 
 dependencies {
@@ -28,19 +42,6 @@ dependencies {
 
 	// MongoDB Java Driver (버전 업데이트)
 	implementation("org.mongodb:mongodb-driver-sync:5.0.0")
-}
-
-
-kotlin {
-	sourceSets.main {
-		kotlin.srcDir("src/main/kotlin")
-	}
-}
-
-kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll("-Xjsr305=strict")
-	}
 }
 
 tasks.withType<Test> {

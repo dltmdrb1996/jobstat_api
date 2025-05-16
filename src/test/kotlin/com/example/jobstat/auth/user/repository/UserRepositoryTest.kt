@@ -284,7 +284,6 @@ class UserRepositoryTest : JpaIntegrationTestSupport() {
     @Nested
     @DisplayName("사용자 조회 테스트")
     inner class FindUserTest {
-
         @Test
         @DisplayName("Username으로 사용자를 조회할 수 있다")
         fun findUserByUsernameSuccess() {

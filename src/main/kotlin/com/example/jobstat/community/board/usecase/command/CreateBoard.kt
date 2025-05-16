@@ -14,6 +14,7 @@ import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -32,6 +33,8 @@ internal class CreateBoard(
 ) : ValidUseCase<CreateBoard.Request, CreateBoard.Response>(validator) {
     @Transactional
     override fun invoke(request: Request): Response = super.invoke(request)
+
+    private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
     override fun execute(request: Request): Response =
         run {
