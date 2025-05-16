@@ -267,10 +267,10 @@ class RedisCommunityEventUpdateRepository(
     ): Long =
         try {
             val result = redisTemplate.execute(script, keys, *args)
-            if (result == null) {
-                log.error("Redis Lua 스크립트({}) 실행 결과 null: {}", script.sha1 ?: "N/A", operationDesc)
-                throw AppException.fromErrorCode(ErrorCode.REDIS_OPERATION_FAILED, "$operationDesc Lua 스크립트 결과 null")
-            }
+//            if (result == null) {
+//                log.error("Redis Lua 스크립트({}) 실행 결과 null: {}", script.sha1 ?: "N/A", operationDesc)
+//                throw AppException.fromErrorCode(ErrorCode.REDIS_OPERATION_FAILED, "$operationDesc Lua 스크립트 결과 null")
+//            }
             if (result == ReadSideLuaScriptConfig.SCRIPT_RESULT_SKIPPED) {
                 log.debug("Redis Lua 스크립트({}) 실행 건너뜀(오래된 이벤트): {}", script.sha1 ?: "N/A", operationDesc)
             }

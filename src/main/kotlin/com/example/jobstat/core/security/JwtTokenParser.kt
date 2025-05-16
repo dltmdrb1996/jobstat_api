@@ -18,16 +18,16 @@ class JwtTokenParser(
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    private val jwtParser =
+    private val jwtParser: JwtParser =
         Jwts
-            .parserBuilder()
-            .setSigningKey(key)
+            .parser()
+            .verifyWith(key)
             .build()
 
     @Suppress("UNCHECKED_CAST")
     fun validateToken(token: String): AccessPayload =
         try {
-            val claims = jwtParser.parseClaimsJws(token).body
+            val claims = jwtParser.parseSignedClaims(token).payload
 
             val id = (claims["userId"] as? Number)?.toLong()
                 ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 JWT 토큰입니다", "userId claim이 존재하지 않음")
@@ -41,60 +41,31 @@ class JwtTokenParser(
         } catch (ex: Exception) {
             val appException =
                 when (ex) {
-                    is SignatureException ->
+                    is SignatureException, is JwtException ->
                         AppException.fromErrorCode(
                             ErrorCode.TOKEN_INVALID,
-                            message = "JWT 서명이 유효하지 않습니다",
-                            detailInfo = "잘못된 JWT 서명",
-                        )
-
-                    is MalformedJwtException ->
-                        AppException.fromErrorCode(
-                            ErrorCode.TOKEN_INVALID,
-                            message = "JWT 토큰의 형식이 올바르지 않습니다",
-                            detailInfo = "잘못된 JWT 토큰 형식",
-                        )
-
-                    is ExpiredJwtException ->
-                        AppException.fromErrorCode(
-                            ErrorCode.TOKEN_INVALID,
-                            message = "JWT 토큰이 만료되었습니다",
-                            detailInfo = "만료된 JWT 토큰",
-                        )
-
-                    is UnsupportedJwtException ->
-                        AppException.fromErrorCode(
-                            ErrorCode.AUTHENTICATION_FAILURE,
-                            message = "지원되지 않는 JWT 토큰입니다",
-                            detailInfo = "지원되지 않는 JWT 토큰",
+                            message = ex.message ?: "JWT 서명 또는 형식이 유효하지 않습니다.",
+                            detailInfo = ex.message,
                         )
 
                     is IllegalArgumentException ->
                         AppException.fromErrorCode(
                             ErrorCode.AUTHENTICATION_FAILURE,
-                            message = "JWT 토큰이 비어있습니다",
-                            detailInfo = "JWT claims 문자열이 비어있음",
+                            message = "JWT 토큰 인수가 유효하지 않습니다.",
+                            detailInfo = ex.message,
                         )
 
                     is ClassCastException ->
                         AppException.fromErrorCode(
                             ErrorCode.AUTHENTICATION_FAILURE,
                             message = "JWT 토큰의 데이터 형식이 올바르지 않습니다",
-                            detailInfo = "잘못된 JWT claims 데이터 타입",
+                            detailInfo = "잘못된 JWT claims 데이터 타입: ${ex.message}",
                         )
-
-                    is JwtException ->
-                        AppException.fromErrorCode(
-                            ErrorCode.AUTHENTICATION_FAILURE,
-                            message = ex.message ?: "토큰 검증에 실패했습니다",
-                            detailInfo = ex.message,
-                        )
-
                     else ->
                         AppException.fromErrorCode(
                             ErrorCode.INTERNAL_ERROR,
-                            message = "JWT 처리 중 예상치 못한 오류가 발생했습니다",
-                            detailInfo = ex.message,
+                            message = "JWT 처리 중 예상치 못한 오류가 발생했습니다: ${ex.localizedMessage}",
+                            detailInfo = ex.toString(),
                         )
                 }
             throw appException
