@@ -66,20 +66,20 @@ class ReadSideLuaScriptConfig {
             -- KEYS[1]: zsetKey
             -- ARGV[1]: lastItemId (member)
             -- ARGV[2]: limit
-    
+            
             local zsetKey = KEYS[1]
             local lastItemId = ARGV[1]
             local limit = tonumber(ARGV[2])
-    
+            
             local lastScore = redis.call('ZSCORE', zsetKey, lastItemId)
-    
+            
             if not lastScore then
-              redis.log(redis.LOG_WARNING, "Cursor pagination: lastItemId '" .. lastItemId .. "' not found in key '" .. zsetKey .. "'. Returning first page as fallback.")
-              return redis.call('ZREVRANGE', zsetKey, 0, limit - 1)
+              redis.log(redis.LOG_WARNING, "Cursor pagination: lastItemId '" .. lastItemId .. "' not found in key '" .. zsetKey .. "'. Returning empty list.")
+              return {} -- <<-- 이렇게 수정! 빈 테이블을 반환
             end
-    
+            
             local exclusiveMaxScore = '(' .. lastScore
-    
+            
             return redis.call('ZREVRANGEBYSCORE', zsetKey, exclusiveMaxScore, '-inf', 'LIMIT', 0, limit)
             """.trimIndent(),
         )

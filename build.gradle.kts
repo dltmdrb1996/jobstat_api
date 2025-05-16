@@ -3,14 +3,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
-    id("org.springframework.boot") version "3.4.2"
+    id("org.springframework.boot") version "3.4.5"
     id("io.spring.dependency-management") version "1.1.5"
     kotlin("jvm") version "2.1.0"
     kotlin("plugin.spring") version "2.1.0"
     kotlin("plugin.jpa") version "2.1.0"
     kotlin("plugin.serialization") version "2.1.0"
     id("com.google.devtools.ksp") version "2.1.0-1.0.29"
-    id("io.sentry.jvm.gradle") version "4.10.0"
+    id("io.sentry.jvm.gradle") version "5.5.0"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2" // ktlint 플러그인 추가
     id("jacoco")
 }
@@ -19,10 +19,17 @@ group = "com.example"
 version = "0.0.1-SNAPSHOT"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.VERSION_21 // 변경
+    targetCompatibility = JavaVersion.VERSION_21 // 변경
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(24)) // 유지 (JDK 24 사용 명시)
+    }
+}
+
+tasks.withType<KotlinJvmCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+        freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
 
@@ -98,9 +105,9 @@ dependencies {
 
     // Additional Libraries
     implementation("org.hibernate.validator:hibernate-validator")
-    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    implementation("io.jsonwebtoken:jjwt-api:0.12.5") // 최신 버전 확인
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 //    testImplementation("org.mockito:mockito-core:5.15.2")
@@ -125,13 +132,6 @@ kotlin {
         annotation("jakarta.persistence.MappedSuperclass")
         annotation("jakarta.persistence.Embeddable")
         annotation("org.springframework.data.mongodb.core.mapping.Document") // MongoDB Document 추가
-    }
-}
-
-tasks.withType<KotlinJvmCompile>().configureEach {
-    compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_21)
-        freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
 

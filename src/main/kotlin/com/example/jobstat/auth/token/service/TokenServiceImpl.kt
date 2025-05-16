@@ -26,11 +26,10 @@ internal class TokenServiceImpl(
             .set(userKey, refreshToken, expirationInSeconds, TimeUnit.SECONDS)
     }
 
-    override fun getUserIdFromToken(refreshToken: String): Long {
-        return findUserKeyByRefreshToken(refreshToken)
+    override fun getUserIdFromToken(refreshToken: String): Long =
+        findUserKeyByRefreshToken(refreshToken)
             ?.let { userIdKey -> extractUserIdFromKey(userIdKey) }
             ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 리프레시 토큰입니다.")
-    }
 
     /**
      * 리프레시 토큰으로 사용자 키를 찾습니다
