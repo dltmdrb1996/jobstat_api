@@ -29,8 +29,9 @@ class JwtTokenParser(
         try {
             val claims = jwtParser.parseSignedClaims(token).payload
 
-            val id = (claims["userId"] as? Number)?.toLong()
-                ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 JWT 토큰입니다", "userId claim이 존재하지 않음")
+            val id =
+                (claims["userId"] as? Number)?.toLong()
+                    ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "유효하지 않은 JWT 토큰입니다", "userId claim이 존재하지 않음")
             val roles = (claims["roles"] as ArrayList<String>)
             val tokenType = TokenType.fromValue(claims["tokenType"] as Int)
             AccessPayload(

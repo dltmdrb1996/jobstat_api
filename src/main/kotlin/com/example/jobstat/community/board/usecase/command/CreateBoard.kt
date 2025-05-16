@@ -38,7 +38,6 @@ internal class CreateBoard(
 
     override fun execute(request: Request): Response =
         run {
-
             val userId = securityUtils.getCurrentUserId()
 
             // 로그인 상태가 아니면서 비밀번호가 없는 경우 예외 처리

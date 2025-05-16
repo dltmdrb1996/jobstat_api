@@ -1,7 +1,6 @@
 package com.example.jobstat.core.security
 
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -32,14 +31,16 @@ class JwtTokenGenerator(
         val now: Instant = Instant.now() // 현재 시간을 Instant로 가져옴
         val expirationTime: Instant = now.plusSeconds(expirationInSeconds.toLong())
 
-        return Jwts.builder().apply {
-            this.header().add("typ", "JWT")
-            this.claim("userId", id)
-            this.claim("tokenType", tokenType.value)
-            this.claim("roles", roles)
-            this.issuedAt(Date.from(now))
-            this.expiration(Date.from(expirationTime))
-            this.signWith(key)
-        }.compact()
+        return Jwts
+            .builder()
+            .apply {
+                this.header().add("typ", "JWT")
+                this.claim("userId", id)
+                this.claim("tokenType", tokenType.value)
+                this.claim("roles", roles)
+                this.issuedAt(Date.from(now))
+                this.expiration(Date.from(expirationTime))
+                this.signWith(key)
+            }.compact()
     }
 }

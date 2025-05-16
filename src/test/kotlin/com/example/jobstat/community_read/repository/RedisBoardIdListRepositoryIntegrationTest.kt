@@ -30,7 +30,7 @@ class RedisBoardIdListRepositoryIntegrationTest : RedisIntegrationTestSupport() 
     }
 
     @Nested
-    @DisplayName("전체 게시글 목록 조회 (readAllByTime...)")
+    @DisplayName("전체 게시글 목록 조회 readAllByTime")
     inner class ReadAllByTime {
         private val key = RedisBoardIdListRepository.ALL_BOARDS_KEY
         private val totalElements = 5L
@@ -93,6 +93,7 @@ class RedisBoardIdListRepositoryIntegrationTest : RedisIntegrationTestSupport() 
             assertTrue(page4.isEmpty())
             // 존재하지 않는 커서
             val page5 = boardIdListRepository.readAllByTimeByCursor(99L, 2L)
+            println(page5)
             assertTrue(page5.isEmpty())
         }
     }
