@@ -22,7 +22,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21 // 변경
     targetCompatibility = JavaVersion.VERSION_21 // 변경
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(24)) // 유지 (JDK 24 사용 명시)
+        languageVersion.set(JavaLanguageVersion.of(21)) // 유지 (JDK 24 사용 명시)
     }
 }
 
@@ -32,6 +32,14 @@ tasks.withType<KotlinJvmCompile>().configureEach {
         freeCompilerArgs.add("-Xjsr305=strict")
     }
 }
+
+//java {
+//    sourceCompatibility = JavaVersion.VERSION_21
+//    targetCompatibility = JavaVersion.VERSION_21
+//    toolchain {
+//        languageVersion.set(JavaLanguageVersion.of(21))
+//    }
+//}
 
 repositories {
     mavenCentral()

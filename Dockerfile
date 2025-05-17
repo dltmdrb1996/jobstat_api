@@ -1,4 +1,4 @@
-FROM eclipse-temurin:24-jre-alpine
+FROM azul/zulu-openjdk-alpine:21-jre-headless-latest
 
 ARG JAR_FILE=build/libs/jobstat-0.0.1-SNAPSHOT.jar
 COPY ${JAR_FILE} app.jar

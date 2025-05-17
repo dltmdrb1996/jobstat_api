@@ -11,7 +11,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21 // 루트와 일치 또는 ksp 모듈 특성에 맞게
     targetCompatibility = JavaVersion.VERSION_21 // 루트와 일치 (중요)
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(24)) // 루트와 일치 (빌드/실행 JDK)
+        languageVersion.set(JavaLanguageVersion.of(21)) // 루트와 일치 (빌드/실행 JDK)
     }
 }
 

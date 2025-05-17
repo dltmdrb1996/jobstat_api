@@ -10,10 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up JDK 24
+      - name: Set up JDK 21
         uses: actions/setup-java@v3 # 또는 @v4 권장
         with:
-          java-version: '24'
+          java-version: '21'
           distribution: 'zulu'
           cache: gradle # 이 옵션이 Gradle 의존성 및 Wrapper 캐시를 처리합니다.
 
