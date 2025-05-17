@@ -48,7 +48,7 @@ class AppConfig {
             Pbkdf2PasswordEncoder(
                 "",
                 8,
-                100000,
+                10000,
                 SecretKeyFactoryAlgorithm.PBKDF2WithHmacSHA256,
             )
 
