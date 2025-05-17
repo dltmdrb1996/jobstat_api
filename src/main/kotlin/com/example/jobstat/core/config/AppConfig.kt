@@ -1,5 +1,8 @@
 package com.example.jobstat.core.config
 
+import com.example.jobstat.core.global.utils.ScopedValueSecurityUtils
+import com.example.jobstat.core.global.utils.SecurityUtils
+import com.example.jobstat.core.global.utils.ThreadLocalSecurityUtils
 import com.example.jobstat.core.global.utils.serializer.DataSerializer
 import com.example.jobstat.core.global.utils.serializer.ObjectMapperDataSerializer
 import com.fasterxml.jackson.databind.DeserializationFeature
@@ -12,6 +15,7 @@ import com.fasterxml.jackson.module.afterburner.AfterburnerModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm
@@ -54,5 +58,11 @@ class AppConfig {
 
         encoder.setEncodeHashAsBase64(true)
         return encoder
+    }
+
+    @Bean
+    @Primary
+    fun primarySecurityOperations(): SecurityUtils {
+        return ScopedValueSecurityUtils()
     }
 }

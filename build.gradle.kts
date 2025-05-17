@@ -22,7 +22,7 @@ java {
     sourceCompatibility = JavaVersion.VERSION_21 // 변경
     targetCompatibility = JavaVersion.VERSION_21 // 변경
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21)) // 유지 (JDK 24 사용 명시)
+        languageVersion.set(JavaLanguageVersion.of(24)) // 유지 (JDK 24 사용 명시)
     }
 }
 

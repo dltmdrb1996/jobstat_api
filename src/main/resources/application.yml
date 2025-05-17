@@ -1,11 +1,11 @@
 ddns.domain: ${DDNS_DOMAIN}
 
 server:
-  tomcat:
-    threads:
-      max: 150
-    max-connections: 10000
-    accept-count: 300
+#  tomcat:
+#    threads:
+#      max: 150
+#    max-connections: 10000
+#    accept-count: 300
   compression:
     enabled: true
     mime-types: application/json,application/xml,text/plain
@@ -16,9 +16,9 @@ server:
   forward-headers-strategy: NATIVE
 
 spring:
-#  threads:
-#    virtual:
-#      enabled: true
+  threads:
+    virtual:
+      enabled: true
   mail:
     host: smtp.gmail.com
     port: 587

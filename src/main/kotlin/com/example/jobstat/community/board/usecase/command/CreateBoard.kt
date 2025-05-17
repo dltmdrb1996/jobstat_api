@@ -38,7 +38,13 @@ internal class CreateBoard(
 
     override fun execute(request: Request): Response =
         run {
+
+            log.info("Current thread in CreateBoard.execute: {}, isVirtual: {}",
+                Thread.currentThread().name,
+                Thread.currentThread().isVirtual) // isVirtual()은 JDK 21+
+
             val userId = securityUtils.getCurrentUserId()
+            log.info("Retrieved userId from SecurityUtils: {}", userId) // userId 값 로깅
 
             // 로그인 상태가 아니면서 비밀번호가 없는 경우 예외 처리
             validatePasswordIfNotLoggedIn(userId, request.password)
