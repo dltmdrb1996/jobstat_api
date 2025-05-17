@@ -8,11 +8,9 @@ COPY ${JAR_FILE} app.jar
 ENV JAVA_OPTS="\
   -Xms1G -Xmx1G \
   -XX:+UseZGC \
-  -XX:ZGenerationalGC=true \
+  -XX:+ZGenerational \
   -XX:MaxGCPauseMillis=200 \
-  -XX:+ZUncommit \
   -XX:+ZProactive \
-  -XX:+HeapDumpOnOutOfMemoryError \
   "
-
+  
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app.jar"]

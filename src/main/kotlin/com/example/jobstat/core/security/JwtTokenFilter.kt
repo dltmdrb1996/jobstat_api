@@ -31,7 +31,6 @@ class JwtTokenFilter(
     private val requestMappingHandlerMapping: RequestMappingHandlerMapping,
     private val objectMapper: ObjectMapper,
 ) : OncePerRequestFilter() {
-    // ... (log, requestCache, Companion object는 변경 없음) ...
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     private val requestCache =
