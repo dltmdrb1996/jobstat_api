@@ -95,11 +95,11 @@
             </filter>
         </appender>
 
-        <root level="INFO">
+        <root level="DEBUG">
             <appender-ref ref="CONSOLE"/>
         </root>
 
-        <logger name="com.example.jobstat" level="INFO" additivity="false">
+        <logger name="com.example.jobstat" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="DEV_FILE"/>
             <appender-ref ref="DEV_ERROR_FILE"/>

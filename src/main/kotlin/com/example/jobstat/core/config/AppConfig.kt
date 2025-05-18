@@ -13,12 +13,18 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.afterburner.AfterburnerModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder
 import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder.SecretKeyFactoryAlgorithm
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 @Configuration
 class AppConfig {
@@ -65,4 +71,20 @@ class AppConfig {
     fun primarySecurityOperations(): SecurityUtils {
         return ScopedValueSecurityUtils()
     }
+
+    @Bean(destroyMethod = "close")
+    fun virtualThreadExecutor(): ExecutorService =
+        Executors.newVirtualThreadPerTaskExecutor()
+
+    @Bean
+    fun virtualThreadDispatcher(
+        virtualThreadExecutor: ExecutorService
+    ): CoroutineDispatcher =
+        virtualThreadExecutor.asCoroutineDispatcher()
+
+    @Bean
+    fun virtualThreadScope(
+        virtualThreadDispatcher: CoroutineDispatcher
+    ): CoroutineScope =
+        CoroutineScope(virtualThreadDispatcher + SupervisorJob())
 }
