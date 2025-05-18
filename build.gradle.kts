@@ -62,6 +62,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.kafka:spring-kafka:3.3.4")
+    implementation("io.lettuce:lettuce-core:6.6.0.RELEASE")
 
     // Database
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
