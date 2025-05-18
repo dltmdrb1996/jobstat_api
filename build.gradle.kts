@@ -61,7 +61,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-aop")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.springframework.kafka:spring-kafka:3.3.4")
+    implementation("org.springframework.kafka:spring-kafka:3.3.5")
     implementation("io.lettuce:lettuce-core:6.6.0.RELEASE")
 
     // Database
@@ -78,7 +78,7 @@ dependencies {
     ksp(project(":ksp"))
 
     // Spring Boot DevTools
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+//    developmentOnly("org.springframework.boot:spring-boot-devtools")
 
     // Optional - SLF4J API for Logging
     implementation("org.slf4j:slf4j-api")
