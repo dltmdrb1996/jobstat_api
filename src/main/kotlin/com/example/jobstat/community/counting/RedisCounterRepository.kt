@@ -106,7 +106,7 @@ class RedisCounterRepository(
                 errorCode = ErrorCode.REDIS_OPERATION_FAILED,
             ) {
                 redisTemplate.execute(atomicLikeScript, keys, *args)
-            }
+            } ?: emptyList()
 
         if (result.size != 2) {
             throw AppException.fromErrorCode(ErrorCode.REDIS_OPERATION_FAILED, "Redis 스크립트 실행/결과 오류 (Like)")
@@ -140,7 +140,7 @@ class RedisCounterRepository(
                 errorCode = ErrorCode.REDIS_OPERATION_FAILED,
             ) {
                 redisTemplate.execute(atomicUnlikeScript, keys, *args)
-            }
+            } ?: emptyList()
 
         if (result.size != 2) {
             throw AppException.fromErrorCode(ErrorCode.REDIS_OPERATION_FAILED, "Redis 스크립트 실행/결과 오류 (Unlike)")
