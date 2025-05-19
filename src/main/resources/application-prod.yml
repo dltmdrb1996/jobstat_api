@@ -82,3 +82,9 @@ logging:
     org.springframework: WARN
     org.springframework.security: WARN
     com.example.jobstat.core.security.JwtTokenFilter: ERROR
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
