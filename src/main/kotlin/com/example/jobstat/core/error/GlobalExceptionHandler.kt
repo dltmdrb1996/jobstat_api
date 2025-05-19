@@ -7,7 +7,7 @@ import io.sentry.SentryLevel
 import io.sentry.protocol.Message
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.slf4j.MDC
+//import org.slf4j.MDC
 import org.springframework.core.env.Environment
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -25,7 +25,7 @@ class GlobalExceptionHandler(
     @ExceptionHandler(Exception::class)
     fun handleException(ex: Exception): ResponseEntity<ApiResponse<Unit>> {
         val errorId = UUID.randomUUID().toString()
-        MDC.put("errorId", errorId)
+//        MDC.put("errorId", errorId)
 
         val appException =
             when (ex) {
@@ -78,8 +78,7 @@ class GlobalExceptionHandler(
 
             return ApiResponse.fail(appException.httpStatus, errorMessage)
         } finally {
-            // ThreadLocal 자원 정리
-            MDC.remove("errorId")
+//            MDC.remove("errorId")
         }
     }
 

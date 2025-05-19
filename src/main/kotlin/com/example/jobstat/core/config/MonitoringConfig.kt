@@ -32,7 +32,7 @@ class MonitoringConfig(
     @Value("\${logging.level.root:INFO}")
     private lateinit var defaultLogLevel: String
 
-    @Scheduled(fixedRate = 30000) // 30초마다 체크
+//    @Scheduled(fixedRate = 30000) // 30초마다 체크
     fun monitorSystemResources() {
         val osBean = ManagementFactory.getOperatingSystemMXBean()
         if (osBean is com.sun.management.OperatingSystemMXBean) {

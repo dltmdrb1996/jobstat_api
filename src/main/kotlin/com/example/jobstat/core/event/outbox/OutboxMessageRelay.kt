@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 import java.time.LocalDateTime
+import java.util.concurrent.Executors
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -28,6 +29,7 @@ class OutboxMessageRelay(
     private val outboxRepository: OutboxRepository,
     private val outboxKafkaTemplate: KafkaTemplate<String, String>,
     private val outboxProcessor: OutboxProcessor, // OutboxProcessor 주입
+    private val coroutineScope: CoroutineScope,
     @Value("\${outbox.relay.kafka-send-timeout-seconds:3}")
     private val kafkaSendTimeoutSeconds: Long,
     @Value("\${outbox.relay.scheduler.cutoff-seconds:10}")
@@ -39,18 +41,16 @@ class OutboxMessageRelay(
 ) : DisposableBean {
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-
     /**
      * 메인 트랜잭션 커밋 전에 아웃박스 저장
      * 이 메소드에서 예외 발생 시 메인 트랜잭션도 롤백됩니다.
      */
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     fun saveOutboxOnEvent(outbox: Outbox) {
-        log.debug("아웃박스 저장 시도 (BEFORE_COMMIT 리스너): id=${outbox.id}, type=${outbox.eventType}")
+        log.debug("아웃박스 저장 시도 (BEFORE_COMMIT 리스너): id={}, type={}", outbox.id, outbox.eventType)
         try {
             outboxRepository.save(outbox)
-            log.debug("아웃박스 저장 성공 (BEFORE_COMMIT 리스너): id=${outbox.id}, type=${outbox.eventType}")
+            log.debug("아웃박스 저장 성공 (BEFORE_COMMIT 리스너): id={}, type={}", outbox.id, outbox.eventType)
         } catch (e: Exception) {
             log.error("아웃박스 저장 실패 (BEFORE_COMMIT 리스너): id=${outbox.id}, type=${outbox.eventType}, error=${e.message}", e)
             throw e
@@ -85,13 +85,11 @@ class OutboxMessageRelay(
 
             log.debug("즉시 발행 성공 (코루틴): id=${outbox.id}, type=${outbox.eventType}")
 
-            withContext(Dispatchers.IO) {
-                try {
-                    outboxRepository.deleteById(outbox.id)
-                    log.debug("즉시 발행 성공 후 Outbox 삭제 완료: id=${outbox.id}")
-                } catch (e: Exception) {
-                    log.error("즉시 발행 성공 후 Outbox 삭제 실패 (컨슈머 멱등성 필요): id=${outbox.id}, error=${e.message}", e)
-                }
+            try {
+                outboxRepository.deleteById(outbox.id)
+                log.debug("즉시 발행 성공 후 Outbox 삭제 완료: id=${outbox.id}")
+            } catch (e: Exception) {
+                log.error("즉시 발행 성공 후 Outbox 삭제 실패 (컨슈머 멱등성 필요): id=${outbox.id}, error=${e.message}", e)
             }
         } catch (e: TimeoutCancellationException) {
             log.warn("즉시 발행 실패 (타임아웃): id=${outbox.id}, type=${outbox.eventType}. 스케줄러가 재시도합니다.", e)
