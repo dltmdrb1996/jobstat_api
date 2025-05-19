@@ -1,6 +1,6 @@
 package com.example.jobstat.community.board.entity
 
-import com.example.jobstat.core.base.BaseAutoIncEntity
+import com.example.jobstat.core.core_jpa_base.base.BaseAutoIncEntity
 import jakarta.persistence.*
 
 @Entity

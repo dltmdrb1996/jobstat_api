@@ -1,6 +1,6 @@
 package com.example.jobstat.auth.email.entity
 
-import com.example.jobstat.core.base.AuditableEntitySnow
+import com.example.jobstat.core.core_jpa_base.base.AuditableEntitySnow
 import jakarta.persistence.*
 import java.time.LocalDateTime
 import kotlin.random.Random

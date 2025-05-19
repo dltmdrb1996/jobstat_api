@@ -1,7 +1,7 @@
 package com.example.jobstat.community.board.service
 
 import com.example.jobstat.community.board.repository.FakeCategoryRepository
-import com.example.jobstat.core.error.AppException
+import com.example.jobstat.core.core_error.model.AppException
 import jakarta.persistence.EntityNotFoundException // Keep if Fake repo throws this for findById
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.JobCategoryGrowthRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.JOB_CATEGORY_GROWTH)
 @NoRepositoryBean
-interface JobCategoryGrowthRankingsRepository : SimpleRankingRepository<JobCategoryGrowthRankingsDocument, JobCategoryGrowthRankingsDocument.JobCategoryGrowthRankingEntry, String> {
+interface JobCategoryGrowthRankingsRepository :
+    SimpleRankingRepository<JobCategoryGrowthRankingsDocument, JobCategoryGrowthRankingsDocument.JobCategoryGrowthRankingEntry, String> {
     // 산업 연관성 분석
     fun findByIndustryCorrelation(
         baseDate: String,

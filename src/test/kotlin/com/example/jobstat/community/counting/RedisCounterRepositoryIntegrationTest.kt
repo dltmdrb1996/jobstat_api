@@ -1,7 +1,7 @@
 package com.example.jobstat.community.counting
 
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
 import com.example.jobstat.utils.base.BaseIntegrationTest
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

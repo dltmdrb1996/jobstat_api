@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.stats.service
 
-import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
+import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
 import com.example.jobstat.core.cache.StatsBulkCacheManager
-import com.example.jobstat.core.state.BaseDate
+import com.example.jobstat.core.core_model.BaseDate
 import com.example.jobstat.statistics_read.stats.registry.StatsRepositoryRegistry
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 import org.slf4j.Logger

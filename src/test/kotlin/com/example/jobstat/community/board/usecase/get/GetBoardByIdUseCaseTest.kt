@@ -8,8 +8,8 @@ import com.example.jobstat.community.board.repository.FakeCategoryRepository
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.board.service.BoardServiceImpl
 import com.example.jobstat.community.counting.CounterService // Mock 대상
-import com.example.jobstat.core.global.extension.toEpochMilli
-import com.example.jobstat.core.global.utils.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_util.extension.toEpochMilli
+import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Validation
 import org.junit.jupiter.api.*

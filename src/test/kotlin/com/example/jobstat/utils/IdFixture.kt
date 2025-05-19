@@ -1,6 +1,6 @@
 package com.example.jobstat.utils
 
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.core_jpa_base.base.BaseEntity
 import java.lang.reflect.Field
 
 abstract class IdFixture<T : BaseEntity> : TestFixture<T> {

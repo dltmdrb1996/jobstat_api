@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.DistributionRankingRepository
-import com.example.jobstat.core.base.repository.DistributionRankingRepositoryImpl
-import com.example.jobstat.core.state.ExperienceLevel
+import com.example.jobstat.core.core_mongo_base.repository.DistributionRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.DistributionRankingRepositoryImpl
+import com.example.jobstat.core.core_model.ExperienceLevel
 import com.example.jobstat.statistics_read.rankings.document.CompanySizeSalaryRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -17,7 +17,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_SIZE_SALARY)
 @NoRepositoryBean
-interface CompanySizeSalaryRankingsRepository : DistributionRankingRepository<CompanySizeSalaryRankingsDocument, CompanySizeSalaryRankingsDocument.CompanySizeSalaryRankingEntry, String> {
+interface CompanySizeSalaryRankingsRepository :
+    DistributionRankingRepository<CompanySizeSalaryRankingsDocument, CompanySizeSalaryRankingsDocument.CompanySizeSalaryRankingEntry, String> {
     // 급여 공정성 분석
     fun findSalaryEquityByCompanySize(
         baseDate: String,

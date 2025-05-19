@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.user.repository
 
 import com.example.jobstat.auth.user.entity.User
-import com.example.jobstat.core.global.extension.orThrowNotFound
+import com.example.jobstat.core.core_util.extension.orThrowNotFound
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository

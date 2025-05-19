@@ -1,8 +1,8 @@
 package com.example.jobstat.auth.user.entity
 
 import com.example.jobstat.auth.user.UserConstants
-import com.example.jobstat.core.base.SoftDeleteBaseAutoIncEntity
-import com.example.jobstat.core.state.Address
+import com.example.jobstat.core.core_jpa_base.base.SoftDeleteBaseAutoIncEntity
+import com.example.jobstat.core.core_model.Address
 import jakarta.persistence.*
 import java.time.LocalDate
 

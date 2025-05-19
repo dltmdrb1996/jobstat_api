@@ -1,7 +1,7 @@
 package com.example.jobstat.community.comment.utils
 
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.core.global.extension.toEpochMilli
+import com.example.jobstat.core.core_util.extension.toEpochMilli
 import java.time.LocalDateTime
 
 object CommentMapperUtils {

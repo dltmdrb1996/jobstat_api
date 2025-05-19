@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.CompanyHiringVolumeRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_HIRING_VOLUME)
 @NoRepositoryBean
-interface CompanyHiringVolumeRankingsRepository : SimpleRankingRepository<CompanyHiringVolumeRankingsDocument, CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry, String> {
+interface CompanyHiringVolumeRankingsRepository :
+    SimpleRankingRepository<CompanyHiringVolumeRankingsDocument, CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry, String> {
     // 부서별 채용 트렌드 분석
     fun findTopHiringDepartments(
         baseDate: String,

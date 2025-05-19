@@ -3,11 +3,11 @@ package com.example.jobstat.community.board.usecase.get
 import com.example.jobstat.community.board.entity.Board
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.counting.CounterService
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.extension.toEpochMilli
-import com.example.jobstat.core.global.utils.SecurityUtils
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_util.extension.toEpochMilli
+import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotEmpty

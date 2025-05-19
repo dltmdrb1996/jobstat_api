@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.email.repository
 
 import com.example.jobstat.auth.email.entity.EmailVerification
-import com.example.jobstat.core.global.extension.orThrowNotFound
+import com.example.jobstat.core.core_util.extension.orThrowNotFound
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query

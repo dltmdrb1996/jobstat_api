@@ -1,6 +1,6 @@
 package com.example.jobstat.utils
 
-import com.example.jobstat.core.security.PasswordUtil
+import com.example.jobstat.core.core_security.util.PasswordUtil
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 

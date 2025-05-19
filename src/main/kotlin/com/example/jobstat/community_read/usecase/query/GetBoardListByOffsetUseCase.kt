@@ -2,11 +2,11 @@ package com.example.jobstat.community_read.usecase.query
 
 import com.example.jobstat.community_read.model.BoardResponseDto
 import com.example.jobstat.community_read.service.CommunityReadService
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.state.BoardRankingMetric // Enum 임포트
-import com.example.jobstat.core.state.BoardRankingPeriod // Enum 임포트
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_model.BoardRankingMetric // Enum 임포트
+import com.example.jobstat.core.core_model.BoardRankingPeriod // Enum 임포트
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Max

@@ -1,16 +1,15 @@
 package com.example.jobstat.statistics_read.rankings.service
 
-import com.example.jobstat.core.base.mongo.SnapshotPeriod
-import com.example.jobstat.core.base.mongo.ranking.BaseRankingDocument
-import com.example.jobstat.core.base.mongo.ranking.RankingEntry
-import com.example.jobstat.core.base.mongo.ranking.RankingMetrics
-import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
-import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
-import com.example.jobstat.core.base.repository.BaseRankingRepository
-import com.example.jobstat.core.state.BaseDate
+import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.core.core_mongo_base.model.ranking.BaseRankingDocument
+import com.example.jobstat.core.core_mongo_base.model.ranking.RankingEntry
+import com.example.jobstat.core.core_mongo_base.model.ranking.RankingMetrics
+import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.core.core_mongo_base.repository.BaseRankingRepository
+import com.example.jobstat.core.core_model.BaseDate
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.repository.RankingRepositoryRegistry
-import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisServiceImpl
 import com.example.jobstat.statistics_read.stats.service.StatsAnalysisService
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach

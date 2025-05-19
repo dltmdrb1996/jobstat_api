@@ -1,12 +1,14 @@
 package com.example.jobstat.community_read.repository.fake
 
+import com.example.jobstat.core.core_event.model.payload.comment.CommentCreatedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.example.jobstat.community_read.model.BoardReadModel
 import com.example.jobstat.community_read.model.CommentReadModel
 import com.example.jobstat.community_read.repository.*
 import com.example.jobstat.community_read.repository.impl.*
-import com.example.jobstat.core.event.payload.board.*
-import com.example.jobstat.core.event.payload.comment.*
-import com.example.jobstat.core.global.utils.serializer.DataSerializer
+import com.example.jobstat.core.core_event.model.payload.board.*
+import com.example.jobstat.core.core_serializer.DataSerializer
 import org.mockito.Mockito.mock
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap

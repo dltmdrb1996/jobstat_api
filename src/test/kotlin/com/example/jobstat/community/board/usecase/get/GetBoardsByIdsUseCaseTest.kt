@@ -8,9 +8,9 @@ import com.example.jobstat.community.board.repository.FakeCategoryRepository
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.board.service.BoardServiceImpl
 import com.example.jobstat.community.counting.CounterService // Mock 대상
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.utils.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation
 import org.junit.jupiter.api.*

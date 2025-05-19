@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.SkillSalaryRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.SKILL_SALARY)
 @NoRepositoryBean
-interface SkillSalaryRankingsRepository : SimpleRankingRepository<SkillSalaryRankingsDocument, SkillSalaryRankingsDocument.SkillSalaryRankingEntry, String> {
+interface SkillSalaryRankingsRepository :
+    SimpleRankingRepository<SkillSalaryRankingsDocument, SkillSalaryRankingsDocument.SkillSalaryRankingEntry, String> {
     // 산업별 급여 프리미엄 분석
     fun findByIndustryPremium(
         baseDate: String,

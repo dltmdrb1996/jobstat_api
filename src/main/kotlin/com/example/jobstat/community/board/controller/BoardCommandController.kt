@@ -5,9 +5,9 @@ import com.example.jobstat.community.board.usecase.command.DeleteBoard
 import com.example.jobstat.community.board.usecase.command.LikeBoard
 import com.example.jobstat.community.board.usecase.command.UnlikeBoard
 import com.example.jobstat.community.board.usecase.command.UpdateBoard
-import com.example.jobstat.core.constants.RestConstants
-import com.example.jobstat.core.global.wrapper.ApiResponse
-import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
+import com.example.jobstat.core.core_util.constant.RestConstants
+import com.example.jobstat.core.core_web_util.ApiResponse
+import com.example.jobstat.core.core_security.annotation.PublicWithTokenCheck
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content

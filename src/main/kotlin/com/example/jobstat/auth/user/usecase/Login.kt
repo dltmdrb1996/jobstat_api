@@ -1,14 +1,17 @@
 package com.example.jobstat.auth.user.usecase
 
+import com.example.jobstat.core.core_security.util.PasswordUtil
 import com.example.jobstat.auth.token.service.TokenService
 import com.example.jobstat.auth.user.UserConstants
 import com.example.jobstat.auth.user.entity.User
 import com.example.jobstat.auth.user.service.LoginAttemptService
 import com.example.jobstat.auth.user.service.UserService
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.security.*
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
+import com.example.jobstat.core.core_token.JwtTokenGenerator
+import com.example.jobstat.core.core_token.model.AccessPayload
+import com.example.jobstat.core.core_token.model.RefreshPayload
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank

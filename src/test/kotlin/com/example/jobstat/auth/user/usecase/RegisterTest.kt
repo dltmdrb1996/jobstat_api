@@ -6,9 +6,9 @@ import com.example.jobstat.auth.user.fake.FakeRoleRepository
 import com.example.jobstat.auth.user.fake.FakeUserRepository
 import com.example.jobstat.auth.user.service.UserService
 import com.example.jobstat.auth.user.service.UserServiceImpl
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.security.JwtTokenGenerator
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_token.JwtTokenGenerator
 import com.example.jobstat.utils.FakePasswordUtil
 import com.example.jobstat.utils.FakeStringRedisTemplate
 import jakarta.validation.Validation

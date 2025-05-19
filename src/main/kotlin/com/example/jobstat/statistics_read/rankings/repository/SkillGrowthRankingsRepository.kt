@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.SkillGrowthRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -16,7 +16,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.SKILL_GROWTH)
 @NoRepositoryBean
-interface SkillGrowthRankingsRepository : SimpleRankingRepository<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String> {
+interface SkillGrowthRankingsRepository :
+    SimpleRankingRepository<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String> {
     // 성장 일관성 분석
     fun findByGrowthConsistency(
         baseDate: String,

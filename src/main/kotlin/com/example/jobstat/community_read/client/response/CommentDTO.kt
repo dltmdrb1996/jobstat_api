@@ -1,7 +1,7 @@
 package com.example.jobstat.community_read.client.response
 
 import com.example.jobstat.community_read.model.CommentReadModel
-import com.example.jobstat.core.global.extension.toEpochMilli
+import com.example.jobstat.core.core_util.extension.toEpochMilli
 import java.time.LocalDateTime
 
 data class CommentDTO(

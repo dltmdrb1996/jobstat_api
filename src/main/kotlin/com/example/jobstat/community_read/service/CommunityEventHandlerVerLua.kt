@@ -1,13 +1,15 @@
 package com.example.jobstat.community_read.service
 
+import com.example.jobstat.core.core_event.model.payload.comment.CommentCreatedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.example.jobstat.community_read.repository.BoardDetailRepository // Read 용도로 필요
 import com.example.jobstat.community_read.repository.CommentDetailRepository // Read 용도로 필요
 import com.example.jobstat.community_read.repository.CommunityEventUpdateRepository // 신규 의존성
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.event.payload.board.*
-import com.example.jobstat.core.event.payload.comment.*
-import com.example.jobstat.core.global.utils.serializer.DataSerializer // 직렬화기 필요
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_event.model.payload.board.*
+import com.example.jobstat.core.core_serializer.DataSerializer // 직렬화기 필요
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 

@@ -1,6 +1,6 @@
 package com.example.jobstat.community.event
 
-import com.example.jobstat.core.event.consumer.AbstractEventConsumer
+import com.example.jobstat.core.core_event.consumer.AbstractEventConsumer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.kafka.annotation.KafkaListener
 import org.springframework.kafka.annotation.RetryableTopic

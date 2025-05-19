@@ -2,7 +2,7 @@ package com.example.jobstat.community.board.entity
 
 import com.example.jobstat.community.board.utils.BoardConstants
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.core.base.AuditableEntitySnow
+import com.example.jobstat.core.core_jpa_base.base.AuditableEntitySnow
 import jakarta.persistence.*
 
 @Entity

@@ -6,9 +6,9 @@ import com.example.jobstat.auth.user.entity.User
 import com.example.jobstat.auth.user.entity.UserRole
 import com.example.jobstat.auth.user.repository.RoleRepository
 import com.example.jobstat.auth.user.repository.UserRepository
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.extension.trueOrThrow
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_util.extension.trueOrThrow
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

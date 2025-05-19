@@ -1,12 +1,12 @@
 package com.example.jobstat.community_read.controller
 
 import com.example.jobstat.community_read.usecase.query.* // 모든 UseCase import
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.wrapper.ApiResponse
-import com.example.jobstat.core.security.annotation.Public
-import com.example.jobstat.core.state.BoardRankingMetric
-import com.example.jobstat.core.state.BoardRankingPeriod
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_web_util.ApiResponse
+import com.example.jobstat.core.core_security.annotation.Public
+import com.example.jobstat.core.core_model.BoardRankingMetric
+import com.example.jobstat.core.core_model.BoardRankingPeriod
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content

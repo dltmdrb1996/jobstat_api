@@ -1,9 +1,9 @@
 package com.example.jobstat.community_read.repository
 
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository
-import com.example.jobstat.core.event.payload.board.BoardRankingUpdatedEventPayload
-import com.example.jobstat.core.state.BoardRankingMetric
-import com.example.jobstat.core.state.BoardRankingPeriod
+import com.example.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
+import com.example.jobstat.core.core_model.BoardRankingMetric
+import com.example.jobstat.core.core_model.BoardRankingPeriod
 import com.example.jobstat.utils.base.RedisIntegrationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

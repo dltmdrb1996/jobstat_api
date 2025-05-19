@@ -4,7 +4,7 @@ import com.example.jobstat.community.board.entity.Board
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.comment.entity.Comment
 import com.example.jobstat.community.comment.service.CommentService
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank

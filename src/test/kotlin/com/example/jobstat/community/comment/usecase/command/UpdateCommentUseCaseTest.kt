@@ -11,9 +11,9 @@ import com.example.jobstat.community.comment.repository.FakeCommentRepository
 import com.example.jobstat.community.comment.service.CommentService
 import com.example.jobstat.community.comment.service.CommentServiceImpl
 import com.example.jobstat.community.event.CommunityCommandEventPublisher // Mock 대상
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.utils.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
 import com.example.jobstat.utils.FakePasswordUtil
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolationException

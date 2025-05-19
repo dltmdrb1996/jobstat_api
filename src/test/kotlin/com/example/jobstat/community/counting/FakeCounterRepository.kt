@@ -3,8 +3,8 @@ package com.example.jobstat.community.counting
 import com.example.jobstat.community.counting.RedisCounterRepository.Companion.likeCountKey
 import com.example.jobstat.community.counting.RedisCounterRepository.Companion.likeUsersKey
 import com.example.jobstat.community.counting.RedisCounterRepository.Companion.viewCountKey
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
 

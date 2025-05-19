@@ -3,9 +3,9 @@ package com.example.jobstat.community_read.repository.fake
 import com.example.jobstat.community_read.model.CommentReadModel
 import com.example.jobstat.community_read.repository.CommentDetailRepository
 import com.example.jobstat.community_read.repository.impl.RedisCommentDetailRepository
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.utils.serializer.DataSerializer
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_serializer.DataSerializer
 import org.springframework.data.redis.connection.StringRedisConnection
 import java.util.concurrent.ConcurrentHashMap
 

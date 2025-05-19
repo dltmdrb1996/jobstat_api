@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.token.service
 
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
 import com.example.jobstat.utils.FakeStringRedisTemplate
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

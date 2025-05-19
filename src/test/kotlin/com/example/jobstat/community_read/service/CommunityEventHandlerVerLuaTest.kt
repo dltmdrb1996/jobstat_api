@@ -1,5 +1,6 @@
 package com.example.jobstat.community_read.service
 
+import com.example.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
 import com.example.jobstat.community_read.fixture.BoardReadModelFixture
 import com.example.jobstat.community_read.fixture.CommentReadModelFixture
 import com.example.jobstat.community_read.repository.fake.*
@@ -18,10 +19,10 @@ import com.example.jobstat.core.event.payload.CommentCreatedEventPayloadFixture
 import com.example.jobstat.core.event.payload.CommentDeletedEventPayloadFixture
 import com.example.jobstat.core.event.payload.CommentUpdatedEventPayloadFixture
 import com.example.jobstat.core.event.payload.board.*
-import com.example.jobstat.core.global.utils.serializer.DataSerializer
-import com.example.jobstat.core.global.utils.serializer.ObjectMapperDataSerializer
-import com.example.jobstat.core.state.BoardRankingMetric
-import com.example.jobstat.core.state.BoardRankingPeriod
+import com.example.jobstat.core.core_serializer.DataSerializer
+import com.example.jobstat.core.core_serializer.ObjectMapperDataSerializer
+import com.example.jobstat.core.core_model.BoardRankingMetric
+import com.example.jobstat.core.core_model.BoardRankingPeriod
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.kotlin.*

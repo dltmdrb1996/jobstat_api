@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.DistributionRankingRepository
-import com.example.jobstat.core.base.repository.DistributionRankingRepositoryImpl
-import com.example.jobstat.core.state.CompanySize
+import com.example.jobstat.core.core_mongo_base.repository.DistributionRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.DistributionRankingRepositoryImpl
+import com.example.jobstat.core.core_model.CompanySize
 import com.example.jobstat.statistics_read.rankings.document.CompanySizeBenefitRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -17,7 +17,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_SIZE_BENEFIT)
 @NoRepositoryBean
-interface CompanySizeBenefitRankingsRepository : DistributionRankingRepository<CompanySizeBenefitRankingsDocument, CompanySizeBenefitRankingsDocument.CompanySizeBenefitRankingEntry, String> {
+interface CompanySizeBenefitRankingsRepository :
+    DistributionRankingRepository<CompanySizeBenefitRankingsDocument, CompanySizeBenefitRankingsDocument.CompanySizeBenefitRankingEntry, String> {
     // 회사 규모별 특화 복리후생 패턴 분석
     fun findDistinctiveBenefitsByCompanySize(
         baseDate: String,

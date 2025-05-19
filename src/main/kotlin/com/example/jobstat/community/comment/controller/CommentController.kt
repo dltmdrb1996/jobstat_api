@@ -9,10 +9,10 @@ import com.example.jobstat.community.comment.usecase.get.GetCommentsByAuthor
 import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardId
 import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardIdAfter
 import com.example.jobstat.community.comment.usecase.get.GetCommentsByIds
-import com.example.jobstat.core.constants.RestConstants
-import com.example.jobstat.core.global.wrapper.ApiResponse
-import com.example.jobstat.core.security.annotation.Public
-import com.example.jobstat.core.security.annotation.PublicWithTokenCheck
+import com.example.jobstat.core.core_util.constant.RestConstants
+import com.example.jobstat.core.core_web_util.ApiResponse
+import com.example.jobstat.core.core_security.annotation.Public
+import com.example.jobstat.core.core_security.annotation.PublicWithTokenCheck
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content

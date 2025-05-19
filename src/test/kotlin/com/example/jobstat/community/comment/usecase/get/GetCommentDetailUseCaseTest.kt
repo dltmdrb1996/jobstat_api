@@ -10,7 +10,7 @@ import com.example.jobstat.community.comment.entity.Comment
 import com.example.jobstat.community.comment.repository.FakeCommentRepository
 import com.example.jobstat.community.comment.service.CommentService
 import com.example.jobstat.community.comment.service.CommentServiceImpl
-import com.example.jobstat.core.global.utils.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation

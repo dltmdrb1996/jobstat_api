@@ -3,7 +3,7 @@ package com.example.jobstat.community.counting
 import com.example.jobstat.community.board.repository.BoardRepository
 import com.example.jobstat.community.counting.RedisCounterRepository.Companion.likeCountKey
 import com.example.jobstat.community.counting.RedisCounterRepository.Companion.viewCountKey
-import com.example.jobstat.core.error.AppException // AppException 임포트 확인 필요
+import com.example.jobstat.core.core_error.model.AppException // AppException 임포트 확인 필요
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled

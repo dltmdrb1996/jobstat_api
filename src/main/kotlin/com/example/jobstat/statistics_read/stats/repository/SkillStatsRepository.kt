@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.stats.repository
 
-import com.example.jobstat.core.base.repository.StatsMongoRepository
-import com.example.jobstat.core.base.repository.StatsMongoRepositoryImpl
-import com.example.jobstat.core.global.utils.StatisticsCalculationUtil
+import com.example.jobstat.core.core_mongo_base.repository.StatsMongoRepository
+import com.example.jobstat.core.core_mongo_base.repository.StatsMongoRepositoryImpl
+import com.example.jobstat.core.core_util.calculation.StatisticsCalculationUtil
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.stats.document.SkillStatsDocument
 import com.example.jobstat.statistics_read.stats.registry.StatsRepositoryType

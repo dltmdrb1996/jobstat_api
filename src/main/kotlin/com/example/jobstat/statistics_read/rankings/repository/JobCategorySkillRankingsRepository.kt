@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.RelationshipRankingRepository
-import com.example.jobstat.core.base.repository.RelationshipRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.RelationshipRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.RelationshipRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.JobCategorySkillRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -14,7 +14,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.JOB_CATEGORY_SKILL)
 @NoRepositoryBean
-interface JobCategorySkillRankingsRepository : RelationshipRankingRepository<JobCategorySkillRankingsDocument, JobCategorySkillRankingsDocument.JobCategorySkillRankingEntry, String> {
+interface JobCategorySkillRankingsRepository :
+    RelationshipRankingRepository<JobCategorySkillRankingsDocument, JobCategorySkillRankingsDocument.JobCategorySkillRankingEntry, String> {
     // 스킬 연관성 분석
     fun findCorrelatedSkills(
         baseDate: String,

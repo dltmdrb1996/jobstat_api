@@ -1,9 +1,9 @@
 package com.example.jobstat.community_read.repository.impl
 
 import com.example.jobstat.community_read.repository.BoardIdListRepository
-import com.example.jobstat.core.event.payload.board.BoardRankingUpdatedEventPayload
-import com.example.jobstat.core.state.BoardRankingMetric
-import com.example.jobstat.core.state.BoardRankingPeriod
+import com.example.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
+import com.example.jobstat.core.core_model.BoardRankingMetric
+import com.example.jobstat.core.core_model.BoardRankingPeriod
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl

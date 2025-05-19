@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.SkillPostingCountRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.SKILL_POSTING_COUNT)
 @NoRepositoryBean
-interface SkillPostingCountRankingsRepository : SimpleRankingRepository<SkillPostingCountRankingsDocument, SkillPostingCountRankingsDocument.SkillPostingRankingEntry, String> {
+interface SkillPostingCountRankingsRepository :
+    SimpleRankingRepository<SkillPostingCountRankingsDocument, SkillPostingCountRankingsDocument.SkillPostingRankingEntry, String> {
     // 산업별 수요 분석
     fun findByIndustryDemand(
         baseDate: String,

@@ -1,14 +1,13 @@
 package com.example.jobstat.community.counting
 
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.*
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.stereotype.Repository
 import java.time.Duration
 import java.time.LocalDateTime
-import java.util.*
 
 @Repository
 class RedisCounterRepository(

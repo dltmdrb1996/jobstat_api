@@ -1,9 +1,9 @@
 package com.example.jobstat.statistics_read.rankings.document
 
-import com.example.jobstat.core.base.mongo.SnapshotPeriod
-import com.example.jobstat.core.base.mongo.ranking.RankingMetrics
-import com.example.jobstat.core.base.mongo.ranking.SimpleRankingDocument
-import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
+import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.core.core_mongo_base.model.ranking.RankingMetrics
+import com.example.jobstat.core.core_mongo_base.model.ranking.SimpleRankingDocument
+import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 

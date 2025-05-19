@@ -1,7 +1,9 @@
 package com.example.jobstat.community_read.service
 
-import com.example.jobstat.core.event.payload.board.*
-import com.example.jobstat.core.event.payload.comment.*
+import com.example.jobstat.core.core_event.model.payload.board.*
+import com.example.jobstat.core.core_event.model.payload.comment.CommentCreatedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 
 interface CommunityEventHandler {
     fun handleBoardCreated(payload: BoardCreatedEventPayload)

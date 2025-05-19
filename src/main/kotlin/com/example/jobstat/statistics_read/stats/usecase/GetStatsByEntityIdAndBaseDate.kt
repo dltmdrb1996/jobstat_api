@@ -1,10 +1,18 @@
 package com.example.jobstat.statistics_read.stats.usecase
 
-import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
-import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.core.core_usecase.base.UseCase
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
+import com.example.jobstat.statistics_read.rankings.model.RankingWithStats
+import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.example.jobstat.statistics_read.rankings.model.rankingtype.toStatsType
+import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisService
+import com.example.jobstat.statistics_read.stats.document.*
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 import com.example.jobstat.statistics_read.stats.service.StatsAnalysisService
+import io.swagger.v3.oas.annotations.media.Schema
+import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull

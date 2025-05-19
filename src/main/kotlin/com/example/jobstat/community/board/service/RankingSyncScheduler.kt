@@ -1,10 +1,10 @@
 package com.example.jobstat.community.board.service
 
 import com.example.jobstat.community.event.CommunityCommandEventPublisher
-import com.example.jobstat.core.constants.CoreConstants
-import com.example.jobstat.core.event.payload.board.BoardRankingUpdatedEventPayload
-import com.example.jobstat.core.state.BoardRankingMetric
-import com.example.jobstat.core.state.BoardRankingPeriod
+import com.example.jobstat.core.core_util.constant.CoreConstants
+import com.example.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
+import com.example.jobstat.core.core_model.BoardRankingMetric
+import com.example.jobstat.core.core_model.BoardRankingPeriod
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component

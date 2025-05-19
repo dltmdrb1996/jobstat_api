@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.stats.fake
 
-import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
-import com.example.jobstat.core.base.repository.StatsMongoRepository
+import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.core.core_mongo_base.repository.StatsMongoRepository
 import com.example.jobstat.statistics_read.stats.registry.StatsRepositoryRegistry
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 

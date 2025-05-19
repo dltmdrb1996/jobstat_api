@@ -2,8 +2,8 @@ package com.example.jobstat.community.board.service
 
 import com.example.jobstat.community.board.entity.BoardCategory
 import com.example.jobstat.community.board.repository.CategoryRepository
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 

@@ -2,7 +2,7 @@ package com.example.jobstat.community_read.usecase.query
 
 import com.example.jobstat.community_read.model.CommentResponseDto
 import com.example.jobstat.community_read.service.CommunityReadService
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Positive

@@ -1,10 +1,10 @@
 package com.example.jobstat.core.base.repository
 
-import com.example.jobstat.core.base.mongo.SnapshotPeriod
-import com.example.jobstat.core.base.mongo.ranking.DistributionRankingDocument
-import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
-import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.core.state.EntityType
+import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.core.core_mongo_base.model.ranking.DistributionRankingDocument
+import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.core.core_model.EntityType
 import com.example.jobstat.statistics_read.rankings.document.CompanySizeEducationRankingsDocument
 import com.example.jobstat.statistics_read.rankings.repository.CompanySizeEducationRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport

@@ -3,8 +3,8 @@ package com.example.jobstat.community_read.repository.fake
 import com.example.jobstat.community_read.repository.BoardIdListRepository
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository.Companion.getCategoryKey
-import com.example.jobstat.core.event.payload.board.BoardRankingUpdatedEventPayload
-import com.example.jobstat.core.state.BoardRankingPeriod
+import com.example.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
+import com.example.jobstat.core.core_model.BoardRankingPeriod
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable

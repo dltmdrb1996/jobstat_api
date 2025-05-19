@@ -3,10 +3,10 @@ package com.example.jobstat.community.board.usecase.command
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.counting.CounterService
 import com.example.jobstat.community.event.CommunityCommandEventPublisher
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.utils.SecurityUtils
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import org.slf4j.LoggerFactory

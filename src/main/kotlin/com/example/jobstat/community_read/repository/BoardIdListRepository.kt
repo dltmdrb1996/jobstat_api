@@ -1,6 +1,6 @@
 package com.example.jobstat.community_read.repository
 
-import com.example.jobstat.core.event.payload.board.BoardRankingUpdatedEventPayload
+import com.example.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.redis.connection.StringRedisConnection

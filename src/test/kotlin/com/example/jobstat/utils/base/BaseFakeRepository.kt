@@ -1,6 +1,6 @@
 package com.example.jobstat.utils.base
 
-import com.example.jobstat.core.base.BaseEntity
+import com.example.jobstat.core.core_jpa_base.base.BaseEntity
 import com.example.jobstat.utils.TestFixture
 import jakarta.persistence.EntityNotFoundException
 import java.lang.reflect.Field

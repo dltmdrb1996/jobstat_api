@@ -1,9 +1,9 @@
 package com.example.jobstat.utils.base
 
-import com.example.jobstat.core.base.mongo.ranking.RelationshipRankingDocument
-import com.example.jobstat.core.base.mongo.ranking.RelationshipRankingDocument.RelatedEntityRank
-import com.example.jobstat.core.base.repository.RelationshipRankingRepository
-import com.example.jobstat.core.state.BaseDate
+import com.example.jobstat.core.core_mongo_base.model.ranking.RelationshipRankingDocument
+import com.example.jobstat.core.core_mongo_base.model.ranking.RelationshipRankingDocument.RelatedEntityRank
+import com.example.jobstat.core.core_mongo_base.repository.RelationshipRankingRepository
+import com.example.jobstat.core.core_model.BaseDate
 
 abstract class AbstractFakeRelationshipRankingRepository<
     T : RelationshipRankingDocument<E>,

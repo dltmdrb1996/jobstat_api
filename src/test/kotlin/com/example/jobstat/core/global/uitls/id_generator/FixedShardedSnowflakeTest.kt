@@ -1,7 +1,7 @@
 package com.example.jobstat.core.global.uitls.id_generator
 
-import com.example.jobstat.core.global.utils.id_generator.sharded.ShardedSnowflake.Companion.NODE_ID_BITS
-import com.example.jobstat.core.global.utils.id_generator.sharded.SynchronizedSnowflakeCore
+import com.example.jobstat.core.core_id_generator.sharded.ShardedSnowflake.Companion.NODE_ID_BITS
+import com.example.jobstat.core.core_id_generator.sharded.SynchronizedSnowflakeCore
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.params.ParameterizedTest
@@ -11,7 +11,7 @@ import java.util.concurrent.*
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
-import com.example.jobstat.core.global.utils.id_generator.sharded.ShardedSnowflake as FixedShardedSnowflake
+import com.example.jobstat.core.core_id_generator.sharded.ShardedSnowflake as FixedShardedSnowflake
 
 class FixedShardedSnowflakeTest {
     private val log = LoggerFactory.getLogger(javaClass)

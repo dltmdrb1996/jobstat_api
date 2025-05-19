@@ -8,9 +8,9 @@ import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.board.service.BoardServiceImpl
 import com.example.jobstat.community.board.utils.BoardConstants
 import com.example.jobstat.community.event.CommunityCommandEventPublisher // Mock 대상
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.utils.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
 import com.example.jobstat.utils.FakePasswordUtil // Fake 구현 사용
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation

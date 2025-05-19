@@ -3,11 +3,11 @@ package com.example.jobstat.community.board.controller
 import com.example.jobstat.community.board.usecase.get.* // 분리된 UseCase들 import
 import com.example.jobstat.community.board.usecase.get.dto.BoardIdsResponse // 공통 응답 DTO import
 import com.example.jobstat.community.board.utils.BoardConstants
-import com.example.jobstat.core.constants.RestConstants
-import com.example.jobstat.core.global.wrapper.ApiResponse
-import com.example.jobstat.core.security.annotation.Public
-import com.example.jobstat.core.state.BoardRankingMetric
-import com.example.jobstat.core.state.BoardRankingPeriod
+import com.example.jobstat.core.core_util.constant.RestConstants
+import com.example.jobstat.core.core_web_util.ApiResponse
+import com.example.jobstat.core.core_security.annotation.Public
+import com.example.jobstat.core.core_model.BoardRankingMetric
+import com.example.jobstat.core.core_model.BoardRankingPeriod
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content

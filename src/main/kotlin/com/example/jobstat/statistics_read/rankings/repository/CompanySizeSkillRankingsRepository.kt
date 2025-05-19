@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.RelationshipRankingRepository
-import com.example.jobstat.core.base.repository.RelationshipRankingRepositoryImpl
-import com.example.jobstat.core.state.CompanySize
+import com.example.jobstat.core.core_mongo_base.repository.RelationshipRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.RelationshipRankingRepositoryImpl
+import com.example.jobstat.core.core_model.CompanySize
 import com.example.jobstat.statistics_read.rankings.document.CompanySizeSkillRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_SIZE_SKILL_DEMAND)
 @NoRepositoryBean
-interface CompanySizeSkillRankingsRepository : RelationshipRankingRepository<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry, String> {
+interface CompanySizeSkillRankingsRepository :
+    RelationshipRankingRepository<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry, String> {
     // 회사 규모별 핵심 스킬 분석
     fun findCoreSkillsByCompanySize(
         baseDate: String,

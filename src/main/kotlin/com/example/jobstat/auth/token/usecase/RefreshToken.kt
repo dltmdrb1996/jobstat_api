@@ -2,10 +2,10 @@ package com.example.jobstat.auth.token.usecase
 
 import com.example.jobstat.auth.token.service.TokenService
 import com.example.jobstat.auth.user.service.UserService
-import com.example.jobstat.core.security.AccessPayload
-import com.example.jobstat.core.security.JwtTokenGenerator
-import com.example.jobstat.core.security.RefreshPayload
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_token.model.AccessPayload
+import com.example.jobstat.core.core_token.JwtTokenGenerator
+import com.example.jobstat.core.core_token.model.RefreshPayload
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotBlank

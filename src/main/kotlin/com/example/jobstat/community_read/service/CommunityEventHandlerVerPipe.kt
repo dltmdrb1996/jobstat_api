@@ -1,11 +1,13 @@
 package com.example.jobstat.community_read.service
 
+import com.example.jobstat.core.core_event.model.payload.comment.CommentCreatedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.example.jobstat.community_read.repository.*
 import com.example.jobstat.community_read.repository.impl.RedisBoardDetailRepository
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository
 import com.example.jobstat.community_read.repository.impl.RedisCommentDetailRepository
-import com.example.jobstat.core.event.payload.board.*
-import com.example.jobstat.core.event.payload.comment.*
+import com.example.jobstat.core.core_event.model.payload.board.*
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.connection.StringRedisConnection
 import org.springframework.data.redis.core.StringRedisTemplate

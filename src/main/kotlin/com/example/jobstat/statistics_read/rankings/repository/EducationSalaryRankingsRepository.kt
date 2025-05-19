@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.EducationSalaryRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -16,7 +16,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.EDUCATION_SALARY)
 @NoRepositoryBean
-interface EducationSalaryRankingsRepository : SimpleRankingRepository<EducationSalaryRankingsDocument, EducationSalaryRankingsDocument.EducationSalaryRankingEntry, String> {
+interface EducationSalaryRankingsRepository :
+    SimpleRankingRepository<EducationSalaryRankingsDocument, EducationSalaryRankingsDocument.EducationSalaryRankingEntry, String> {
     // ROI 기반 교육 분석
     fun findHighestRoiEducations(
         baseDate: String,

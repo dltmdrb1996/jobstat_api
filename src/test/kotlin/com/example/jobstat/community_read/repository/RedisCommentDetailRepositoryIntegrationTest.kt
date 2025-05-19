@@ -3,9 +3,9 @@ package com.example.jobstat.community_read.repository
 import com.example.jobstat.community_read.fixture.CommentReadModelFixture
 import com.example.jobstat.community_read.model.CommentReadModel
 import com.example.jobstat.community_read.repository.impl.RedisCommentDetailRepository
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.utils.serializer.DataSerializer
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_serializer.DataSerializer
 import com.example.jobstat.utils.base.RedisIntegrationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

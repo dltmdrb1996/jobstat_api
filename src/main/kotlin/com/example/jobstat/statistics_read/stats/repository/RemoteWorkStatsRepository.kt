@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.stats.repository
 
-import com.example.jobstat.core.base.repository.StatsMongoRepository
-import com.example.jobstat.core.base.repository.StatsMongoRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.StatsMongoRepository
+import com.example.jobstat.core.core_mongo_base.repository.StatsMongoRepositoryImpl
 import com.example.jobstat.statistics_read.stats.document.RemoteWorkStatsDocument
 import com.example.jobstat.statistics_read.stats.registry.StatsRepositoryType
 import com.example.jobstat.statistics_read.stats.registry.StatsType

@@ -1,6 +1,6 @@
 package com.example.jobstat
 
-import com.example.jobstat.core.config.TimeZoneConfig.Companion.KOREA_TIME_ZONE_ID
+import com.example.jobstat.core.core_config.TimeZoneConfig.Companion.KOREA_TIME_ZONE_ID
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.mongo.MongoProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties

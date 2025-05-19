@@ -3,8 +3,8 @@ package com.example.jobstat.auth.user.service
 import com.example.jobstat.auth.user.fake.FakeRoleRepository
 import com.example.jobstat.auth.user.fake.FakeUserRepository
 import com.example.jobstat.auth.user.fake.UserFixture
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
 import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Test

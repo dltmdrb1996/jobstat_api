@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.JobCategoryPostingCountRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -16,7 +16,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.JOB_CATEGORY_POSTING_COUNT)
 @NoRepositoryBean
-interface JobCategoryPostingCountRankingsRepository : SimpleRankingRepository<JobCategoryPostingCountRankingsDocument, JobCategoryPostingCountRankingsDocument.JobCategoryPostingRankingEntry, String> {
+interface JobCategoryPostingCountRankingsRepository :
+    SimpleRankingRepository<JobCategoryPostingCountRankingsDocument, JobCategoryPostingCountRankingsDocument.JobCategoryPostingRankingEntry, String> {
     // 지역 고용 시장 분석
     fun findByLocationDemand(
         baseDate: String,

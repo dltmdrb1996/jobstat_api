@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.rankings.usecase
 
-import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
-import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.core.usecase.UseCase
+import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.core.core_usecase.base.UseCase
 import com.example.jobstat.statistics_read.rankings.model.RankingWithStats
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.toStatsType

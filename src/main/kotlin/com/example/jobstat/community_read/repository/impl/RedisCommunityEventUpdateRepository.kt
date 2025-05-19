@@ -1,12 +1,14 @@
 package com.example.jobstat.community_read.repository.impl
 
+import com.example.jobstat.core.core_event.model.payload.comment.CommentCreatedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.example.jobstat.community_read.repository.CommunityEventUpdateRepository
 import com.example.jobstat.community_read.utils.config.ReadSideLuaScriptConfig
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.event.payload.board.*
-import com.example.jobstat.core.event.payload.comment.*
-import com.example.jobstat.core.global.utils.serializer.DataSerializer // Serializer 필요
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_event.model.payload.board.*
+import com.example.jobstat.core.core_serializer.DataSerializer // Serializer 필요
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.redis.core.StringRedisTemplate

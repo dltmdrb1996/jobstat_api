@@ -1,8 +1,8 @@
 package com.example.jobstat.utils.base
 
-import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
-import com.example.jobstat.core.base.repository.StatsMongoRepository
-import com.example.jobstat.core.state.BaseDate
+import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.core.core_mongo_base.repository.StatsMongoRepository
+import com.example.jobstat.core.core_model.BaseDate
 import com.example.jobstat.statistics_read.fake.AbstractFakeTimeSeriesRepository
 
 abstract class AbstractFakeStatsRepository<T : BaseStatsDocument> :

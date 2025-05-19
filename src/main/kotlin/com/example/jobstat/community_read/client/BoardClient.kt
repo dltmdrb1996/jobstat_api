@@ -2,9 +2,9 @@ package com.example.jobstat.community_read.client
 
 import com.example.jobstat.community_read.client.response.*
 import com.example.jobstat.community_read.model.BoardReadModel
-import com.example.jobstat.core.base.BaseClient
-import com.example.jobstat.core.global.wrapper.ApiResponse // 서버 ApiResponse Wrapper import
-import com.example.jobstat.core.state.BoardRankingMetric // BoardRankingMetric import
+import com.example.jobstat.core.core_util.base.BaseClient
+import com.example.jobstat.core.core_web_util.ApiResponse // 서버 ApiResponse Wrapper import
+import com.example.jobstat.core.core_model.BoardRankingMetric // BoardRankingMetric import
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference // Import
 import org.springframework.stereotype.Component

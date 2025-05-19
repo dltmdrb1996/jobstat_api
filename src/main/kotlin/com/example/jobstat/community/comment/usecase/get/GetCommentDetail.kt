@@ -3,8 +3,8 @@ package com.example.jobstat.community.comment.usecase.get
 import com.example.jobstat.community.comment.entity.Comment
 import com.example.jobstat.community.comment.service.CommentService
 import com.example.jobstat.community.comment.utils.CommentMapperUtils
-import com.example.jobstat.core.global.utils.SecurityUtils
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Positive

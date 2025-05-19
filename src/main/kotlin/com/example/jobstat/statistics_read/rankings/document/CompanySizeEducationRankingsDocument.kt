@@ -1,11 +1,11 @@
 package com.example.jobstat.statistics_read.rankings.document
 
-import com.example.jobstat.core.base.mongo.SnapshotPeriod
-import com.example.jobstat.core.base.mongo.ranking.DistributionRankingDocument
-import com.example.jobstat.core.base.mongo.ranking.RankingMetrics
-import com.example.jobstat.core.base.mongo.ranking.VolatilityMetrics
-import com.example.jobstat.core.state.CompanySize
-import com.example.jobstat.core.state.EntityType
+import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.core.core_mongo_base.model.ranking.DistributionRankingDocument
+import com.example.jobstat.core.core_mongo_base.model.ranking.RankingMetrics
+import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.example.jobstat.core.core_model.CompanySize
+import com.example.jobstat.core.core_model.EntityType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 

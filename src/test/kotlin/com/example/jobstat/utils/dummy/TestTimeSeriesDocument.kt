@@ -1,8 +1,8 @@
 package com.example.jobstat.utils.dummy
 
-import com.example.jobstat.core.base.mongo.BaseTimeSeriesDocument
-import com.example.jobstat.core.base.mongo.SnapshotPeriod
-import com.example.jobstat.core.base.repository.BaseTimeSeriesRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.model.BaseTimeSeriesDocument
+import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.core.core_mongo_base.repository.BaseTimeSeriesRepositoryImpl
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field

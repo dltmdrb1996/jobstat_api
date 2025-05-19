@@ -2,7 +2,7 @@ package com.example.jobstat.community_read.scheduler
 
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository
 import com.example.jobstat.community_read.service.CommunityReadService
-import com.example.jobstat.core.global.extension.toEpochMilli
+import com.example.jobstat.core.core_util.extension.toEpochMilli
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.EnableScheduling

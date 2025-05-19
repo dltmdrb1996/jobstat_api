@@ -1,9 +1,9 @@
 package com.example.jobstat.community_read.event
 
-import com.example.jobstat.core.event.EventType
-import com.example.jobstat.core.event.outbox.OutboxEventPublisher
-import com.example.jobstat.core.event.payload.board.IncViewEventPayload
-import com.example.jobstat.core.event.publisher.AbstractEventPublisher
+import com.example.jobstat.core.core_event.model.EventType
+import com.example.jobstat.core.core_event.outbox.OutboxEventPublisher
+import com.example.jobstat.core.core_event.model.payload.board.IncViewEventPayload
+import com.example.jobstat.core.core_event.publisher.AbstractEventPublisher
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 

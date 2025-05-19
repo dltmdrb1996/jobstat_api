@@ -5,9 +5,9 @@ import com.example.jobstat.community_read.repository.BoardDetailRepository
 import com.example.jobstat.community_read.repository.impl.RedisCommentCountRepository.Companion.getBoardCommentCountKey
 import com.example.jobstat.community_read.repository.impl.RedisCommunityEventUpdateRepository.Companion.boardEventTsKey
 import com.example.jobstat.community_read.service.CommunityEventHandlerVerPipe.Companion.EVENT_TS_TTL_SECONDS
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.global.utils.serializer.DataSerializer
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_serializer.DataSerializer
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.connection.StringRedisConnection
 import org.springframework.data.redis.core.StringRedisTemplate

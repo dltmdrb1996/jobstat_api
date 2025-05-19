@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.base.repository.SimpleRankingRepository
-import com.example.jobstat.core.base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.CompanyRetentionRateRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates
@@ -15,7 +15,8 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_RETENTION_RATE)
 @NoRepositoryBean
-interface CompanyRetentionRateRankingsRepository : SimpleRankingRepository<CompanyRetentionRateRankingsDocument, CompanyRetentionRateRankingsDocument.CompanyRetentionRankingEntry, String> {
+interface CompanyRetentionRateRankingsRepository :
+    SimpleRankingRepository<CompanyRetentionRateRankingsDocument, CompanyRetentionRateRankingsDocument.CompanyRetentionRankingEntry, String> {
     // 이직률 패턴 분석
     fun findLowTurnoverCompanies(
         baseDate: String,

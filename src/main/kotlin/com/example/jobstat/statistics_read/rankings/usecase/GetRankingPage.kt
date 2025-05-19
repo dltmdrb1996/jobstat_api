@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.usecase
 
-import com.example.jobstat.core.state.BaseDate
-import com.example.jobstat.core.usecase.impl.ValidUseCase
+import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import com.example.jobstat.statistics_read.rankings.model.RankingPage
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisService

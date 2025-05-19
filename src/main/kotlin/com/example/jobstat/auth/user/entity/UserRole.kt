@@ -1,6 +1,6 @@
 package com.example.jobstat.auth.user.entity
 
-import com.example.jobstat.core.base.AuditableEntitySnow
+import com.example.jobstat.core.core_jpa_base.base.AuditableEntitySnow
 import jakarta.persistence.*
 
 @Entity

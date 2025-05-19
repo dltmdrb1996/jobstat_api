@@ -1,10 +1,11 @@
 package com.example.jobstat.statistics_read.rankings.service
 
-import com.example.jobstat.core.base.mongo.ranking.*
-import com.example.jobstat.core.base.mongo.stats.BaseStatsDocument
-import com.example.jobstat.core.error.AppException
-import com.example.jobstat.core.error.ErrorCode
-import com.example.jobstat.core.state.BaseDate
+import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.core.core_error.model.AppException
+import com.example.jobstat.core.core_error.model.ErrorCode
+import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.core.core_mongo_base.model.ranking.BaseRankingDocument
+import com.example.jobstat.core.core_mongo_base.model.ranking.RankingEntry
 import com.example.jobstat.statistics_read.rankings.model.*
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.toStatsType

@@ -1,14 +1,16 @@
 package com.example.jobstat.community.event
 
+import com.example.jobstat.core.core_event.model.payload.comment.CommentCreatedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
+import com.example.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.example.jobstat.community.board.entity.Board
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.core.event.EventType
-import com.example.jobstat.core.event.outbox.OutboxEventPublisher
-import com.example.jobstat.core.event.payload.board.*
-import com.example.jobstat.core.event.payload.comment.*
-import com.example.jobstat.core.event.publisher.AbstractEventPublisher
-import com.example.jobstat.core.state.BoardRankingMetric
-import com.example.jobstat.core.state.BoardRankingPeriod
+import com.example.jobstat.core.core_event.model.EventType
+import com.example.jobstat.core.core_event.outbox.OutboxEventPublisher
+import com.example.jobstat.core.core_event.publisher.AbstractEventPublisher
+import com.example.jobstat.core.core_model.BoardRankingMetric
+import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.core.core_event.model.payload.board.*
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 

@@ -5,8 +5,8 @@ import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardIdAft
 import com.example.jobstat.community_read.client.response.CommentDTO
 import com.example.jobstat.community_read.client.response.FetchCommentIdsResponse
 import com.example.jobstat.community_read.model.CommentReadModel
-import com.example.jobstat.core.base.BaseClient
-import com.example.jobstat.core.global.wrapper.ApiResponse
+import com.example.jobstat.core.core_util.base.BaseClient
+import com.example.jobstat.core.core_web_util.ApiResponse
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
