@@ -2,7 +2,7 @@ package com.example.jobstat.community_read.scheduler
 
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository
 import com.example.jobstat.community_read.service.CommunityReadService
-import com.example.jobstat.core.core_util.extension.toEpochMilli
+import com.example.jobstat.eacheach.toEpochMilli
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -18,7 +18,6 @@ import java.time.temporal.ChronoUnit
  * - 월간(30일) 캐시: 30일이 지난 게시글 제거
  */
 @Component
-@EnableScheduling
 internal class CacheCleanupScheduler(
     private val redisTemplate: StringRedisTemplate,
     private val communityReadService: CommunityReadService,

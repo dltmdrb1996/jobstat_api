@@ -1,6 +1,6 @@
 package com.example.jobstat.core.core_jpa_base.base
 
-import com.example.jobstat.core.core_id_generator.SnowflakeId
+import com.example.jobstat.core.core_jpa_base.id_generator.SnowflakeId
 import jakarta.persistence.*
 import org.hibernate.proxy.HibernateProxy
 import java.util.Objects

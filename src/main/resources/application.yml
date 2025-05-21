@@ -16,6 +16,8 @@ server:
   forward-headers-strategy: NATIVE
 
 spring:
+  application:
+    name: jobstat
   threads:
     virtual:
       enabled: true
@@ -33,8 +35,6 @@ spring:
   web:
     resources:
       add-mappings: false
-  application:
-    name: jobstat
   jpa:
     open-in-view: false
     hibernate:
@@ -61,9 +61,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
-
-
   jackson:
     time-zone: Asia/Seoul
     serialization:
@@ -109,11 +106,14 @@ management:
         enabled: true
 
 springdoc:
-  swagger-ui:
-    default-models-expand-depth: 1
-  default-produces-media-type: application/json
   api-docs:
-    resolve-schema-properties: true
+    enabled: true   # 기본적으로 API 문서 생성을 활성화 (개발/로컬 환경 고려)
+    path: /v3/api-docs # API 문서 경로 (기본값)
+  swagger-ui:
+    enabled: true   # 기본적으로 Swagger UI를 활성화
+    path: /swagger-ui.html # Swagger UI 경로 (기본값)
+    default-models-expand-depth: 1 # 기타 springdoc 설정들
+  default-produces-media-type: application/json
 
 SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
 
@@ -123,13 +123,35 @@ monitoring:
     check-interval: 30000
     debug-duration: 1800000 # 30분
 
-jwt:
-  secret: ${JWT_SECRET}
-  accessTokenExpiration: ${JWT_ACCESS_TOKEN_EXPIRATION:999999}
-  refreshTokenExpiration: ${JWT_REFRESH_TOKEN_EXPIRATION:9604800}
-  tokenPrefix: "Bearer "
+jobstat:
+  core:
+    security:
+      admin:
+        username: ${ADMIN_USERNAME}
+        password: ${ADMIN_PASSWORD}
+    token:
+      jwt:
+        secret: ${JWT_SECRET}
+        access-token-expiration-seconds: ${JWT_ACCESS_TOKEN_EXPIRATION:999999}
+        refresh-token-expiration-seconds: ${JWT_REFRESH_TOKEN_EXPIRATION:9604800}
+        tokenPrefix: "Bearer "
+    openapi:
+      title: "JobStat API (Default)"
+      version: "v1.0-default"
+      description: "JobStat API Documentation"
+      server:
+        urls: "http://localhost:${server.port:8081}" # 현재 서버 포트를 기본값으로 사용
+        description: "Current Development Server"
+      security:
+        bearer-auth:
+          enabled: true # JWT 보안 기본 활성화
+      custom-model-converter:
+        enabled: true # CustomModelConverter 기본 활성화
+    error:
+      global-handler:
+        enabled: true
 
-app:
+
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:"http://localhost:3000,http://localhost:8080"}
   security:

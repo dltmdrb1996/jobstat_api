@@ -4,7 +4,7 @@ import com.example.jobstat.auth.user.entity.Role
 import com.example.jobstat.auth.user.entity.RoleData
 import com.example.jobstat.auth.user.entity.User
 import com.example.jobstat.auth.user.entity.UserRole
-import com.example.jobstat.core.core_model.Address
+import com.example.jobstat.auth.user.model.Address
 import com.example.jobstat.utils.TestFixture
 import java.time.LocalDate
 import java.time.LocalDateTime

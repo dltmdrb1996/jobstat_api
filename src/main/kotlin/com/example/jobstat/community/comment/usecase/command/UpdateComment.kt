@@ -6,7 +6,7 @@ import com.example.jobstat.community.comment.utils.CommentMapperUtils
 import com.example.jobstat.community.event.CommunityCommandEventPublisher
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_security.util.PasswordUtil
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 internal class UpdateComment(
     private val commentService: CommentService,
     private val passwordUtil: PasswordUtil,
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     private val eventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
 ) : ValidUseCase<UpdateComment.ExecuteRequest, UpdateComment.Response>(validator) {
@@ -93,13 +93,13 @@ internal class UpdateComment(
 
     private fun validateMemberPermission(comment: Comment) {
         val currentUserId =
-            securityUtils.getCurrentUserId()
+            theadContextUtils.getCurrentUserId()
                 ?: throw AppException.fromErrorCode(
                     ErrorCode.AUTHENTICATION_FAILURE,
                     "로그인이 필요합니다",
                 )
 
-        if (comment.userId != currentUserId && !securityUtils.isAdmin()) {
+        if (comment.userId != currentUserId && !theadContextUtils.isAdmin()) {
             throw AppException.fromErrorCode(
                 ErrorCode.INSUFFICIENT_PERMISSION,
                 "본인의 댓글만 수정할 수 있습니다",

@@ -2,8 +2,8 @@ package com.example.jobstat.community.board.service
 
 import com.example.jobstat.community.board.entity.Board
 import com.example.jobstat.community.board.utils.model.BoardRankingQueryResult
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 

@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.core_mongo_base.repository.DistributionRankingRepository
-import com.example.jobstat.core.core_mongo_base.repository.DistributionRankingRepositoryImpl
-import com.example.jobstat.core.core_model.CompanySize
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepositoryImpl
+import com.example.jobstat.statistics_read.core.core_model.CompanySize
 import com.example.jobstat.statistics_read.rankings.document.CompanySizeBenefitRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates

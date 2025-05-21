@@ -8,8 +8,8 @@ import com.example.jobstat.community.board.repository.FakeBoardRepository
 import com.example.jobstat.community.board.repository.FakeCategoryRepository
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

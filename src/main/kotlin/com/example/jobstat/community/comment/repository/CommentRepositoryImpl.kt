@@ -1,7 +1,7 @@
 package com.example.jobstat.community.comment.repository
 
 import com.example.jobstat.community.comment.entity.Comment
-import com.example.jobstat.core.core_util.extension.orThrowNotFound
+import com.example.jobstat.core.core_jpa_base.orThrowNotFound
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository

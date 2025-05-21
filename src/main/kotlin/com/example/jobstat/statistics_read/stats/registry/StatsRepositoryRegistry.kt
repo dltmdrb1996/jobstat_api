@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.stats.registry
 
-import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.example.jobstat.core.core_mongo_base.repository.StatsMongoRepository
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import org.springframework.stereotype.Component
 import kotlin.reflect.full.findAnnotation
 

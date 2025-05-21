@@ -10,7 +10,7 @@ import com.example.jobstat.community.board.utils.BoardConstants
 import com.example.jobstat.community.event.CommunityCommandEventPublisher // Mock 대상
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
 import com.example.jobstat.utils.FakePasswordUtil // Fake 구현 사용
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation
@@ -28,7 +28,7 @@ class CreateBoardUseCaseTest {
 
     private lateinit var boardService: BoardService
 
-    private lateinit var securityUtils: SecurityUtils
+    private lateinit var theadContextUtils: TheadContextUtils
     private lateinit var eventPublisher: CommunityCommandEventPublisher // Mock 처리
 
     private lateinit var createBoard: CreateBoard
@@ -45,13 +45,13 @@ class CreateBoardUseCaseTest {
 
         boardService = BoardServiceImpl(boardRepository, categoryRepository)
 
-        securityUtils = mock()
+        theadContextUtils = mock()
         eventPublisher = mock()
 
         createBoard =
             CreateBoard(
                 boardService = boardService,
-                securityUtils = securityUtils,
+                theadContextUtils = theadContextUtils,
                 passwordUtil = passwordUtil,
                 communityCommandEventPublisher = eventPublisher,
                 validator = Validation.buildDefaultValidatorFactory().validator,
@@ -76,7 +76,7 @@ class CreateBoardUseCaseTest {
         @DisplayName("로그인 사용자가 유효한 정보로 게시글 생성 성공")
         fun `given logged in user and valid request, when execute, then create board and publish event`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
 
             val request =
                 CreateBoard.Request(
@@ -110,14 +110,14 @@ class CreateBoardUseCaseTest {
                 categoryId = eq(testCategory.id),
                 userId = eq(testUserId),
             )
-            verify(securityUtils).getCurrentUserId() // securityUtils 호출 확인
+            verify(theadContextUtils).getCurrentUserId() // securityUtils 호출 확인
         }
 
         @Test
         @DisplayName("비로그인 사용자가 비밀번호와 함께 유효한 정보로 게시글 생성 성공")
         fun `given guest user with password and valid request, when execute, then create board and publish event`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 상태 Mock
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 상태 Mock
             val rawPassword = "gPassword123"
 
             val request =
@@ -153,7 +153,7 @@ class CreateBoardUseCaseTest {
                 categoryId = eq(testCategory.id),
                 userId = eq(guestUserId),
             )
-            verify(securityUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserId()
         }
     }
 
@@ -163,7 +163,7 @@ class CreateBoardUseCaseTest {
         @BeforeEach
         fun setup() {
             // 기본적으로 로그인 상태로 설정
-            whenever(securityUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
         }
 
         @Test
@@ -227,7 +227,7 @@ class CreateBoardUseCaseTest {
         @DisplayName("비밀번호가 너무 짧으면 ConstraintViolationException 발생 (비회원)")
         fun `given guest user and too short password, when execute, then throw ConstraintViolationException`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
             val request =
                 CreateBoard.Request(
                     title = "적절한 제목",
@@ -251,7 +251,7 @@ class CreateBoardUseCaseTest {
         @DisplayName("비로그인 사용자가 비밀번호 없이 생성 시 AppException(AUTHENTICATION_FAILURE) 발생")
         fun `given guest user without password, when execute, then throw AppException`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 상태
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 상태
 
             val request =
                 CreateBoard.Request(
@@ -280,7 +280,7 @@ class CreateBoardUseCaseTest {
         @DisplayName("존재하지 않는 카테고리 ID로 생성 시 EntityNotFoundException 발생 (BoardService 레벨)")
         fun `given non-existent categoryId, when execute, then throw EntityNotFoundException`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(testUserId) // 로그인 상태 (누구나 가능)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId) // 로그인 상태 (누구나 가능)
             val nonExistentCategoryId = 999L
 
             val request =

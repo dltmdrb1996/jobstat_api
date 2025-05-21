@@ -5,7 +5,7 @@ import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.event.CommunityCommandEventPublisher
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_security.util.PasswordUtil
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional
 internal class UpdateBoard(
     private val boardService: BoardService,
     private val passwordUtil: PasswordUtil,
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     private val eventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
 ) : ValidUseCase<UpdateBoard.ExecuteRequest, UpdateBoard.Response>(validator) {
@@ -90,13 +90,13 @@ internal class UpdateBoard(
 
     private fun validateMemberPermission(board: Board) {
         val currentUserId =
-            securityUtils.getCurrentUserId()
+            theadContextUtils.getCurrentUserId()
                 ?: throw AppException.fromErrorCode(
                     ErrorCode.AUTHENTICATION_FAILURE,
                     "로그인이 필요합니다",
                 )
 
-        if (board.userId != currentUserId && !securityUtils.isAdmin()) {
+        if (board.userId != currentUserId && !theadContextUtils.isAdmin()) {
             throw AppException.fromErrorCode(
                 ErrorCode.INSUFFICIENT_PERMISSION,
                 "본인의 게시글만 수정할 수 있습니다",

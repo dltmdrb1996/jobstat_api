@@ -3,8 +3,8 @@ package com.example.jobstat.core.event.payload
 import com.example.jobstat.core.core_event.model.payload.comment.CommentCreatedEventPayload
 import com.example.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
 import com.example.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import com.example.jobstat.core.core_event.model.payload.board.*
 import java.time.LocalDateTime
 

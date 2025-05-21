@@ -4,11 +4,6 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextImpl
 import org.springframework.stereotype.Component
 
-// 실제 ScopedValue import (JDK 버전에 따라 확인 필요)
-// 예: import java.lang.ScopedValue; (Java 코드에서)
-// Kotlin에서는 직접 java.lang.ScopedValue 사용 가능
-
-@Component
 object ScopedSecurityContextHolder {
 
     /**

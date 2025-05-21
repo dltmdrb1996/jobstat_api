@@ -1,8 +1,8 @@
 package com.example.jobstat.utils.base
 
-import com.example.jobstat.core.core_mongo_base.model.ranking.DistributionRankingDocument
-import com.example.jobstat.core.core_mongo_base.repository.DistributionRankingRepository
-import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.DistributionRankingDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
+import com.example.jobstat.statistics_read.core.core_model.BaseDate
 import kotlin.math.sqrt
 
 abstract class AbstractFakeDistributionRankingRepository<

@@ -1,4 +1,4 @@
-package com.example.jobstat.core.core_event.publisher
+package com.example.jobstat.core.core_event.publisher // 패키지 변경
 
 import com.example.jobstat.core.core_event.model.EventPayload
 import com.example.jobstat.core.core_event.model.EventType
@@ -6,8 +6,9 @@ import com.example.jobstat.core.core_event.outbox.OutboxEventPublisher
 import org.slf4j.LoggerFactory
 
 abstract class AbstractEventPublisher(
-    protected val outboxEventPublisher: OutboxEventPublisher,
-) : EventPublisher {
+    // protected val outboxEventPublisher: OutboxEventPublisher // 생성자 주입
+    private val outboxEventPublisher: OutboxEventPublisher // private으로 변경해도 무방
+) : EventPublisher { // 인터페이스 구현 명시
     private val log = LoggerFactory.getLogger(this::class.java)
 
     override fun publish(
@@ -15,38 +16,35 @@ abstract class AbstractEventPublisher(
         payload: EventPayload,
     ) {
         log.debug(
-            "[{}] 이벤트 발행 시도: type=$type, payloadType=${payload::class.simpleName}",
-            this::class.simpleName,
+            "[{}] 이벤트 발행 시도: type={}, payloadType={}",
+            this::class.simpleName, type, payload::class.simpleName
         )
-
         try {
-            validateEventType(type)
-            log.debug("[{}] 이벤트 타입 검증 성공: type=$type", this::class.simpleName)
+            validateEventType(type) // 이 클래스를 상속받는 구현체에서 getSupportedEventTypes()를 정의해야 함
+            log.debug("[{}] 이벤트 타입 검증 통과: type={}", this::class.simpleName, type)
 
             outboxEventPublisher.publish(type, payload)
-            log.debug("[{}] 이벤트 발행 요청 완료: type=$type", this::class.simpleName)
-        } catch (e: Exception) {
+            log.debug("[{}] OutboxEventPublisher에 발행 요청 완료: type={}", this::class.simpleName, type)
+        } catch (e: Exception) { // IllegalArgumentException 또는 OutboxEventPublisher.publish()의 예외
             log.error(
-                "[{}] 이벤트 발행 중 오류 발생: type=$type, error=${e.message}",
-                this::class.simpleName,
-                e,
+                "[{}] 이벤트 발행 중 오류 발생: type={}, error={}",
+                this::class.simpleName, type, e.message, e
             )
-            throw e
+            throw e // 예외 전파
         }
     }
 
+    // 이 메소드는 추상 클래스를 상속받는 서비스의 구체 Publisher 클래스에서 구현해야 함.
+    abstract override fun getSupportedEventTypes(): Set<EventType>
+
     private fun validateEventType(type: EventType) {
         val supportedTypes = getSupportedEventTypes()
-        log.debug("[{}] 지원하는 이벤트 타입 목록: {}", this::class.simpleName, supportedTypes)
+        log.debug("[{}] 지원 이벤트 타입: {}", this::class.simpleName, supportedTypes)
 
         require(type in supportedTypes) {
-            log.warn(
-                "[{}] 지원하지 않는 이벤트 타입: type={}, supported={}",
-                this::class.simpleName,
-                type,
-                supportedTypes,
-            )
-            "이벤트 타입 $type 은 ${this::class.simpleName}에서 지원되지 않습니다."
+            val errorMessage = "이벤트 타입 $type 은(는) ${this::class.simpleName} 에서 지원되지 않습니다. 지원 타입: $supportedTypes"
+            log.warn(errorMessage)
+            errorMessage // require의 메시지로 사용됨
         }
     }
 }

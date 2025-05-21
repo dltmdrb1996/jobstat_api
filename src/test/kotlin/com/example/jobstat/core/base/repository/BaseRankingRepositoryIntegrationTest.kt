@@ -1,7 +1,7 @@
 package com.example.jobstat.core.base.repository
 
-import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
-import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
 import com.example.jobstat.statistics_read.rankings.document.SkillGrowthRankingsDocument
 import com.example.jobstat.statistics_read.rankings.repository.SkillGrowthRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
@@ -315,11 +315,11 @@ class BaseRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
             newEntries = 0,
             droppedEntries = 0,
             volatilityMetrics =
-                VolatilityMetrics(
-                    avgRankChange = Random.nextDouble(0.0, 5.0),
-                    rankChangeStdDev = Random.nextDouble(0.0, 2.0),
-                    volatilityTrend = "STABLE",
-                ),
+            com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics(
+                avgRankChange = Random.nextDouble(0.0, 5.0),
+                rankChangeStdDev = Random.nextDouble(0.0, 2.0),
+                volatilityTrend = "STABLE",
+            ),
             growthAnalysis =
                 SkillGrowthRankingsDocument.SkillGrowthMetrics.GrowthAnalysis(
                     avgGrowthRate = Random.nextDouble(-20.0, 50.0),

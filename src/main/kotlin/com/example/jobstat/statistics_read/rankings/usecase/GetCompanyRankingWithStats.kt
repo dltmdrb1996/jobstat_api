@@ -1,6 +1,6 @@
 package com.example.jobstat.statistics_read.rankings.usecase
 
-import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.statistics_read.core.core_model.BaseDate
 import com.example.jobstat.core.core_usecase.base.UseCase
 import com.example.jobstat.statistics_read.rankings.model.RankingWithStats
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.CompanyRankingType

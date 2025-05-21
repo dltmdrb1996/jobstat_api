@@ -3,7 +3,7 @@ package com.example.jobstat.auth
 import com.example.jobstat.auth.token.usecase.RefreshToken
 import com.example.jobstat.auth.user.usecase.Login
 import com.example.jobstat.auth.user.usecase.Register
-import com.example.jobstat.core.core_util.constant.RestConstants
+import com.example.jobstat.core.core_web_util.constant.RestConstants
 import com.example.jobstat.core.core_web_util.ApiResponse
 import com.example.jobstat.core.core_security.annotation.Public
 import io.swagger.v3.oas.annotations.Operation

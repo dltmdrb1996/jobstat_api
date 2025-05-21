@@ -1,9 +1,9 @@
 package com.example.jobstat.core.base.repository
 
-import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
-import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
-import com.example.jobstat.core.core_model.BaseDate
-import com.example.jobstat.core.core_model.EntityType
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.example.jobstat.statistics_read.core.core_model.BaseDate
+import com.example.jobstat.statistics_read.core.core_model.EntityType
 import com.example.jobstat.statistics_read.rankings.document.IndustrySkillRankingsDocument
 import com.example.jobstat.statistics_read.rankings.repository.IndustrySkillRankingsRepositoryImpl
 import com.example.jobstat.utils.base.BatchOperationTestSupport
@@ -86,11 +86,11 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
             newEntries = 0,
             droppedEntries = 0,
             volatilityMetrics =
-                VolatilityMetrics(
-                    avgRankChange = Random.nextDouble(0.0, 5.0),
-                    rankChangeStdDev = Random.nextDouble(0.0, 2.0),
-                    volatilityTrend = "STABLE",
-                ),
+            com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics(
+                avgRankChange = Random.nextDouble(0.0, 5.0),
+                rankChangeStdDev = Random.nextDouble(0.0, 2.0),
+                volatilityTrend = "STABLE",
+            ),
             industrySkillCorrelation =
                 IndustrySkillRankingsDocument.IndustrySkillMetrics.IndustrySkillCorrelation(
                     crossIndustrySkills = emptyMap(),

@@ -2,7 +2,7 @@ package com.example.jobstat.community.board.repository
 
 import com.example.jobstat.community.board.entity.Board
 import com.example.jobstat.community.board.utils.model.BoardRankingQueryResult
-import com.example.jobstat.core.core_util.extension.orThrowNotFound
+import com.example.jobstat.core.core_jpa_base.orThrowNotFound
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable

@@ -1,9 +1,9 @@
 package com.example.jobstat.statistics_read
 
-import com.example.jobstat.core.core_util.constant.RestConstants
+import com.example.jobstat.core.core_web_util.constant.RestConstants
 import com.example.jobstat.core.core_web_util.ApiResponse
 import com.example.jobstat.core.core_security.annotation.Public
-import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.statistics_read.core.core_model.BaseDate
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.BenefitRankingType
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.IndustryRankingType
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.JobCategoryRankingType

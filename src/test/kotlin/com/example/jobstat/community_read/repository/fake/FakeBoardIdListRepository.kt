@@ -4,7 +4,7 @@ import com.example.jobstat.community_read.repository.BoardIdListRepository
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository.Companion.getCategoryKey
 import com.example.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable

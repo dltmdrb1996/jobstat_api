@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.fake
 
-import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
 import com.example.jobstat.core.cache.StatsBulkCacheManager
-import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.statistics_read.core.core_model.BaseDate
 import com.example.jobstat.statistics_read.stats.registry.StatsType
 
 class FakeStatsBulkCacheManager : StatsBulkCacheManager {

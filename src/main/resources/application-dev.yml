@@ -70,3 +70,10 @@ batch:
   chunk-size: 500
   job-size: 100
 
+jobstat:
+  core:
+    openapi:
+      title: "JobStat API (Development)"
+      server:
+        urls: "http://localhost:${server.port:8081}" # dev 환경 서버 URL
+        description: "Development Server"

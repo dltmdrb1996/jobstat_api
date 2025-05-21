@@ -1,6 +1,6 @@
 package com.example.jobstat
 
-import com.example.jobstat.core.core_util.constant.RestConstants
+import com.example.jobstat.core.core_web_util.constant.RestConstants
 import com.example.jobstat.core.core_security.annotation.AdminAuth
 import org.springframework.cache.CacheManager
 import org.springframework.http.ResponseEntity

@@ -3,7 +3,7 @@ package com.example.jobstat.community.board.usecase.handler // Command 서비스
 import com.example.jobstat.community.counting.CounterService // CounterService 임포트 (경로 확인 필요)
 import com.example.jobstat.core.core_event.model.EventType
 import com.example.jobstat.core.core_event.model.payload.board.IncViewEventPayload
-import com.example.jobstat.core.core_usecase.base.EventHandlingUseCase
+import com.example.jobstat.core.core_event.consumer.EventHandlingUseCase
 import org.springframework.stereotype.Component
 
 @Component

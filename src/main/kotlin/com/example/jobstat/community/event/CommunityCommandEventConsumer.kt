@@ -33,7 +33,7 @@ class CommunityCommandEventConsumer : AbstractEventConsumer() {
     @KafkaListener(
         topics = ["\${kafka.consumer.community-command.topic:community-command}"],
         groupId = "\${kafka.consumer.community-command.group-id:community-command-group}",
-        containerFactory = "kafkaListenerContainerFactory",
+        containerFactory = "#{@coreKafkaListenerContainerFactory}"
     )
     fun receiveBoardEvent(
         event: String,
@@ -45,6 +45,6 @@ class CommunityCommandEventConsumer : AbstractEventConsumer() {
             topic,
             groupId,
         )
-        super.consumeEvent(event, ack)
+        super.consumeEvent(event, ack, this::class.simpleName ?: "error") // consumerIdentifier로 클래스 이름 사용
     }
 }

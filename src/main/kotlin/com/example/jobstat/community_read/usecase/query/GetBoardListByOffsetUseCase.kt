@@ -4,8 +4,8 @@ import com.example.jobstat.community_read.model.BoardResponseDto
 import com.example.jobstat.community_read.service.CommunityReadService
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_model.BoardRankingMetric // Enum 임포트
-import com.example.jobstat.core.core_model.BoardRankingPeriod // Enum 임포트
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric // Enum 임포트
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod // Enum 임포트
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator

@@ -2,8 +2,8 @@ package com.example.jobstat.community_read.service
 
 import com.example.jobstat.community_read.model.BoardReadModel
 import com.example.jobstat.community_read.model.CommentReadModel
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 

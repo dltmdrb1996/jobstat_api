@@ -1,5 +1,6 @@
 package com.example.jobstat.core.core_open_api.converter
 
+import com.example.jobstat.core.core_web_util.CommonApiResponseWrapper
 import io.swagger.v3.core.converter.AnnotatedType
 import io.swagger.v3.core.converter.ModelConverter
 import io.swagger.v3.core.converter.ModelConverterContext
@@ -16,7 +17,6 @@ class CustomModelConverter : ModelConverter {
         context: ModelConverterContext,
         chain: Iterator<ModelConverter>,
     ): Schema<*>? {
-        // 1) 체인에서 다른 컨버터 우선 적용
         val resolvedSchema =
             if (chain.hasNext()) {
                 chain.next().resolve(annotatedType, context, chain)
@@ -24,12 +24,11 @@ class CustomModelConverter : ModelConverter {
                 null
             }
 
-        // 2) 타입이 "ApiResponse<T>"인지 판별
         val type = annotatedType.type
         if (type !is ParameterizedType) return resolvedSchema
 
         val rawClass = type.rawType as? Class<*> ?: return resolvedSchema
-        if (rawClass.canonicalName != "com.example.jobstat.core.core_web_util.ApiResponse") {
+        if (!rawClass.isAnnotationPresent(CommonApiResponseWrapper::class.java)) {
             return resolvedSchema
         }
 

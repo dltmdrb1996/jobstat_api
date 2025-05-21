@@ -29,7 +29,7 @@ class CommunityReadEventConsumer : AbstractEventConsumer() {
     @KafkaListener(
         topics = ["\${kafka.consumer.community-read.topic:community-read}"],
         groupId = "\${kafka.consumer.community-read.group-id:community-read-group}",
-        containerFactory = "kafkaListenerContainerFactory",
+        containerFactory = "#{@coreKafkaListenerContainerFactory}"
     )
     fun receiveEvent(
         event: String,
@@ -39,6 +39,6 @@ class CommunityReadEventConsumer : AbstractEventConsumer() {
             "[{}] Kafka 메시지 수신 시도: topic=$topic, groupId=$groupId",
             this::class.simpleName,
         )
-        super.consumeEvent(event, ack)
+        super.consumeEvent(event, ack, this::class.simpleName ?: "error")
     }
 }

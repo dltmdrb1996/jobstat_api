@@ -10,7 +10,7 @@ import com.example.jobstat.community.board.service.BoardServiceImpl
 import com.example.jobstat.community.event.CommunityCommandEventPublisher // Mock 대상
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
 import com.example.jobstat.utils.FakePasswordUtil
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolationException
@@ -28,7 +28,7 @@ class UpdateBoardUseCaseTest {
 
     private lateinit var boardService: BoardService
 
-    private lateinit var securityUtils: SecurityUtils
+    private lateinit var theadContextUtils: TheadContextUtils
     private lateinit var eventPublisher: CommunityCommandEventPublisher
 
     private lateinit var updateBoard: UpdateBoard
@@ -49,14 +49,14 @@ class UpdateBoardUseCaseTest {
 
         boardService = BoardServiceImpl(boardRepository, categoryRepository)
 
-        securityUtils = mock()
+        theadContextUtils = mock()
         eventPublisher = mock()
 
         updateBoard =
             UpdateBoard(
                 boardService = boardService,
                 passwordUtil = passwordUtil,
-                securityUtils = securityUtils,
+                theadContextUtils = theadContextUtils,
                 eventPublisher = eventPublisher,
                 validator = Validation.buildDefaultValidatorFactory().validator,
             )
@@ -94,8 +94,8 @@ class UpdateBoardUseCaseTest {
         fun `given owner user and valid request, when update own board, then success and publish event`() {
             // Given
             val board = createTestBoard(ownerUserId, null)
-            whenever(securityUtils.getCurrentUserId()).thenReturn(ownerUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(false)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(false)
 
             val newTitle = "수정된 제목"
             val newContent = "수정된 내용입니다. 길이를 맞춥니다."
@@ -117,7 +117,7 @@ class UpdateBoardUseCaseTest {
 
             // Verify
             verify(eventPublisher).publishBoardUpdated(argThat { id == board.id })
-            verify(securityUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserId()
         }
 
         @Test
@@ -125,8 +125,8 @@ class UpdateBoardUseCaseTest {
         fun `given admin user and valid request, when update other user board, then success`() {
             // Given
             val board = createTestBoard(otherUserId, null)
-            whenever(securityUtils.getCurrentUserId()).thenReturn(adminUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(true) // 관리자
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(adminUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(true) // 관리자
 
             val newTitle = "관리자가 수정한 제목"
             val newContent = "관리자가 수정한 내용입니다."
@@ -141,8 +141,8 @@ class UpdateBoardUseCaseTest {
             assertEquals(newTitle, updatedBoard.title)
             assertEquals(newContent, updatedBoard.content)
             verify(eventPublisher).publishBoardUpdated(argThat { id == board.id })
-            verify(securityUtils).getCurrentUserId()
-            verify(securityUtils).isAdmin()
+            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).isAdmin()
         }
 
         @Test
@@ -150,7 +150,7 @@ class UpdateBoardUseCaseTest {
         fun `given guest user with correct password and valid request, when update guest board, then success`() {
             // Given
             val board = createTestBoard(guestUserId, correctPassword)
-            whenever(securityUtils.getCurrentUserId()).thenReturn(guestUserId) // 필요 없음 (비밀번호 검증)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 필요 없음 (비밀번호 검증)
 
             val newTitle = "비회원 수정 제목"
             val newContent = "비회원 수정 내용입니다."
@@ -166,7 +166,7 @@ class UpdateBoardUseCaseTest {
             assertEquals(newContent, updatedBoard.content)
             verify(eventPublisher).publishBoardUpdated(argThat { id == board.id })
             assertTrue(passwordUtil.matches(correctPassword, updatedBoard.password!!))
-            verifyNoInteractions(securityUtils)
+            verifyNoInteractions(theadContextUtils)
         }
     }
 
@@ -178,8 +178,8 @@ class UpdateBoardUseCaseTest {
         fun `given non-owner user, when update other user board, then throw AppException`() {
             // Given
             val board = createTestBoard(ownerUserId, null)
-            whenever(securityUtils.getCurrentUserId()).thenReturn(otherUserId) // 다른 사용자
-            whenever(securityUtils.isAdmin()).thenReturn(false) // 관리자 아님
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(otherUserId) // 다른 사용자
+            whenever(theadContextUtils.isAdmin()).thenReturn(false) // 관리자 아님
 
             val request = UpdateBoard.ExecuteRequest(board.id, "다른 제목", "다른 내용", null)
 
@@ -222,7 +222,7 @@ class UpdateBoardUseCaseTest {
         fun `given guest user, when update member board, then throw AppException`() {
             // Given
             val board = createTestBoard(ownerUserId, null) // 회원 게시글
-            whenever(securityUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 상태
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 상태
             val request = UpdateBoard.ExecuteRequest(board.id, "제목", "내용", null)
 
             // When & Then
@@ -242,8 +242,8 @@ class UpdateBoardUseCaseTest {
         fun setupValidation() {
             // 모든 유효성 검사 테스트는 본인 게시글 수정 상황을 가정
             board = createTestBoard(ownerUserId, null)
-            whenever(securityUtils.getCurrentUserId()).thenReturn(ownerUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(false)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(false)
         }
 
         @Test
@@ -279,7 +279,7 @@ class UpdateBoardUseCaseTest {
         fun `given non-existent boardId, when update board, then throw EntityNotFoundException`() {
             // Given
             val nonExistentBoardId = 999L
-            whenever(securityUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
             val request = UpdateBoard.ExecuteRequest(nonExistentBoardId, "제목", "내용", null)
 
             // When & Then

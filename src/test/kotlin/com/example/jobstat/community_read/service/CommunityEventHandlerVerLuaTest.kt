@@ -8,7 +8,6 @@ import com.example.jobstat.community_read.repository.impl.RedisBoardCountReposit
 import com.example.jobstat.community_read.repository.impl.RedisBoardIdListRepository
 import com.example.jobstat.community_read.repository.impl.RedisCommentCountRepository
 import com.example.jobstat.community_read.repository.impl.RedisCommunityEventUpdateRepository
-import com.example.jobstat.core.config.AppConfig
 import com.example.jobstat.core.event.payload.BoardCreatedEventPayloadFixture
 import com.example.jobstat.core.event.payload.BoardDeletedEventPayloadFixture
 import com.example.jobstat.core.event.payload.BoardLikedEventPayloadFixture
@@ -18,11 +17,11 @@ import com.example.jobstat.core.event.payload.BoardViewedEventPayloadFixture
 import com.example.jobstat.core.event.payload.CommentCreatedEventPayloadFixture
 import com.example.jobstat.core.event.payload.CommentDeletedEventPayloadFixture
 import com.example.jobstat.core.event.payload.CommentUpdatedEventPayloadFixture
-import com.example.jobstat.core.event.payload.board.*
 import com.example.jobstat.core.core_serializer.DataSerializer
 import com.example.jobstat.core.core_serializer.ObjectMapperDataSerializer
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.kotlin.*
@@ -40,7 +39,7 @@ class CommunityEventHandlerVerLuaTest {
 
     private val dataSerializer: DataSerializer =
         ObjectMapperDataSerializer(
-            AppConfig.OBJECT_MAPPER,
+            CoreSerializerAutoConfiguration.createDefaultObjectMapper(),
         )
 
     private lateinit var communityEventHandler: CommunityEventHandlerVerLua

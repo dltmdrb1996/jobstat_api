@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import javax.crypto.SecretKey
 
-@Component
 class JwtTokenParser(
     @Value("\${jwt.secret}") private val secret: String,
 ) {

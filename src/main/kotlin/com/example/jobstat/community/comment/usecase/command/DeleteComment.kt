@@ -6,7 +6,7 @@ import com.example.jobstat.community.comment.utils.CommentConstants
 import com.example.jobstat.community.event.CommunityCommandEventPublisher
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_security.util.PasswordUtil
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 internal class DeleteComment(
     private val commentService: CommentService,
     private val passwordUtil: PasswordUtil,
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     private val communityCommandEventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
 ) : ValidUseCase<DeleteComment.ExecuteRequest, DeleteComment.Response>(validator) {
@@ -89,7 +89,7 @@ internal class DeleteComment(
     private fun validateMemberAccess(comment: Comment) {
         // 현재 사용자 ID 확인
         val currentUserId =
-            securityUtils.getCurrentUserId()
+            theadContextUtils.getCurrentUserId()
                 ?: throw AppException.fromErrorCode(
                     ErrorCode.AUTHENTICATION_FAILURE,
                     "로그인이 필요합니다",
@@ -97,7 +97,7 @@ internal class DeleteComment(
 
         when {
             // 관리자는 모든 댓글 삭제 가능
-            securityUtils.isAdmin() -> {
+            theadContextUtils.isAdmin() -> {
                 log.debug("[DeleteComment] 관리자 사용자 $currentUserId 댓글 ${comment.id}번을 삭제합니다")
             }
             // 일반 사용자는 자신의 댓글만 삭제 가능

@@ -6,7 +6,7 @@ import com.example.jobstat.community.board.utils.BoardConstants
 import com.example.jobstat.community.event.CommunityCommandEventPublisher
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_security.util.PasswordUtil
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 internal class CreateBoard(
     private val boardService: BoardService,
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     private val passwordUtil: PasswordUtil,
     private val communityCommandEventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
@@ -43,7 +43,7 @@ internal class CreateBoard(
                 Thread.currentThread().name,
                 Thread.currentThread().isVirtual) // isVirtual()은 JDK 21+
 
-            val userId = securityUtils.getCurrentUserId()
+            val userId = theadContextUtils.getCurrentUserId()
             log.info("Retrieved userId from SecurityUtils: {}", userId) // userId 값 로깅
 
             // 로그인 상태가 아니면서 비밀번호가 없는 경우 예외 처리

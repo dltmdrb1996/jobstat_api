@@ -1,13 +1,13 @@
 package com.example.jobstat.statistics_read.rankings.service
 
-import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
-import com.example.jobstat.core.core_mongo_base.model.ranking.BaseRankingDocument
-import com.example.jobstat.core.core_mongo_base.model.ranking.RankingEntry
-import com.example.jobstat.core.core_mongo_base.model.ranking.RankingMetrics
-import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
-import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.example.jobstat.core.core_mongo_base.repository.BaseRankingRepository
-import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingMetrics
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.BaseRankingRepository
+import com.example.jobstat.statistics_read.core.core_model.BaseDate
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.repository.RankingRepositoryRegistry
 import com.example.jobstat.statistics_read.stats.service.StatsAnalysisService
@@ -46,7 +46,7 @@ class RankingAnalysisServiceTest {
 
     private fun createMockDocument(rankings: List<RankingEntry>): BaseRankingDocument<RankingEntry> {
         val mockVolatilityMetrics =
-            VolatilityMetrics(
+            com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics(
                 avgRankChange = 2.5,
                 rankChangeStdDev = 1.2,
                 volatilityTrend = "STABLE",
@@ -58,7 +58,7 @@ class RankingAnalysisServiceTest {
                 override val rankedCount: Int = 100
                 override val newEntries: Int = 0
                 override val droppedEntries: Int = 0
-                override val volatilityMetrics: VolatilityMetrics = mockVolatilityMetrics
+                override val volatilityMetrics: com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics = mockVolatilityMetrics
             }
 
         return object : BaseRankingDocument<RankingEntry>(

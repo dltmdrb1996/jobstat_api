@@ -1,6 +1,6 @@
 package com.example.jobstat.statistics_read.rankings.model
 
-import com.example.jobstat.core.core_mongo_base.model.ranking.BaseRankingDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
 
 data class RankingResult(
     val documentType: Class<*>,

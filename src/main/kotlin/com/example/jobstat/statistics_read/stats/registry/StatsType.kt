@@ -1,6 +1,6 @@
 package com.example.jobstat.statistics_read.stats.registry
 
-import com.example.jobstat.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
 import com.example.jobstat.statistics_read.stats.document.*
 
 enum class StatsType {

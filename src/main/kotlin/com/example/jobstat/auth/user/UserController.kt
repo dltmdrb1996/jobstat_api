@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.user
 
 import com.example.jobstat.auth.user.usecase.Register
-import com.example.jobstat.core.core_util.constant.RestConstants
+import com.example.jobstat.core.core_web_util.constant.RestConstants
 import com.example.jobstat.core.core_web_util.ApiResponse
 import com.example.jobstat.core.core_security.annotation.Public
 import io.swagger.v3.oas.annotations.Operation

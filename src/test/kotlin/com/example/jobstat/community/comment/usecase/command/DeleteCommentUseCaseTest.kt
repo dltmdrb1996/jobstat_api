@@ -13,7 +13,7 @@ import com.example.jobstat.community.comment.service.CommentServiceImpl
 import com.example.jobstat.community.event.CommunityCommandEventPublisher // Mock 대상
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
 import com.example.jobstat.utils.FakePasswordUtil
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Validation
@@ -31,7 +31,7 @@ class DeleteCommentUseCaseTest {
 
     private lateinit var commentService: CommentService
 
-    private lateinit var securityUtils: SecurityUtils
+    private lateinit var theadContextUtils: TheadContextUtils
     private lateinit var eventPublisher: CommunityCommandEventPublisher
 
     private lateinit var deleteComment: DeleteComment
@@ -56,14 +56,14 @@ class DeleteCommentUseCaseTest {
 
         commentService = CommentServiceImpl(commentRepository, boardRepository)
 
-        securityUtils = mock()
+        theadContextUtils = mock()
         eventPublisher = mock()
 
         deleteComment =
             DeleteComment(
                 commentService = commentService,
                 passwordUtil = passwordUtil,
-                securityUtils = securityUtils,
+                theadContextUtils = theadContextUtils,
                 communityCommandEventPublisher = eventPublisher,
                 validator = Validation.buildDefaultValidatorFactory().validator,
             )
@@ -104,8 +104,8 @@ class DeleteCommentUseCaseTest {
         @DisplayName("로그인 사용자가 자신의 댓글 삭제 성공")
         fun `given owner user, when delete own comment, then success and publish event`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(ownerUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(false)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(false)
             val requestDto = DeleteComment.Request(password = null)
             val request = requestDto.of(memberComment.id)
 
@@ -118,16 +118,16 @@ class DeleteCommentUseCaseTest {
             assertEquals(1, boardRepository.findById(testBoard.id).commentCount)
 
             verify(eventPublisher).publishCommentDeleted(memberComment.id, testBoard.id)
-            verify(securityUtils).getCurrentUserId()
-            verify(securityUtils).isAdmin()
+            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).isAdmin()
         }
 
         @Test
         @DisplayName("관리자가 다른 사용자의 댓글 삭제 성공")
         fun `given admin user, when delete other user comment, then success`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(adminUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(true)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(adminUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(true)
             val requestDto = DeleteComment.Request(password = null)
             val request = requestDto.of(memberComment.id)
 
@@ -158,7 +158,7 @@ class DeleteCommentUseCaseTest {
 
             assertTrue(passwordUtil.matches(correctPassword, guestComment.password!!))
             verify(eventPublisher).publishCommentDeleted(guestComment.id, testBoard.id)
-            verifyNoInteractions(securityUtils)
+            verifyNoInteractions(theadContextUtils)
         }
     }
 
@@ -169,8 +169,8 @@ class DeleteCommentUseCaseTest {
         @DisplayName("로그인 사용자가 다른 사용자 댓글 삭제 시 AppException(INSUFFICIENT_PERMISSION) 발생")
         fun `given non-owner user, when delete other user comment, then throw AppException`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(otherUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(false)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(otherUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(false)
             val requestDto = DeleteComment.Request(password = null)
             val request = requestDto.of(memberComment.id)
 
@@ -215,7 +215,7 @@ class DeleteCommentUseCaseTest {
         @DisplayName("로그인 필요한 댓글 삭제 시 비로그인 상태면 AppException(AUTHENTICATION_FAILURE) 발생")
         fun `given guest user, when delete member comment, then throw AppException`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
             val requestDto = DeleteComment.Request(password = null)
             val request = requestDto.of(memberComment.id)
 
@@ -236,7 +236,7 @@ class DeleteCommentUseCaseTest {
         fun `given non-existent commentId, when delete comment, then throw EntityNotFoundException`() {
             // Given
             val nonExistentCommentId = 999L
-            whenever(securityUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
             val requestDto = DeleteComment.Request(password = null)
             val request = requestDto.of(nonExistentCommentId)
 

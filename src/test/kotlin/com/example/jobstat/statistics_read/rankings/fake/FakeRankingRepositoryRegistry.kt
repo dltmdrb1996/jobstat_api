@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.fake
 
-import com.example.jobstat.core.core_mongo_base.model.ranking.BaseRankingDocument
-import com.example.jobstat.core.core_mongo_base.repository.BaseRankingRepository
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.BaseRankingRepository
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.repository.RankingRepositoryRegistry
 

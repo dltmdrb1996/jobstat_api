@@ -1,7 +1,7 @@
 package com.example.jobstat.statistics_read.rankings.repository
 
-import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
-import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.example.jobstat.statistics_read.rankings.document.CompanyRetentionRateRankingsDocument
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.mongodb.client.model.Aggregates

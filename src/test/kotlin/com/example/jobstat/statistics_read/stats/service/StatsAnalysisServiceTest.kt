@@ -1,9 +1,9 @@
 package com.example.jobstat.statistics_read.stats.service
 
-import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
-import com.example.jobstat.core.core_mongo_base.repository.StatsMongoRepository
-import com.example.jobstat.core.core_model.BaseDate
-import com.example.jobstat.core.core_mongo_base.model.stats.*
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
+import com.example.jobstat.statistics_read.core.core_model.BaseDate
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.stats.*
 import com.example.jobstat.statistics_read.fake.FakeStatsBulkCacheManager
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.stats.document.SkillStatsDocument

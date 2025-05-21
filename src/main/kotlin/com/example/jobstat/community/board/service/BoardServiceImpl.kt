@@ -5,12 +5,12 @@ import com.example.jobstat.community.board.repository.BoardRepository
 import com.example.jobstat.community.board.repository.CategoryRepository
 import com.example.jobstat.community.board.utils.BoardConstants
 import com.example.jobstat.community.board.utils.model.BoardRankingQueryResult
-import com.example.jobstat.core.core_util.constant.CoreConstants
+import com.example.jobstat.core.core_web_util.constant.CoreConstants
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_util.extension.orThrowNotFound
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.core.core_jpa_base.orThrowNotFound
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable

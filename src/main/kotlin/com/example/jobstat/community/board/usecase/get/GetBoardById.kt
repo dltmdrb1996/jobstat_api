@@ -3,8 +3,8 @@ package com.example.jobstat.community.board.usecase.get
 import com.example.jobstat.community.board.entity.Board
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.counting.CounterService
-import com.example.jobstat.core.core_util.extension.toEpochMilli
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.eacheach.toEpochMilli
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 internal class GetBoardById(
     private val boardService: BoardService,
     private val counterService: CounterService,
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     validator: Validator,
 ) : ValidUseCase<GetBoardById.Request, GetBoardById.Response>(validator) {
     @Transactional(readOnly = true)
@@ -24,7 +24,7 @@ internal class GetBoardById(
 
     override fun execute(request: Request): Response {
         val board = boardService.getBoard(request.boardId)
-        val userId = securityUtils.getCurrentUserId()?.toString()
+        val userId = theadContextUtils.getCurrentUserId()?.toString()
 
         val finalCounters =
             counterService.getSingleBoardCounters(

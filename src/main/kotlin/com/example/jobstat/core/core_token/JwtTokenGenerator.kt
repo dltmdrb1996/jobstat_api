@@ -11,7 +11,6 @@ import java.time.Instant
 import java.util.*
 import javax.crypto.SecretKey
 
-@Component
 class JwtTokenGenerator(
     @Value("\${jwt.secret}") private val secret: String,
     @Value("\${jwt.accessTokenExpiration}") private val accessTokenExpiration: Int,

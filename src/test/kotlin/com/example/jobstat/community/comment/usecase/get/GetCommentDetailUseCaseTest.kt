@@ -10,7 +10,7 @@ import com.example.jobstat.community.comment.entity.Comment
 import com.example.jobstat.community.comment.repository.FakeCommentRepository
 import com.example.jobstat.community.comment.service.CommentService
 import com.example.jobstat.community.comment.service.CommentServiceImpl
-import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation
@@ -27,7 +27,7 @@ class GetCommentDetailUseCaseTest {
 
     private lateinit var commentService: CommentService
 
-    private lateinit var securityUtils: SecurityUtils
+    private lateinit var theadContextUtils: TheadContextUtils
 
     private lateinit var getCommentDetail: GetCommentDetail
 
@@ -44,12 +44,12 @@ class GetCommentDetailUseCaseTest {
 
         commentService = CommentServiceImpl(commentRepository, boardRepository)
 
-        securityUtils = mock()
+        theadContextUtils = mock()
 
         getCommentDetail =
             GetCommentDetail(
                 commentService = commentService,
-                securityUtils = securityUtils,
+                theadContextUtils = theadContextUtils,
                 validator = Validation.buildDefaultValidatorFactory().validator,
             )
 
@@ -94,7 +94,7 @@ class GetCommentDetailUseCaseTest {
             assertEquals(testComment.updatedAt, response.updatedAt)
             assertNotNull(response.eventTs)
 
-            verify(securityUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserId()
         }
     }
 
@@ -110,7 +110,7 @@ class GetCommentDetailUseCaseTest {
 
             // When & Then
             assertThrows<EntityNotFoundException> { getCommentDetail(request) }
-            verifyNoInteractions(securityUtils)
+            verifyNoInteractions(theadContextUtils)
         }
 
         @Test
@@ -123,7 +123,7 @@ class GetCommentDetailUseCaseTest {
             // When & Then
             assertThrows<ConstraintViolationException> { getCommentDetail(request1) }
             assertThrows<ConstraintViolationException> { getCommentDetail(request2) }
-            verifyNoInteractions(securityUtils)
+            verifyNoInteractions(theadContextUtils)
         }
     }
 }

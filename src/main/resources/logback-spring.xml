@@ -161,7 +161,7 @@
         <logger name="io.lettuce" level="WARN"/>
         <logger name="com.zaxxer.hikari" level="WARN"/>
         <logger name="org.springframework.security" level="WARN"/>
-        <logger name="com.example.jobstat.core.security.JwtTokenFilter" level="WARN"/>
+        <logger name="com.example.jobstat.core.core_security.filter.JwtTokenFilterWithScopedValue" level="WARN"/>
 
     </springProfile>
 </configuration>

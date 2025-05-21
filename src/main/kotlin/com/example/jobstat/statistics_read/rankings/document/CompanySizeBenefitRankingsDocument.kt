@@ -1,10 +1,10 @@
 package com.example.jobstat.statistics_read.rankings.document
 
-import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
-import com.example.jobstat.core.core_mongo_base.model.ranking.DistributionRankingDocument
-import com.example.jobstat.core.core_mongo_base.model.ranking.RankingMetrics
-import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
-import com.example.jobstat.core.core_model.EntityType
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.DistributionRankingDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingMetrics
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.example.jobstat.statistics_read.core.core_model.EntityType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
@@ -42,7 +42,7 @@ class CompanySizeBenefitRankingsDocument(
         @Field("dropped_entries")
         override val droppedEntries: Int,
         @Field("volatility_metrics")
-        override val volatilityMetrics: VolatilityMetrics,
+        override val volatilityMetrics: com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics,
         @Field("benefit_trends")
         val benefitTrends: BenefitTrends,
     ) : RankingMetrics {

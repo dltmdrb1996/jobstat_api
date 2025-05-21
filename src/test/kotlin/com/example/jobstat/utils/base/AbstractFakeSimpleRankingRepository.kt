@@ -1,7 +1,7 @@
 package com.example.jobstat.utils.base
 
-import com.example.jobstat.core.core_mongo_base.model.ranking.SimpleRankingDocument
-import com.example.jobstat.core.core_mongo_base.repository.SimpleRankingRepository
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.SimpleRankingDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 
 abstract class AbstractFakeSimpleRankingRepository<
     T : SimpleRankingDocument<E>,

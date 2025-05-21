@@ -5,8 +5,8 @@ import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.counting.CounterService
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_util.extension.toEpochMilli
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.eacheach.toEpochMilli
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
@@ -21,14 +21,14 @@ import java.time.LocalDateTime
  */
 @Service
 internal class GetBoardsByIds(
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     private val boardService: BoardService,
     private val counterService: CounterService,
     validator: Validator,
 ) : ValidUseCase<GetBoardsByIds.Request, GetBoardsByIds.Response>(validator) {
     override fun execute(request: Request): Response {
         // 현재 사용자 ID 확인
-        val userId = securityUtils.getCurrentUserId()?.toString()
+        val userId = theadContextUtils.getCurrentUserId()?.toString()
 
         // ID 목록으로 게시글 조회
         val boards = boardService.getBoardsByIds(request.boardIds)

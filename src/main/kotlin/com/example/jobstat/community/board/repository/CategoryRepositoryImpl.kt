@@ -1,7 +1,7 @@
 package com.example.jobstat.community.board.repository
 
 import com.example.jobstat.community.board.entity.BoardCategory
-import com.example.jobstat.core.core_util.extension.orThrowNotFound
+import com.example.jobstat.core.core_jpa_base.orThrowNotFound
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository

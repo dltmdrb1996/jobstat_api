@@ -7,7 +7,7 @@ import com.example.jobstat.community.counting.CounterService
 import com.example.jobstat.community.event.CommunityCommandEventPublisher
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_security.util.PasswordUtil
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
@@ -27,7 +27,7 @@ internal class DeleteBoard(
     private val boardService: BoardService,
     private val counterService: CounterService,
     private val passwordUtil: PasswordUtil,
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     private val communityCommandEventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
 ) : ValidUseCase<DeleteBoard.ExecuteRequest, DeleteBoard.Response>(validator) {
@@ -90,14 +90,14 @@ internal class DeleteBoard(
 
     private fun validateMemberAccess(board: Board) {
         val currentUserId =
-            securityUtils.getCurrentUserId()
+            theadContextUtils.getCurrentUserId()
                 ?: throw AppException.fromErrorCode(
                     ErrorCode.AUTHENTICATION_FAILURE,
                     "로그인이 필요합니다",
                 )
 
         when {
-            securityUtils.isAdmin() -> {
+            theadContextUtils.isAdmin() -> {
                 log.debug("관리자 {} 사용자가 게시글 {} 삭제", currentUserId, board.id)
             }
             board.userId != currentUserId -> {

@@ -17,8 +17,8 @@ import com.example.jobstat.core.event.payload.CommentCreatedEventPayloadFixture
 import com.example.jobstat.core.event.payload.CommentDeletedEventPayloadFixture
 import com.example.jobstat.core.event.payload.CommentUpdatedEventPayloadFixture
 import com.example.jobstat.core.core_serializer.DataSerializer
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import com.example.jobstat.utils.base.RedisIntegrationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

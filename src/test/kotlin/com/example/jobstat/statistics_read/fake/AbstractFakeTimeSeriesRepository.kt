@@ -1,8 +1,8 @@
 package com.example.jobstat.statistics_read.fake
 
-import com.example.jobstat.core.core_mongo_base.model.BaseTimeSeriesDocument
-import com.example.jobstat.core.core_mongo_base.repository.BaseTimeSeriesRepository
-import com.example.jobstat.core.core_model.BaseDate
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.BaseTimeSeriesDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.repository.BaseTimeSeriesRepository
+import com.example.jobstat.statistics_read.core.core_model.BaseDate
 import com.mongodb.bulk.BulkWriteResult
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.query.Query

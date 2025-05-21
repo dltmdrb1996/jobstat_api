@@ -5,7 +5,7 @@ import com.example.jobstat.community.counting.CounterService
 import com.example.jobstat.community.event.CommunityCommandEventPublisher
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 internal class LikeBoard(
     private val counterService: CounterService,
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     private val boardService: BoardService,
     private val communityCommandEventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
@@ -60,7 +60,7 @@ internal class LikeBoard(
     }
 
     private fun getUserIdOrThrow(): Long =
-        securityUtils.getCurrentUserId()
+        theadContextUtils.getCurrentUserId()
             ?: throw AppException.fromErrorCode(
                 ErrorCode.AUTHENTICATION_FAILURE,
                 "좋아요를 누르려면 로그인이 필요합니다",

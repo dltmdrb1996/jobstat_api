@@ -3,7 +3,7 @@ package com.example.jobstat.community.comment.usecase.get
 import com.example.jobstat.community.comment.entity.Comment
 import com.example.jobstat.community.comment.service.CommentService
 import com.example.jobstat.community.comment.utils.CommentMapperUtils
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator
@@ -14,12 +14,12 @@ import java.time.LocalDateTime
 @Service
 internal class GetCommentDetail(
     private val commentService: CommentService,
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
     validator: Validator,
 ) : ValidUseCase<GetCommentDetail.Request, GetCommentDetail.Response>(validator) {
     override fun execute(request: Request): Response {
         val comment = commentService.getCommentById(request.commentId)
-        val userId = securityUtils.getCurrentUserId()
+        val userId = theadContextUtils.getCurrentUserId()
 
         return Response.from(comment)
     }

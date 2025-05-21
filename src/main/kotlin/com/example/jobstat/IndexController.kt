@@ -2,7 +2,7 @@ package com.example.jobstat
 
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils
 import com.example.jobstat.core.core_security.annotation.AdminAuth
 import com.example.jobstat.core.core_security.annotation.Public
 import com.example.jobstat.core.core_security.annotation.PublicWithTokenCheck
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @Profile("dev") // dev 프로파일에서만 활성화
 internal class IndexController(
-    private val securityUtils: SecurityUtils,
+    private val theadContextUtils: TheadContextUtils,
 ) {
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
@@ -34,10 +34,10 @@ internal class IndexController(
     @PublicWithTokenCheck
     @GetMapping("/api/test/public/check")
     fun apiTestTokenCheck(): String {
-        val isAuthenticated = securityUtils.isAuthenticated()
-        val userId = securityUtils.getCurrentUserId()
-        val role = securityUtils.getCurrentUserRoles()
-        val highRole = securityUtils.getHighestRole()
+        val isAuthenticated = theadContextUtils.isAuthenticated()
+        val userId = theadContextUtils.getCurrentUserId()
+        val role = theadContextUtils.getCurrentUserRoles()
+        val highRole = theadContextUtils.getHighestRole()
         return "apiTestTokenCheck: isAuthenticated=$isAuthenticated userId=$userId, role=$role, highRole=$highRole"
     }
 

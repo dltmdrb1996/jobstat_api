@@ -13,7 +13,7 @@ import com.example.jobstat.community.comment.service.CommentServiceImpl
 import com.example.jobstat.community.event.CommunityCommandEventPublisher // Mock 대상
 import com.example.jobstat.core.core_error.model.AppException
 import com.example.jobstat.core.core_error.model.ErrorCode
-import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
 import com.example.jobstat.utils.FakePasswordUtil
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolationException
@@ -33,7 +33,7 @@ class UpdateCommentUseCaseTest {
 
     private lateinit var commentService: CommentService
 
-    private lateinit var securityUtils: SecurityUtils
+    private lateinit var theadContextUtils: TheadContextUtils
     private lateinit var eventPublisher: CommunityCommandEventPublisher
 
     private lateinit var updateComment: UpdateComment
@@ -58,14 +58,14 @@ class UpdateCommentUseCaseTest {
 
         commentService = CommentServiceImpl(commentRepository, boardRepository)
 
-        securityUtils = mock()
+        theadContextUtils = mock()
         eventPublisher = mock()
 
         updateComment =
             UpdateComment(
                 commentService = commentService,
                 passwordUtil = passwordUtil,
-                securityUtils = securityUtils,
+                theadContextUtils = theadContextUtils,
                 eventPublisher = eventPublisher,
                 validator = Validation.buildDefaultValidatorFactory().validator,
             )
@@ -90,8 +90,8 @@ class UpdateCommentUseCaseTest {
         @DisplayName("로그인 사용자가 자신의 댓글 수정 성공")
         fun `given owner user and valid request, when update own comment, then success and publish event`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(ownerUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(false)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(false)
             val newContent = "수정된 멤버 댓글 내용"
             val requestDto = UpdateComment.Request(content = newContent, password = null)
             val request = requestDto.of(memberComment.id)
@@ -113,15 +113,15 @@ class UpdateCommentUseCaseTest {
                 comment = argThat { id == memberComment.id && content == newContent },
                 boardId = eq(testBoard.id),
             )
-            verify(securityUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserId()
         }
 
         @Test
         @DisplayName("관리자가 다른 사용자 댓글 수정 성공")
         fun `given admin user, when update other user comment, then success`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(adminUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(true)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(adminUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(true)
             val newContent = "관리자가 수정한 댓글"
             val requestDto = UpdateComment.Request(content = newContent, password = null)
             val request = requestDto.of(memberComment.id)
@@ -154,7 +154,7 @@ class UpdateCommentUseCaseTest {
 
             assertTrue(passwordUtil.matches(correctPassword, updatedComment.password!!))
             verify(eventPublisher).publishCommentUpdated(any(), eq(testBoard.id))
-            verifyNoInteractions(securityUtils)
+            verifyNoInteractions(theadContextUtils)
         }
     }
 
@@ -165,8 +165,8 @@ class UpdateCommentUseCaseTest {
         @DisplayName("로그인 사용자가 다른 사용자 댓글 수정 시 AppException(INSUFFICIENT_PERMISSION) 발생")
         fun `given non-owner user, when update other user comment, then throw AppException`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(otherUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(false)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(otherUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(false)
             val requestDto = UpdateComment.Request("수정 시도", null)
             val request = requestDto.of(memberComment.id)
 
@@ -200,8 +200,8 @@ class UpdateCommentUseCaseTest {
         fun setupValidationCase() {
             commentId = memberComment.id
 
-            whenever(securityUtils.getCurrentUserId()).thenReturn(ownerUserId)
-            whenever(securityUtils.isAdmin()).thenReturn(false)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(false)
         }
 
         @Test
@@ -239,7 +239,7 @@ class UpdateCommentUseCaseTest {
         fun `given non-existent commentId, when update comment, then throw EntityNotFoundException`() {
             // Given
             val nonExistentCommentId = 999L
-            whenever(securityUtils.getCurrentUserId()).thenReturn(ownerUserId) // 권한은 있음
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId) // 권한은 있음
             val requestDto = UpdateComment.Request("내용", null)
             val request = requestDto.of(nonExistentCommentId)
 

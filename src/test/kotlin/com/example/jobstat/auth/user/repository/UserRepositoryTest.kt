@@ -1,7 +1,7 @@
 package com.example.jobstat.auth.user.repository
 
 import com.example.jobstat.auth.user.entity.User
-import com.example.jobstat.core.core_model.Address
+import com.example.jobstat.auth.user.model.Address
 import com.example.jobstat.utils.base.JpaIntegrationTestSupport
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

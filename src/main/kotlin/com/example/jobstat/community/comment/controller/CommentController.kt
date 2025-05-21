@@ -9,7 +9,7 @@ import com.example.jobstat.community.comment.usecase.get.GetCommentsByAuthor
 import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardId
 import com.example.jobstat.community.comment.usecase.get.GetCommentsByBoardIdAfter
 import com.example.jobstat.community.comment.usecase.get.GetCommentsByIds
-import com.example.jobstat.core.core_util.constant.RestConstants
+import com.example.jobstat.core.core_web_util.constant.RestConstants
 import com.example.jobstat.core.core_web_util.ApiResponse
 import com.example.jobstat.core.core_security.annotation.Public
 import com.example.jobstat.core.core_security.annotation.PublicWithTokenCheck

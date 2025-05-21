@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
-@Repository
+@Repository // 동일
 interface OutboxRepository : JpaRepository<Outbox, Long> {
     fun findByRetryCountLessThanAndCreatedAtLessThanEqual(
         retryCount: Int,

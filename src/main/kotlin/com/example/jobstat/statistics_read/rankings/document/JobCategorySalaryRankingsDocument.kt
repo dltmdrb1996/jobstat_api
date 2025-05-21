@@ -1,9 +1,9 @@
 package com.example.jobstat.statistics_read.rankings.document
 
-import com.example.jobstat.core.core_mongo_base.model.SnapshotPeriod
-import com.example.jobstat.core.core_mongo_base.model.ranking.RankingMetrics
-import com.example.jobstat.core.core_mongo_base.model.ranking.SimpleRankingDocument
-import com.example.jobstat.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingMetrics
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.SimpleRankingDocument
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
@@ -28,7 +28,7 @@ class JobCategorySalaryRankingsDocument(
         @Field("ranked_count") override val rankedCount: Int,
         @Field("new_entries") override val newEntries: Int,
         @Field("dropped_entries") override val droppedEntries: Int,
-        @Field("volatility_metrics") override val volatilityMetrics: VolatilityMetrics,
+        @Field("volatility_metrics") override val volatilityMetrics: com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics,
         @Field("salary_analysis") val salaryAnalysis: SalaryAnalysis,
     ) : RankingMetrics {
         data class SalaryAnalysis(

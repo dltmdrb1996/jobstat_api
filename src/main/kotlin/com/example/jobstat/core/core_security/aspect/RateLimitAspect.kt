@@ -12,7 +12,6 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 
 @Aspect
-@Component
 class RateLimitAspect {
     private val requestCountMap = ConcurrentHashMap<String, ConcurrentLinkedQueue<Long>>()
 

@@ -1,6 +1,6 @@
 package com.example.jobstat.statistics_read.rankings.usecase.analyze
 
-import com.example.jobstat.core.core_mongo_base.model.ranking.RankingEntry
+import com.example.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import com.example.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.example.jobstat.statistics_read.rankings.service.RankingAnalysisService

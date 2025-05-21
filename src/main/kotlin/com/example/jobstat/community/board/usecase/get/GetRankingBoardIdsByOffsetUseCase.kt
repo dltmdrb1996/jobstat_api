@@ -3,8 +3,8 @@ package com.example.jobstat.community.board.usecase.get
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.board.usecase.get.dto.BoardIdsResponse
 import com.example.jobstat.community.board.utils.BoardConstants
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import com.example.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator

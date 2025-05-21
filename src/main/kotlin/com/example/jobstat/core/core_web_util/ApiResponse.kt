@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
+@CommonApiResponseWrapper
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class ApiResponse<T>(
     val code: Int,

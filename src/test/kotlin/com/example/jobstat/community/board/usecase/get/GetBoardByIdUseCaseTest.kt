@@ -8,8 +8,8 @@ import com.example.jobstat.community.board.repository.FakeCategoryRepository
 import com.example.jobstat.community.board.service.BoardService
 import com.example.jobstat.community.board.service.BoardServiceImpl
 import com.example.jobstat.community.counting.CounterService // Mock 대상
-import com.example.jobstat.core.core_util.extension.toEpochMilli
-import com.example.jobstat.core.core_security.util.SecurityUtils // Mock 대상
+import com.example.jobstat.eacheach.toEpochMilli
+import com.example.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Validation
 import org.junit.jupiter.api.*
@@ -24,7 +24,7 @@ class GetBoardByIdUseCaseTest {
 
     private lateinit var boardService: BoardService
 
-    private lateinit var securityUtils: SecurityUtils
+    private lateinit var theadContextUtils: TheadContextUtils
     private lateinit var counterService: CounterService
 
     private lateinit var getBoardById: GetBoardById
@@ -41,14 +41,14 @@ class GetBoardByIdUseCaseTest {
 
         boardService = BoardServiceImpl(boardRepository, categoryRepository)
 
-        securityUtils = mock()
+        theadContextUtils = mock()
         counterService = mock()
 
         getBoardById =
             GetBoardById(
                 boardService = boardService,
                 counterService = counterService,
-                securityUtils = securityUtils,
+                theadContextUtils = theadContextUtils,
                 validator = Validation.buildDefaultValidatorFactory().validator,
             )
 
@@ -72,7 +72,7 @@ class GetBoardByIdUseCaseTest {
         @DisplayName("로그인 사용자가 게시글 상세 조회 성공")
         fun `given logged in user and existing boardId, when execute, then return board details with counters`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
             val expectedViewCount = testBoard.viewCount + 1 // 조회수 1 증가 예상
             val expectedLikeCount = testBoard.likeCount // 좋아요 수는 그대로
             val expectedUserLiked = true
@@ -113,7 +113,7 @@ class GetBoardByIdUseCaseTest {
             assertEquals(testBoard.updatedAt.toEpochMilli(), response.eventTs)
 
             // Verify
-            verify(securityUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserId()
             verify(counterService).getSingleBoardCounters(any(), eq(testUserId.toString()), any(), any())
         }
 
@@ -121,7 +121,7 @@ class GetBoardByIdUseCaseTest {
         @DisplayName("비로그인 사용자가 게시글 상세 조회 성공")
         fun `given guest user and existing boardId, when execute, then return board details without user liked info`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인
             val expectedViewCount = testBoard.viewCount + 1
             val expectedLikeCount = testBoard.likeCount
             val expectedUserLiked = false // 비로그인은 항상 false
@@ -153,7 +153,7 @@ class GetBoardByIdUseCaseTest {
             assertFalse(response.userLiked) // 비로그인 확인
 
             // Verify
-            verify(securityUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserId()
             verify(counterService).getSingleBoardCounters(any(), eq(null), any(), any())
         }
     }
@@ -166,7 +166,7 @@ class GetBoardByIdUseCaseTest {
         fun `given non-existent boardId, when execute, then throw EntityNotFoundException`() {
             // Given
             val nonExistentBoardId = 999L
-            whenever(securityUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
 
             val request = GetBoardById.Request(boardId = nonExistentBoardId)
 
@@ -179,7 +179,7 @@ class GetBoardByIdUseCaseTest {
         @DisplayName("CounterService에서 예외 발생 시 전파")
         fun `given counterService throws exception, when execute, then exception propagates`() {
             // Given
-            whenever(securityUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
             val counterException = RuntimeException("Redis connection failed")
             whenever(counterService.getSingleBoardCounters(any(), any(), any(), any()))
                 .thenThrow(counterException)

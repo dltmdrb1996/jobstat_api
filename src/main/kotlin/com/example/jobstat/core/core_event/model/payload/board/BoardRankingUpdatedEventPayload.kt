@@ -1,8 +1,8 @@
 package com.example.jobstat.core.core_event.model.payload.board
 
 import com.example.jobstat.core.core_event.model.EventPayload
-import com.example.jobstat.core.core_model.BoardRankingMetric
-import com.example.jobstat.core.core_model.BoardRankingPeriod
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingMetric
+import com.example.jobstat.statistics_read.core.core_model.BoardRankingPeriod
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class BoardRankingUpdatedEventPayload(
