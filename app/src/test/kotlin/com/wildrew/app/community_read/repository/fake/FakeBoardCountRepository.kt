@@ -1,12 +1,12 @@
 package com.wildrew.app.community_read.repository.fake
 
-import com.wildrew.jobstat.community_read.repository.BoardCountRepository
-import com.wildrew.jobstat.community_read.repository.impl.RedisBoardCountRepository
+import com.wildrew.app.community_read.repository.BoardCountRepository
+import com.wildrew.app.community_read.repository.impl.RedisBoardCountRepository
 import org.springframework.data.redis.connection.StringRedisConnection
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 
-internal class FakeBoardCountRepository : BoardCountRepository {
+class FakeBoardCountRepository : BoardCountRepository {
     private val store = ConcurrentHashMap<String, AtomicLong>()
     private val totalCountKey = RedisBoardCountRepository.BOARD_TOTAL_COUNT_KEY
 

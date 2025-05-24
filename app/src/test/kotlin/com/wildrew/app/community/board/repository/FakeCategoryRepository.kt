@@ -1,13 +1,13 @@
 package com.wildrew.app.community.board.repository // 패키지 조정
 
-import com.wildrew.jobstat.community.board.entity.BoardCategory
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.utils.IndexManager // IndexManager 임포트 가정
-import com.wildrew.jobstat.utils.base.BaseFakeRepository // 제공된 BaseFakeRepository 임포트
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.utils.IndexManager // IndexManager 임포트 가정
+import com.wildrew.app.utils.base.BaseFakeRepository // 제공된 BaseFakeRepository 임포트
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.dao.DuplicateKeyException
 
-internal class FakeCategoryRepository : CategoryRepository {
+class FakeCategoryRepository : CategoryRepository {
     private val baseRepo =
         object : BaseFakeRepository<BoardCategory, CategoryFixture>() {
             override fun fixture(): CategoryFixture = CategoryFixture.aCategory()

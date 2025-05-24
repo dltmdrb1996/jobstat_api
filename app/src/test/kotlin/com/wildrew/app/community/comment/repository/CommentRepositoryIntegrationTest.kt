@@ -1,15 +1,15 @@
 package com.wildrew.app.community.comment.repository
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.entity.BoardCategory
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.board.repository.BoardRepository
-import com.wildrew.jobstat.community.board.repository.CategoryRepository
-import com.wildrew.jobstat.community.comment.entity.Comment
-import com.wildrew.jobstat.community.comment.fixture.CommentFixture
-import com.wildrew.jobstat.community.comment.utils.CommentConstants
-import com.wildrew.jobstat.utils.base.JpaIntegrationTestSupport
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.board.repository.BoardRepository
+import com.wildrew.app.community.board.repository.CategoryRepository
+import com.wildrew.app.community.comment.entity.Comment
+import com.wildrew.app.community.comment.fixture.CommentFixture
+import com.wildrew.app.community.comment.utils.CommentConstants
+import com.wildrew.app.utils.base.JpaIntegrationTestSupport
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired

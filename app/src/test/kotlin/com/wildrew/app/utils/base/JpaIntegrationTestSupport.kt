@@ -1,5 +1,6 @@
 package com.wildrew.app.utils.base
 
+import com.wildrew.app.utils.config.BatchOperationTestSupport
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.springframework.test.annotation.Rollback

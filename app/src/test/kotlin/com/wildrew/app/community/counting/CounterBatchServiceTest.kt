@@ -1,10 +1,10 @@
 package com.wildrew.app.community.counting
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.board.repository.FakeBoardRepository
-import com.wildrew.jobstat.community.event.CommunityCommandEventPublisher
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.board.repository.FakeBoardRepository
+import com.wildrew.app.community.event.CommunityCommandEventPublisher
 import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

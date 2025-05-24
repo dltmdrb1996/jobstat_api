@@ -1,9 +1,9 @@
 package com.wildrew.app.statistics_read.stats.fake
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
-import com.wildrew.jobstat.statistics_read.stats.registry.StatsRepositoryRegistry
-import com.wildrew.jobstat.statistics_read.stats.registry.StatsType
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.wildrew.app.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
+import com.wildrew.app.statistics_read.stats.registry.StatsRepositoryRegistry
+import com.wildrew.app.statistics_read.stats.registry.StatsType
 
 class FakeStatsRepositoryRegistry(
     private val repositories: Map<StatsType, StatsMongoRepository<*, *>>,

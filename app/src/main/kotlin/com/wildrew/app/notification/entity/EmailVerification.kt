@@ -1,4 +1,4 @@
-package com.wildrew.app.auth.email.entity
+package com.wildrew.app.notification.entity
 
 import com.wildrew.jobstat.core.core_jpa_base.base.AuditableEntitySnow
 import jakarta.persistence.Column

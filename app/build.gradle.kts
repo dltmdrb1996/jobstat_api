@@ -86,6 +86,10 @@ dependencies {
     // SpringDoc OpenAPI
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4") // 또는 최신 버전
 
+    // MapStruct
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    ksp("org.mapstruct:mapstruct-processor:1.6.3")
+
     // Test Dependencies
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0") // 최신 안정 버전 확인

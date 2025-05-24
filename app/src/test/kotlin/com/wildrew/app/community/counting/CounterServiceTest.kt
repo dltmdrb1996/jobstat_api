@@ -1,8 +1,8 @@
 package com.wildrew.app.community.counting
 
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.board.repository.FakeBoardRepository
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.board.repository.FakeBoardRepository
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import org.junit.jupiter.api.*

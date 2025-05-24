@@ -1,15 +1,15 @@
 package com.wildrew.app.community.board.repository
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.utils.model.BoardRankingQueryResult
-import com.wildrew.jobstat.community.board.utils.model.BoardRankingQueryResultImpl
-import com.wildrew.jobstat.utils.base.BaseFakeRepository
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.utils.model.BoardRankingQueryResult
+import com.wildrew.app.community.board.utils.model.BoardRankingQueryResultImpl
+import com.wildrew.app.utils.base.BaseFakeRepository
 import org.springframework.data.domain.*
 import java.time.LocalDateTime
 import kotlin.math.min
 
-internal class FakeBoardRepository : BoardRepository {
+class FakeBoardRepository : BoardRepository {
     private val baseRepo =
         object : BaseFakeRepository<Board, BoardFixture>() {
             override fun fixture(): BoardFixture = BoardFixture.aBoard()

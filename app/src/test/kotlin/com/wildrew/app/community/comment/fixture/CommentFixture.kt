@@ -1,12 +1,12 @@
 package com.wildrew.app.community.comment.fixture
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.comment.entity.Comment
-import com.wildrew.jobstat.utils.TestFixture
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.comment.entity.Comment
+import com.wildrew.app.utils.TestFixture
 import java.time.LocalDateTime
 
-internal class CommentFixture private constructor(
+class CommentFixture private constructor(
     private var content: String = "테스트 댓글",
     private var author: String = "댓글작성자",
     private var password: String? = null,

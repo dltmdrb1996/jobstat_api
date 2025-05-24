@@ -57,7 +57,7 @@ subprojects {
     // 공통 Jacoco 설정
     apply(plugin = "jacoco")
     configure<JacocoPluginExtension> {
-        toolVersion = "0.8.12"
+        toolVersion = "0.8.13"
     }
 
     tasks.withType<JacocoReport> {

@@ -1,12 +1,12 @@
 package com.wildrew.app.community.comment.repository // 패키지 조정
 
-import com.wildrew.jobstat.community.comment.entity.Comment
-import com.wildrew.jobstat.community.comment.fixture.CommentFixture
-import com.wildrew.jobstat.utils.base.BaseFakeRepository // 제공된 BaseFakeRepository 임포트
+import com.wildrew.app.community.comment.entity.Comment
+import com.wildrew.app.community.comment.fixture.CommentFixture
+import com.wildrew.app.utils.base.BaseFakeRepository // 제공된 BaseFakeRepository 임포트
 import org.springframework.data.domain.*
 import kotlin.math.min
 
-internal class FakeCommentRepository : CommentRepository {
+class FakeCommentRepository : CommentRepository {
     private val baseRepo =
         object : BaseFakeRepository<Comment, CommentFixture>() {
             override fun fixture(): CommentFixture = CommentFixture.aComment()

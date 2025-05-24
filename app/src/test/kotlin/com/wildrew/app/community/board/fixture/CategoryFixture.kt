@@ -1,10 +1,10 @@
 package com.wildrew.app.community.board.fixture
 
-import com.wildrew.jobstat.community.board.entity.BoardCategory
-import com.wildrew.jobstat.utils.TestFixture
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.utils.TestFixture
 import java.time.LocalDateTime
 
-internal class CategoryFixture private constructor(
+class CategoryFixture private constructor(
     private var name: String = "기본 카테고리",
     private var displayName: String = "기본 표시 이름",
     private var description: String = "기본 설명",

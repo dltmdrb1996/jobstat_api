@@ -1,15 +1,15 @@
 package com.wildrew.app.community.board.usecase.get
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.entity.BoardCategory
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.board.repository.FakeBoardRepository
-import com.wildrew.jobstat.community.board.repository.FakeCategoryRepository
-import com.wildrew.jobstat.community.board.service.BoardService
-import com.wildrew.jobstat.community.board.service.BoardServiceImpl
-import com.wildrew.jobstat.community.counting.CounterService
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.board.repository.FakeBoardRepository
+import com.wildrew.app.community.board.repository.FakeCategoryRepository
+import com.wildrew.app.community.board.service.BoardService
+import com.wildrew.app.community.board.service.BoardServiceImpl
+import com.wildrew.app.community.counting.CounterService
+import com.wildrew.app.eacheach.toEpochMilli
 import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils
-import com.wildrew.jobstat.eacheach.toEpochMilli
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.Validation
 import org.junit.jupiter.api.*

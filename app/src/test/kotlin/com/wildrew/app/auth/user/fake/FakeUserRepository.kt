@@ -1,9 +1,9 @@
 package com.wildrew.app.auth.user.fake
 
-import com.wildrew.jobstat.auth.user.entity.User
-import com.wildrew.jobstat.auth.user.repository.UserRepository
-import com.wildrew.jobstat.utils.IndexManager
-import com.wildrew.jobstat.utils.base.BaseFakeRepository
+import com.wildrew.app.auth.user.entity.User
+import com.wildrew.app.auth.user.repository.UserRepository
+import com.wildrew.app.utils.IndexManager
+import com.wildrew.app.utils.base.BaseFakeRepository
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.dao.DuplicateKeyException
 import java.time.LocalDate
@@ -12,7 +12,7 @@ import java.time.LocalDate
  * User 전용 FakeRepository 구현
  * - 소프트 삭제, 활성화 상태, 사용자명/이메일 중복 인덱싱 등 처리
  */
-internal class FakeUserRepository : UserRepository {
+class FakeUserRepository : UserRepository {
     private val baseRepo =
         object : BaseFakeRepository<User, UserFixture>() {
             override fun fixture() = UserFixture.aUser()

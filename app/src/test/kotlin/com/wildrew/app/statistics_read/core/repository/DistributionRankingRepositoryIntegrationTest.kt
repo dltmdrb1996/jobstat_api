@@ -1,13 +1,13 @@
-package com.wildrew.app.core.base.repository
+package com.wildrew.app.statistics_read.core.repository
 
-import com.wildrew.jobstat.statistics_read.core.core_model.BaseDate
-import com.wildrew.jobstat.statistics_read.core.core_model.EntityType
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.DistributionRankingDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
-import com.wildrew.jobstat.statistics_read.rankings.document.CompanySizeEducationRankingsDocument
-import com.wildrew.jobstat.statistics_read.rankings.repository.CompanySizeEducationRankingsRepositoryImpl
-import com.wildrew.jobstat.utils.base.BatchOperationTestSupport
+import com.wildrew.jobstat.core.core_global.model.BaseDate
+import com.wildrew.app.statistics_read.core.core_model.EntityType
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.DistributionRankingDocument
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.wildrew.app.statistics_read.rankings.document.CompanySizeEducationRankingsDocument
+import com.wildrew.app.statistics_read.rankings.repository.CompanySizeEducationRankingsRepositoryImpl
+import com.wildrew.app.utils.config.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired

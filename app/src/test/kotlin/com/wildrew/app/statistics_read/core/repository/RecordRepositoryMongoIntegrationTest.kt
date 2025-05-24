@@ -1,9 +1,9 @@
-package com.wildrew.app.core.base.repository
+package com.wildrew.app.statistics_read.core.repository
 
-import com.wildrew.jobstat.utils.base.BatchOperationTestSupport
-import com.wildrew.jobstat.utils.dummy.Address
-import com.wildrew.jobstat.utils.dummy.RecordDto
-import com.wildrew.jobstat.utils.dummy.RecordRepository
+import com.wildrew.app.utils.config.BatchOperationTestSupport
+import com.wildrew.app.utils.dummy.Address
+import com.wildrew.app.utils.dummy.RecordDto
+import com.wildrew.app.utils.dummy.RecordRepository
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,9 +17,9 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var recordRepository: RecordRepository
 
-    private val totalRecords = 10000
+    private val totalRecords = 1000000
     private val batchSize = 2000
-    private val allRecords = mutableListOf<Record>()
+    private val allRecords = mutableListOf<com.wildrew.app.utils.dummy.Record>()
     private var startTime: Long = 0
     private val performanceMetrics = hashMapOf<String, Double>()
 
@@ -27,11 +27,11 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
         recordRepository.deleteAll()
     }
 
-    private fun createRandomRecord(): Record {
+    private fun createRandomRecord(): com.wildrew.app.utils.dummy.Record {
         val cities = listOf("Seoul", "Busan", "Incheon", "Daegu", "Daejeon")
         val streets = listOf("Main St", "First St", "Second St", "Third St", "Fourth St")
 
-        return Record(
+        return com.wildrew.app.utils.dummy.Record(
             name = "Test Person ${Random.nextInt(1000)}",
             age = Random.nextInt(20, 60),
             data =

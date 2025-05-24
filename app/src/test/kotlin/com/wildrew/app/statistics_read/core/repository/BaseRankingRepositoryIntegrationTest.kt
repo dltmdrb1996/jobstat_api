@@ -1,10 +1,10 @@
-package com.wildrew.app.core.base.repository
+package com.wildrew.app.statistics_read.core.repository
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
-import com.wildrew.jobstat.statistics_read.rankings.document.SkillGrowthRankingsDocument
-import com.wildrew.jobstat.statistics_read.rankings.repository.SkillGrowthRankingsRepositoryImpl
-import com.wildrew.jobstat.utils.base.BatchOperationTestSupport
+import com.wildrew.app.statistics_read.rankings.repository.SkillGrowthRankingsRepositoryImpl
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.wildrew.app.statistics_read.rankings.document.SkillGrowthRankingsDocument
+import com.wildrew.app.utils.config.BatchOperationTestSupport
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.*

@@ -1,13 +1,13 @@
 package com.wildrew.app.community_read.repository.fake
 
-import com.wildrew.jobstat.community_read.repository.CommentCountRepository
-import com.wildrew.jobstat.community_read.repository.impl.RedisCommentCountRepository
+import com.wildrew.app.community_read.repository.CommentCountRepository
+import com.wildrew.app.community_read.repository.impl.RedisCommentCountRepository
 import org.springframework.data.redis.connection.StringRedisConnection
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.max
 
-internal class FakeCommentCountRepository : CommentCountRepository {
+class FakeCommentCountRepository : CommentCountRepository {
     private val store = ConcurrentHashMap<String, AtomicLong>()
     private val totalCountKey = RedisCommentCountRepository.getTotalCommentCountKey()
 

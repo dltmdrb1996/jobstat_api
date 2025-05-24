@@ -1,14 +1,14 @@
 package com.wildrew.app.community.counting
 
-import com.wildrew.jobstat.community.counting.RedisCounterRepository.Companion.likeCountKey
-import com.wildrew.jobstat.community.counting.RedisCounterRepository.Companion.likeUsersKey
-import com.wildrew.jobstat.community.counting.RedisCounterRepository.Companion.viewCountKey
+import com.wildrew.app.community.counting.RedisCounterRepository.Companion.likeCountKey
+import com.wildrew.app.community.counting.RedisCounterRepository.Companion.likeUsersKey
+import com.wildrew.app.community.counting.RedisCounterRepository.Companion.viewCountKey
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.max
 
-internal class FakeCounterRepository : CounterRepository {
+class FakeCounterRepository : CounterRepository {
     private val counts = ConcurrentHashMap<String, Long>()
     private val likeUsers = ConcurrentHashMap<String, MutableSet<String>>()
     private val pendingUpdates = ConcurrentHashMap.newKeySet<String>()

@@ -1,10 +1,10 @@
 package com.wildrew.app.auth.user.fake
 
-import com.wildrew.jobstat.auth.user.entity.Role
-import com.wildrew.jobstat.auth.user.entity.RoleData
-import com.wildrew.jobstat.utils.IdFixture
+import com.wildrew.app.auth.user.entity.Role
+import com.wildrew.app.auth.user.entity.RoleData
+import com.wildrew.app.utils.IdFixture
 
-internal class RoleFixture private constructor(
+class RoleFixture private constructor(
     private var id: Long = 0L,
     private var name: String = "USER",
 ) : IdFixture<Role>() {

@@ -1,10 +1,10 @@
-package com.wildrew.app.core.base.repository
+package com.wildrew.app.statistics_read.core.repository
 
-import com.wildrew.jobstat.statistics_read.core.core_model.BaseDate
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
-import com.wildrew.jobstat.utils.base.BatchOperationTestSupport
-import com.wildrew.jobstat.utils.dummy.TestTimeSeriesDocument
-import com.wildrew.jobstat.utils.dummy.TestTimeSeriesRepository
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.app.utils.config.BatchOperationTestSupport
+import com.wildrew.app.utils.dummy.TestTimeSeriesDocument
+import com.wildrew.app.utils.dummy.TestTimeSeriesRepository
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.MethodOrderer.OrderAnnotation
 import org.springframework.beans.factory.annotation.Autowired

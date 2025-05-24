@@ -1,9 +1,9 @@
 package com.wildrew.app.community_read.repository
 
-import com.wildrew.jobstat.community_read.repository.impl.RedisBoardIdListRepository
+import com.wildrew.app.community_read.repository.impl.RedisBoardIdListRepository
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.statistics_read.core.core_model.BoardRankingPeriod
-import com.wildrew.jobstat.utils.base.RedisIntegrationTestSupport
+import com.wildrew.app.utils.base.RedisIntegrationTestSupport
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired

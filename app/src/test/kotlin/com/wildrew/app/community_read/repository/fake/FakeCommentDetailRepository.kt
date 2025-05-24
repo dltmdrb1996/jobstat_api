@@ -1,15 +1,15 @@
 package com.wildrew.app.community_read.repository.fake
 
-import com.wildrew.jobstat.community_read.model.CommentReadModel
-import com.wildrew.jobstat.community_read.repository.CommentDetailRepository
-import com.wildrew.jobstat.community_read.repository.impl.RedisCommentDetailRepository
+import com.wildrew.app.community_read.model.CommentReadModel
+import com.wildrew.app.community_read.repository.CommentDetailRepository
+import com.wildrew.app.community_read.repository.impl.RedisCommentDetailRepository
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_serializer.DataSerializer
 import org.springframework.data.redis.connection.StringRedisConnection
 import java.util.concurrent.ConcurrentHashMap
 
-internal class FakeCommentDetailRepository(
+class FakeCommentDetailRepository(
     private val dataSerializer: DataSerializer,
 ) : CommentDetailRepository {
     val store = ConcurrentHashMap<String, String>()

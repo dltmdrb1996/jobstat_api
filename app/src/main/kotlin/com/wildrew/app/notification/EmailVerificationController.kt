@@ -1,7 +1,7 @@
-package com.wildrew.app.auth.email
+package com.wildrew.app.notification
 
-import com.wildrew.app.auth.email.usecase.RequestEmailVerification
-import com.wildrew.app.auth.email.usecase.VerifyEmail
+import com.wildrew.app.notification.usecase.RequestEmailVerification
+import com.wildrew.app.notification.usecase.VerifyEmail
 import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import com.wildrew.jobstat.core.core_web_util.ApiResponse

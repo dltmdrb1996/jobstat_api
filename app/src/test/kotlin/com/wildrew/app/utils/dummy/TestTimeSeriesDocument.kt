@@ -1,8 +1,8 @@
 package com.wildrew.app.utils.dummy
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.BaseTimeSeriesDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.BaseTimeSeriesRepositoryImpl
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.BaseTimeSeriesDocument
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.app.statistics_read.core.core_mongo_base.repository.BaseTimeSeriesRepositoryImpl
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field

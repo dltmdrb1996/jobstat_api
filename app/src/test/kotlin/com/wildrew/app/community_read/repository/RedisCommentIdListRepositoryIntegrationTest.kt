@@ -1,7 +1,7 @@
 package com.wildrew.app.community_read.repository
 
-import com.wildrew.jobstat.community_read.repository.impl.RedisCommentIdListRepository
-import com.wildrew.jobstat.utils.base.RedisIntegrationTestSupport
+import com.wildrew.app.community_read.repository.impl.RedisCommentIdListRepository
+import com.wildrew.app.utils.base.RedisIntegrationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired

@@ -1,8 +1,8 @@
 package com.wildrew.app.statistics_read.fake
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.SimpleRankingDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
-import com.wildrew.jobstat.utils.base.AbstractFakeRankingRepository
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.SimpleRankingDocument
+import com.wildrew.app.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
+import com.wildrew.app.utils.base.AbstractFakeRankingRepository
 
 abstract class AbstractFakeSimpleRankingRepository<T : SimpleRankingDocument<E>, E : SimpleRankingDocument.SimpleRankingEntry> :
     AbstractFakeRankingRepository<T, E>(),

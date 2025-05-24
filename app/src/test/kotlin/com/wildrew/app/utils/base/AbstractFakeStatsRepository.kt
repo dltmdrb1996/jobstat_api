@@ -1,9 +1,9 @@
 package com.wildrew.app.utils.base
 
-import com.wildrew.jobstat.statistics_read.core.core_model.BaseDate
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
-import com.wildrew.jobstat.statistics_read.fake.AbstractFakeTimeSeriesRepository
+import com.wildrew.jobstat.core.core_global.model.BaseDate
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.wildrew.app.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
+import com.wildrew.app.statistics_read.fake.AbstractFakeTimeSeriesRepository
 
 abstract class AbstractFakeStatsRepository<T : BaseStatsDocument> :
     AbstractFakeTimeSeriesRepository<T>(),

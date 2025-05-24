@@ -1,9 +1,9 @@
 package com.wildrew.app.community_read.repository.fake
 
-import com.wildrew.jobstat.community_read.repository.BoardIdListRepository
-import com.wildrew.jobstat.community_read.repository.impl.RedisBoardIdListRepository
-import com.wildrew.jobstat.community_read.repository.impl.RedisBoardIdListRepository.Companion.getCategoryKey
-import com.wildrew.jobstat.statistics_read.core.core_model.BoardRankingPeriod
+import com.wildrew.app.community_read.repository.BoardIdListRepository
+import com.wildrew.app.community_read.repository.impl.RedisBoardIdListRepository
+import com.wildrew.app.community_read.repository.impl.RedisBoardIdListRepository.Companion.getCategoryKey
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -12,7 +12,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
-internal class FakeBoardIdListRepository : BoardIdListRepository {
+class FakeBoardIdListRepository : BoardIdListRepository {
     private val zsets = ConcurrentHashMap<String, NavigableMap<Double, String>>()
 
     private fun getMap(key: String): NavigableMap<Double, String> = zsets.computeIfAbsent(key) { Collections.synchronizedNavigableMap(TreeMap<Double, String>()) }

@@ -1,7 +1,7 @@
-package com.wildrew.app.auth.email.usecase
+package com.wildrew.app.notification.usecase
 
-import com.wildrew.app.auth.email.service.EmailService
-import com.wildrew.app.auth.email.service.EmailVerificationService
+import com.wildrew.app.notification.service.EmailService
+import com.wildrew.app.notification.service.EmailVerificationService
 import com.wildrew.app.auth.user.service.UserService
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode

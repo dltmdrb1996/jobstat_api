@@ -1,9 +1,9 @@
 package com.wildrew.app.statistics_read.stats.fake
 
-import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
-import com.wildrew.jobstat.statistics_read.stats.document.SkillStatsDocument
-import com.wildrew.jobstat.statistics_read.stats.repository.SkillStatsRepository
-import com.wildrew.jobstat.utils.base.AbstractFakeStatsRepository
+import com.wildrew.app.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.app.statistics_read.stats.document.SkillStatsDocument
+import com.wildrew.app.statistics_read.stats.repository.SkillStatsRepository
+import com.wildrew.app.utils.base.AbstractFakeStatsRepository
 import org.springframework.data.domain.Example
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable

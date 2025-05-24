@@ -1,7 +1,7 @@
 package com.wildrew.app.utils.base
 
 import com.wildrew.jobstat.core.core_jpa_base.base.BaseEntity
-import com.wildrew.jobstat.utils.TestFixture
+import com.wildrew.app.utils.TestFixture
 import jakarta.persistence.EntityNotFoundException
 import java.lang.reflect.Field
 import java.time.LocalDateTime

@@ -1,24 +1,24 @@
 package com.wildrew.app.community_read.repository
 
-import com.wildrew.jobstat.community_read.fixture.BoardReadModelFixture
-import com.wildrew.jobstat.community_read.fixture.CommentReadModelFixture
-import com.wildrew.jobstat.community_read.model.BoardReadModel
-import com.wildrew.jobstat.community_read.model.CommentReadModel
-import com.wildrew.jobstat.community_read.repository.impl.*
+import com.wildrew.app.community_read.fixture.BoardReadModelFixture
+import com.wildrew.app.community_read.fixture.CommentReadModelFixture
+import com.wildrew.app.community_read.model.BoardReadModel
+import com.wildrew.app.community_read.model.CommentReadModel
+import com.wildrew.app.community_read.repository.impl.*
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.wildrew.jobstat.core.core_serializer.DataSerializer
-import com.wildrew.jobstat.core.event.payload.BoardCreatedEventPayloadFixture
-import com.wildrew.jobstat.core.event.payload.BoardDeletedEventPayloadFixture
-import com.wildrew.jobstat.core.event.payload.BoardLikedEventPayloadFixture
-import com.wildrew.jobstat.core.event.payload.BoardRankingUpdatedEventPayloadFixture
-import com.wildrew.jobstat.core.event.payload.BoardUpdatedEventPayloadFixture
-import com.wildrew.jobstat.core.event.payload.BoardViewedEventPayloadFixture
-import com.wildrew.jobstat.core.event.payload.CommentCreatedEventPayloadFixture
-import com.wildrew.jobstat.core.event.payload.CommentDeletedEventPayloadFixture
-import com.wildrew.jobstat.core.event.payload.CommentUpdatedEventPayloadFixture
+import com.wildrew.app.core.event.payload.BoardCreatedEventPayloadFixture
+import com.wildrew.app.core.event.payload.BoardDeletedEventPayloadFixture
+import com.wildrew.app.core.event.payload.BoardLikedEventPayloadFixture
+import com.wildrew.app.core.event.payload.BoardRankingUpdatedEventPayloadFixture
+import com.wildrew.app.core.event.payload.BoardUpdatedEventPayloadFixture
+import com.wildrew.app.core.event.payload.BoardViewedEventPayloadFixture
+import com.wildrew.app.core.event.payload.CommentCreatedEventPayloadFixture
+import com.wildrew.app.core.event.payload.CommentDeletedEventPayloadFixture
+import com.wildrew.app.core.event.payload.CommentUpdatedEventPayloadFixture
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.statistics_read.core.core_model.BoardRankingPeriod
-import com.wildrew.jobstat.utils.base.RedisIntegrationTestSupport
+import com.wildrew.app.utils.base.RedisIntegrationTestSupport
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.kotlin.*
@@ -136,7 +136,7 @@ class RedisCommunityEventUpdateRepositoryIntegrationTest : RedisIntegrationTestS
                 .withEventTs(eventTs)
                 .create()
 
-        private val boardReadModel = payload.toReadModel()
+        private val boardReadModel = BoardReadModel.fromPayload(payload)
         private val boardJson = dataSerializer.serialize(boardReadModel)!!
 
         @Test
@@ -505,7 +505,7 @@ class RedisCommunityEventUpdateRepositoryIntegrationTest : RedisIntegrationTestS
                 .withEventTs(eventTs)
                 .create()
 
-        private val commentReadModel = payload.toReadModel()
+        private val commentReadModel = CommentReadModel.fromPayload(payload)
         private val commentJson = dataSerializer.serialize(commentReadModel)!!
 
         private val initialBoardModel =

@@ -1,4 +1,4 @@
-package com.wildrew.app.auth.email.service
+package com.wildrew.app.notification.service
 
 import org.springframework.scheduling.annotation.Async
 

@@ -18,9 +18,9 @@ import java.util.*
 @EnableScheduling
 @EntityScan( // app 모듈 내의 모든 JPA Entity 패키지를 지정
     basePackages = [
-        "com.wildrew.app.auth.email.entity",
         "com.wildrew.app.auth.user.entity",
         "com.wildrew.app.community.board.entity",
+        "com.wildrew.app.notification.entity",
         "com.wildrew.app.community.comment.entity",
         "com.wildrew.jobstat.core.core_event.dlt",
         "com.wildrew.jobstat.core.core_event.outbox"
@@ -28,8 +28,8 @@ import java.util.*
 )
 @EnableJpaRepositories( // app 모듈 내의 모든 JPA Repository 패키지를 지정
     basePackages = [
-        "com.wildrew.app.auth.email.repository",
         "com.wildrew.app.auth.user.repository",
+        "com.wildrew.app.notification.repository",
         "com.wildrew.app.community.board.repository",
         "com.wildrew.app.community.comment.repository",
         "com.wildrew.jobstat.core.core_event.dlt",

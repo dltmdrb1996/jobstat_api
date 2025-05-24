@@ -1,15 +1,15 @@
 package com.wildrew.app.community.comment.usecase.get
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.entity.BoardCategory
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.board.repository.FakeBoardRepository
-import com.wildrew.jobstat.community.board.repository.FakeCategoryRepository
-import com.wildrew.jobstat.community.comment.entity.Comment
-import com.wildrew.jobstat.community.comment.repository.FakeCommentRepository
-import com.wildrew.jobstat.community.comment.service.CommentService
-import com.wildrew.jobstat.community.comment.service.CommentServiceImpl
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.board.repository.FakeBoardRepository
+import com.wildrew.app.community.board.repository.FakeCategoryRepository
+import com.wildrew.app.community.comment.entity.Comment
+import com.wildrew.app.community.comment.repository.FakeCommentRepository
+import com.wildrew.app.community.comment.service.CommentService
+import com.wildrew.app.community.comment.service.CommentServiceImpl
 import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolationException

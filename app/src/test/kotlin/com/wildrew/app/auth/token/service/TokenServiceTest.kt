@@ -1,8 +1,8 @@
 package com.wildrew.app.auth.token.service
 
+import com.wildrew.app.utils.FakeStringRedisTemplate
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
-import com.wildrew.jobstat.utils.FakeStringRedisTemplate
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 

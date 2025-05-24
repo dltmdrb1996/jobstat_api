@@ -1,9 +1,9 @@
 package com.wildrew.app.utils.base
 
-import com.wildrew.jobstat.statistics_read.core.core_model.BaseDate
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RelationshipRankingDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RelationshipRankingDocument.RelatedEntityRank
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.RelationshipRankingRepository
+import com.wildrew.jobstat.core.core_global.model.BaseDate
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.RelationshipRankingDocument
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.RelationshipRankingDocument.RelatedEntityRank
+import com.wildrew.app.statistics_read.core.core_mongo_base.repository.RelationshipRankingRepository
 
 abstract class AbstractFakeRelationshipRankingRepository<
     T : RelationshipRankingDocument<E>,

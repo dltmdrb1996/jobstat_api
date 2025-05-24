@@ -1,12 +1,12 @@
 package com.wildrew.app.community_read.repository
 
-import com.wildrew.jobstat.community_read.fixture.CommentReadModelFixture
-import com.wildrew.jobstat.community_read.model.CommentReadModel
-import com.wildrew.jobstat.community_read.repository.impl.RedisCommentDetailRepository
+import com.wildrew.app.community_read.fixture.CommentReadModelFixture
+import com.wildrew.app.community_read.model.CommentReadModel
+import com.wildrew.app.community_read.repository.impl.RedisCommentDetailRepository
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_serializer.DataSerializer
-import com.wildrew.jobstat.utils.base.RedisIntegrationTestSupport
+import com.wildrew.app.utils.base.RedisIntegrationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.kotlin.*

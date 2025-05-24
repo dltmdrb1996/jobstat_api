@@ -1,11 +1,11 @@
 package com.wildrew.app.community.board.repository
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.entity.BoardCategory
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.comment.repository.CommentRepository // 댓글 삭제 위해 추가
-import com.wildrew.jobstat.utils.base.JpaIntegrationTestSupport
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.comment.repository.CommentRepository
+import com.wildrew.app.utils.base.JpaIntegrationTestSupport
 import org.assertj.core.api.Assertions.assertThat
 import org.hibernate.exception.ConstraintViolationException
 import org.junit.jupiter.api.*

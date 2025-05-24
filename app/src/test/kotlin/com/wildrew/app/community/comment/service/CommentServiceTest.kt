@@ -1,11 +1,12 @@
 package com.wildrew.app.community.comment.service
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.board.repository.FakeBoardRepository
-import com.wildrew.jobstat.community.board.repository.FakeCategoryRepository
-import com.wildrew.jobstat.community.comment.repository.FakeCommentRepository
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.board.repository.FakeBoardRepository
+import com.wildrew.app.community.board.repository.FakeCategoryRepository
+import com.wildrew.app.community.comment.repository.FakeCommentRepository
 import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -19,7 +20,7 @@ class CommentServiceTest {
     private lateinit var categoryRepository: FakeCategoryRepository
     private lateinit var commentService: CommentService
     private lateinit var testBoard: Board
-    private lateinit var testCategory: com.example.jobstat.community.board.entity.BoardCategory
+    private lateinit var testCategory: BoardCategory
 
     @BeforeEach
     fun setUp() {

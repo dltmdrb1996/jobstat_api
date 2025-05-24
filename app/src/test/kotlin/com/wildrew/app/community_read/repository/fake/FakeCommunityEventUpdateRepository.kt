@@ -1,9 +1,9 @@
 package com.wildrew.app.community_read.repository.fake
 
-import com.wildrew.jobstat.community_read.model.BoardReadModel
-import com.wildrew.jobstat.community_read.model.CommentReadModel
-import com.wildrew.jobstat.community_read.repository.*
-import com.wildrew.jobstat.community_read.repository.impl.*
+import com.wildrew.app.community_read.model.BoardReadModel
+import com.wildrew.app.community_read.model.CommentReadModel
+import com.wildrew.app.community_read.repository.*
+import com.wildrew.app.community_read.repository.impl.*
 import com.wildrew.jobstat.core.core_event.model.payload.board.*
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
@@ -12,7 +12,7 @@ import org.mockito.Mockito.mock
 import org.slf4j.LoggerFactory
 import java.util.concurrent.ConcurrentHashMap
 
-internal class FakeCommunityEventUpdateRepository(
+class FakeCommunityEventUpdateRepository(
     private val boardDetailRepository: FakeBoardDetailRepository,
     private val boardIdListRepository: FakeBoardIdListRepository,
     private val boardCountRepository: FakeBoardCountRepository,
@@ -63,7 +63,7 @@ internal class FakeCommunityEventUpdateRepository(
         val boardModel: BoardReadModel
         val boardJson: String
         try {
-            boardModel = payload.toReadModel()
+            boardModel = BoardReadModel.fromPayload(payload)
             boardJson = dataSerializer.serialize(boardModel) ?: run {
                 log.error("[Fake] 게시글 생성 직렬화 결과가 boardId: {}에 대해 null입니다", boardId)
                 return false

@@ -1,14 +1,15 @@
-package com.wildrew.app.core.base.repository
+package com.wildrew.app.statistics_read.core.repository
 
-import com.wildrew.jobstat.statistics_read.core.core_model.BaseDate
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.*
-import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
-import com.wildrew.jobstat.statistics_read.stats.document.SkillStatsDocument
-import com.wildrew.jobstat.statistics_read.stats.repository.SkillStatsRepository
-import com.wildrew.jobstat.utils.base.BatchOperationTestSupport
+import com.wildrew.jobstat.core.core_global.model.BaseDate
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.*
+import com.wildrew.app.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.app.statistics_read.stats.document.SkillStatsDocument
+import com.wildrew.app.statistics_read.stats.repository.SkillStatsRepository
+import com.wildrew.app.utils.config.BatchOperationTestSupport
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.mongodb.core.query.Query
 import java.time.Instant
 import kotlin.random.Random
@@ -16,6 +17,7 @@ import kotlin.random.Random
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 @DisplayName("StatsMongo 통합 테스트")
 class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
+    @Qualifier("skillStatsRepositoryImpl")
     @Autowired
     lateinit var skillStatsRepository: SkillStatsRepository
 

@@ -1,8 +1,8 @@
 package com.wildrew.app.auth.user.service
 
-import com.wildrew.jobstat.auth.user.fake.FakeRoleRepository
-import com.wildrew.jobstat.auth.user.fake.FakeUserRepository
-import com.wildrew.jobstat.auth.user.fake.UserFixture
+import com.wildrew.app.auth.user.fake.FakeRoleRepository
+import com.wildrew.app.auth.user.fake.FakeUserRepository
+import com.wildrew.app.auth.user.fake.UserFixture
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import jakarta.persistence.EntityNotFoundException

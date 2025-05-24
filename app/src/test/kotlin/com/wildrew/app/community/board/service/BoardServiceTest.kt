@@ -1,15 +1,15 @@
 package com.wildrew.app.community.board.service
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.entity.BoardCategory
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.board.repository.FakeBoardRepository
-import com.wildrew.jobstat.community.board.repository.FakeCategoryRepository
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.board.repository.FakeBoardRepository
+import com.wildrew.app.community.board.repository.FakeCategoryRepository
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.statistics_read.core.core_model.BoardRankingPeriod
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*

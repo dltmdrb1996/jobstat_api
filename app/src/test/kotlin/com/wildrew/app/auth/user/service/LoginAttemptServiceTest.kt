@@ -1,7 +1,7 @@
 package com.wildrew.app.auth.user.service
 
-import com.wildrew.jobstat.utils.TestCacheManager
-import com.wildrew.jobstat.utils.TestClock
+import com.wildrew.app.utils.TestCacheManager
+import com.wildrew.app.utils.TestClock
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

@@ -1,8 +1,8 @@
 package com.wildrew.app.auth.user.repository
 
-import com.wildrew.jobstat.auth.user.entity.User
-import com.wildrew.jobstat.auth.user.model.Address
-import com.wildrew.jobstat.utils.base.JpaIntegrationTestSupport
+import com.wildrew.app.auth.user.entity.User
+import com.wildrew.app.auth.user.model.Address
+import com.wildrew.app.utils.base.JpaIntegrationTestSupport
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

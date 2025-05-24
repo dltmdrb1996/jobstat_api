@@ -1,15 +1,15 @@
 package com.wildrew.app.community_read.repository.fake
 
-import com.wildrew.jobstat.community_read.model.BoardReadModel
-import com.wildrew.jobstat.community_read.repository.BoardDetailRepository
-import com.wildrew.jobstat.community_read.repository.impl.RedisBoardDetailRepository
+import com.wildrew.app.community_read.model.BoardReadModel
+import com.wildrew.app.community_read.repository.BoardDetailRepository
+import com.wildrew.app.community_read.repository.impl.RedisBoardDetailRepository
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_serializer.DataSerializer
 import org.springframework.data.redis.connection.StringRedisConnection
 import java.util.concurrent.ConcurrentHashMap
 
-internal class FakeBoardDetailRepository(
+class FakeBoardDetailRepository(
     private val dataSerializer: DataSerializer,
 ) : BoardDetailRepository {
     val store = ConcurrentHashMap<String, String>()

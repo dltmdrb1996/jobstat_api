@@ -1,8 +1,9 @@
 package com.wildrew.app.community_read.fixture
-import com.wildrew.jobstat.community_read.model.CommentReadModel
+
+import com.wildrew.app.community_read.model.CommentReadModel
 import java.time.LocalDateTime
 
-internal class CommentReadModelFixture private constructor(
+class CommentReadModelFixture private constructor(
     private var id: Long = 101L,
     private var boardId: Long = 1L,
     private var userId: Long? = 20L,

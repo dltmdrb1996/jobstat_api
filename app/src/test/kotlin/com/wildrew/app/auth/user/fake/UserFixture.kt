@@ -1,15 +1,15 @@
 package com.wildrew.app.auth.user.fake
 
-import com.wildrew.jobstat.auth.user.entity.Role
-import com.wildrew.jobstat.auth.user.entity.RoleData
-import com.wildrew.jobstat.auth.user.entity.User
-import com.wildrew.jobstat.auth.user.entity.UserRole
-import com.wildrew.jobstat.auth.user.model.Address
-import com.wildrew.jobstat.utils.TestFixture
+import com.wildrew.app.auth.user.entity.Role
+import com.wildrew.app.auth.user.entity.RoleData
+import com.wildrew.app.auth.user.entity.User
+import com.wildrew.app.auth.user.entity.UserRole
+import com.wildrew.app.auth.user.model.Address
+import com.wildrew.app.utils.TestFixture
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-internal class UserFixture private constructor(
+class UserFixture private constructor(
     private var id: Long = 0L,
     private var username: String = "테스트사용자1",
     private var email: String = "test@example.com",

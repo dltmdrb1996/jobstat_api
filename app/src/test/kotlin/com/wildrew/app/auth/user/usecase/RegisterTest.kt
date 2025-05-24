@@ -1,16 +1,16 @@
 package com.wildrew.app.auth.user.usecase
 
-import com.wildrew.jobstat.auth.token.service.TokenService
-import com.wildrew.jobstat.auth.token.service.TokenServiceImpl
-import com.wildrew.jobstat.auth.user.fake.FakeRoleRepository
-import com.wildrew.jobstat.auth.user.fake.FakeUserRepository
-import com.wildrew.jobstat.auth.user.service.UserService
-import com.wildrew.jobstat.auth.user.service.UserServiceImpl
+import com.wildrew.app.auth.token.service.TokenService
+import com.wildrew.app.auth.token.service.TokenServiceImpl
+import com.wildrew.app.auth.user.fake.FakeRoleRepository
+import com.wildrew.app.auth.user.fake.FakeUserRepository
+import com.wildrew.app.auth.user.service.UserService
+import com.wildrew.app.auth.user.service.UserServiceImpl
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_token.JwtTokenGenerator
-import com.wildrew.jobstat.utils.FakePasswordUtil
-import com.wildrew.jobstat.utils.FakeStringRedisTemplate
+import com.wildrew.app.utils.FakePasswordUtil
+import com.wildrew.app.utils.FakeStringRedisTemplate
 import jakarta.validation.Validation
 import jakarta.validation.ValidationException
 import org.junit.jupiter.api.*

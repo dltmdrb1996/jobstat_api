@@ -2,7 +2,7 @@ package com.wildrew.app.community.counting
 
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
-import com.wildrew.jobstat.utils.base.BaseIntegrationTest
+import com.wildrew.app.utils.config.BaseIntegrationTest
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired

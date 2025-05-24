@@ -1,11 +1,5 @@
-package com.wildrew.app.utils.base
+package com.wildrew.app.utils.config
 
-import com.wildrew.jobstat.utils.TestMetrics
-import com.wildrew.jobstat.utils.TestUtils
-import com.wildrew.jobstat.utils.config.DockerTestConfig
-import com.wildrew.jobstat.utils.config.TestMongoConfig
-import com.wildrew.jobstat.utils.config.TestMysqlConfig
-import com.wildrew.jobstat.utils.config.TestRedisConfig
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
@@ -37,7 +31,7 @@ import kotlin.system.measureTimeMillis
         "spring.batch.job.enabled=false",
         "batch.chunk-size=2000",
         "batch.max-threads=10",
-        "jwt.secret=test-jwt-secret-key-that-is-long-enough-for-hmac-sha256",
+        "jobstat.core.token.jwt.secret=test-jwt-secret-key-that-is-long-enough-for-hmac-sha256",
         "spring.jpa.hibernate.ddl-auto=create",
         "spring.jpa.show-sql=true",
         "spring.jpa.properties.hibernate.format_sql=true",
@@ -46,8 +40,8 @@ import kotlin.system.measureTimeMillis
         "ddns.domain=http://localhost:8080",
         "spring.mail.username=test@gamil.com",
         "spring.mail.password=test-password",
-        "ADMIN_USERNAME=admin",
-        "ADMIN_PASSWORD=admin",
+        "jobstat.core.security.admin.username=admin",
+        "jobstat.core.security.admin.password=admin",
         "app.server.url=http://localhost:8081",
     ],
 )

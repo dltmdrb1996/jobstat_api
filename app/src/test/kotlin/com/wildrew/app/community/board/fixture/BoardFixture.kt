@@ -1,10 +1,11 @@
 package com.wildrew.app.community.board.fixture
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.utils.IdFixture
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.utils.IdFixture
 import java.time.LocalDateTime
 
-internal class BoardFixture private constructor(
+class BoardFixture private constructor(
     private var id: Long = 0L,
     private var title: String = "테스트 제목",
     private var content: String = "테스트 내용",
@@ -12,7 +13,7 @@ internal class BoardFixture private constructor(
     private var password: String? = null,
     private var viewCount: Int = 0,
     private var likeCount: Int = 0,
-    private var category: com.example.jobstat.community.board.entity.BoardCategory =
+    private var category: BoardCategory =
         CategoryFixture
             .aCategory()
             .create(),
@@ -46,7 +47,7 @@ internal class BoardFixture private constructor(
 
     fun withLikeCount(likeCount: Int) = apply { this.likeCount = likeCount }
 
-    fun withCategory(category: com.example.jobstat.community.board.entity.BoardCategory) = apply { this.category = category }
+    fun withCategory(category: BoardCategory) = apply { this.category = category }
 
     fun withCreatedAt(createdAt: LocalDateTime) = apply { this.createdAt = createdAt }
 

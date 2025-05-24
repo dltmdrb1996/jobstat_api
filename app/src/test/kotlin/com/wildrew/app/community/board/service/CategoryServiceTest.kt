@@ -1,6 +1,6 @@
 package com.wildrew.app.community.board.service
 
-import com.wildrew.jobstat.community.board.repository.FakeCategoryRepository
+import com.wildrew.app.community.board.repository.FakeCategoryRepository
 import com.wildrew.jobstat.core.core_error.model.AppException
 import jakarta.persistence.EntityNotFoundException // Keep if Fake repo throws this for findById
 import org.junit.jupiter.api.*

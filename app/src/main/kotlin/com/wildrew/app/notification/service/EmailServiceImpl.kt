@@ -1,4 +1,4 @@
-package com.wildrew.app.auth.email.service
+package com.wildrew.app.notification.service
 
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode

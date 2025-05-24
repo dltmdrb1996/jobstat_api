@@ -1,5 +1,6 @@
 package com.wildrew.app.utils.base // 또는 적절한 패키지 위치
 
+import com.wildrew.app.utils.config.BaseIntegrationTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.redis.core.StringRedisTemplate
 

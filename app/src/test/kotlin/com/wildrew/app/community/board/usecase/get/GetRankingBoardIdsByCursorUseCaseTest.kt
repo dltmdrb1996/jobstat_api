@@ -1,15 +1,15 @@
 package com.wildrew.app.community.board.usecase.get
 
-import com.wildrew.jobstat.community.board.entity.Board
-import com.wildrew.jobstat.community.board.entity.BoardCategory
-import com.wildrew.jobstat.community.board.fixture.BoardFixture
-import com.wildrew.jobstat.community.board.fixture.CategoryFixture
-import com.wildrew.jobstat.community.board.repository.FakeBoardRepository // saveWithTimestamp 사용
-import com.wildrew.jobstat.community.board.repository.FakeCategoryRepository
-import com.wildrew.jobstat.community.board.service.BoardService
-import com.wildrew.jobstat.community.board.service.BoardServiceImpl
+import com.wildrew.app.community.board.entity.Board
+import com.wildrew.app.community.board.entity.BoardCategory
+import com.wildrew.app.community.board.fixture.BoardFixture
+import com.wildrew.app.community.board.fixture.CategoryFixture
+import com.wildrew.app.community.board.repository.FakeBoardRepository // saveWithTimestamp 사용
+import com.wildrew.app.community.board.repository.FakeCategoryRepository
+import com.wildrew.app.community.board.service.BoardService
+import com.wildrew.app.community.board.service.BoardServiceImpl
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.statistics_read.core.core_model.BoardRankingPeriod
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation
 import org.junit.jupiter.api.*

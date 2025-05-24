@@ -1,7 +1,7 @@
 package com.wildrew.app.auth.user.repository
 
-import com.wildrew.jobstat.auth.user.entity.*
-import com.wildrew.jobstat.utils.base.JpaIntegrationTestSupport
+import com.wildrew.app.auth.user.entity.*
+import com.wildrew.app.utils.base.JpaIntegrationTestSupport
 import org.hibernate.exception.ConstraintViolationException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

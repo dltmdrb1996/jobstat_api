@@ -1,9 +1,9 @@
 package com.wildrew.app.utils.base
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.BaseRankingRepository
-import com.wildrew.jobstat.statistics_read.fake.AbstractFakeTimeSeriesRepository
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
+import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
+import com.wildrew.app.statistics_read.core.core_mongo_base.repository.BaseRankingRepository
+import com.wildrew.app.statistics_read.fake.AbstractFakeTimeSeriesRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 

@@ -1,10 +1,10 @@
 package com.wildrew.app.community_read.fixture
 
-import com.wildrew.jobstat.community_read.model.BoardReadModel
-import com.wildrew.jobstat.community_read.model.CommentReadModel
+import com.wildrew.app.community_read.model.BoardReadModel
+import com.wildrew.app.community_read.model.CommentReadModel
 import java.time.LocalDateTime
 
-internal class BoardReadModelFixture private constructor(
+class BoardReadModelFixture private constructor(
     private var id: Long = 1L,
     private var categoryId: Long = 1L,
     private var title: String = "읽기 모델 테스트 제목",

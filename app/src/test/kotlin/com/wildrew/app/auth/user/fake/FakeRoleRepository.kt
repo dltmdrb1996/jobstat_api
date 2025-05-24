@@ -1,13 +1,13 @@
 package com.wildrew.app.auth.user.fake
 
-import com.wildrew.jobstat.auth.user.entity.Role
-import com.wildrew.jobstat.auth.user.repository.RoleRepository
-import com.wildrew.jobstat.utils.IndexManager
-import com.wildrew.jobstat.utils.base.BaseFakeRepository
+import com.wildrew.app.auth.user.entity.Role
+import com.wildrew.app.auth.user.repository.RoleRepository
+import com.wildrew.app.utils.IndexManager
+import com.wildrew.app.utils.base.BaseFakeRepository
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.dao.DuplicateKeyException
 
-internal class FakeRoleRepository : RoleRepository {
+class FakeRoleRepository : RoleRepository {
     private val baseRepo =
         object : BaseFakeRepository<Role, RoleFixture>() {
             override fun fixture() = RoleFixture.aRole()

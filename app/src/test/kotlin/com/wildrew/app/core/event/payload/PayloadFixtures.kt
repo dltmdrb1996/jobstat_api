@@ -4,10 +4,10 @@ import com.wildrew.jobstat.core.core_event.model.payload.board.*
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.statistics_read.core.core_model.BoardRankingPeriod
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import java.time.LocalDateTime
 
-internal class BoardCreatedEventPayloadFixture private constructor(
+class BoardCreatedEventPayloadFixture private constructor(
     private var boardId: Long = 1L,
     private var userId: Long? = 10L,
     private var categoryId: Long = 1L,
@@ -63,7 +63,7 @@ internal class BoardCreatedEventPayloadFixture private constructor(
     }
 }
 
-internal class BoardUpdatedEventPayloadFixture private constructor(
+class BoardUpdatedEventPayloadFixture private constructor(
     private var boardId: Long = 1L,
     private var eventTs: Long = System.currentTimeMillis(),
     private var title: String = "수정된 페이로드 제목",
@@ -103,7 +103,7 @@ internal class BoardUpdatedEventPayloadFixture private constructor(
     }
 }
 
-internal class BoardDeletedEventPayloadFixture private constructor(
+class BoardDeletedEventPayloadFixture private constructor(
     private var boardId: Long = 1L,
     private var eventTs: Long = System.currentTimeMillis(),
     private var categoryId: Long = 1L,
@@ -143,7 +143,7 @@ internal class BoardDeletedEventPayloadFixture private constructor(
     }
 }
 
-internal class BoardLikedEventPayloadFixture private constructor(
+class BoardLikedEventPayloadFixture private constructor(
     private var boardId: Long = 1L,
     private var createdAt: LocalDateTime = LocalDateTime.now(), // Typically event time
     private var eventTs: Long = System.currentTimeMillis(),
@@ -160,8 +160,8 @@ internal class BoardLikedEventPayloadFixture private constructor(
 
     fun withLikeCount(likeCount: Int) = apply { this.likeCount = likeCount }
 
-    fun create(): com.wildrew.jobstat.core.core_event.model.payload.board.BoardLikedEventPayload =
-        com.wildrew.jobstat.core.core_event.model.payload.board.BoardLikedEventPayload(
+    fun create(): BoardLikedEventPayload =
+        BoardLikedEventPayload(
             boardId = boardId,
             createdAt = createdAt,
             eventTs = eventTs,
@@ -187,7 +187,7 @@ internal class BoardLikedEventPayloadFixture private constructor(
     }
 }
 
-internal class BoardUnlikedEventPayloadFixture private constructor(
+class BoardUnlikedEventPayloadFixture private constructor(
     private var boardId: Long = 1L,
     private var createdAt: LocalDateTime = LocalDateTime.now(), // Typically event time
     private var eventTs: Long = System.currentTimeMillis(),
@@ -231,7 +231,7 @@ internal class BoardUnlikedEventPayloadFixture private constructor(
     }
 }
 
-internal class BoardViewedEventPayloadFixture private constructor(
+class BoardViewedEventPayloadFixture private constructor(
     private var boardId: Long = 1L,
     private var createdAt: LocalDateTime = LocalDateTime.now(), // Typically event time
     private var eventTs: Long = System.currentTimeMillis(),
@@ -269,13 +269,13 @@ internal class BoardViewedEventPayloadFixture private constructor(
     }
 }
 
-internal class BoardRankingUpdatedEventPayloadFixture private constructor(
+class BoardRankingUpdatedEventPayloadFixture private constructor(
     private var metric: BoardRankingMetric = BoardRankingMetric.VIEWS,
     private var period: BoardRankingPeriod = BoardRankingPeriod.DAY,
-    private var rankings: List<com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload.RankingEntry> =
+    private var rankings: List<BoardRankingUpdatedEventPayload.RankingEntry> =
         listOf(
-            com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload.RankingEntry(1L, 100.0),
-            com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload.RankingEntry(2L, 90.0),
+            BoardRankingUpdatedEventPayload.RankingEntry(1L, 100.0),
+            BoardRankingUpdatedEventPayload.RankingEntry(2L, 90.0),
         ),
     private var eventTs: Long = System.currentTimeMillis(),
 ) {
@@ -283,12 +283,12 @@ internal class BoardRankingUpdatedEventPayloadFixture private constructor(
 
     fun withPeriod(period: BoardRankingPeriod) = apply { this.period = period }
 
-    fun withRankings(rankings: List<com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload.RankingEntry>) = apply { this.rankings = rankings }
+    fun withRankings(rankings: List<BoardRankingUpdatedEventPayload.RankingEntry>) = apply { this.rankings = rankings }
 
     fun withEventTs(eventTs: Long) = apply { this.eventTs = eventTs }
 
-    fun create(): com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload =
-        com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload(
+    fun create(): BoardRankingUpdatedEventPayload =
+        BoardRankingUpdatedEventPayload(
             metric = metric,
             period = period,
             rankings = rankings,
@@ -311,7 +311,7 @@ internal class BoardRankingUpdatedEventPayloadFixture private constructor(
 }
 
 // --- IncViewEventPayload Fixture ---
-internal class IncViewEventPayloadFixture private constructor(
+class IncViewEventPayloadFixture private constructor(
     private var boardId: Long = 1L,
     private var eventTs: Long = System.currentTimeMillis(),
     private var delta: Int = 1,
@@ -345,7 +345,7 @@ internal class IncViewEventPayloadFixture private constructor(
     }
 }
 
-internal class CommentCreatedEventPayloadFixture private constructor(
+class CommentCreatedEventPayloadFixture private constructor(
     private var commentId: Long = 101L,
     private var boardId: Long = 1L,
     private var userId: Long? = 20L,
@@ -398,7 +398,7 @@ internal class CommentCreatedEventPayloadFixture private constructor(
 }
 
 // --- CommentUpdatedEventPayload Fixture ---
-internal class CommentUpdatedEventPayloadFixture private constructor(
+class CommentUpdatedEventPayloadFixture private constructor(
     private var commentId: Long = 101L,
     private var boardId: Long = 1L, // Usually needed for context, even if not directly used in update logic
     private var content: String = "수정된 댓글 페이로드 내용",
@@ -441,7 +441,7 @@ internal class CommentUpdatedEventPayloadFixture private constructor(
 }
 
 // --- CommentDeletedEventPayload Fixture ---
-internal class CommentDeletedEventPayloadFixture private constructor(
+class CommentDeletedEventPayloadFixture private constructor(
     private var commentId: Long = 101L,
     private var boardId: Long = 1L,
     private var eventTs: Long = System.currentTimeMillis(),

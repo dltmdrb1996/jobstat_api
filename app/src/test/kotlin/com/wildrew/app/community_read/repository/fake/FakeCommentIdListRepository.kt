@@ -1,7 +1,7 @@
 package com.wildrew.app.community_read.repository.fake
 
-import com.wildrew.jobstat.community_read.repository.CommentIdListRepository
-import com.wildrew.jobstat.community_read.repository.impl.RedisCommentIdListRepository
+import com.wildrew.app.community_read.repository.CommentIdListRepository
+import com.wildrew.app.community_read.repository.impl.RedisCommentIdListRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -10,7 +10,7 @@ import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.math.min
 
-internal class FakeCommentIdListRepository : CommentIdListRepository {
+class FakeCommentIdListRepository : CommentIdListRepository {
     private val zsets = ConcurrentHashMap<String, NavigableMap<Double, String>>()
 
     private fun getMap(boardId: Long): NavigableMap<Double, String> = zsets.computeIfAbsent(RedisCommentIdListRepository.getBoardCommentsKey(boardId)) { Collections.synchronizedNavigableMap(TreeMap<Double, String>()) }
