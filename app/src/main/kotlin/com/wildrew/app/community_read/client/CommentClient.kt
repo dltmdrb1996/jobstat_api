@@ -1,15 +1,17 @@
 package com.wildrew.app.community_read.client
 
-import com.wildrew.app.community.comment.usecase.get.GetCommentsByBoardId
-import com.wildrew.app.community.comment.usecase.get.GetCommentsByBoardIdAfter
 import com.wildrew.app.community_read.BaseClient
 import com.wildrew.app.community_read.client.response.CommentDTO
 import com.wildrew.app.community_read.client.response.FetchCommentIdsResponse
+import com.wildrew.app.community_read.client.response.GetCommentsByBoardIdAfterResponse
+import com.wildrew.app.community_read.client.response.GetCommentsByBoardIdResponse
 import com.wildrew.app.community_read.model.CommentReadModel
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
+import io.swagger.v3.oas.annotations.media.Schema
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientException
 
@@ -30,10 +32,10 @@ class CommentClient : BaseClient() {
             object : ParameterizedTypeReference<ApiResponse<Array<CommentDTO>>>() {}
 
         private val COMMENTS_BY_BOARD_ID_RESPONSE_TYPE =
-            object : ParameterizedTypeReference<ApiResponse<GetCommentsByBoardId.Response>>() {}
+            object : ParameterizedTypeReference<ApiResponse<GetCommentsByBoardIdResponse>>() {}
 
         private val COMMENTS_BY_BOARD_ID_AFTER_RESPONSE_TYPE =
-            object : ParameterizedTypeReference<ApiResponse<GetCommentsByBoardIdAfter.Response>>() {}
+            object : ParameterizedTypeReference<ApiResponse<GetCommentsByBoardIdAfterResponse>>() {}
     }
 
     fun fetchCommentById(commentId: Long): CommentReadModel? {
@@ -106,7 +108,7 @@ class CommentClient : BaseClient() {
 
             log.debug("[{}] Calling Fallback API (fetches full comment data): {}", logContext, uri)
 
-            val responseWrapper: ApiResponse<GetCommentsByBoardId.Response>? =
+            val responseWrapper: ApiResponse<GetCommentsByBoardIdResponse>? =
                 restClient
                     .get()
                     .uri(uri)
@@ -148,7 +150,7 @@ class CommentClient : BaseClient() {
 
             log.debug("[{}] Calling Fallback API (fetches full comment data): {}", logContext, uri)
 
-            val responseWrapper: ApiResponse<GetCommentsByBoardIdAfter.Response>? =
+            val responseWrapper: ApiResponse<GetCommentsByBoardIdAfterResponse>? =
                 restClient
                     .get()
                     .uri(uri)
@@ -175,3 +177,5 @@ class CommentClient : BaseClient() {
         }
     }
 }
+
+

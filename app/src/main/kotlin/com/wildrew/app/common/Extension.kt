@@ -1,6 +1,5 @@
 package com.wildrew.app.common
 
-import kotlinx.coroutines.delay
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
@@ -133,25 +132,6 @@ private fun getOrdinal(n: Int) =
         n % 10 == 3 -> "${n}rd"
         else -> "${n}th"
     }
-
-suspend fun <T> withRetry(
-    maxAttempts: Int = 3,
-    initialDelay: Long = 1000,
-    factor: Double = 2.0,
-    block: suspend () -> T,
-): T {
-    var currentDelay = initialDelay
-    repeat(maxAttempts) { attempt ->
-        try {
-            return block()
-        } catch (e: Exception) {
-            if (attempt == maxAttempts - 1) throw e
-            delay(currentDelay)
-            currentDelay = (currentDelay * factor).toLong()
-        }
-    }
-    throw IllegalStateException("This line should never be reached")
-}
 
 fun <T, R> Page<T>.map(converter: (T) -> R): Page<R> =
     PageImpl(

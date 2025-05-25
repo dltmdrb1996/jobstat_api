@@ -5,16 +5,18 @@ import com.wildrew.jobstat.core.core_token.model.RefreshPayload
 import com.wildrew.jobstat.core.core_token.model.TokenType
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import java.time.Instant
 import java.util.*
 import javax.crypto.SecretKey
 
 class JwtTokenGenerator(
-    @Value("\${jwt.secret}") private val secret: String,
-    @Value("\${jwt.accessTokenExpiration}") private val accessTokenExpiration: Int,
-    @Value("\${jwt.refreshTokenExpiration}") private val refreshTokenExpiration: Int,
+    private val secret: String,
+    private val accessTokenExpiration: Int,
+    private val refreshTokenExpiration: Int,
 ) {
+    private val log by lazy { LoggerFactory.getLogger(this::class.java) }
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
 
     fun createAccessToken(payload: AccessPayload): String = createToken(payload.id, payload.roles, payload.tokenType, accessTokenExpiration)
@@ -22,6 +24,10 @@ class JwtTokenGenerator(
     fun createRefreshToken(payload: RefreshPayload): String = createToken(payload.id, payload.roles, payload.tokenType, refreshTokenExpiration)
 
     fun getRefreshTokenExpiration(): Long = refreshTokenExpiration.toLong()
+
+    init {
+        log.info("JWT Token Generator initialized with secret key length: ${secret} characters")
+    }
 
     private fun createToken(
         id: Long,

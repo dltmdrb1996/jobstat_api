@@ -1,7 +1,7 @@
 package com.wildrew.app.auth.user.fake
 
 import com.wildrew.app.auth.user.entity.Role
-import com.wildrew.app.auth.user.entity.RoleData
+import com.wildrew.jobstat.core.core_global.model.RoleData
 import com.wildrew.app.auth.user.entity.User
 import com.wildrew.app.auth.user.entity.UserRole
 import com.wildrew.app.auth.user.model.Address
@@ -81,7 +81,7 @@ class UserFixture private constructor(
             aUser()
                 .withUsername("adminUserX")
                 .withPassword("adminPass123!")
-                .withRoles(setOf(RoleData.ADMIN.toEntity()))
+                .withRoles(setOf(Role.create(RoleData.ADMIN.name)))
                 .create()
 
         fun aUserWithAddress() =

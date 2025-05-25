@@ -1,7 +1,7 @@
 package com.wildrew.app.auth.user.fake
 
 import com.wildrew.app.auth.user.entity.Role
-import com.wildrew.app.auth.user.entity.RoleData
+import com.wildrew.jobstat.core.core_global.model.RoleData
 import com.wildrew.app.utils.IdFixture
 
 class RoleFixture private constructor(

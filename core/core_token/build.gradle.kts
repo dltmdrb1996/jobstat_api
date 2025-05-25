@@ -17,9 +17,9 @@ java {
 dependencies {
     api(project(":core:core_error")) // JwtTokenParser 공개 메소드가 AppException throw
 
-    implementation("io.jsonwebtoken:jjwt-api:0.12.5") // 내부 구현에서 사용
-    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")
-    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.5") // Jackson ObjectMapper를 사용한 직렬화/역직렬화 시 필요
+    api("io.jsonwebtoken:jjwt-api:0.12.5") // 내부 구현에서 사용
+    api("io.jsonwebtoken:jjwt-impl:0.12.5")
+    api("io.jsonwebtoken:jjwt-jackson:0.12.5") // Jackson ObjectMapper를 사용한 직렬화/역직렬화 시 필요
 
     implementation("org.slf4j:slf4j-api")
 

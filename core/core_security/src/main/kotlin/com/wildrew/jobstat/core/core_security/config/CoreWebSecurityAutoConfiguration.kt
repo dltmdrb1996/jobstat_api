@@ -47,10 +47,9 @@ class CoreWebSecurityAutoConfiguration {
     @ConditionalOnMissingBean(name = ["coreSecurityFilterChain"])
     fun coreSecurityFilterChain(
         http: HttpSecurity,
-        @Qualifier("jwtTokenFilter") jwtTokenFilter: Filter,
+        @Qualifier("coreSecurityFilter") jwtTokenFilter: Filter,
         jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     ): SecurityFilterChain {
-        log.info("Configuring CoreWebSecurityAutoConfiguration with jwtTokenFilter: {}", jwtTokenFilter.javaClass.simpleName)
         http
             .cors { it.configurationSource(coreCorsConfigurationSource()) }
             .csrf { it.disable() }

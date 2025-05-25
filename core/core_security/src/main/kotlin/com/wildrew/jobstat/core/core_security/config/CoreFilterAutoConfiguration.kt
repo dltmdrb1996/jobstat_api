@@ -1,7 +1,9 @@
 package com.wildrew.jobstat.core.core_security.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.wildrew.jobstat.core.core_security.filter.ScopedValueGatewayHeaderAuthenticationFilter
 import com.wildrew.jobstat.core.core_security.filter.ScopedValueJwtTokenFilter
+import com.wildrew.jobstat.core.core_security.filter.ThreadLocalGatewayHeaderAuthenticationFilter
 import com.wildrew.jobstat.core.core_security.filter.ThreadLocalJwtTokenFilter
 import com.wildrew.jobstat.core.core_security.util.ScopedSecurityContextHolder
 import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
@@ -27,42 +29,38 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 class CoreFilterAutoConfiguration {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
-    @Bean("jwtTokenFilter")
-    @ConditionalOnMissingBean(name = ["jwtTokenFilter"])
+    @Bean("coreSecurityFilter")
+    @ConditionalOnMissingBean(name = ["coreSecurityFilter"])
     @ConditionalOnProperty(
         name = ["spring.threads.virtual.enabled"],
         havingValue = "true",
         matchIfMissing = false,
     )
     @ConditionalOnClass(ScopedSecurityContextHolder::class)
-    fun scopedValueJwtTokenFilter(
-        jwtTokenParser: JwtTokenParser,
+    fun scopedValueCoreSecurityFilter(
         requestMappingHandlerMapping: RequestMappingHandlerMapping,
         objectMapper: ObjectMapper,
     ): OncePerRequestFilter {
         log.info("Configuring ScopedValueJwtTokenFilter")
-        return ScopedValueJwtTokenFilter(
-            jwtTokenParser,
+        return ScopedValueGatewayHeaderAuthenticationFilter(
             requestMappingHandlerMapping,
             objectMapper,
         )
     }
 
-    @Bean("jwtTokenFilter")
-    @ConditionalOnMissingBean(name = ["jwtTokenFilter"])
+    @Bean("coreSecurityFilter")
+    @ConditionalOnMissingBean(name = ["coreSecurityFilter"])
     @ConditionalOnProperty(
         name = ["spring.threads.virtual.enabled"],
         havingValue = "false",
         matchIfMissing = true,
     )
-    fun threadLocalJwtTokenFilter(
-        jwtTokenParser: JwtTokenParser,
+    fun threadLocalCoreSecurityFilter(
         requestMappingHandlerMapping: RequestMappingHandlerMapping,
         objectMapper: ObjectMapper,
     ): OncePerRequestFilter {
         log.info("Configuring ThreadLocalJwtTokenFilter")
-        return ThreadLocalJwtTokenFilter(
-            jwtTokenParser,
+        return ThreadLocalGatewayHeaderAuthenticationFilter(
             requestMappingHandlerMapping,
             objectMapper,
         )

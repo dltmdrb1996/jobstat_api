@@ -1,0 +1,70 @@
+# file: /Users/lsg_mac_mini/IntelliJProject/jobstat_api/infra/config-repo/jobstat-auth-prod.yml
+spring:
+  config:
+    activate:
+      on-profile: prod # "prod" 프로필 활성화 시 적용
+  datasource: # 운영용 DB 설정
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:prod_jobstat}?
+      serverTimezone=Asia/Seoul&useSSL=true # 운영에서는 SSL 사용 권장
+      &allowPublicKeyRetrieval=true
+      &rewriteBatchedStatements=true
+      &useServerPrepStmts=false
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari: # 운영 환경에 맞는 Hikari CP 설정
+      idle-timeout: 60000
+      maximum-pool-size: 20 # 서비스 부하에 맞게 조정
+      minimum-idle: 5
+      connection-timeout: 30000
+      initialization-fail-timeout: 30000
+      connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:2}
+      password: ${REDIS_PASSWORD}
+      username: default
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: -1ms
+      client-type: lettuce
+      connect-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+logging: # 운영 환경 로그 레벨
+  level:
+    com.wildrew: INFO
+    org.hibernate: WARN
+    org.springframework.security: WARN
+
+jobstat:
+  core:
+    openapi:
+      title: "JobStat Auth API (Production)"
+      server:
+        urls: "https://auth.jobstat.com" # 실제 운영 도메인
+        description: "Auth Production Server"
+
+eureka:
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME_AUTH_PROD:jobstat-auth-service} # Docker 서비스 이름 등
+    prefer-ip-address: true # IP 주소 우선 사용
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_DEFAULT_ZONE_AUTH_PROD:http://jobstat-eureka-server:8761/eureka/} # 운영 Eureka 서버 주소
+
+springdoc: # 운영 환경에서는 API 문서 UI 비활성화 권장 (필요시 게이트웨이 등에서 제어)
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false # API 스펙 자체도 비공개가 필요하면 false

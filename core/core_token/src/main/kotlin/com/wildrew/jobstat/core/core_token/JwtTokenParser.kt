@@ -15,8 +15,10 @@ import org.springframework.beans.factory.annotation.Value
 import javax.crypto.SecretKey
 
 class JwtTokenParser(
-    @Value("\${jwt.secret}") private val secret: String,
+    private val secret: String,
 ) {
+
+
     private val key: SecretKey by lazy { Keys.hmacShaKeyFor(secret.toByteArray()) }
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
@@ -25,6 +27,11 @@ class JwtTokenParser(
             .parser()
             .verifyWith(key)
             .build()
+
+    init {
+        log.info("JWT Token Parser initialized with secret key length: ${secret} characters")
+    }
+
 
     @Suppress("UNCHECKED_CAST")
     fun validateToken(token: String): AccessPayload =

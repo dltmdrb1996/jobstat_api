@@ -4,6 +4,7 @@ import com.wildrew.app.common.toEpochMilli
 import com.wildrew.app.community_read.model.CommentReadModel
 import java.time.LocalDateTime
 
+
 data class CommentDTO(
     val id: Long,
     val boardId: Long,

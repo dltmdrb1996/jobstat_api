@@ -5,6 +5,11 @@ rootProject.name = "jobstat"
 
 include(
     ":app",
+    "service:jobstat-auth",
+//    "service:jobstat-community",
+//    "service:jobstat-community_read",
+//    "service:jobstat-notification",
+//    "service:jobstat-statistics_read",
     "core:core_coroutine",
     "core:core_error",
     "core:core_event",
@@ -17,7 +22,14 @@ include(
     "core:core_usecase",
     "core:core_web_util",
     "core:core_global",
-    ":jobstat-config-server",
-    ":jobstat-eureka-server",
+    "infra:jobstat-config-server",
+    "infra:jobstat-eureka-server",
+    "infra:jobstat-api-gateway",
     ":ksp",
 )
+include("jobstat-api-gateway")
+include("jobstat-auth")
+include("jobstat-community")
+include("jobstat-community_read")
+include("jobstat-notification")
+include("jobstat-statistics_read")

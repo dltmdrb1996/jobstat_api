@@ -1,7 +1,6 @@
 package com.wildrew.app.auth.user.service
 
 import com.wildrew.app.auth.user.UserConstants
-import com.wildrew.app.auth.user.entity.RoleData
 import com.wildrew.app.auth.user.entity.User
 import com.wildrew.app.auth.user.entity.UserRole
 import com.wildrew.app.auth.user.repository.RoleRepository
@@ -9,6 +8,7 @@ import com.wildrew.app.auth.user.repository.UserRepository
 import com.wildrew.app.common.trueOrThrow
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
+import com.wildrew.jobstat.core.core_global.model.RoleData
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
