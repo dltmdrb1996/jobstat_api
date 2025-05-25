@@ -1,7 +1,10 @@
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
 rootProject.name = "jobstat"
 
 include(
-    ":app", // 애플리케이션 모듈 (기존 main 코드가 이동될 곳)
+    ":app",
     "core:core_coroutine",
     "core:core_error",
     "core:core_event",
@@ -14,9 +17,7 @@ include(
     "core:core_usecase",
     "core:core_web_util",
     "core:core_global",
+    ":jobstat-config-server",
+    ":jobstat-eureka-server",
     ":ksp",
 )
-// // 기존 ksp 모듈이 있다면 유지
-// if (file("ksp").exists()) {
-//    include(":ksp")
-// }

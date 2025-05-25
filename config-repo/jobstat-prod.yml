@@ -1,0 +1,98 @@
+app:
+  server:
+    url: http://localhost:8081
+
+eureka:
+  instance:
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS_JOBSTAT_PROD:true}
+    hostname: ${EUREKA_INSTANCE_HOSTNAME_JOBSTAT_PROD:jobstat-app}
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_DEFAULT_ZONE_JOBSTAT_PROD:http://jobstat-eureka-server:8761/eureka/}
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:prod_jobstat}?
+      serverTimezone=UTC&useSSL=false
+      &allowPublicKeyRetrieval=true
+      &rewriteBatchedStatements=true
+      &useServerPrepStmts=false
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      idle-timeout: 60000
+      maximum-pool-size: 50
+      minimum-idle: 10
+      connection-timeout: 30000
+      initialization-fail-timeout: 30000
+      connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
+      cache-prepared-statements: true
+      prepared-statement-cache-size: 250
+      prepared-statement-cache-sql-limit: 2048
+
+
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:prod_database}?maxPoolSize=50&minPoolSize=0&maxIdleTimeMS=60000&authSource=admin
+      database: ${MONGO_DB:prod_database}
+      auto-index-creation: true
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:2}
+      password: ${REDIS_PASSWORD}
+      username: default
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: -1ms
+      client-type: lettuce
+      connect-timeout: 5000
+  batch:
+    jdbc:
+      initialize-schema: never
+    job:
+      enabled: false
+    chunk-size: 1000
+    max-threads: 10
+  jpa:
+    hibernate:
+      ddl-auto: update # 현재 개발중이기 때문에 update로 설정
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: false
+        connection.provider_disables_autocommit: false
+        acquire_increment: 1
+        acquire_retry_attempts: 3
+        acquire_retry_delay: 5000
+        jdbc:
+          time_zone: Asia/Seoul
+
+
+batch:
+  chunk-size: 500
+  job-size: 100
+
+logging:
+  level:
+    root: WARN
+    com.example: WARN
+    org.hibernate: ERROR
+    org.hibernate.SQL: ERROR
+    org.hibernate.type: ERROR
+    org.springframework: WARN
+    org.springframework.security: WARN
+    com.wildrew.jobstat.core.security.JwtTokenFilter: ERROR
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false

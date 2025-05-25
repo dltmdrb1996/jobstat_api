@@ -2,6 +2,11 @@ app:
   server:
     url: http://localhost:8081
 
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/
+
 spring:
   config:
     activate:
@@ -25,8 +30,6 @@ spring:
       cache-prepared-statements: true
       prepared-statement-cache-size: 250
       prepared-statement-cache-sql-limit: 2048
-
-
   data:
     mongodb:
       uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:dev_database}?maxPoolSize=5&minPoolSize=2&maxIdleTimeMS=30000
@@ -77,3 +80,16 @@ jobstat:
       server:
         urls: "http://localhost:${server.port:8081}" # dev 환경 서버 URL
         description: "Development Server"
+
+springdoc:
+  security:
+    bearer-auth:
+      enabled: true
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    default-models-expand-depth: 1
+  default-produces-media-type: application/json

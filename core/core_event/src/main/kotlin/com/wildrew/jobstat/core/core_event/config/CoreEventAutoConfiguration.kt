@@ -28,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
@@ -51,6 +52,7 @@ import org.springframework.kafka.listener.ContainerProperties
 @ConditionalOnClass(KafkaOperations::class)
 @ConditionalOnProperty(name = ["spring.kafka.bootstrap-servers"])
 @ConditionalOnBean(ConsumerFactory::class)
+@EnableConfigurationProperties(KafkaConsumersConfiguration::class)
 class CoreEventAutoConfiguration {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
@@ -188,14 +190,14 @@ class CoreEventAutoConfiguration {
         )
     }
 
-    @Bean
-    @ConditionalOnMissingBean
-    fun coreKafkaProfileAwareConstantsInitializer(
-        @Value("\${spring.profiles.active:dev}") activeProfile: String,
-    ): KafkaProfileAwareConstantsInitializer {
-        val initializer = KafkaProfileAwareConstantsInitializer(activeProfile)
-        initializer.initializeConstants()
-        log.info("CoreKafkaProfileAwareConstantsInitializer bean created and Kafka constants initialized for profile: {}", activeProfile)
-        return initializer
-    }
+//    @Bean
+//    @ConditionalOnMissingBean
+//    fun coreKafkaProfileAwareConstantsInitializer(
+//        @Value("\${spring.profiles.active:dev}") activeProfile: String,
+//    ): KafkaProfileAwareConstantsInitializer {
+//        val initializer = KafkaProfileAwareConstantsInitializer(activeProfile)
+//        initializer.initializeConstants()
+//        log.info("CoreKafkaProfileAwareConstantsInitializer bean created and Kafka constants initialized for profile: {}", activeProfile)
+//        return initializer
+//    }
 }

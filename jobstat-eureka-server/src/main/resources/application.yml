@@ -1,7 +1,8 @@
 spring:
   application:
-    name: jobstat
+    name: jobstat-eureka-server
   config:
     import: "configserver:${CONFIG_SERVER_URI:http://localhost:8888}"
   profiles:
     active: ${APP_PROFILE:dev}
+

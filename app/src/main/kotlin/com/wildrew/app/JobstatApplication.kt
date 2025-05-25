@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.autoconfigure.mongo.MongoProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 import org.springframework.scheduling.annotation.EnableScheduling
@@ -15,6 +16,7 @@ import java.util.*
 @EnableAspectJAutoProxy
 @EnableConfigurationProperties(MongoProperties::class)
 @EnableScheduling
+@EnableDiscoveryClient
 @EntityScan( // app 모듈 내의 모든 JPA Entity 패키지를 지정
     basePackages = [
         "com.wildrew.app.auth.user.entity",

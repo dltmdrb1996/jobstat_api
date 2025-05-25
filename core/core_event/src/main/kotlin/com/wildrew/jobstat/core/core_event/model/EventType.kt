@@ -1,43 +1,40 @@
 package com.wildrew.jobstat.core.core_event.model
 
+import com.wildrew.jobstat.core.core_event.config.ConsumerConfig
 import com.wildrew.jobstat.core.core_event.model.payload.board.*
 import com.wildrew.jobstat.core.core_event.model.payload.comment.*
 import com.wildrew.jobstat.core.core_event.model.payload.notification.EmailNotificationEvent
 import org.slf4j.LoggerFactory
 
-enum class TopicKey {
-    COMMUNITY_READ,
-    COMMUNITY_COMMAND,
-    NOTIFICATION,
-}
+const val CONSUMER_NAME_COMMUNITY_READ = "community-read"
+const val CONSUMER_NAME_COMMUNITY_COMMAND = "community-command"
+const val CONSUMER_NAME_NOTIFICATION = "notification"
 
 enum class EventType(
     val payloadClass: Class<out EventPayload>,
-    val topicKey: TopicKey,
+    val consumerName: String,
 ) {
-    BOARD_CREATED(BoardCreatedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    BOARD_UPDATED(BoardUpdatedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    BOARD_DELETED(BoardDeletedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    BOARD_LIKED(BoardLikedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    BOARD_UNLIKED(BoardUnlikedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    BOARD_VIEWED(BoardViewedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    BOARD_RANKING_UPDATED(BoardRankingUpdatedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    BOARD_INC_VIEW(IncViewEventPayload::class.java, TopicKey.COMMUNITY_COMMAND),
-    COMMENT_CREATED(CommentCreatedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    COMMENT_UPDATED(CommentUpdatedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    COMMENT_DELETED(CommentDeletedEventPayload::class.java, TopicKey.COMMUNITY_READ),
-    EMAIL_NOTIFICATION(EmailNotificationEvent::class.java, TopicKey.NOTIFICATION),
+    BOARD_CREATED(BoardCreatedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    BOARD_UPDATED(BoardUpdatedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    BOARD_DELETED(BoardDeletedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    BOARD_LIKED(BoardLikedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    BOARD_UNLIKED(BoardUnlikedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    BOARD_VIEWED(BoardViewedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    BOARD_RANKING_UPDATED(BoardRankingUpdatedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    BOARD_INC_VIEW(IncViewEventPayload::class.java, CONSUMER_NAME_COMMUNITY_COMMAND),
+
+    COMMENT_CREATED(CommentCreatedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    COMMENT_UPDATED(CommentUpdatedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    COMMENT_DELETED(CommentDeletedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+
+    EMAIL_NOTIFICATION(EmailNotificationEvent::class.java, CONSUMER_NAME_NOTIFICATION),
     ;
 
-    fun getTopicName(): String =
-        when (topicKey) {
-            TopicKey.COMMUNITY_READ -> Topic.communityRead
-            TopicKey.COMMUNITY_COMMAND -> Topic.communityCommand
-            TopicKey.NOTIFICATION -> Topic.notification
-        }
+    fun getTopicName(): String = Topic.getTopicName(consumerName)
+    fun getGroupId(): String = GroupId.getGroupId(consumerName)
 
     companion object {
-        private val log by lazy { LoggerFactory.getLogger(this::class.java) }
+        private val log by lazy { LoggerFactory.getLogger(EventType::class.java.enclosingClass) }
 
         fun from(type: String): EventType? =
             try {
@@ -49,40 +46,60 @@ enum class EventType(
     }
 
     object Topic {
-        private const val COMMUNITY_COMMAND_BASE = "community-command"
-        private const val COMMUNITY_READ_BASE = "community-read"
-        private const val NOTIFICATION_BASE = "notification"
-
-        lateinit var communityCommand: String
-        lateinit var communityRead: String
-        lateinit var notification: String
-
+        private lateinit var consumerConfigMap: Map<String, ConsumerConfig>
         private val log by lazy { LoggerFactory.getLogger(Topic::class.java) }
 
-        fun initialize(activeProfile: String) {
-            communityCommand = "$COMMUNITY_COMMAND_BASE-$activeProfile"
-            communityRead = "$COMMUNITY_READ_BASE-$activeProfile"
-            notification = "$NOTIFICATION_BASE-$activeProfile"
-            log.info("[EventType.Topic Initialized] Active Profile: $activeProfile, communityRead: $communityRead, communityCommand: $communityCommand, notification: $notification") // Updated log to use camelCase
+        fun initialize(configMap: Map<String, ConsumerConfig>) {
+            this.consumerConfigMap = configMap
+            log.info("[EventType.Topic Initialized] Using consumerConfigMap: $consumerConfigMap")
+        }
+
+        fun getTopicName(consumerNameKey: String): String {
+            check(::consumerConfigMap.isInitialized) { "EventType.Topic has not been initialized. Ensure KafkaConsumersConfiguration is loaded." }
+            return consumerConfigMap[consumerNameKey]?.topic
+                ?: throw IllegalArgumentException("No topic configured for consumer name: $consumerNameKey. Available keys: ${consumerConfigMap.keys}")
+        }
+
+        val communityRead: String by lazy {
+            log.debug("Lazily initializing EventType.Topic.communityRead")
+            getTopicName(CONSUMER_NAME_COMMUNITY_READ)
+        }
+        val communityCommand: String by lazy {
+            log.debug("Lazily initializing EventType.Topic.communityCommand")
+            getTopicName(CONSUMER_NAME_COMMUNITY_COMMAND)
+        }
+        val notification: String by lazy {
+            log.debug("Lazily initializing EventType.Topic.notification")
+            getTopicName(CONSUMER_NAME_NOTIFICATION)
         }
     }
 
     object GroupId {
-        private const val COMMUNITY_COMMAND_BASE = "community-command-consumer-group"
-        private const val COMMUNITY_READ_BASE = "community-read-consumer-group"
-        private const val NOTIFICATION_BASE = "notification-consumer-group"
-
-        private lateinit var communityCommand: String
-        private lateinit var communityRead: String
-        private lateinit var notification: String
-
+        private lateinit var consumerConfigMap: Map<String, ConsumerConfig>
         private val log by lazy { LoggerFactory.getLogger(GroupId::class.java) }
 
-        fun initialize(activeProfile: String) {
-            communityCommand = "$COMMUNITY_COMMAND_BASE-$activeProfile"
-            communityRead = "$COMMUNITY_READ_BASE-$activeProfile"
-            notification = "$NOTIFICATION_BASE-$activeProfile"
-            log.info("[EventType.GroupId Initialized] Active Profile: $activeProfile, communityRead: $communityRead, communityCommand: $communityCommand, notification: $notification")
+        fun initialize(configMap: Map<String, ConsumerConfig>) {
+            this.consumerConfigMap = configMap
+            log.info("[EventType.GroupId Initialized] Using consumerConfigMap: $consumerConfigMap")
+        }
+
+        fun getGroupId(consumerNameKey: String): String {
+            check(::consumerConfigMap.isInitialized) { "EventType.GroupId has not been initialized." }
+            return consumerConfigMap[consumerNameKey]?.groupId
+                ?: throw IllegalArgumentException("No groupId configured for consumer name: $consumerNameKey. Available keys: ${consumerConfigMap.keys}")
+        }
+
+        val communityRead: String by lazy {
+            log.debug("Lazily initializing EventType.GroupId.communityRead")
+            getGroupId(CONSUMER_NAME_COMMUNITY_READ)
+        }
+        val communityCommand: String by lazy {
+            log.debug("Lazily initializing EventType.GroupId.communityCommand")
+            getGroupId(CONSUMER_NAME_COMMUNITY_COMMAND)
+        }
+        val notification: String by lazy {
+            log.debug("Lazily initializing EventType.GroupId.notification")
+            getGroupId(CONSUMER_NAME_NOTIFICATION)
         }
     }
 }

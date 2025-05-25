@@ -41,7 +41,16 @@ class ScopedValueJwtTokenFilter(
 
     companion object {
         private const val BEARER_PREFIX = "Bearer "
-        private val EXCLUDED_PREFIXES = listOf("/swagger-ui", "/v3/api-docs", "/swagger-resources", "/webjars", "/admin", "/actuator/health", "/actuator/prometheus")
+        private val EXCLUDED_PREFIXES = listOf(
+            "/swagger-ui",
+            "/v3/api-docs",
+            "/swagger-resources",
+            "/webjars",
+            "/admin",
+            "/actuator/health",
+            "/actuator/prometheus",
+            "/actuator/info"
+        )
         private val EXCLUDED_PATHS = setOf("/swagger-ui.html", "/favicon.ico")
 
         private val ERROR_MESSAGES =

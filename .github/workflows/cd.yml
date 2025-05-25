@@ -38,8 +38,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build with Gradle
-        run: ./gradlew bootJar
+      - name: Build app with Gradle
+        run: ./gradlew :app:bootJar
+        env:
+          SPRING_PROFILES_ACTIVE: prod
+
+      - name: Build config-server with Gradle
+        run: ./gradlew :jobstat-config-server:bootJar
         env:
           SPRING_PROFILES_ACTIVE: prod
 
@@ -54,10 +59,15 @@ jobs:
           TAG: ${{ needs.create-tag.outputs.new_tag }}
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG \
-                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest .
+                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest -f app/Dockerfile .
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest
-
+          
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:$TAG \
+                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:latest -f jobstat-config-server/Dockerfile .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:$TAG
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:latest
+          
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG \
                       -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:latest -f nginx/Dockerfile ./nginx
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG
@@ -92,6 +102,10 @@ jobs:
       - name: Copy configuration files to EC2
         uses: appleboy/scp-action@master
         with:
+          # config-repo 디렉토리도 함께 복사 (만약 Config Server가 jar 외부 파일을 참조한다면)
+          # 현재는 jar에 포함되므로, docker-compose.yml만 복사해도 될 수 있음.
+          # 하지만 docker-compose.yml에서 호스트 볼륨 마운트를 사용한다면 config-repo도 복사 필요.
+          # 여기서는 jar에 포함된 Config Server를 가정하고, config-repo 복사는 생략 (필요시 추가)
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
