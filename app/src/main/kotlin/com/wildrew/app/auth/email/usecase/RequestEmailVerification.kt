@@ -1,7 +1,7 @@
-package com.wildrew.app.notification.usecase
+package com.wildrew.app.auth.email.usecase
 
-import com.wildrew.app.notification.service.EmailService
-import com.wildrew.app.notification.service.EmailVerificationService
+import com.wildrew.app.auth.UserEventPublisher
+import com.wildrew.app.auth.email.service.EmailVerificationService
 import com.wildrew.app.auth.user.service.UserService
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
@@ -17,19 +17,29 @@ import org.springframework.transaction.annotation.Transactional
 class RequestEmailVerification(
     private val emailVerificationService: EmailVerificationService,
     private val userService: UserService,
-    private val emailService: EmailService,
+    private val userEventPublisher: UserEventPublisher,
     validator: Validator,
 ) : ValidUseCase<RequestEmailVerification.Request, Unit>(validator) {
     @Transactional
+    override fun invoke(request: Request) {
+        super.invoke(request)
+    }
+
     override fun execute(request: Request): Unit =
         with(request) {
             validateEmailAvailability(email)
 
             checkPreviousVerification(email)
+            val emailVerification = emailVerificationService.create(email)
+            val code = emailVerification.code
+            val subject = "[JobStat] 이메일 인증"
+            val body = "인증 코드: $code\n30분 안에 인증을 완료해주세요."
 
-            emailVerificationService
-                .create(email)
-                .also { verification -> emailService.sendVerificationEmail(email, verification.code) }
+            userEventPublisher.publishEmailNotification(
+                to = email,
+                subject = subject,
+                body = body,
+            )
         }
 
     private fun validateEmailAvailability(email: String) {

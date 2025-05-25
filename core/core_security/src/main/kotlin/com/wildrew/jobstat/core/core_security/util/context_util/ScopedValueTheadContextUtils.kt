@@ -2,8 +2,7 @@ package com.wildrew.jobstat.core.core_security.util.context_util
 
 import com.wildrew.jobstat.core.core_security.util.ScopedSecurityContextHolder
 
-class ScopedValueTheadContextUtils(
-) : TheadContextUtils { // 인터페이스 구현
+class ScopedValueTheadContextUtils : TheadContextUtils { // 인터페이스 구현
 
     private object Constants {
         const val ROLE_PREFIX = "ROLE_"
@@ -55,9 +54,7 @@ class ScopedValueTheadContextUtils(
         }
     }
 
-    override fun isAdmin(): Boolean {
-        return hasRole("ADMIN")
-    }
+    override fun isAdmin(): Boolean = hasRole("ADMIN")
 
     override fun canAccess(resourceUserId: Long): Boolean {
         if (!isAuthenticated()) return false

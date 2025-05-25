@@ -1,10 +1,10 @@
-package com.wildrew.app.notification
+package com.wildrew.app.auth.email
 
-import com.wildrew.app.notification.usecase.RequestEmailVerification
-import com.wildrew.app.notification.usecase.VerifyEmail
+import com.wildrew.app.auth.email.usecase.RequestEmailVerification
+import com.wildrew.app.auth.email.usecase.VerifyEmail
 import com.wildrew.jobstat.core.core_security.annotation.Public
-import com.wildrew.jobstat.core.core_web_util.RestConstants
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
+import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.tags.Tag

@@ -8,7 +8,11 @@ data class FetchBoardIdsResponse(
     val hasNext: Boolean,
 ) {
     companion object {
-        fun from(response: FetchBoardIdsResponse): List<Long> = response.ids.map { it.toLongOrNull() ?: throw AppException.fromErrorCode(
-            ErrorCode.INVALID_ARGUMENT) }
+        fun from(response: FetchBoardIdsResponse): List<Long> =
+            response.ids.map {
+                it.toLongOrNull() ?: throw AppException.fromErrorCode(
+                    ErrorCode.INVALID_ARGUMENT,
+                )
+            }
     }
 }

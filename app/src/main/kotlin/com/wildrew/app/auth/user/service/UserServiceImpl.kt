@@ -6,7 +6,7 @@ import com.wildrew.app.auth.user.entity.User
 import com.wildrew.app.auth.user.entity.UserRole
 import com.wildrew.app.auth.user.repository.RoleRepository
 import com.wildrew.app.auth.user.repository.UserRepository
-import com.wildrew.app.eacheach.trueOrThrow
+import com.wildrew.app.common.trueOrThrow
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import org.slf4j.Logger

@@ -1,12 +1,12 @@
 package com.wildrew.app.statistics_read.core.repository
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_model.EntityType
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
 import com.wildrew.app.statistics_read.rankings.document.IndustrySkillRankingsDocument
 import com.wildrew.app.statistics_read.rankings.repository.IndustrySkillRankingsRepositoryImpl
 import com.wildrew.app.utils.config.BatchOperationTestSupport
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -86,11 +86,11 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
             newEntries = 0,
             droppedEntries = 0,
             volatilityMetrics =
-            VolatilityMetrics(
-                avgRankChange = Random.nextDouble(0.0, 5.0),
-                rankChangeStdDev = Random.nextDouble(0.0, 2.0),
-                volatilityTrend = "STABLE",
-            ),
+                VolatilityMetrics(
+                    avgRankChange = Random.nextDouble(0.0, 5.0),
+                    rankChangeStdDev = Random.nextDouble(0.0, 2.0),
+                    volatilityTrend = "STABLE",
+                ),
             industrySkillCorrelation =
                 IndustrySkillRankingsDocument.IndustrySkillMetrics.IndustrySkillCorrelation(
                     crossIndustrySkills = emptyMap(),

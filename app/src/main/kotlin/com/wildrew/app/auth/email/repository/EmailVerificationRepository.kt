@@ -1,6 +1,6 @@
-package com.wildrew.app.notification.repository
+package com.wildrew.app.auth.email.repository
 
-import com.wildrew.app.notification.entity.EmailVerification
+import com.wildrew.app.auth.email.entity.EmailVerification
 
 interface EmailVerificationRepository {
     fun save(emailVerification: EmailVerification): EmailVerification

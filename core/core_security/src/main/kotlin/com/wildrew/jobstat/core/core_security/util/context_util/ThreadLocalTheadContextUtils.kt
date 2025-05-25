@@ -3,7 +3,6 @@ package com.wildrew.jobstat.core.core_security.util.context_util
 import org.springframework.security.core.context.SecurityContextHolder
 
 class ThreadLocalTheadContextUtils : TheadContextUtils {
-
     private object Constants {
         const val ROLE_PREFIX = "ROLE_"
         const val ANONYMOUS_USER = "anonymousUser"
@@ -36,7 +35,8 @@ class ThreadLocalTheadContextUtils : TheadContextUtils {
     override fun hasRole(role: String): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
         // isAuthenticated()를 먼저 체크하여 중복 로직 줄이기 가능
-        return isAuthenticated() && // 인증된 경우에만 역할 검사
+        return isAuthenticated() &&
+            // 인증된 경우에만 역할 검사
             (authentication?.authorities?.any { it.authority == "${Constants.ROLE_PREFIX}$role" } ?: false)
     }
 

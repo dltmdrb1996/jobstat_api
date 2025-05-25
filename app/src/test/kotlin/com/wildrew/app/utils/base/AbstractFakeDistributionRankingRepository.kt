@@ -1,8 +1,8 @@
 package com.wildrew.app.utils.base
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.DistributionRankingDocument
 import com.wildrew.app.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import kotlin.math.sqrt
 
 abstract class AbstractFakeDistributionRankingRepository<

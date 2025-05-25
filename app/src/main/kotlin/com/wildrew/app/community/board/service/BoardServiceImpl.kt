@@ -5,10 +5,10 @@ import com.wildrew.app.community.board.repository.BoardRepository
 import com.wildrew.app.community.board.repository.CategoryRepository
 import com.wildrew.app.community.board.utils.BoardConstants
 import com.wildrew.app.community.board.utils.model.BoardRankingQueryResult
-import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
+import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import com.wildrew.jobstat.core.core_jpa_base.orThrowNotFound
 import com.wildrew.jobstat.core.core_web_util.CoreConstants
 import org.springframework.data.domain.Page

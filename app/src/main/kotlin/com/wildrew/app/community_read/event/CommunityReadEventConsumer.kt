@@ -29,7 +29,7 @@ class CommunityReadEventConsumer : AbstractEventConsumer() {
     @KafkaListener(
         topics = ["\${kafka.consumer.community-read.topic:community-read}"],
         groupId = "\${kafka.consumer.community-read.group-id:community-read-group}",
-        containerFactory = "#{@coreKafkaListenerContainerFactory}"
+        containerFactory = "#{@coreKafkaListenerContainerFactory}",
     )
     fun receiveEvent(
         event: String,

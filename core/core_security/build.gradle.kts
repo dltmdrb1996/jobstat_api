@@ -15,8 +15,8 @@ java {
 }
 
 dependencies {
-    api(project(":core:core_error"))    // 공개 클래스/메소드가 AppException 사용
-    api(project(":core:core_token"))   // 공개 클래스/메소드가 JwtTokenParser 등 사용
+    api(project(":core:core_error")) // 공개 클래스/메소드가 AppException 사용
+    api(project(":core:core_token")) // 공개 클래스/메소드가 JwtTokenParser 등 사용
     api(project(":core:core_web_util")) // 공개 에러 핸들러가 ApiResponse 사용
 
     api("org.springframework.boot:spring-boot-starter-security") // 보안 설정을 제공 (SecurityFilterChain 등)

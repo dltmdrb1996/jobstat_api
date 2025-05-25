@@ -1,9 +1,9 @@
 package com.wildrew.app.statistics_read.fake
 
 import com.mongodb.bulk.BulkWriteResult
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.BaseTimeSeriesDocument
 import com.wildrew.app.statistics_read.core.core_mongo_base.repository.BaseTimeSeriesRepository
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.core.query.Query
 import java.time.Instant

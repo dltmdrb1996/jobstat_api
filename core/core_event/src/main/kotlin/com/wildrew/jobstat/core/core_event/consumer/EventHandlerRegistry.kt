@@ -1,19 +1,19 @@
-package com.wildrew.jobstat.core.core_event.consumer // 패키지 변경
+package com.wildrew.jobstat.core.core_event.consumer
 
 import com.wildrew.jobstat.core.core_event.model.Event
 import com.wildrew.jobstat.core.core_event.model.EventPayload
 import com.wildrew.jobstat.core.core_event.model.EventType
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
-// import org.springframework.stereotype.Component // Auto-config에서 Bean으로 등록되므로 제거
 
-interface EventHandlerRegistryService { // 이 인터페이스는 유지
+interface EventHandlerRegistryService {
     fun getHandlersForEventType(eventType: EventType): List<EventHandlingUseCase<*, *, *>>
+
     fun getSupportedEventTypes(): Set<EventType>
 }
 
-class EventHandlerRegistry( // @Component 제거, 생성자 주입으로 변경
-    private val handlers: List<EventHandlingUseCase<*, *, *>> // @Autowired 생략 가능
+class EventHandlerRegistry(
+    private val handlers: List<EventHandlingUseCase<*, *, *>>,
 ) : EventHandlerRegistryService {
     private val log = LoggerFactory.getLogger(this::class.java)
     private val handlerMap: MutableMap<EventType, MutableList<EventHandlingUseCase<*, *, *>>> = mutableMapOf()
@@ -48,7 +48,6 @@ class EventHandlerRegistry( // @Component 제거, 생성자 주입으로 변경
 
     override fun getSupportedEventTypes(): Set<EventType> = handlerMap.keys
 
-    // 이 메소드는 외부에 노출될 필요는 없어보임. AbstractEventConsumer에서 호출
     internal fun processEvent(event: Event<out EventPayload>) { // internal로 변경
         val eventType = event.type
         val eventId = event.eventId
@@ -72,11 +71,8 @@ class EventHandlerRegistry( // @Component 제거, 생성자 주입으로 변경
             val startTime = System.currentTimeMillis()
 
             try {
-                // EventHandlingUseCase의 invoke는 Event<P>를 받지만, 여기서는 Event<out EventPayload>를 전달해야 함.
-                // 타입 캐스팅에 대한 안정성 확보 필요. EventHandlingUseCase에서 타입 체크를 이미 하고 있음.
                 @Suppress("UNCHECKED_CAST")
                 (handler as EventHandlingUseCase<EventType, EventPayload, Any>).invoke(event as Event<EventPayload>)
-
 
                 val elapsedTime = System.currentTimeMillis() - startTime
                 log.debug(
@@ -89,7 +85,7 @@ class EventHandlerRegistry( // @Component 제거, 생성자 주입으로 변경
                     e,
                 )
                 success = false
-                throw e // 예외를 다시 던져서 Kafka 리스너가 재시도/DLT 처리하도록 함
+                throw e
             }
         }
         if (success) {

@@ -1,6 +1,5 @@
 package com.wildrew.app.statistics_read.stats.service
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.*
 import com.wildrew.app.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
@@ -9,6 +8,7 @@ import com.wildrew.app.statistics_read.rankings.model.rankingtype.RankingType
 import com.wildrew.app.statistics_read.stats.document.SkillStatsDocument
 import com.wildrew.app.statistics_read.stats.registry.StatsRepositoryRegistry
 import com.wildrew.app.statistics_read.stats.registry.StatsType
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

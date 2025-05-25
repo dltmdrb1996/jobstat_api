@@ -1,4 +1,4 @@
-package com.wildrew.jobstat.core.core_security.config // 패키지 경로 예시
+package com.wildrew.jobstat.core.core_security.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wildrew.jobstat.core.core_security.util.JwtAuthenticationEntryPoint
@@ -13,7 +13,6 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Primary
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -28,44 +27,40 @@ import org.springframework.web.server.adapter.ForwardedHeaderTransformer
 
 @AutoConfiguration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@EnableWebSecurity // Spring Security 활성화
-@EnableMethodSecurity(prePostEnabled = true) // 메소드 수준 보안 활성화
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 @AutoConfigureAfter(
     CoreFilterAutoConfiguration::class,
-    CoreSerializerAutoConfiguration::class
+    CoreSerializerAutoConfiguration::class,
 )
 class CoreWebSecurityAutoConfiguration {
-
-    @Value("\${ddns.domain:http://localhost:8080}") // 기본값 설정
+    @Value("\${ddns.domain:http://localhost:8080}")
     private lateinit var ddnsDomain: String
 
     private val log: Logger by lazy { LoggerFactory.getLogger(javaClass) }
 
     @Bean
     @ConditionalOnMissingBean(AuthenticationEntryPoint::class)
-    fun coreJwtAuthenticationEntryPoint(objectMapper: ObjectMapper): JwtAuthenticationEntryPoint {
-        return JwtAuthenticationEntryPoint(objectMapper)
-    }
+    fun coreJwtAuthenticationEntryPoint(objectMapper: ObjectMapper): JwtAuthenticationEntryPoint = JwtAuthenticationEntryPoint(objectMapper)
 
-    @Bean("coreSecurityFilterChain") // 빈 이름 명시
+    @Bean("coreSecurityFilterChain")
     @ConditionalOnMissingBean(name = ["coreSecurityFilterChain"])
     fun coreSecurityFilterChain(
         http: HttpSecurity,
         @Qualifier("jwtTokenFilter") jwtTokenFilter: Filter,
-        jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint
+        jwtAuthenticationEntryPoint: JwtAuthenticationEntryPoint,
     ): SecurityFilterChain {
         log.info("Configuring CoreWebSecurityAutoConfiguration with jwtTokenFilter: {}", jwtTokenFilter.javaClass.simpleName)
         http
-            .cors { it.configurationSource(coreCorsConfigurationSource()) } // 내부 빈 호출
+            .cors { it.configurationSource(coreCorsConfigurationSource()) }
             .csrf { it.disable() }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .exceptionHandling { it.authenticationEntryPoint(jwtAuthenticationEntryPoint) }
             .authorizeHttpRequests {
                 it
                     .anyRequest()
-                    .permitAll() // 실제 인증은 JwtTokenFilter에서 처리
-            }
-            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
+                    .permitAll()
+            }.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter::class.java)
             .headers { headers ->
                 headers
                     .xssProtection { xss -> xss.disable() }
@@ -73,29 +68,28 @@ class CoreWebSecurityAutoConfiguration {
                     .contentSecurityPolicy { csp ->
                         csp.policyDirectives(
                             "default-src 'self'; " +
-                                    "script-src 'self' https://jobstatanalysis.com; " +
-                                    "style-src 'self' 'unsafe-inline' https://jobstatanalysis.com; " +
-                                    "img-src 'self' data: https: blob:; " +
-                                    "font-src 'self' data: https://cdn.jsdelivr.net; " +
-                                    "connect-src 'self' https://jobstatanalysis.com $ddnsDomain; " + // ddnsDomain 사용
-                                    "frame-src 'none'; " +
-                                    "object-src 'none'; " +
-                                    "base-uri 'self';"
+                                "script-src 'self' https://jobstatanalysis.com; " +
+                                "style-src 'self' 'unsafe-inline' https://jobstatanalysis.com; " +
+                                "img-src 'self' data: https: blob:; " +
+                                "font-src 'self' data: https://cdn.jsdelivr.net; " +
+                                "connect-src 'self' https://jobstatanalysis.com $ddnsDomain; " +
+                                "frame-src 'none'; " +
+                                "object-src 'none'; " +
+                                "base-uri 'self';",
                         )
                     }
-            }
-            .setSharedObject(ForwardedHeaderTransformer::class.java, ForwardedHeaderTransformer())
+            }.setSharedObject(ForwardedHeaderTransformer::class.java, ForwardedHeaderTransformer())
 
         return http.build()
     }
 
+    //    @ConditionalOnMissingBean(CorsConfigurationSource::class)
     @Bean("coreCorsConfigurationSource") // 빈 이름 명시
-//    @ConditionalOnMissingBean(CorsConfigurationSource::class)
     fun coreCorsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
         configuration.allowedOrigins =
             listOf(
-                ddnsDomain, // 프로퍼티 값 사용
+                ddnsDomain,
                 "https://www.jobstatanalysis.com",
                 "https://jobstatanalysis.com",
                 "jobstatanalysis.com",
@@ -103,7 +97,7 @@ class CoreWebSecurityAutoConfiguration {
                 "http://spring-app:8081",
                 "http://localhost:8081",
                 "http://localhost:3000",
-                "http://localhost:8080"
+                "http://localhost:8080",
             )
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type")

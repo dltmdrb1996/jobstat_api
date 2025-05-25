@@ -1,6 +1,5 @@
 package com.wildrew.app.community_read.service
 
-import com.wildrew.app.community_read.model.BoardReadModel
 import com.wildrew.app.community_read.model.CommentReadModel
 import com.wildrew.app.community_read.repository.BoardDetailRepository
 import com.wildrew.app.community_read.repository.CommentDetailRepository

@@ -15,8 +15,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_SIZE_SKILL_DEMAND)
 @NoRepositoryBean
-interface CompanySizeSkillRankingsRepository :
-    RelationshipRankingRepository<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry, String> {
+interface CompanySizeSkillRankingsRepository : RelationshipRankingRepository<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry, String> {
     // 회사 규모별 핵심 스킬 분석
     fun findCoreSkillsByCompanySize(
         baseDate: String,

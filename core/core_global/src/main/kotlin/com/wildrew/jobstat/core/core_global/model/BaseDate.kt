@@ -7,7 +7,6 @@ class BaseDate(
         fun now(): BaseDate {
             val now = java.time.LocalDate.now()
             val year = now.year
-            // val month = now.monthValue
             val month = 1
             val monthString = if (month < 10) "0$month" else month.toString()
             return BaseDate("$year$monthString")
@@ -35,13 +34,11 @@ class BaseDate(
         val totalMonths = year * 12 + month - minus
         val newYear = totalMonths / 12
         val newMonthValue = totalMonths % 12
-        // 0월이 나오면 12월로 조정하고 연도 감소
         val adjustedMonth = if (newMonthValue == 0) 12 else newMonthValue
         val adjustedYear = if (newMonthValue == 0) newYear - 1 else newYear
         val newMonthString = if (adjustedMonth < 10) "0$adjustedMonth" else adjustedMonth.toString()
         return BaseDate("$adjustedYear$newMonthString")
     }
 
-    // MongoDB 쿼리용 toString()
     override fun toString(): String = value
 }

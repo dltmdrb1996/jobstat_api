@@ -1,9 +1,8 @@
 package com.wildrew.app
 
-import com.wildrew.app.eacheach.TimeZoneConfig.Companion.KOREA_TIME_ZONE_ID
+import com.wildrew.app.common.TimeZoneConfig.Companion.KOREA_TIME_ZONE_ID
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
 import org.springframework.boot.autoconfigure.mongo.MongoProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
@@ -20,21 +19,21 @@ import java.util.*
     basePackages = [
         "com.wildrew.app.auth.user.entity",
         "com.wildrew.app.community.board.entity",
-        "com.wildrew.app.notification.entity",
+        "com.wildrew.app.auth.email.entity",
         "com.wildrew.app.community.comment.entity",
         "com.wildrew.jobstat.core.core_event.dlt",
-        "com.wildrew.jobstat.core.core_event.outbox"
-    ]
+        "com.wildrew.jobstat.core.core_event.outbox",
+    ],
 )
 @EnableJpaRepositories( // app 모듈 내의 모든 JPA Repository 패키지를 지정
     basePackages = [
         "com.wildrew.app.auth.user.repository",
-        "com.wildrew.app.notification.repository",
+        "com.wildrew.app.auth.email.repository",
         "com.wildrew.app.community.board.repository",
         "com.wildrew.app.community.comment.repository",
         "com.wildrew.jobstat.core.core_event.dlt",
-        "com.wildrew.jobstat.core.core_event.outbox"
-    ]
+        "com.wildrew.jobstat.core.core_event.outbox",
+    ],
 )
 class JobstatApplication
 

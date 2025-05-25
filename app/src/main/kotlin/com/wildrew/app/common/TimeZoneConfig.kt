@@ -1,4 +1,4 @@
-package com.wildrew.app.eacheach
+package com.wildrew.app.common
 
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory

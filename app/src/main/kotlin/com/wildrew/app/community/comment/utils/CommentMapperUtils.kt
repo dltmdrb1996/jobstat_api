@@ -1,7 +1,7 @@
 package com.wildrew.app.community.comment.utils
 
+import com.wildrew.app.common.toEpochMilli
 import com.wildrew.app.community.comment.entity.Comment
-import com.wildrew.app.eacheach.toEpochMilli
 import java.time.LocalDateTime
 
 object CommentMapperUtils {

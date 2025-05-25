@@ -17,8 +17,8 @@ java {
 
 dependencies {
     api(project(":core:core_serializer")) // DataSerializer, Event<T>.toJson, ObjectMapper
-    api(project(":core:core_error"))     // AppException
-    api(project(":core:core_jpa_base"))  // AuditableEntitySnow, SnowflakeGenerator
+    api(project(":core:core_error")) // AppException
+    api(project(":core:core_jpa_base")) // AuditableEntitySnow, SnowflakeGenerator
     api(project(":core:core_coroutine")) // OutboxMessageRelay 에서 CoroutineScope 사용
     implementation(project(":core:core_global"))
 

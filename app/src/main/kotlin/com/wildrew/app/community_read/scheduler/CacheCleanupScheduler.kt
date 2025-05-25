@@ -1,8 +1,8 @@
 package com.wildrew.app.community_read.scheduler
 
+import com.wildrew.app.common.toEpochMilli
 import com.wildrew.app.community_read.repository.impl.RedisBoardIdListRepository
 import com.wildrew.app.community_read.service.CommunityReadService
-import com.wildrew.app.eacheach.toEpochMilli
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled

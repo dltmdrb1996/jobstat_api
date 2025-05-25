@@ -1,6 +1,5 @@
 package com.wildrew.app.statistics_read.rankings.service
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
@@ -14,6 +13,7 @@ import com.wildrew.app.statistics_read.rankings.repository.RankingRepositoryRegi
 import com.wildrew.app.statistics_read.stats.service.StatsAnalysisService
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

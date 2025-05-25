@@ -15,8 +15,7 @@ import org.springframework.stereotype.Repository
 
 @com.wildrew.app.statistics_read.rankings.repository.RankingRepositoryType(RankingType.JOB_CATEGORY_GROWTH)
 @NoRepositoryBean
-interface JobCategoryGrowthRankingsRepository :
-    SimpleRankingRepository<JobCategoryGrowthRankingsDocument, JobCategoryGrowthRankingsDocument.JobCategoryGrowthRankingEntry, String> {
+interface JobCategoryGrowthRankingsRepository : SimpleRankingRepository<JobCategoryGrowthRankingsDocument, JobCategoryGrowthRankingsDocument.JobCategoryGrowthRankingEntry, String> {
     // 산업 연관성 분석
     fun findByIndustryCorrelation(
         baseDate: String,

@@ -1,4 +1,4 @@
-package com.wildrew.jobstat.core.core_jpa_base.id_generator // 실제 패키지 경로
+package com.wildrew.jobstat.core.core_jpa_base.id_generator
 
 import org.slf4j.LoggerFactory
 import kotlin.math.max
@@ -9,11 +9,10 @@ class SynchronizedSnowflake(
     private val log = LoggerFactory.getLogger(javaClass)
 
     companion object {
-        // 표준 Snowflake 비트 구성
         private const val UNUSED_BITS = 1
         private const val EPOCH_BITS = 41
         private const val NODE_ID_BITS = 10
-        private const val SEQUENCE_BITS = 12 // 표준 12비트 사용
+        private const val SEQUENCE_BITS = 12
 
         const val MAX_NODE_ID = (1L shl NODE_ID_BITS) - 1
         private const val MAX_SEQUENCE = (1L shl SEQUENCE_BITS) - 1

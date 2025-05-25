@@ -7,8 +7,8 @@ import com.wildrew.app.community.comment.usecase.command.UpdateComment
 import com.wildrew.app.community.comment.usecase.get.*
 import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_security.annotation.PublicWithTokenCheck
-import com.wildrew.jobstat.core.core_web_util.RestConstants
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
+import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content

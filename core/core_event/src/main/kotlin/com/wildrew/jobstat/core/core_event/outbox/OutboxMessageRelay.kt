@@ -31,7 +31,7 @@ class OutboxMessageRelay(
     private val schedulerBatchSize: Int,
     private val maxRetryCountForScheduler: Int, // 프로퍼티 이름 명확화 (OutboxProcessor의 maxRetryCount와 구분)
     // 스케줄러 활성화 여부 (Auto-config에서 주입)
-    private val schedulerEnabled: Boolean
+    private val schedulerEnabled: Boolean,
 ) : DisposableBean {
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
@@ -53,7 +53,9 @@ class OutboxMessageRelay(
         } catch (e: Exception) {
             log.error(
                 "아웃박스 저장 실패 (BEFORE_COMMIT): eventType={}, error={}",
-                outbox.eventType, e.message, e
+                outbox.eventType,
+                e.message,
+                e,
             )
             throw e // 예외를 전파하여 메인 트랜잭션 롤백 유도
         }
@@ -70,7 +72,8 @@ class OutboxMessageRelay(
         coroutineScope.launch {
             try {
                 publishEventExecute(outbox)
-            } catch (e: Exception) { // Coroutine 내부의 모든 예외
+            } catch (e: Exception) {
+                // Coroutine 내부의 모든 예외
                 log.error("비동기 즉시 발행 코루틴 실행 중 예상치 못한 오류: outboxId={}, error={}", outbox.id, e.message, e)
                 // 이 예외는 이미 커밋된 트랜잭션에 영향을 주지 않음. Outbox에 남아 스케줄러가 처리.
             }
@@ -78,10 +81,10 @@ class OutboxMessageRelay(
     }
 
     private suspend fun publishEventExecute(outbox: Outbox) {
-        log.debug("즉시 발행 실행 (코루틴): outboxId={}, type={}, topic={}", outbox.id, outbox.eventType, outbox.eventType.topic)
+        log.debug("즉시 발행 실행 (코루틴): outboxId={}, type={}, topic={}", outbox.id, outbox.eventType, outbox.eventType.getTopicName())
         try {
             withTimeout(kafkaSendTimeoutSeconds.toDuration(DurationUnit.SECONDS)) {
-                outboxKafkaTemplate.send(outbox.eventType.topic, outbox.id.toString(), outbox.event).await()
+                outboxKafkaTemplate.send(outbox.eventType.getTopicName(), outbox.id.toString(), outbox.event).await()
             }
             log.info("즉시 발행 성공 (코루틴): outboxId={}, type={}", outbox.id, outbox.eventType)
 
@@ -98,19 +101,27 @@ class OutboxMessageRelay(
             } catch (e: Exception) {
                 log.error(
                     "즉시 발행은 성공했으나 Outbox 레코드(ID: {}) 삭제 실패 (컨슈머 멱등성 중요). Error: {}",
-                    outbox.id, e.message, e
+                    outbox.id,
+                    e.message,
+                    e,
                 )
                 // 메시지는 이미 발행되었으므로, 이 오류는 로깅만 하고 무시.
             }
         } catch (e: TimeoutCancellationException) {
             log.warn(
                 "즉시 발행 실패 (타임아웃): outboxId={}, type={}. 스케줄러가 재시도합니다.",
-                outbox.id, outbox.eventType, e
+                outbox.id,
+                outbox.eventType,
+                e,
             )
-        } catch (e: Exception) { // Kafka 발행 관련 모든 예외
+        } catch (e: Exception) {
+            // Kafka 발행 관련 모든 예외
             log.error(
                 "즉시 발행 실패 (오류): outboxId={}, type={}, error={}. 스케줄러가 재시도합니다.",
-                outbox.id, outbox.eventType, e.message, e
+                outbox.id,
+                outbox.eventType,
+                e.message,
+                e,
             )
         }
     }
@@ -118,13 +129,13 @@ class OutboxMessageRelay(
     // @Scheduled 어노테이션은 이 클래스에 유지하고, Auto-config에서 schedulerEnabled 프로퍼티로 제어
     @Scheduled(
         fixedDelayString = "\${jobstat.core.event.outbox.relay.scheduler.fixed-delay-millis:10000}",
-        initialDelayString = "\${jobstat.core.event.outbox.relay.scheduler.initial-delay-millis:5000}"
+        initialDelayString = "\${jobstat.core.event.outbox.relay.scheduler.initial-delay-millis:5000}",
     )
     fun processPendingOutboxMessagesByScheduler() { // 메소드 이름 변경
         if (!schedulerEnabled) { // Auto-config에서 주입받은 프로퍼티로 활성화 여부 체크
             return
         }
-        log.debug("미처리 Outbox 메시지 스케줄러 실행 시작...")
+//        log.debug("미처리 Outbox 메시지 스케줄러 실행 시작...")
         val cutoffTime = LocalDateTime.now().minusSeconds(schedulerCutoffSeconds)
         try {
             // Pageable.ofSize 대신 PageRequest.of 사용
@@ -137,7 +148,7 @@ class OutboxMessageRelay(
                 )
 
             if (pendingOutboxes.isNotEmpty()) {
-                log.info("미처리 Outbox 메시지 발견: count={}", pendingOutboxes.size)
+//                log.info("미처리 Outbox 메시지 발견: count={}", pendingOutboxes.size)
                 pendingOutboxes.forEach { outbox ->
                     try {
                         // OutboxProcessor에 위임 (각각의 아이템은 새 트랜잭션으로 처리됨)
@@ -148,16 +159,19 @@ class OutboxMessageRelay(
                         // 트랜잭션은 이미 롤백되었을 것임.
                         log.error(
                             "개별 Outbox 항목(ID: {}) 처리 중 스케줄러 레벨에서 오류 감지 (이미 롤백되었을 수 있음). Error: {}",
-                            outbox.id, itemError.message, itemError
+                            outbox.id,
+                            itemError.message,
+                            itemError,
                         )
                         // 개별 아이템 실패가 다른 아이템 처리에 영향 주지 않도록 continue
                     }
                 }
-                log.info("미처리 Outbox 메시지 {}개에 대한 처리 시도 완료", pendingOutboxes.size)
+//                log.info("미처리 Outbox 메시지 {}개에 대한 처리 시도 완료", pendingOutboxes.size)
             } else {
-                log.debug("처리 대기 중인 Outbox 메시지 없음.")
+//                log.debug("처리 대기 중인 Outbox 메시지 없음.")
             }
-        } catch (e: Exception) { // DB 조회 실패 등 스케줄러 실행 자체의 오류
+        } catch (e: Exception) {
+            // DB 조회 실패 등 스케줄러 실행 자체의 오류
             log.error("미처리 Outbox 메시지 스캔/처리 중 스케줄러 오류 발생: error={}", e.message, e)
         }
     }

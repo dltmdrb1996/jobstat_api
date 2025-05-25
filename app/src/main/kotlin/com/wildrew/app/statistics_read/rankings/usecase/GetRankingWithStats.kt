@@ -1,6 +1,5 @@
 package com.wildrew.app.statistics_read.rankings.usecase
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
 import com.wildrew.app.statistics_read.rankings.model.RankingWithStats
 import com.wildrew.app.statistics_read.rankings.model.rankingtype.RankingType
@@ -8,6 +7,7 @@ import com.wildrew.app.statistics_read.rankings.model.rankingtype.toStatsType
 import com.wildrew.app.statistics_read.rankings.service.RankingAnalysisService
 import com.wildrew.app.statistics_read.stats.document.*
 import com.wildrew.app.statistics_read.stats.registry.StatsType
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.jobstat.core.core_usecase.base.UseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.ConstraintViolationException

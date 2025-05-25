@@ -8,8 +8,7 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
-interface SimpleRankingRepository<T : SimpleRankingDocument<E>, E : SimpleRankingDocument.SimpleRankingEntry, ID : Any> :
-    BaseRankingRepository<T, E, ID> {
+interface SimpleRankingRepository<T : SimpleRankingDocument<E>, E : SimpleRankingDocument.SimpleRankingEntry, ID : Any> : BaseRankingRepository<T, E, ID> {
     // Value(score) 범위 기반 검색
     fun findByValueRange(
         baseDate: String,

@@ -15,8 +15,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.SKILL_POSTING_COUNT)
 @NoRepositoryBean
-interface SkillPostingCountRankingsRepository :
-    SimpleRankingRepository<SkillPostingCountRankingsDocument, SkillPostingCountRankingsDocument.SkillPostingRankingEntry, String> {
+interface SkillPostingCountRankingsRepository : SimpleRankingRepository<SkillPostingCountRankingsDocument, SkillPostingCountRankingsDocument.SkillPostingRankingEntry, String> {
     // 산업별 수요 분석
     fun findByIndustryDemand(
         baseDate: String,

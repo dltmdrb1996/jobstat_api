@@ -191,11 +191,11 @@ class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
             newEntries = 0,
             droppedEntries = 0,
             volatilityMetrics =
-            VolatilityMetrics(
-                avgRankChange = Random.nextDouble(0.0, 5.0),
-                rankChangeStdDev = Random.nextDouble(0.0, 2.0),
-                volatilityTrend = "STABLE",
-            ),
+                VolatilityMetrics(
+                    avgRankChange = Random.nextDouble(0.0, 5.0),
+                    rankChangeStdDev = Random.nextDouble(0.0, 2.0),
+                    volatilityTrend = "STABLE",
+                ),
             growthAnalysis =
                 SkillGrowthRankingsDocument.SkillGrowthMetrics.GrowthAnalysis(
                     avgGrowthRate = Random.nextDouble(-20.0, 50.0),

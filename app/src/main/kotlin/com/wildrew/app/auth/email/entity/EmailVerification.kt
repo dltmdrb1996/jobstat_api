@@ -1,4 +1,4 @@
-package com.wildrew.app.notification.entity
+package com.wildrew.app.auth.email.entity
 
 import com.wildrew.jobstat.core.core_jpa_base.base.AuditableEntitySnow
 import jakarta.persistence.Column
@@ -27,7 +27,7 @@ class EmailVerification(
     @Column(nullable = false)
     override val email: String = email
 
-    @Column(nullable = false, length = VERIFICATION_CODE_LENGTH)
+    @Column(name = "code", length = 6)
     override val code: String = code
 
     @Column(nullable = false)
@@ -37,7 +37,7 @@ class EmailVerification(
 
     companion object {
         private const val VERIFICATION_CODE_LENGTH = 6
-        private const val EXPIRATION_MINUTES = 30L
+        private const val EXPIRATION_MINUTES = 3L
         private const val MIN_CODE_VALUE = 100000
         private const val MAX_CODE_VALUE = 999999
 

@@ -1,4 +1,4 @@
-package com.wildrew.app.eacheach
+package com.wildrew.app.common
 
 import org.springframework.core.env.Environment
 import org.springframework.stereotype.Component

@@ -2,7 +2,7 @@ package com.wildrew.app.auth.user.entity
 
 import com.wildrew.app.auth.user.UserConstants
 import com.wildrew.app.auth.user.model.Address
-import com.wildrew.jobstat.core.core_jpa_base.base.SoftDeleteBaseAutoIncEntity
+import com.wildrew.jobstat.core.core_jpa_base.base.SoftDeleteBaseSnowEntity
 import jakarta.persistence.*
 import java.time.LocalDate
 
@@ -18,7 +18,7 @@ class User private constructor(
     email: String,
     password: String,
     birthDate: LocalDate,
-) : SoftDeleteBaseAutoIncEntity() {
+) : SoftDeleteBaseSnowEntity() {
     @Column(
         name = "username",
         nullable = false,

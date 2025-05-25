@@ -1,7 +1,7 @@
 package com.wildrew.app.community_read.client.response
 
+import com.wildrew.app.common.toEpochMilli
 import com.wildrew.app.community_read.model.CommentReadModel
-import com.wildrew.app.eacheach.toEpochMilli
 import java.time.LocalDateTime
 
 data class CommentDTO(

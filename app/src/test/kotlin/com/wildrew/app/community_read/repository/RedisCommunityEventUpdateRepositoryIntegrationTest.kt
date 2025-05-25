@@ -5,8 +5,6 @@ import com.wildrew.app.community_read.fixture.CommentReadModelFixture
 import com.wildrew.app.community_read.model.BoardReadModel
 import com.wildrew.app.community_read.model.CommentReadModel
 import com.wildrew.app.community_read.repository.impl.*
-import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
-import com.wildrew.jobstat.core.core_serializer.DataSerializer
 import com.wildrew.app.core.event.payload.BoardCreatedEventPayloadFixture
 import com.wildrew.app.core.event.payload.BoardDeletedEventPayloadFixture
 import com.wildrew.app.core.event.payload.BoardLikedEventPayloadFixture
@@ -16,9 +14,11 @@ import com.wildrew.app.core.event.payload.BoardViewedEventPayloadFixture
 import com.wildrew.app.core.event.payload.CommentCreatedEventPayloadFixture
 import com.wildrew.app.core.event.payload.CommentDeletedEventPayloadFixture
 import com.wildrew.app.core.event.payload.CommentUpdatedEventPayloadFixture
-import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
 import com.wildrew.app.utils.base.RedisIntegrationTestSupport
+import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
+import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
 import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
+import com.wildrew.jobstat.core.core_serializer.DataSerializer
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.kotlin.*
@@ -449,7 +449,13 @@ class RedisCommunityEventUpdateRepositoryIntegrationTest : RedisIntegrationTestS
         private val key = rankingKey(metric, period)
         private val tsKey = rankingEventTsKey(metric, period)
 
-        private val rankings = listOf(com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload.RankingEntry(10L, 500.0), com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload.RankingEntry(20L, 450.0))
+        private val rankings =
+            listOf(
+                com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
+                    .RankingEntry(10L, 500.0),
+                com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
+                    .RankingEntry(20L, 450.0),
+            )
         private val payload =
             BoardRankingUpdatedEventPayloadFixture
                 .aBoardRankingUpdatedEventPayload()

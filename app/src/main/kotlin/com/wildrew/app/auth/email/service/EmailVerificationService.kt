@@ -1,6 +1,6 @@
-package com.wildrew.app.notification.service
+package com.wildrew.app.auth.email.service
 
-import com.wildrew.app.notification.entity.ReadEmailVerification
+import com.wildrew.app.auth.email.entity.ReadEmailVerification
 
 interface EmailVerificationService {
     fun create(email: String): ReadEmailVerification

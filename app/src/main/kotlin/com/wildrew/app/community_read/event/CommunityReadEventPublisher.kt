@@ -28,7 +28,6 @@ class CommunityReadEventPublisher(
         eventTs: Long = System.currentTimeMillis(),
     ) {
         log.debug("게시글 조회수 증가 이벤트 발행 준비: boardId=$boardId")
-        log.debug("@@@ 게시글 조회수 증가 이벤트 발행 준비: boardId=${EventType.BOARD_INC_VIEW}")
         val payload =
             IncViewEventPayload(
                 boardId = boardId,

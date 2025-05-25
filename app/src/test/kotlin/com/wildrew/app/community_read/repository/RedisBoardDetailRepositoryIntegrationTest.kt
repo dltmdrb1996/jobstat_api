@@ -3,10 +3,10 @@ package com.wildrew.app.community_read.repository
 import com.wildrew.app.community_read.fixture.BoardReadModelFixture
 import com.wildrew.app.community_read.model.BoardReadModel
 import com.wildrew.app.community_read.repository.impl.RedisBoardDetailRepository
+import com.wildrew.app.utils.base.RedisIntegrationTestSupport
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_serializer.DataSerializer
-import com.wildrew.app.utils.base.RedisIntegrationTestSupport
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.kotlin.*

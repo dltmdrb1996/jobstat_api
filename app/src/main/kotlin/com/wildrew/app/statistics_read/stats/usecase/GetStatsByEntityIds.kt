@@ -1,10 +1,10 @@
 package com.wildrew.app.statistics_read.stats.usecase
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
 import com.wildrew.app.statistics_read.stats.document.*
 import com.wildrew.app.statistics_read.stats.registry.StatsType
 import com.wildrew.app.statistics_read.stats.service.StatsAnalysisService
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.jobstat.core.core_usecase.base.ValidUseCase
 import jakarta.validation.Validator
 import jakarta.validation.constraints.NotEmpty

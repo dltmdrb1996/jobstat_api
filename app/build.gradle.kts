@@ -137,8 +137,8 @@ tasks.jacocoTestReport {
                         "**/dto/**",
                     )
                 }
-            }
-        )
+            },
+        ),
     )
     sourceDirectories.setFrom(files(project.layout.projectDirectory.dir("src/main/kotlin")))
 }

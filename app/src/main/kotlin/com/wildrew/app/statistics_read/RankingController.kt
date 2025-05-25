@@ -1,11 +1,11 @@
 package com.wildrew.app.statistics_read
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.rankings.model.rankingtype.*
 import com.wildrew.app.statistics_read.rankings.usecase.*
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.jobstat.core.core_security.annotation.Public
-import com.wildrew.jobstat.core.core_web_util.RestConstants
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
+import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content

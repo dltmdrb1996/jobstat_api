@@ -17,8 +17,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_SIZE_SALARY)
 @NoRepositoryBean
-interface CompanySizeSalaryRankingsRepository :
-    DistributionRankingRepository<CompanySizeSalaryRankingsDocument, CompanySizeSalaryRankingsDocument.CompanySizeSalaryRankingEntry, String> {
+interface CompanySizeSalaryRankingsRepository : DistributionRankingRepository<CompanySizeSalaryRankingsDocument, CompanySizeSalaryRankingsDocument.CompanySizeSalaryRankingEntry, String> {
     // 급여 공정성 분석
     fun findSalaryEquityByCompanySize(
         baseDate: String,

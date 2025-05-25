@@ -14,8 +14,8 @@ data class CommentReadModel(
     val eventTs: Long,
 ) {
     companion object {
-        fun fromPayload(payload: CommentCreatedEventPayload): CommentReadModel {
-            return CommentReadModel(
+        fun fromPayload(payload: CommentCreatedEventPayload): CommentReadModel =
+            CommentReadModel(
                 id = payload.commentId,
                 boardId = payload.boardId,
                 userId = payload.userId,
@@ -24,6 +24,5 @@ data class CommentReadModel(
                 createdAt = payload.createdAt,
                 eventTs = payload.eventTs,
             )
-        }
     }
 }

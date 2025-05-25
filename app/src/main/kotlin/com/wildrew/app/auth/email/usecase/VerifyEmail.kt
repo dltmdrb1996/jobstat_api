@@ -1,6 +1,6 @@
-package com.wildrew.app.notification.usecase
+package com.wildrew.app.auth.email.usecase
 
-import com.wildrew.app.notification.service.EmailVerificationService
+import com.wildrew.app.auth.email.service.EmailVerificationService
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_usecase.base.ValidUseCase
@@ -18,6 +18,10 @@ class VerifyEmail(
     validator: Validator,
 ) : ValidUseCase<VerifyEmail.Request, Unit>(validator) {
     @Transactional
+    override fun invoke(request: Request) {
+        super.invoke(request)
+    }
+
     override fun execute(request: Request) {
         emailVerificationService
             .findLatestByEmail(request.email)

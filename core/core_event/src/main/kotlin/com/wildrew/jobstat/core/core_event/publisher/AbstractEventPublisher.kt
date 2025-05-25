@@ -1,4 +1,4 @@
-package com.wildrew.jobstat.core.core_event.publisher // 패키지 변경
+package com.wildrew.jobstat.core.core_event.publisher
 
 import com.wildrew.jobstat.core.core_event.model.EventPayload
 import com.wildrew.jobstat.core.core_event.model.EventType
@@ -6,9 +6,8 @@ import com.wildrew.jobstat.core.core_event.outbox.OutboxEventPublisher
 import org.slf4j.LoggerFactory
 
 abstract class AbstractEventPublisher(
-    // protected val outboxEventPublisher: OutboxEventPublisher // 생성자 주입
-    private val outboxEventPublisher: OutboxEventPublisher // private으로 변경해도 무방
-) : EventPublisher { // 인터페이스 구현 명시
+    private val outboxEventPublisher: OutboxEventPublisher,
+) : EventPublisher {
     private val log = LoggerFactory.getLogger(this::class.java)
 
     override fun publish(
@@ -17,18 +16,23 @@ abstract class AbstractEventPublisher(
     ) {
         log.debug(
             "[{}] 이벤트 발행 시도: type={}, payloadType={}",
-            this::class.simpleName, type, payload::class.simpleName
+            this::class.simpleName,
+            type,
+            payload::class.simpleName,
         )
         try {
-            validateEventType(type) // 이 클래스를 상속받는 구현체에서 getSupportedEventTypes()를 정의해야 함
+            validateEventType(type)
             log.debug("[{}] 이벤트 타입 검증 통과: type={}", this::class.simpleName, type)
 
             outboxEventPublisher.publish(type, payload)
             log.debug("[{}] OutboxEventPublisher에 발행 요청 완료: type={}", this::class.simpleName, type)
-        } catch (e: Exception) { // IllegalArgumentException 또는 OutboxEventPublisher.publish()의 예외
+        } catch (e: Exception) {
             log.error(
                 "[{}] 이벤트 발행 중 오류 발생: type={}, error={}",
-                this::class.simpleName, type, e.message, e
+                this::class.simpleName,
+                type,
+                e.message,
+                e,
             )
             throw e // 예외 전파
         }

@@ -16,8 +16,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.JOB_CATEGORY_POSTING_COUNT)
 @NoRepositoryBean
-interface JobCategoryPostingCountRankingsRepository :
-    SimpleRankingRepository<JobCategoryPostingCountRankingsDocument, JobCategoryPostingCountRankingsDocument.JobCategoryPostingRankingEntry, String> {
+interface JobCategoryPostingCountRankingsRepository : SimpleRankingRepository<JobCategoryPostingCountRankingsDocument, JobCategoryPostingCountRankingsDocument.JobCategoryPostingRankingEntry, String> {
     // 지역 고용 시장 분석
     fun findByLocationDemand(
         baseDate: String,

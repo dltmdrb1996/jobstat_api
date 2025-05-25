@@ -1,12 +1,12 @@
 package com.wildrew.app.statistics_read.core.repository
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.*
 import com.wildrew.app.statistics_read.rankings.model.rankingtype.RankingType
 import com.wildrew.app.statistics_read.stats.document.SkillStatsDocument
 import com.wildrew.app.statistics_read.stats.repository.SkillStatsRepository
 import com.wildrew.app.utils.config.BatchOperationTestSupport
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import org.junit.jupiter.api.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier

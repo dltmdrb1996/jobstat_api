@@ -1,4 +1,4 @@
-package com.wildrew.app.eacheach
+package com.wildrew.app.common
 
 fun <T> List<T>?.orEmptyList(): List<T> = this ?: emptyList()
 

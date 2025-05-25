@@ -1,4 +1,4 @@
-package com.wildrew.app.eacheach
+package com.wildrew.app.common
 
 import kotlinx.coroutines.delay
 import org.slf4j.Logger

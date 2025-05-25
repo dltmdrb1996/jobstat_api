@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.wildrew.jobstat.core.core_event.model.EventPayload
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
 import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
+
 data class BoardRankingUpdatedEventPayload(
     @JsonProperty("metric")
     val metric: BoardRankingMetric,

@@ -1,4 +1,4 @@
-package com.wildrew.app.eacheach
+package com.wildrew.app.common
 
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -17,7 +17,6 @@ class RedisConfig(
     @Value("\${spring.data.redis.database}") private val dataIndex: Int,
     @Value("\${spring.data.redis.password}") private val password: String,
 ) {
-
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
     @Bean

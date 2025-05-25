@@ -9,10 +9,10 @@ import com.wildrew.app.community_read.repository.BoardDetailRepository
 import com.wildrew.app.community_read.repository.BoardIdListRepository
 import com.wildrew.app.community_read.repository.CommentDetailRepository
 import com.wildrew.app.community_read.repository.CommentIdListRepository
-import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
+import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl

@@ -2,10 +2,10 @@ package com.wildrew.app.community_read.usecase.query
 
 import com.wildrew.app.community_read.model.BoardResponseDto
 import com.wildrew.app.community_read.service.CommunityReadService
-import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
+import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import com.wildrew.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator

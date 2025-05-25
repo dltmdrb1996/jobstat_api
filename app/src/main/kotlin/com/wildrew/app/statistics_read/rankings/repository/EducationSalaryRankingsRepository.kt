@@ -16,8 +16,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.EDUCATION_SALARY)
 @NoRepositoryBean
-interface EducationSalaryRankingsRepository :
-    SimpleRankingRepository<EducationSalaryRankingsDocument, EducationSalaryRankingsDocument.EducationSalaryRankingEntry, String> {
+interface EducationSalaryRankingsRepository : SimpleRankingRepository<EducationSalaryRankingsDocument, EducationSalaryRankingsDocument.EducationSalaryRankingEntry, String> {
     // ROI 기반 교육 분석
     fun findHighestRoiEducations(
         baseDate: String,

@@ -13,9 +13,8 @@ import org.springframework.context.annotation.Bean
 
 @AutoConfiguration
 @ConditionalOnClass(Jwts::class)
-@ConditionalOnProperty(name = ["jobstat.core.token.jwt.enabled"], havingValue = "true", matchIfMissing = true) // JWT 기능 활성화 프로퍼티
+@ConditionalOnProperty(name = ["jobstat.core.token.jwt.enabled"], havingValue = "true", matchIfMissing = true)
 class CoreTokenAutoConfiguration {
-
     private val log = LoggerFactory.getLogger(CoreTokenAutoConfiguration::class.java)
 
     @Value("\${jobstat.core.token.jwt.secret}")
@@ -29,17 +28,14 @@ class CoreTokenAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(JwtTokenParser::class)
-    fun coreJwtTokenParser(): JwtTokenParser {
-        return JwtTokenParser(jwtSecret)
-    }
+    fun coreJwtTokenParser(): JwtTokenParser = JwtTokenParser(jwtSecret)
 
     @Bean
     @ConditionalOnMissingBean(JwtTokenGenerator::class)
-    fun coreJwtTokenGenerator(): JwtTokenGenerator {
-        return JwtTokenGenerator(
+    fun coreJwtTokenGenerator(): JwtTokenGenerator =
+        JwtTokenGenerator(
             jwtSecret,
             accessTokenExpirationSeconds,
-            refreshTokenExpirationSeconds
+            refreshTokenExpirationSeconds,
         )
-    }
 }

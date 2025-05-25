@@ -1,9 +1,9 @@
 package com.wildrew.app.statistics_read.rankings.usecase
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.rankings.model.RankingPage
 import com.wildrew.app.statistics_read.rankings.model.rankingtype.RankingType
 import com.wildrew.app.statistics_read.rankings.service.RankingAnalysisService
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.jobstat.core.core_usecase.base.ValidUseCase
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.Validator

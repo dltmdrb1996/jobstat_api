@@ -14,8 +14,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.JOB_CATEGORY_SKILL)
 @NoRepositoryBean
-interface JobCategorySkillRankingsRepository :
-    RelationshipRankingRepository<JobCategorySkillRankingsDocument, JobCategorySkillRankingsDocument.JobCategorySkillRankingEntry, String> {
+interface JobCategorySkillRankingsRepository : RelationshipRankingRepository<JobCategorySkillRankingsDocument, JobCategorySkillRankingsDocument.JobCategorySkillRankingEntry, String> {
     // 스킬 연관성 분석
     fun findCorrelatedSkills(
         baseDate: String,

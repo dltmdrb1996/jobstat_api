@@ -2,14 +2,14 @@ package com.wildrew.app.community.event
 
 import com.wildrew.app.community.board.entity.Board
 import com.wildrew.app.community.comment.entity.Comment
-import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
-import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import com.wildrew.jobstat.core.core_event.model.EventType
 import com.wildrew.jobstat.core.core_event.model.payload.board.*
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.wildrew.jobstat.core.core_event.outbox.OutboxEventPublisher
 import com.wildrew.jobstat.core.core_event.publisher.AbstractEventPublisher
+import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
+import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 

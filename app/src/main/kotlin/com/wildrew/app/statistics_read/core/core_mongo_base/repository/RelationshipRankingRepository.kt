@@ -2,8 +2,8 @@ package com.wildrew.app.statistics_read.core.core_mongo_base.repository
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.RelationshipRankingDocument
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean

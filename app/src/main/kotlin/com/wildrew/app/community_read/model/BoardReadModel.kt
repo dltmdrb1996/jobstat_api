@@ -18,8 +18,8 @@ data class BoardReadModel(
     var comments: List<CommentReadModel> = emptyList(),
 ) {
     companion object {
-        fun fromPayload(payload: BoardCreatedEventPayload) : BoardReadModel {
-            return BoardReadModel(
+        fun fromPayload(payload: BoardCreatedEventPayload): BoardReadModel =
+            BoardReadModel(
                 id = payload.boardId,
                 categoryId = payload.categoryId,
                 title = payload.title,
@@ -30,8 +30,7 @@ data class BoardReadModel(
                 likeCount = 0,
                 commentCount = 0,
                 createdAt = payload.createdAt,
-                eventTs = payload.eventTs
+                eventTs = payload.eventTs,
             )
-        }
     }
 }

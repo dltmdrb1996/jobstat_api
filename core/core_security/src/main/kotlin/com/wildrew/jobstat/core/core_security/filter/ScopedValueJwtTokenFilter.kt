@@ -52,7 +52,6 @@ class ScopedValueJwtTokenFilter(
             )
     }
 
-
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
         val uri = request.requestURI
         // 캐시를 먼저 확인하고, 없으면 계산 후 캐시에 저장.
@@ -85,14 +84,18 @@ class ScopedValueJwtTokenFilter(
         // shouldNotFilter(request)가 true이면, @Public이거나 경로 제외된 경우임.
         // 이 경우, 빈 SecurityContext로 ScopedValue를 설정하고 다음 필터 실행.
         if (shouldNotFilter(request)) {
-            ScopedSecurityContextHolder.runWithNewContext { // Runnable 사용 예시
+            ScopedSecurityContextHolder.runWithNewContext {
+                // Runnable 사용 예시
                 try {
                     filterChain.doFilter(request, response)
                 } catch (e: Exception) {
                     // 예외를 다시 던지거나 처리. ScopedValue.run은 예외를 전파함.
                     // 여기서는 ServletException, IOException 등을 고려해야 함.
-                    if (e is RuntimeException) throw e
-                    else throw RuntimeException(e) // 또는 특정 예외로 감싸기
+                    if (e is RuntimeException) {
+                        throw e
+                    } else {
+                        throw RuntimeException(e) // 또는 특정 예외로 감싸기
+                    }
                 }
             }
             return
@@ -115,11 +118,12 @@ class ScopedValueJwtTokenFilter(
                 }
 
                 // 인증된 사용자의 SecurityContext 생성
-                val authentication = UsernamePasswordAuthenticationToken(
-                    accessPayload.id,
-                    null,
-                    accessPayload.roles.map { SimpleGrantedAuthority("ROLE_$it") },
-                )
+                val authentication =
+                    UsernamePasswordAuthenticationToken(
+                        accessPayload.id,
+                        null,
+                        accessPayload.roles.map { SimpleGrantedAuthority("ROLE_$it") },
+                    )
                 val securityContextWithAuth = SecurityContextImpl()
                 securityContextWithAuth.authentication = authentication
 
@@ -128,8 +132,11 @@ class ScopedValueJwtTokenFilter(
                     try {
                         filterChain.doFilter(request, response)
                     } catch (e: Exception) {
-                        if (e is RuntimeException) throw e
-                        else throw RuntimeException(e)
+                        if (e is RuntimeException) {
+                            throw e
+                        } else {
+                            throw RuntimeException(e)
+                        }
                     }
                 }
             } else { // 토큰이 없거나 유효하지 않은 경우
@@ -139,8 +146,11 @@ class ScopedValueJwtTokenFilter(
                         try {
                             filterChain.doFilter(request, response)
                         } catch (e: Exception) {
-                            if (e is RuntimeException) throw e
-                            else throw RuntimeException(e)
+                            if (e is RuntimeException) {
+                                throw e
+                            } else {
+                                throw RuntimeException(e)
+                            }
                         }
                     }
                 } else {
@@ -198,7 +208,6 @@ class ScopedValueJwtTokenFilter(
             handlerMethod.beanType.isAnnotationPresent(AdminAuth::class.java) -> true
             else -> false
         }
-
 
     private fun getJwtFromRequest(request: HttpServletRequest): String? {
         // 변경 없음

@@ -16,8 +16,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.BENEFIT_POSTING_COUNT)
 @NoRepositoryBean
-interface BenefitPostingCountRankingsRepository :
-    SimpleRankingRepository<BenefitPostingCountRankingsDocument, BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry, String> {
+interface BenefitPostingCountRankingsRepository : SimpleRankingRepository<BenefitPostingCountRankingsDocument, BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry, String> {
     // 산업별 특화 복리후생 분석
     fun findUniqueIndustryBenefits(
         baseDate: String,

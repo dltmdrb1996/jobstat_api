@@ -4,9 +4,9 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.wildrew.app.statistics_read.core.CacheConfig.Companion.EXPIRE_AFTER_ACCESS
 import com.wildrew.app.statistics_read.core.CacheConfig.Companion.STATS_CACHE_SIZE
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
 import com.wildrew.app.statistics_read.stats.registry.StatsType
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 

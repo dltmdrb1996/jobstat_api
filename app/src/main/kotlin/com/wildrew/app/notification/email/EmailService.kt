@@ -1,4 +1,4 @@
-package com.wildrew.app.notification.service
+package com.wildrew.app.notification.email
 
 import org.springframework.scheduling.annotation.Async
 
@@ -6,6 +6,7 @@ interface EmailService {
     @Async
     fun sendVerificationEmail(
         to: String,
-        code: String,
+        body: String,
+        subject: String,
     )
 }

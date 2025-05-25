@@ -10,7 +10,6 @@ import org.springframework.kafka.support.KafkaHeaders
 import org.springframework.transaction.annotation.Transactional // 트랜잭션 필요 시
 import java.nio.charset.StandardCharsets
 
-// @Component // 제거
 open class DLTConsumer(
     private val deadLetterTopicRepository: DeadLetterTopicRepository,
     private val objectMapper: ObjectMapper,
@@ -26,7 +25,7 @@ open class DLTConsumer(
     @KafkaListener(
         topicPattern = "#{'\${jobstat.core.event.dlt.consumer.topic-pattern:.*\\.DLT}'}", // SpEL
         groupId = "#{'\${jobstat.core.event.dlt.consumer.group-id:dlt-persistence-group}'}", // SpEL
-        containerFactory = "coreKafkaListenerContainerFactory"
+        containerFactory = "coreKafkaListenerContainerFactory",
     )
     @Transactional
     open fun processDltMessage(
@@ -36,8 +35,9 @@ open class DLTConsumer(
         val headers = record.headers()
         val originalPayload = record.value()
         val kafkaKey = record.key()
-        val originalTopic = getHeaderAsString(headers, KafkaHeaders.ORIGINAL_TOPIC)
-            ?: getHeaderAsString(headers, KafkaHeaders.DLT_ORIGINAL_TOPIC) ?: "unknown"
+        val originalTopic =
+            getHeaderAsString(headers, KafkaHeaders.ORIGINAL_TOPIC)
+                ?: getHeaderAsString(headers, KafkaHeaders.DLT_ORIGINAL_TOPIC) ?: "unknown"
 
         log.debug("DLT 메시지 수신: originalTopic=$originalTopic, key=$kafkaKey, partition=${record.partition()}, offset=${record.offset()}")
 
@@ -48,7 +48,8 @@ open class DLTConsumer(
             log.debug(
                 "DLT 메시지 출처: {} (Header: {}={})",
                 if (isOutboxFailure) "Outbox 발행 실패" else "구독/핸들링 실패",
-                CustomDltHeaders.X_FAILURE_SOURCE, failureSource
+                CustomDltHeaders.X_FAILURE_SOURCE,
+                failureSource,
             )
 
             val retryCount: Int
@@ -56,10 +57,11 @@ open class DLTConsumer(
             val eventId: String
             val eventType: String
 
-            val (parsedEventId, parsedEventType) = extractEventMetadata(
-                originalPayload,
-                kafkaKey ?: (DEFAULT_EVENT_ID_PREFIX + System.currentTimeMillis())
-            )
+            val (parsedEventId, parsedEventType) =
+                extractEventMetadata(
+                    originalPayload,
+                    kafkaKey ?: (DEFAULT_EVENT_ID_PREFIX + System.currentTimeMillis()),
+                )
 
             if (isOutboxFailure) {
                 log.debug("DLT 메시지 출처: Outbox 발행 실패 (Header: {}={})", CustomDltHeaders.X_FAILURE_SOURCE, failureSource)
@@ -80,8 +82,9 @@ open class DLTConsumer(
                 stacktraceStr?.let {
                     val appPackagePrefix = "com.example."
                     val firstAppStackLine = it.lines().find { line -> line.trim().startsWith("at $appPackagePrefix") }
-                    val stackLineToLog = firstAppStackLine
-                        ?: it.lines().find { line -> line.trim().startsWith("at ") }
+                    val stackLineToLog =
+                        firstAppStackLine
+                            ?: it.lines().find { line -> line.trim().startsWith("at ") }
                     stackLineToLog?.let { line -> essentialInfo += "\n위치(추정): ${line.trim()}" }
                 }
                 lastError = essentialInfo.take(2000) // DB 컬럼 크기에 맞춤 (DeadLetterTopicEvent.lastError)
@@ -93,7 +96,7 @@ open class DLTConsumer(
             }
 
             val dltEvent =
-                DeadLetterTopicEvent.create( // DeadLetterTopicEvent.create 사용
+                DeadLetterTopicEvent.create(
                     eventId = eventId,
                     eventType = eventType,
                     retryCount = retryCount,
@@ -101,21 +104,25 @@ open class DLTConsumer(
                     lastError = lastError,
                     payload = originalPayload,
                 )
-            deadLetterTopicRepository.save(dltEvent) // 이 부분이 트랜잭션으로 보호됨
+            deadLetterTopicRepository.save(dltEvent)
 
-            log.info( // DLT 저장 성공은 INFO 레벨로
+            log.info(
                 "DLT 메시지를 DB에 성공적으로 저장: originalTopic={}, eventId={}, failureSource={}, dbId={}",
-                originalTopic, eventId, dltEvent.failureSource, dltEvent.id
+                originalTopic,
+                eventId,
+                dltEvent.failureSource,
+                dltEvent.id,
             )
 
             ack.acknowledge()
-        } catch (e: Exception) { // DeadLetterTopicRepository.save() 실패 등
+        } catch (e: Exception) {
             log.error(
                 "치명적 오류: DLT 메시지를 DB에 저장 실패! 수동 조치 필요. originalTopic={}, key={}, error={}",
-                originalTopic, kafkaKey, e.message, e
+                originalTopic,
+                kafkaKey,
+                e.message,
+                e,
             )
-            // ack.acknowledge() 하지 않아서 메시지가 DLT에 다시 돌아오거나, nack 처리될 수 있음 (리스너 설정에 따라)
-            // 또는, 여기서 RuntimeException을 던져서 컨테이너가 처리하도록 할 수 있음
             throw RuntimeException("DLT 메시지 처리 중 DB 저장 실패 (재시도 필요): ${e.message}", e)
         }
     }
@@ -128,8 +135,16 @@ open class DLTConsumer(
         var eventType = UNKNOWN_EVENT_TYPE
         try {
             val jsonNode = objectMapper.readTree(payload)
-            jsonNode.path("eventId").asText(null)?.takeIf { it.isNotBlank() }?.let { eventId = it }
-            jsonNode.path("type").asText(null)?.takeIf { it.isNotBlank() }?.let { eventType = it }
+            jsonNode
+                .path("eventId")
+                .asText(null)
+                ?.takeIf { it.isNotBlank() }
+                ?.let { eventId = it }
+            jsonNode
+                .path("type")
+                .asText(null)
+                ?.takeIf { it.isNotBlank() }
+                ?.let { eventType = it }
         } catch (e: Exception) {
             log.warn("DLT 페이로드 JSON에서 eventId/eventType 파싱 실패 (Fallback 사용): {}", e.message)
         }

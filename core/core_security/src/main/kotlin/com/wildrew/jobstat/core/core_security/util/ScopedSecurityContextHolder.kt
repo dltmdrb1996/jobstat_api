@@ -4,7 +4,6 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextImpl
 
 object ScopedSecurityContextHolder {
-
     /**
      * SecurityContext를 저장하기 위한 ScopedValue 인스턴스.
      * 이 ScopedValue는 각 가상 스레드 (또는 플랫폼 스레드)의 특정 스코프 내에서
@@ -19,8 +18,8 @@ object ScopedSecurityContextHolder {
      * (엄밀히 말하면, ScopedValue가 바인딩되지 않았을 때 get()을 호출하면 예외가 발생하므로,
      * isBound 체크가 중요합니다.)
      */
-    fun getContext(): SecurityContext {
-        return if (SCOPED_SECURITY_CONTEXT.isBound) {
+    fun getContext(): SecurityContext =
+        if (SCOPED_SECURITY_CONTEXT.isBound) {
             SCOPED_SECURITY_CONTEXT.get()
         } else {
             // ScopedValue가 바인딩되지 않은 경우, 애플리케이션의 정책에 따라
@@ -28,7 +27,6 @@ object ScopedSecurityContextHolder {
             // 여기서는 비어있는 컨텍스트를 반환하여 기존 동작과 유사하게 만듭니다.
             SecurityContextImpl()
         }
-    }
 
     /**
      * 제공된 SecurityContext를 현재 스코프에 바인딩하고,
@@ -40,10 +38,14 @@ object ScopedSecurityContextHolder {
      * @return 작업(task)의 실행 결과.
      * @throws Exception 작업(task) 실행 중 발생할 수 있는 모든 예외.
      */
-    fun <R> callWithContext(context: SecurityContext, task: () -> R): R {
-        val op = ScopedValue.CallableOp<R, RuntimeException> { task() }   // X = RuntimeException
-        return ScopedValue.where(SCOPED_SECURITY_CONTEXT, context)
-            .call(op)                                                    // ← 더 이상 추론 오류 없음
+    fun <R> callWithContext(
+        context: SecurityContext,
+        task: () -> R,
+    ): R {
+        val op = ScopedValue.CallableOp<R, RuntimeException> { task() } // X = RuntimeException
+        return ScopedValue
+            .where(SCOPED_SECURITY_CONTEXT, context)
+            .call(op) // ← 더 이상 추론 오류 없음
     }
 
     /**
@@ -57,9 +59,11 @@ object ScopedSecurityContextHolder {
      */
     fun <R> callWithNewContext(task: () -> R): R {
         val op = ScopedValue.CallableOp<R, RuntimeException> { task() }
-        return ScopedValue.where(SCOPED_SECURITY_CONTEXT, SecurityContextImpl())
+        return ScopedValue
+            .where(SCOPED_SECURITY_CONTEXT, SecurityContextImpl())
             .call(op)
     }
+
     /**
      * 제공된 SecurityContext를 현재 스코프에 바인딩하고,
      * 결과를 반환하지 않는 주어진 작업(task)을 실행합니다.
@@ -69,12 +73,16 @@ object ScopedSecurityContextHolder {
      * @param task 실행할 작업. 이 작업은 결과를 반환하지 않습니다.
      * @throws Exception 작업(task) 실행 중 발생할 수 있는 모든 예외 (run 메서드가 예외를 전파하는 경우).
      */
-    fun runWithContext(context: SecurityContext, task: () -> Unit) {
+    fun runWithContext(
+        context: SecurityContext,
+        task: () -> Unit,
+    ) {
         // ScopedValue.where(scopedValue, value).run(runnableOp)
         // Kotlin 람다 (() -> Unit)는 ScopedValue.run이 기대하는
         // 함수형 인터페이스 (예: RunnableOp<E extends Throwable> 또는 java.lang.Runnable)로
         // SAM 변환을 통해 호환됩니다.
-        ScopedValue.where(SCOPED_SECURITY_CONTEXT, context)
+        ScopedValue
+            .where(SCOPED_SECURITY_CONTEXT, context)
             .run(task) // task는 RunnableOp (또는 Runnable)으로 취급됨
     }
 
@@ -88,7 +96,8 @@ object ScopedSecurityContextHolder {
      */
     fun runWithNewContext(task: () -> Unit) {
         val newContext = SecurityContextImpl()
-        ScopedValue.where(SCOPED_SECURITY_CONTEXT, newContext)
+        ScopedValue
+            .where(SCOPED_SECURITY_CONTEXT, newContext)
             .run(task)
     }
 }

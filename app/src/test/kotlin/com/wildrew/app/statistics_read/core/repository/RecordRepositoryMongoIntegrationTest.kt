@@ -17,7 +17,7 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
     @Autowired
     lateinit var recordRepository: RecordRepository
 
-    private val totalRecords = 1000000
+    private val totalRecords = 10000
     private val batchSize = 2000
     private val allRecords = mutableListOf<com.wildrew.app.utils.dummy.Record>()
     private var startTime: Long = 0

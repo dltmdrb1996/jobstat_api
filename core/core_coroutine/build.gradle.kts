@@ -22,7 +22,7 @@ dependencies {
     compileOnly("org.springframework.boot:spring-boot-autoconfigure")
     compileOnly("org.springframework:spring-beans")
     compileOnly("org.springframework:spring-context") // @Value, CoroutineScope 빈 생성 등
-    compileOnly("org.springframework:spring-core")   // @Qualifier 등
+    compileOnly("org.springframework:spring-core") // @Qualifier 등
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")

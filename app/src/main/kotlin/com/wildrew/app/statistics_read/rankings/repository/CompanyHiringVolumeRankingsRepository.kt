@@ -15,8 +15,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_HIRING_VOLUME)
 @NoRepositoryBean
-interface CompanyHiringVolumeRankingsRepository :
-    SimpleRankingRepository<CompanyHiringVolumeRankingsDocument, CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry, String> {
+interface CompanyHiringVolumeRankingsRepository : SimpleRankingRepository<CompanyHiringVolumeRankingsDocument, CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry, String> {
     // 부서별 채용 트렌드 분석
     fun findTopHiringDepartments(
         baseDate: String,

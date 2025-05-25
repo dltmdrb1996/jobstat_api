@@ -14,8 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import kotlin.math.abs
 
 @NoRepositoryBean
-interface BaseRankingRepository<T : BaseRankingDocument<E>, E : RankingEntry, ID : Any> :
-    BaseTimeSeriesRepository<T, ID> {
+interface BaseRankingRepository<T : BaseRankingDocument<E>, E : RankingEntry, ID : Any> : BaseTimeSeriesRepository<T, ID> {
     // 특정 페이지 조회
     fun findByPage(
         baseDate: String,

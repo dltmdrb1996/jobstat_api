@@ -16,14 +16,14 @@ java {
 
 dependencies {
     implementation("jakarta.validation:jakarta.validation-api") // ValidUseCase 생성자, 예외, DTO 어노테이션용
-    implementation("org.springframework:spring-tx")             // @Transactional (TransactionalValidUseCase)
+    implementation("org.springframework:spring-tx") // @Transactional (TransactionalValidUseCase)
     compileOnly("org.slf4j:slf4j-api")
-    implementation("org.aspectj:aspectjrt")         // @LoggedUseCase Aspect 런타임용
+    implementation("org.aspectj:aspectjrt") // @LoggedUseCase Aspect 런타임용
 
     compileOnly("org.aspectj:aspectjweaver") // AOP 컴파일용
     compileOnly("org.springframework.boot:spring-boot-autoconfigure") // @AutoConfiguration
-    compileOnly("org.springframework:spring-beans")      // @Bean
-    compileOnly("org.springframework:spring-context")    // @Configuration
+    compileOnly("org.springframework:spring-beans") // @Bean
+    compileOnly("org.springframework:spring-context") // @Configuration
     compileOnly("org.springframework:spring-core")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

@@ -1,9 +1,9 @@
 package com.wildrew.app.community.board.usecase.get
 
+import com.wildrew.app.common.toEpochMilli
 import com.wildrew.app.community.board.entity.Board
 import com.wildrew.app.community.board.service.BoardService
 import com.wildrew.app.community.counting.CounterService
-import com.wildrew.app.eacheach.toEpochMilli
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils

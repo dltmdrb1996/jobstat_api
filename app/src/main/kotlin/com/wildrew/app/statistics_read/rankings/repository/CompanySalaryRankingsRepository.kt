@@ -16,8 +16,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_GROWTH)
 @NoRepositoryBean
-interface CompanySalaryRankingsRepository :
-    SimpleRankingRepository<CompanySalaryRankingsDocument, CompanySalaryRankingsDocument.CompanySalaryRankingEntry, String> {
+interface CompanySalaryRankingsRepository : SimpleRankingRepository<CompanySalaryRankingsDocument, CompanySalaryRankingsDocument.CompanySalaryRankingEntry, String> {
     // 산업별 급여 분포 분석
     fun findCompaniesAboveIndustryMedian(
         baseDate: String,

@@ -24,8 +24,8 @@ dependencies {
     implementation("org.slf4j:slf4j-api")
 
     compileOnly("org.springframework.boot:spring-boot-autoconfigure")
-    compileOnly("org.springframework:spring-beans")    // @Value
-    compileOnly("org.springframework:spring-context")  // @Configuration
+    compileOnly("org.springframework:spring-beans") // @Value
+    compileOnly("org.springframework:spring-context") // @Configuration
     compileOnly("org.springframework:spring-core")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

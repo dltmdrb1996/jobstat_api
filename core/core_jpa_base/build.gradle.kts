@@ -16,15 +16,15 @@ java {
 }
 
 dependencies {
-    api("jakarta.persistence:jakarta.persistence-api")        // Base 엔티티, SnowflakeIdGenerator 등이 사용
-    api("org.springframework.data:spring-data-jpa")        // Auditing 관련 어노테이션/리스너, JpaRepository
-    api("org.hibernate.orm:hibernate-core")                // @IdGeneratorType, IdentifierGenerator (SnowflakeIdGenerator)
+    api("jakarta.persistence:jakarta.persistence-api") // Base 엔티티, SnowflakeIdGenerator 등이 사용
+    api("org.springframework.data:spring-data-jpa") // Auditing 관련 어노테이션/리스너, JpaRepository
+    api("org.hibernate.orm:hibernate-core") // @IdGeneratorType, IdentifierGenerator (SnowflakeIdGenerator)
 
-    implementation("org.slf4j:slf4j-api")                 // SnowflakeGenerator 내부 로깅
+    implementation("org.slf4j:slf4j-api") // SnowflakeGenerator 내부 로깅
 
     compileOnly("org.springframework.boot:spring-boot-autoconfigure") // @AutoConfiguration
-    compileOnly("org.springframework:spring-beans")      // @Bean, @Value 등
-    compileOnly("org.springframework:spring-context")    // @Configuration
+    compileOnly("org.springframework:spring-beans") // @Bean, @Value 등
+    compileOnly("org.springframework:spring-context") // @Configuration
     compileOnly("org.springframework:spring-core")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

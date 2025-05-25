@@ -29,6 +29,18 @@ open class AppException private constructor(
                 ?: throw IllegalArgumentException("Unknown error code: ${errorCode.code}")
     }
 
+    constructor(
+        errorCode: ErrorCode,
+        message: String? = null,
+        detailInfo: String? = null,
+    ) : this(
+        errorCode,
+        message ?: errorCode.defaultMessage,
+        errorCode.defaultHttpStatus,
+        detailInfo,
+        errorCode.type,
+    )
+
     private val detailInfoMap by lazy {
         mapOf(
             "timestamp" to LocalDateTime.now(),
@@ -69,7 +81,7 @@ open class AppException private constructor(
             errorCode.defaultMessage,
             errorCode.defaultHttpStatus,
             null,
-        AppExceptionType.CLIENT_ERROR,
+            AppExceptionType.CLIENT_ERROR,
         )
 
     class ServerError internal constructor(
@@ -79,7 +91,7 @@ open class AppException private constructor(
             errorCode.defaultMessage,
             errorCode.defaultHttpStatus,
             null,
-        AppExceptionType.SERVER_ERROR,
+            AppExceptionType.SERVER_ERROR,
         )
 }
 

@@ -14,8 +14,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_GROWTH)
 @NoRepositoryBean
-interface CompanyGrowthRankingsRepository :
-    SimpleRankingRepository<CompanyGrowthRankingsDocument, CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry, String> {
+interface CompanyGrowthRankingsRepository : SimpleRankingRepository<CompanyGrowthRankingsDocument, CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry, String> {
     // 다각적 성장 분석 (매출, 직원, 시장점유율 모두 성장하는 기업)
     fun findBalancedGrowthCompanies(
         baseDate: String,

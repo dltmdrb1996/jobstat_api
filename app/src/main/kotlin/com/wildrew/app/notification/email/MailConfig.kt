@@ -1,4 +1,4 @@
-package com.wildrew.app.notification
+package com.wildrew.app.notification.email
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

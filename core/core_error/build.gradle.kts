@@ -30,8 +30,8 @@ dependencies {
 
     compileOnly("org.springframework:spring-webmvc") // DispatcherServlet, NoHandlerFoundException 등 포함
     compileOnly("jakarta.servlet:jakarta.servlet-api") // HttpServletRequest (provided)
-    compileOnly("org.springframework:spring-beans")    // @Value 등
-    compileOnly("org.springframework:spring-context")  // Environment 등
+    compileOnly("org.springframework:spring-beans") // @Value 등
+    compileOnly("org.springframework:spring-context") // Environment 등
     compileOnly("org.springframework:spring-core")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

@@ -1,9 +1,9 @@
 package com.wildrew.app.statistics_read.rankings.usecase.analyze
 
-import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.app.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
 import com.wildrew.app.statistics_read.rankings.model.rankingtype.RankingType
 import com.wildrew.app.statistics_read.rankings.service.RankingAnalysisService
+import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.jobstat.core.core_usecase.base.ValidUseCase
 import jakarta.validation.Validator
 import jakarta.validation.constraints.Min

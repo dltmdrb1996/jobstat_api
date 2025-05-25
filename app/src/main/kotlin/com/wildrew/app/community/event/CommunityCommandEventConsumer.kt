@@ -33,7 +33,7 @@ class CommunityCommandEventConsumer : AbstractEventConsumer() {
     @KafkaListener(
         topics = ["\${kafka.consumer.community-command.topic:community-command}"],
         groupId = "\${kafka.consumer.community-command.group-id:community-command-group}",
-        containerFactory = "#{@coreKafkaListenerContainerFactory}"
+        containerFactory = "#{@coreKafkaListenerContainerFactory}",
     )
     fun receiveBoardEvent(
         event: String,

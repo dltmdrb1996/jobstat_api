@@ -8,10 +8,10 @@ import com.wildrew.app.community.board.repository.FakeCategoryRepository
 import com.wildrew.app.community.board.service.BoardService
 import com.wildrew.app.community.board.service.BoardServiceImpl
 import com.wildrew.app.community.event.CommunityCommandEventPublisher
+import com.wildrew.app.utils.FakePasswordUtil
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils
-import com.wildrew.app.utils.FakePasswordUtil
 import jakarta.persistence.EntityNotFoundException
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation

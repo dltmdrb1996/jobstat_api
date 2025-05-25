@@ -1,4 +1,4 @@
-package com.wildrew.app.notification.service
+package com.wildrew.app.notification.email
 
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
@@ -20,15 +20,16 @@ class EmailServiceImpl(
     @Async
     override fun sendVerificationEmail(
         to: String,
-        code: String,
+        body: String,
+        subject: String,
     ) {
         try {
             SimpleMailMessage()
                 .apply {
                     setFrom(fromEmail)
                     setTo(to)
-                    setSubject("[JobStat] 이메일 인증")
-                    setText("인증 코드: $code\n30분 안에 인증을 완료해주세요.")
+                    setSubject(subject)
+                    setText(body)
                 }.also { message ->
                     emailSender.send(message)
                     log.debug("인증 이메일 발송 완료: $to")

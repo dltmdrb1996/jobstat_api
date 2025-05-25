@@ -14,8 +14,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.COMPANY_SIZE_EDUCATION)
 @NoRepositoryBean
-interface CompanySizeEducationRankingsRepository :
-    DistributionRankingRepository<CompanySizeEducationRankingsDocument, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry, String> {
+interface CompanySizeEducationRankingsRepository : DistributionRankingRepository<CompanySizeEducationRankingsDocument, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry, String> {
     // 교육 수준별 급여 분포 분석
     fun findSalaryDistributionByEducation(
         baseDate: String,

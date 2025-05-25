@@ -7,9 +7,6 @@ import com.wildrew.app.community_read.repository.impl.RedisBoardCountRepository
 import com.wildrew.app.community_read.repository.impl.RedisBoardIdListRepository
 import com.wildrew.app.community_read.repository.impl.RedisCommentCountRepository
 import com.wildrew.app.community_read.repository.impl.RedisCommunityEventUpdateRepository
-import com.wildrew.jobstat.core.core_serializer.DataSerializer
-import com.wildrew.jobstat.core.core_serializer.ObjectMapperDataSerializer
-import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
 import com.wildrew.app.core.event.payload.BoardCreatedEventPayloadFixture
 import com.wildrew.app.core.event.payload.BoardDeletedEventPayloadFixture
 import com.wildrew.app.core.event.payload.BoardLikedEventPayloadFixture
@@ -21,6 +18,9 @@ import com.wildrew.app.core.event.payload.CommentDeletedEventPayloadFixture
 import com.wildrew.app.core.event.payload.CommentUpdatedEventPayloadFixture
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
 import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
+import com.wildrew.jobstat.core.core_serializer.DataSerializer
+import com.wildrew.jobstat.core.core_serializer.ObjectMapperDataSerializer
+import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.mockito.kotlin.*
@@ -383,7 +383,11 @@ class CommunityEventHandlerVerLuaTest {
     inner class HandleBoardRankingUpdated {
         private val metric = BoardRankingMetric.LIKES
         private val period = BoardRankingPeriod.WEEK
-        private val rankings = listOf(com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload.RankingEntry(10L, 500.0))
+        private val rankings =
+            listOf(
+                com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
+                    .RankingEntry(10L, 500.0),
+            )
 
         private val payload =
             BoardRankingUpdatedEventPayloadFixture

@@ -16,8 +16,7 @@ import org.springframework.stereotype.Repository
 
 @RankingRepositoryType(RankingType.SKILL_GROWTH)
 @NoRepositoryBean
-interface SkillGrowthRankingsRepository :
-    SimpleRankingRepository<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String> {
+interface SkillGrowthRankingsRepository : SimpleRankingRepository<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String> {
     // 성장 일관성 분석
     fun findByGrowthConsistency(
         baseDate: String,

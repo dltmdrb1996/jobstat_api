@@ -31,7 +31,6 @@ class CreateBoard(
     private val communityCommandEventPublisher: CommunityCommandEventPublisher,
     validator: Validator,
 ) : ValidUseCase<CreateBoard.Request, CreateBoard.Response>(validator) {
-
     @Transactional
     override fun invoke(request: Request): Response = super.invoke(request)
 
@@ -39,10 +38,11 @@ class CreateBoard(
 
     override fun execute(request: Request): Response =
         run {
-
-            log.info("Current thread in CreateBoard.execute: {}, isVirtual: {}",
+            log.info(
+                "Current thread in CreateBoard.execute: {}, isVirtual: {}",
                 Thread.currentThread().name,
-                Thread.currentThread().isVirtual) // isVirtual()은 JDK 21+
+                Thread.currentThread().isVirtual,
+            ) // isVirtual()은 JDK 21+
 
             val userId = theadContextUtils.getCurrentUserId()
             log.info("Retrieved userId from SecurityUtils: {}", userId) // userId 값 로깅

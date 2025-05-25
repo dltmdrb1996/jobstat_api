@@ -1,4 +1,4 @@
-package com.wildrew.jobstat.core.core_security.config // 패키지 경로 예시
+package com.wildrew.jobstat.core.core_security.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wildrew.jobstat.core.core_security.filter.ScopedValueJwtTokenFilter
@@ -22,53 +22,49 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @AutoConfigureAfter(
     CoreSerializerAutoConfiguration::class,
-    CoreTokenAutoConfiguration::class
+    CoreTokenAutoConfiguration::class,
 )
 class CoreFilterAutoConfiguration {
-
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
-    // 가상 스레드 활성화 시 ScopedValueJwtTokenFilter 빈 등록
-    @Bean("jwtTokenFilter") // 빈 이름을 "jwtTokenFilter"로 통일
-    @ConditionalOnMissingBean(name = ["jwtTokenFilter"]) // 동일 이름의 빈이 없을 때
+
+    @Bean("jwtTokenFilter")
+    @ConditionalOnMissingBean(name = ["jwtTokenFilter"])
     @ConditionalOnProperty(
         name = ["spring.threads.virtual.enabled"],
         havingValue = "true",
-        matchIfMissing = false // 명시적으로 true일 때만
+        matchIfMissing = false,
     )
-    @ConditionalOnClass(ScopedSecurityContextHolder::class) // ScopedValue 관련 클래스 존재 시
+    @ConditionalOnClass(ScopedSecurityContextHolder::class)
     fun scopedValueJwtTokenFilter(
         jwtTokenParser: JwtTokenParser,
         requestMappingHandlerMapping: RequestMappingHandlerMapping,
-        objectMapper: ObjectMapper
-    ): OncePerRequestFilter { // 반환 타입을 OncePerRequestFilter 또는 상위 Filter로
+        objectMapper: ObjectMapper,
+    ): OncePerRequestFilter {
         log.info("Configuring ScopedValueJwtTokenFilter")
         return ScopedValueJwtTokenFilter(
             jwtTokenParser,
             requestMappingHandlerMapping,
-            objectMapper
+            objectMapper,
         )
     }
 
-    // 가상 스레드 비활성화 또는 프로퍼티 없을 시 ThreadLocalJwtTokenFilter 빈 등록
-    @Bean("jwtTokenFilter") // 빈 이름을 "jwtTokenFilter"로 통일
-    @ConditionalOnMissingBean(name = ["jwtTokenFilter"]) // 동일 이름의 빈이 없을 때
+    @Bean("jwtTokenFilter")
+    @ConditionalOnMissingBean(name = ["jwtTokenFilter"])
     @ConditionalOnProperty(
         name = ["spring.threads.virtual.enabled"],
         havingValue = "false",
-        matchIfMissing = true // false이거나 프로퍼티가 없을 때 (기본값)
+        matchIfMissing = true,
     )
     fun threadLocalJwtTokenFilter(
         jwtTokenParser: JwtTokenParser,
         requestMappingHandlerMapping: RequestMappingHandlerMapping,
-        objectMapper: ObjectMapper
-    ): OncePerRequestFilter { // 반환 타입을 OncePerRequestFilter 또는 상위 Filter로
-        // ThreadLocalJwtTokenFilter의 클래스명이 JwtTokenFilter라면 아래와 같이 수정
-        // return JwtTokenFilter(
+        objectMapper: ObjectMapper,
+    ): OncePerRequestFilter {
         log.info("Configuring ThreadLocalJwtTokenFilter")
-        return ThreadLocalJwtTokenFilter( // 클래스명 확인 필요
+        return ThreadLocalJwtTokenFilter(
             jwtTokenParser,
             requestMappingHandlerMapping,
-            objectMapper
+            objectMapper,
         )
     }
 }

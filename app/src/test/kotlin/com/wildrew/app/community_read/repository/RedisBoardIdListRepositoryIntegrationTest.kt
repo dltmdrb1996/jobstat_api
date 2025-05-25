@@ -1,8 +1,8 @@
 package com.wildrew.app.community_read.repository
 
 import com.wildrew.app.community_read.repository.impl.RedisBoardIdListRepository
-import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
 import com.wildrew.app.utils.base.RedisIntegrationTestSupport
+import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
 import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -311,7 +311,8 @@ class RedisBoardIdListRepositoryIntegrationTest : RedisIntegrationTestSupport() 
             // 제한을 초과하는 새 랭킹 데이터 생성
             val newRankings =
                 (1..(limit + 10)).map {
-                    com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload.RankingEntry(it.toLong(), (limit + 10 - it).toDouble())
+                    com.wildrew.jobstat.core.core_event.model.payload.board.BoardRankingUpdatedEventPayload
+                        .RankingEntry(it.toLong(), (limit + 10 - it).toDouble())
                 }
             // When: 랭킹 목록 교체
             redisTemplate.executePipelined { conn ->

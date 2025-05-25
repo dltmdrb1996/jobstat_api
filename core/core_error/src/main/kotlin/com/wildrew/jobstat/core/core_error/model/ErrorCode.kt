@@ -18,8 +18,11 @@ enum class ErrorCode(
     INVALID_REQUEST_BODY("C007", "유효하지 않은 요청 본문입니다", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
     CONSTRAINT_VIOLATION("C008", "제약 조건 위반입니다", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),
     TOO_MANY_REQUESTS("C009", "요청이 너무 많습니다", HttpStatus.TOO_MANY_REQUESTS, AppExceptionType.CLIENT_ERROR),
-    VERIFICATION_CODE_ALREADY_SENT("C010", "이미 발송된 인증 코드가 있습니다. 잠시 후 다시 시도해주세요.", HttpStatus.BAD_REQUEST,
-        AppExceptionType.CLIENT_ERROR
+    VERIFICATION_CODE_ALREADY_SENT(
+        "C010",
+        "이미 발송된 인증 코드가 있습니다. 잠시 후 다시 시도해주세요.",
+        HttpStatus.BAD_REQUEST,
+        AppExceptionType.CLIENT_ERROR,
     ),
     VERIFICATION_NOT_FOUND("C011", "인증 정보를 찾을 수 없습니다.", HttpStatus.NOT_FOUND, AppExceptionType.CLIENT_ERROR),
     VERIFICATION_EXPIRED("C012", "만료된 인증 코드입니다.", HttpStatus.BAD_REQUEST, AppExceptionType.CLIENT_ERROR),

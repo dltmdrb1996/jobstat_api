@@ -213,15 +213,22 @@ kafka:
       dlt-suffix: .DLT
       auto-create-dlt: true
     community-read:
-      topic: community-read
+      topic: community-read-${spring.profiles.active:dev}
       group-id: community-read-consumer-group-${spring.profiles.active:dev}
       retry:
         attempts: 3
         delay-ms: 1000
         multiplier: 2.0
     community-command:
-      topic: community-command
+      topic: community-command-${spring.profiles.active:dev}
       group-id: community-command-consumer-group-${spring.profiles.active:dev}
+      retry:
+        attempts: 3
+        delay-ms: 1000
+        multiplier: 2.0
+    notification:
+      topic: notification-${spring.profiles.active:dev}
+      group-id: notification-consumer-group-${spring.profiles.active:dev}
       retry:
         attempts: 3
         delay-ms: 1000
