@@ -1,0 +1,13 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+eureka:
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME_EUREKA_PROD:jobstat-eureka-server}
+    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS_EUREKA_PROD:true}
+#    prefer-ip-address: false
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_DEFAULT_ZONE_EUREKA_PROD:http://jobstat-eureka-server:8761/eureka/}

@@ -1,0 +1,14 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+eureka:
+  server:
+    enable-self-preservation: false
+#eureka:
+#  instance:
+#    hostname: localhost # 개발 시에는 localhost
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8761/eureka/

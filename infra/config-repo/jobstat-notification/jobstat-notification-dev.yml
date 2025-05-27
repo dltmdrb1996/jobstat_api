@@ -1,0 +1,68 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:dev_jobstat}?
+      serverTimezone=Asia/Seoul&useSSL=false
+      &allowPublicKeyRetrieval=true
+      &rewriteBatchedStatements=true
+      &useServerPrepStmts=false
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      idle-timeout: 30000
+      connection-timeout: 20000
+      maximum-pool-size: 5
+      minimum-idle: 2
+      initialization-fail-timeout: 30000
+      connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:1}
+      password: ${REDIS_PASSWORD}
+      username: default
+      client-type: lettuce
+      connect-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+eureka: # 개발용 Eureka 설정
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME_NOTIFICATION_DEV:localhost}
+    prefer-ip-address: false
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_DEFAULT_ZONE_NOTIFICATION_DEV:http://localhost:8761/eureka/}
+
+logging: # 개발용 로깅 레벨 설정
+  level:
+    com.wildrew.jobstat.notification: DEBUG # 알림 서비스 패키지 상세 로그
+    org.springframework.kafka: DEBUG # Spring Kafka 상세 로그
+    org.springframework.mail: DEBUG # Spring Mail 상세 로그 (메일 발송 디버깅)
+    org.springframework.data.redis: DEBUG # Spring Data Redis 상세 로그
+
+jobstat:
+  core:
+    openapi: # 개발용 OpenAPI 문서 정보
+      title: "JobStat Notification API (Development)"
+      server:
+        urls: "http://localhost:${server.port:8085}"
+        description: "알림 개발 서버"
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  default-models-expand-depth: 2

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-}] %-5level %logger{36} - %msg%n"/>
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="dev">
+        <property name="LOG_FILE_PATH" value="./logs/dev"/>
+        <property name="LOG_FILE_NAME" value="dev-app"/>
+
+        <appender name="DEV_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <prudent>true</prudent> <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>10MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>2GB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <appender name="DEV_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <prudent>true</prudent>
+            <file>${LOG_FILE_PATH}/dev-error.log</file>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE_PATH}/dev-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>10MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
+            </rollingPolicy>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>ERROR</level>
+            </filter>
+        </appender>
+
+        <root level="DEBUG">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+        <logger name="com.wildrew.jobstat" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="DEV_FILE"/>
+            <appender-ref ref="DEV_ERROR_FILE"/>
+        </logger>
+
+        <logger name="com.wildrew.jobstat.core" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="DEV_FILE"/>
+            <appender-ref ref="DEV_ERROR_FILE"/>
+        </logger>
+
+        <logger name="org.hibernate.SQL" level="INFO" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+        <logger name="org.springframework.orm.jpa" level="INFO" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+<!--        <logger name="org.springframework.data.repository.config.RepositoryConfigurationDelegate" level="INFO" additivity="false">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </logger>-->
+        <logger name="org.hibernate.type.descriptor.sql" level="INFO" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+        <logger name="com.netflix.discovery" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+        <logger name="org.springframework.cloud.netflix.eureka" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+        <logger name="org.springframework.cloud.config.client" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="DEV_FILE"/>
+        </logger>
+<!--        <logger name="org.springframework.boot.context.config" level="DEBUG" additivity="false">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--            <appender-ref ref="DEV_FILE"/>-->
+<!--        </logger>-->
+        <logger name="org.springframework.cloud.bootstrap" level="DEBUG" additivity="false">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="DEV_FILE"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="prod">
+        <property name="LOG_FILE_PATH" value="./logs/prod"/>
+        <property name="LOG_FILE_NAME" value="prod-app"/>
+
+        <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>50MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>3GB</totalSizeCap>
+            </rollingPolicy>
+        </appender>
+
+        <appender name="PROD_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_FILE_PATH}/prod-error.log</file>
+            <encoder>
+                <pattern>${LOG_PATTERN}</pattern>
+            </encoder>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_FILE_PATH}/prod-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+                <maxFileSize>50MB</maxFileSize>
+                <maxHistory>30</maxHistory>
+                <totalSizeCap>1GB</totalSizeCap>
+            </rollingPolicy>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>ERROR</level>
+            </filter>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="PROD_FILE"/>
+            <appender-ref ref="PROD_ERROR_FILE"/>
+        </root>
+
+        <logger name="com.wildrew.jobstat" level="INFO" additivity="false">
+            <appender-ref ref="PROD_FILE"/>
+            <appender-ref ref="PROD_ERROR_FILE"/>
+        </logger>
+
+        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/> <logger name="org.apache" level="WARN"/>
+        <logger name="io.lettuce" level="WARN"/>
+        <logger name="com.zaxxer.hikari" level="WARN"/>
+        <logger name="org.springframework.security" level="WARN"/>
+        <logger name="com.wildrew.jobstat.core.core_security.filter.JwtTokenFilterWithScopedValue" level="WARN"/>
+
+    </springProfile>
+</configuration>

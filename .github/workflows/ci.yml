@@ -2,8 +2,7 @@ name: PR Check
 
 on:
   pull_request:
-    branches: [ "main", "develop" ]
-
+    branches: [ "main", "develop", "feature/*", "feat/*" ]
 jobs:
   build-and-test:
     runs-on: ubuntu-latest

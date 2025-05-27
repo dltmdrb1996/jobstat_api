@@ -1,0 +1,66 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:prod_jobstat}?
+      serverTimezone=Asia/Seoul&useSSL=true
+      &allowPublicKeyRetrieval=true
+      &rewriteBatchedStatements=true
+      &useServerPrepStmts=false
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      idle-timeout: 60000
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      initialization-fail-timeout: 30000
+      connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:2}
+      password: ${REDIS_PASSWORD}
+      username: default
+      client-type: lettuce
+      connect-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+eureka:
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME_COMMUNITY_READ_PROD:jobstat-community-read-service}
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_DEFAULT_ZONE_COMMUNITY_READ_PROD:http://jobstat-eureka-server:8761/eureka/}
+
+logging:
+  level:
+    com.wildrew.app.community_read: INFO
+    org.springframework.kafka: WARN
+    org.springframework.data.redis: WARN
+
+jobstat:
+  core:
+    openapi:
+      title: "JobStat Community Read API (Production)"
+      server:
+        urls: "https://community-read.jobstat.com"
+        description: "Community Read Production Server"
+      security:
+        bearer-auth:
+          enabled: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
