@@ -73,7 +73,7 @@ dependencies {
 sentry {
     includeSourceContext = true
     org = "wildrew-5w"
-    projectName = "java-spring-boot-statistics-read" // 이 줄 추가
+    projectName = "java-spring-boot"
     authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
 

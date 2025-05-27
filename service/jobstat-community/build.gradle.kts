@@ -48,7 +48,6 @@ dependencies {
     // Spring Cloud (MSA 기능용)
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-    // implementation("org.springframework.cloud:spring-cloud-starter-openfeign") // 이 서비스가 다른 서비스를 호출한다면
 
     // Kafka
     implementation("org.springframework.kafka:spring-kafka")
@@ -98,7 +97,7 @@ kotlin {
 sentry {
     includeSourceContext = true
     org = "wildrew-5w"
-    projectName = "java-spring-boot-community"
+    projectName = "java-spring-boot"
     authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
 
