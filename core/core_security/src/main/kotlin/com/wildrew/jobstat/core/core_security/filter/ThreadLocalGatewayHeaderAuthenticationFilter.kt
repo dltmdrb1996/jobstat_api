@@ -37,17 +37,19 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
     companion object {
         const val HEADER_USER_ID = "X-User-Id"
         const val HEADER_USER_ROLES = "X-User-Roles"
+
         // EXCLUDED_PREFIXES, EXCLUDED_PATHS, ERROR_MESSAGES는 ScopedValue 버전과 동일하게 사용
-         private val EXCLUDED_PREFIXES = listOf(
-            "/swagger-ui",
-            "/v3/api-docs",
-            "/swagger-resources",
-            "/webjars",
-            "/admin",
-            "/actuator/health",
-            "/actuator/prometheus",
-            "/actuator/info"
-        )
+        private val EXCLUDED_PREFIXES =
+            listOf(
+                "/swagger-ui",
+                "/v3/api-docs",
+                "/swagger-resources",
+                "/webjars",
+                "/admin",
+                "/actuator/health",
+                "/actuator/prometheus",
+                "/actuator/info",
+            )
         private val EXCLUDED_PATHS = setOf("/swagger-ui.html", "/favicon.ico")
 
         private val ERROR_MESSAGES =
@@ -78,7 +80,7 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
                 log.debug(
                     "Gateway Header Auth Filter 처리 (ThreadLocal): {}, shouldNotFilter(path based + @Public): {}",
                     request.requestURI,
-                    shouldNotFilter(request)
+                    shouldNotFilter(request),
                 )
             }
 
@@ -96,9 +98,11 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
             if (userIdHeader != null && userRolesHeader != null) {
                 try {
                     val userId = userIdHeader.toLong()
-                    val roles = userRolesHeader.split(",")
-                        .filter { it.isNotBlank() }
-                        .map { SimpleGrantedAuthority("ROLE_$it") }
+                    val roles =
+                        userRolesHeader
+                            .split(",")
+                            .filter { it.isNotBlank() }
+                            .map { SimpleGrantedAuthority("ROLE_$it") }
 
                     if (requestData.requiresAdminAuth && !roles.any { it.authority == "ROLE_ADMIN" }) {
                         sendErrorResponse(response, ErrorCode.ADMIN_ACCESS_REQUIRED)
@@ -112,9 +116,9 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
                     log.warn("Invalid X-User-Id header: {}", userIdHeader, e)
                     // 인증 실패로 처리
                 } catch (e: Exception) {
-                     log.error("Error processing gateway headers for ThreadLocal", e)
-                     sendErrorResponse(response, ErrorCode.INTERNAL_ERROR)
-                     return
+                    log.error("Error processing gateway headers for ThreadLocal", e)
+                    sendErrorResponse(response, ErrorCode.INTERNAL_ERROR)
+                    return
                 }
             }
 
@@ -148,13 +152,13 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
         }
     }
 
-    private fun getHandlerMethod(request: HttpServletRequest): HandlerMethod? = try {
-        requestMappingHandlerMapping.getHandler(request)?.handler as? HandlerMethod
-    } catch (e: Exception) {
-        log.trace("Could not get handler method for request: {}", request.requestURI, e)
-        null
-    }
-
+    private fun getHandlerMethod(request: HttpServletRequest): HandlerMethod? =
+        try {
+            requestMappingHandlerMapping.getHandler(request)?.handler as? HandlerMethod
+        } catch (e: Exception) {
+            log.trace("Could not get handler method for request: {}", request.requestURI, e)
+            null
+        }
 
     private fun computeIsPublicAnnotation(handlerMethod: HandlerMethod?): Boolean =
         when {

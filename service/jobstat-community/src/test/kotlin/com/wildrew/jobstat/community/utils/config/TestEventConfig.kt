@@ -1,0 +1,32 @@
+package com.wildrew.jobstat.community.utils.config
+
+import com.wildrew.jobstat.core.core_event.consumer.EventHandlerRegistryService
+import com.wildrew.jobstat.core.core_event.outbox.OutboxEventPublisher
+import org.mockito.Mockito
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
+import org.springframework.kafka.core.ConsumerFactory
+import org.springframework.kafka.core.ProducerFactory
+
+@TestConfiguration
+class TestEventConfig {
+    @Bean
+    @Primary
+    fun mockOutboxEventPublisher(): OutboxEventPublisher {
+        val mockPublisher = Mockito.mock(OutboxEventPublisher::class.java)
+        return mockPublisher
+    }
+
+    @Bean
+    @Primary
+    fun mockConsumerFactory(): ConsumerFactory<*, *> = Mockito.mock(ConsumerFactory::class.java) as ConsumerFactory<Any, Any>
+
+    @Bean
+    @Primary
+    fun mockProducerFactory(): ProducerFactory<*, *> = Mockito.mock(ProducerFactory::class.java) as ProducerFactory<Any, Any>
+
+    @Bean
+    @Primary
+    fun mockEventHandlerRegistryService(): EventHandlerRegistryService = Mockito.mock(EventHandlerRegistryService::class.java)
+}

@@ -2,12 +2,9 @@ package com.wildrew.jobstat.core.core_security.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wildrew.jobstat.core.core_security.filter.ScopedValueGatewayHeaderAuthenticationFilter
-import com.wildrew.jobstat.core.core_security.filter.ScopedValueJwtTokenFilter
 import com.wildrew.jobstat.core.core_security.filter.ThreadLocalGatewayHeaderAuthenticationFilter
-import com.wildrew.jobstat.core.core_security.filter.ThreadLocalJwtTokenFilter
 import com.wildrew.jobstat.core.core_security.util.ScopedSecurityContextHolder
 import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
-import com.wildrew.jobstat.core.core_token.JwtTokenParser
 import com.wildrew.jobstat.core.core_token.config.CoreTokenAutoConfiguration
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.AutoConfiguration

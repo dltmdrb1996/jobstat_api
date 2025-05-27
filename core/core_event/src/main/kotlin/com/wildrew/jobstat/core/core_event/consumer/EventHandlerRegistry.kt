@@ -10,6 +10,8 @@ interface EventHandlerRegistryService {
     fun getHandlersForEventType(eventType: EventType): List<EventHandlingUseCase<*, *, *>>
 
     fun getSupportedEventTypes(): Set<EventType>
+
+    fun processEvent(event: Event<out EventPayload>) // 추가: processEvent 메소드 시그니처
 }
 
 class EventHandlerRegistry(
@@ -48,7 +50,7 @@ class EventHandlerRegistry(
 
     override fun getSupportedEventTypes(): Set<EventType> = handlerMap.keys
 
-    internal fun processEvent(event: Event<out EventPayload>) { // internal로 변경
+    override fun processEvent(event: Event<out EventPayload>) { // 변경: override 추가 및 public으로 변경 (인터페이스 구현)
         val eventType = event.type
         val eventId = event.eventId
         val targetHandlers = getHandlersForEventType(eventType)
@@ -85,7 +87,7 @@ class EventHandlerRegistry(
                     e,
                 )
                 success = false
-                throw e
+                throw e // 예외를 다시 던져서 AbstractEventConsumer에서 처리하도록 함
             }
         }
         if (success) {

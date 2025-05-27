@@ -4,12 +4,11 @@ plugins {
 rootProject.name = "jobstat"
 
 include(
-    ":app",
     "service:jobstat-auth",
-//    "service:jobstat-community",
-//    "service:jobstat-community_read",
-//    "service:jobstat-notification",
-//    "service:jobstat-statistics_read",
+    "service:jobstat-community",
+    "service:jobstat-community_read",
+    "service:jobstat-notification",
+    "service:jobstat-statistics_read",
     "core:core_coroutine",
     "core:core_error",
     "core:core_event",

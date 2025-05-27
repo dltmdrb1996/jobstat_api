@@ -23,8 +23,8 @@ open class DLTConsumer(
     }
 
     @KafkaListener(
-        topicPattern = "#{'\${jobstat.core.event.dlt.consumer.topic-pattern:.*\\.DLT}'}", // SpEL
-        groupId = "#{'\${jobstat.core.event.dlt.consumer.group-id:dlt-persistence-group}'}", // SpEL
+        topicPattern = "#{'\${jobstat.core.event.dlt.consumer.topic-pattern:.*\\.DLT}'}",
+        groupId = "#{'\${jobstat.core.event.dlt.consumer.group-id:dlt-persistence-group}'}",
         containerFactory = "coreKafkaListenerContainerFactory",
     )
     @Transactional

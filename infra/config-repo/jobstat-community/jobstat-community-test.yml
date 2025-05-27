@@ -1,0 +1,44 @@
+spring:
+  threads:
+    virtual:
+      enabled: true
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: true
+    show-sql: true
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:1}
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+    chunk-size: 1000
+    job-queue-size: 100
+    max-threads: 5
+
+
+batch:
+  chunk-size: 2000
+  small-size: 100
+  job-size: 100
+
+logging:
+  level:
+    root: INFO
+    com.wildrew.batch: DEBUG
+    org.springframework.jdbc.core: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.testcontainers: INFO

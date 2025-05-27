@@ -3,13 +3,11 @@ package com.wildrew.jobstat.core.core_event.config
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wildrew.jobstat.core.core_coroutine.CoroutineModuleConfig
 import com.wildrew.jobstat.core.core_event.consumer.EventHandlerRegistry
+import com.wildrew.jobstat.core.core_event.consumer.EventHandlerRegistryService
 import com.wildrew.jobstat.core.core_event.consumer.EventHandlingUseCase
 import com.wildrew.jobstat.core.core_event.dlt.DLTConsumer
 import com.wildrew.jobstat.core.core_event.dlt.DeadLetterTopicRepository
-import com.wildrew.jobstat.core.core_event.outbox.OutboxEventPublisher
-import com.wildrew.jobstat.core.core_event.outbox.OutboxMessageRelay
-import com.wildrew.jobstat.core.core_event.outbox.OutboxProcessor
-import com.wildrew.jobstat.core.core_event.outbox.OutboxRepository
+import com.wildrew.jobstat.core.core_event.outbox.*
 import com.wildrew.jobstat.core.core_jpa_base.id_generator.CoreIdGeneratorAutoConfiguration
 import com.wildrew.jobstat.core.core_jpa_base.id_generator.SnowflakeGenerator
 import com.wildrew.jobstat.core.core_serializer.DataSerializer
@@ -33,7 +31,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
-import org.springframework.kafka.core.ConsumerFactory // 이 import가 있는지 확인
+import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaOperations
 import org.springframework.kafka.core.KafkaTemplate
@@ -88,10 +86,13 @@ class CoreEventAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(EventHandlerRegistry::class)
+    @ConditionalOnMissingBean(EventHandlerRegistryService::class)
     fun coreEventHandlerRegistry(
         handlers: List<EventHandlingUseCase<*, *, *>>,
-    ): EventHandlerRegistry = EventHandlerRegistry(handlers)
+    ): EventHandlerRegistryService {
+        log.info("실제 EventHandlerRegistry 빈 생성: ${handlers.size}개의 핸들러와 함께.")
+        return EventHandlerRegistry(handlers)
+    }
 
     @Bean
     @ConditionalOnMissingBean(OutboxEventPublisher::class)
@@ -107,7 +108,7 @@ class CoreEventAutoConfiguration {
             dataSerializer,
             eventIdGenerator,
         )
-        return OutboxEventPublisher(applicationEventPublisher, dataSerializer, eventIdGenerator)
+        return KafkaOutboxEventPublisher(applicationEventPublisher, dataSerializer, eventIdGenerator)
     }
 
     @Bean
@@ -189,15 +190,4 @@ class CoreEventAutoConfiguration {
             schedulerEnabled,
         )
     }
-
-//    @Bean
-//    @ConditionalOnMissingBean
-//    fun coreKafkaProfileAwareConstantsInitializer(
-//        @Value("\${spring.profiles.active:dev}") activeProfile: String,
-//    ): KafkaProfileAwareConstantsInitializer {
-//        val initializer = KafkaProfileAwareConstantsInitializer(activeProfile)
-//        initializer.initializeConstants()
-//        log.info("CoreKafkaProfileAwareConstantsInitializer bean created and Kafka constants initialized for profile: {}", activeProfile)
-//        return initializer
-//    }
 }

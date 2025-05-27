@@ -1,6 +1,5 @@
 package com.wildrew.jobstat.core.core_event.model
 
-import com.wildrew.jobstat.core.core_event.config.ConsumerConfig
 import com.wildrew.jobstat.core.core_event.model.payload.board.*
 import com.wildrew.jobstat.core.core_event.model.payload.comment.*
 import com.wildrew.jobstat.core.core_event.model.payload.notification.EmailNotificationEvent
@@ -31,6 +30,7 @@ enum class EventType(
     ;
 
     fun getTopicName(): String = Topic.getTopicName(consumerName)
+
     fun getGroupId(): String = GroupId.getGroupId(consumerName)
 
     companion object {

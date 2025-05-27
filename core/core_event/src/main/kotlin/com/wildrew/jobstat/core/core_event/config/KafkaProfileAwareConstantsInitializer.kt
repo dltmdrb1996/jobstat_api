@@ -1,11 +1,11 @@
-//package com.wildrew.jobstat.core.core_event.config
+// package com.wildrew.jobstat.core.core_event.config
 //
-//import com.wildrew.jobstat.core.core_event.model.EventType
-//import org.slf4j.LoggerFactory
+// import com.wildrew.jobstat.core.core_event.model.EventType
+// import org.slf4j.LoggerFactory
 //
-//class KafkaProfileAwareConstantsInitializer(
+// class KafkaProfileAwareConstantsInitializer(
 //    private val activeProfile: String,
-//) {
+// ) {
 //    private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 //
 //    fun initializeConstants() {
@@ -15,4 +15,4 @@
 //        log.info("Initialized EventType.Topic.COMMUNITY_COMMAND: ${EventType.Topic.communityCommand}")
 //        log.info("Initialized EventType.Topic.NOTIFICATION: ${EventType.Topic.notification}")
 //    }
-//}
+// }

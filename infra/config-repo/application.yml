@@ -81,11 +81,52 @@ springdoc:
 
 kafka:
   consumer:
+    community-read:
+      topic: community-read-${spring.profiles.active:dev}
+      group-id: community-read-consumer-group-${spring.profiles.active:dev}-${spring.application.name}
+      retry:
+        attempts: 3
+        delay-ms: 1000
+        multiplier: 2.0
+    community-command:
+      topic: community-command-${spring.profiles.active:dev}
+      group-id: community-command-consumer-group-${spring.profiles.active:dev}-${spring.application.name}
+      retry:
+        attempts: 3
+        delay-ms: 1000
+        multiplier: 2.0
+    notification:
+      topic: notification-${spring.profiles.active:dev}
+      group-id: notification-consumer-group-${spring.profiles.active:dev}-${spring.application.name}
+      retry:
+        attempts: 3
+        delay-ms: 1000
+        multiplier: 2.0
     common:
       dlt-suffix: .DLT
       auto-create-dlt: true
 
-
 ddns.domain: ${DDNS_DOMAIN}
 SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN}
 
+outbox:
+  relay: # 아웃박스 메시지 Kafka 전송 스케줄러
+    kafka-send-timeout-seconds: 3
+    scheduler:
+      fixed-delay-seconds: 10
+      initial-delay-seconds: 5
+      cutoff-seconds: 10 # 이 시간 이전의 미전송 메시지만 처리
+      batch-size: 100
+    max-retry-count: 3
+  processor: # 이벤트 발행 후 아웃박스 저장 로직 관련 (core_event에서 사용)
+    kafka-send-timeout-seconds: 5 # 사용 안 함 (relay에서 전송)
+    max-retry-count:
+
+jobstat:
+  core:
+    token:
+      jwt:
+        secret: ${JWT_SECRET}
+        access-token-expiration-seconds: ${JWT_ACCESS_TOKEN_EXPIRATION:999999}
+        refresh-token-expiration-seconds: ${JWT_REFRESH_TOKEN_EXPIRATION:9604800}
+        tokenPrefix: "Bearer "

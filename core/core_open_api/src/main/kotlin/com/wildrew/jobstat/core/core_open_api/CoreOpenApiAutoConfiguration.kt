@@ -65,6 +65,12 @@ class CoreOpenApiAutoConfiguration {
 
     private val jwtSecuritySchemeName = "bearerAuth"
 
+    @Value("\${jobstat.core.openapi.security.gateway-header-auth.enabled:true}")
+    private var gatewayHeaderAuthEnabled: Boolean = true
+
+    private val xUserIdSchemeName = "xUserIdAuth"
+    private val xUserRolesSchemeName = "xUserRolesAuth"
+
     @Bean
     @ConditionalOnMissingBean(OpenAPI::class)
     fun customOpenApiDefinition(): OpenAPI {
@@ -103,7 +109,40 @@ class CoreOpenApiAutoConfiguration {
             log.warn("No server URL configured via 'jobstat.core.openapi.server.urls'. Using default behavior.")
         }
 
-        if (bearerAuthEnabled) {
+        val components = Components()
+        val securityRequirements = mutableListOf<SecurityRequirement>()
+
+        if (gatewayHeaderAuthEnabled) {
+            components.addSecuritySchemes(
+                xUserIdSchemeName,
+                SecurityScheme()
+                    .type(SecurityScheme.Type.APIKEY)
+                    .`in`(SecurityScheme.In.HEADER)
+                    .name("X-User-Id")
+                    .description("게이트웨이에서 전달되는 사용자 ID"),
+            )
+            securityRequirements.add(SecurityRequirement().addList(xUserIdSchemeName))
+
+            components.addSecuritySchemes(
+                xUserRolesSchemeName,
+                SecurityScheme()
+                    .type(SecurityScheme.Type.APIKEY)
+                    .`in`(SecurityScheme.In.HEADER)
+                    .name("X-User-Roles")
+                    .description("게이트웨이에서 전달되는 사용자 역할 (쉼표로 구분)"),
+            )
+            securityRequirements.add(SecurityRequirement().addList(xUserRolesSchemeName))
+        }
+        // else if (bearerAuthEnabled) { // 만약 기존 Bearer 인증도 옵션으로 남겨두고 싶다면
+        //    // 기존 Bearer 토큰 설정
+        // }
+
+        if (components.securitySchemes?.isNotEmpty() == true) {
+            openApi.components(components)
+        }
+        if (securityRequirements.isNotEmpty()) {
+            openApi.security(securityRequirements) // 모든 API에 이 보안 요구사항들을 적용
+        } else if (bearerAuthEnabled) {
             openApi.components(
                 Components().addSecuritySchemes(
                     jwtSecuritySchemeName,

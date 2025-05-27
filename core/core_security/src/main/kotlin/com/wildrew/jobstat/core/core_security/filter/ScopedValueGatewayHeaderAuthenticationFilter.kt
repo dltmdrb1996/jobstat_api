@@ -39,16 +39,17 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
         const val HEADER_USER_ID = "X-User-Id"
         const val HEADER_USER_ROLES = "X-User-Roles"
 
-        private val EXCLUDED_PREFIXES = listOf(
-            "/swagger-ui",
-            "/v3/api-docs",
-            "/swagger-resources",
-            "/webjars",
-            "/admin",
-            "/actuator/health",
-            "/actuator/prometheus",
-            "/actuator/info"
-        )
+        private val EXCLUDED_PREFIXES =
+            listOf(
+                "/swagger-ui",
+                "/v3/api-docs",
+                "/swagger-resources",
+                "/webjars",
+                "/admin",
+                "/actuator/health",
+                "/actuator/prometheus",
+                "/actuator/info",
+            )
         private val EXCLUDED_PATHS = setOf("/swagger-ui.html", "/favicon.ico")
 
         private val ERROR_MESSAGES =
@@ -75,7 +76,7 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
             log.debug(
                 "Gateway Header Auth Filter 처리 (ScopedValue): {}, shouldNotFilter(path based + @Public): {}",
                 request.requestURI,
-                shouldNotFilter(request)
+                shouldNotFilter(request),
             )
         }
 
@@ -93,7 +94,7 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
             "Gateway Header Auth Filter: userIdHeader={}, userRolesHeader={}, requestData={}",
             userIdHeader,
             userRolesHeader,
-            requestData
+            requestData,
         )
         var isAuthenticatedByHeader = false
         var isAdminAuthorizedByHeader = true // 기본적으로 통과, AdminAuth 시 체크
@@ -101,9 +102,11 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
         if (userIdHeader != null && userRolesHeader != null) {
             try {
                 val userId = userIdHeader.toLong()
-                val roles = userRolesHeader.split(",")
-                    .filter { it.isNotBlank() }
-                    .map { SimpleGrantedAuthority("ROLE_$it") }
+                val roles =
+                    userRolesHeader
+                        .split(",")
+                        .filter { it.isNotBlank() }
+                        .map { SimpleGrantedAuthority("ROLE_$it") }
 
                 if (requestData.requiresAdminAuth && !roles.any { it.authority == "ROLE_ADMIN" }) {
                     isAdminAuthorizedByHeader = false
@@ -120,7 +123,8 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
             } catch (e: NumberFormatException) {
                 log.warn("Invalid X-User-Id header: {}", userIdHeader, e)
                 // 헤더가 있지만 파싱 실패 시 인증 실패로 간주 가능
-            } catch (e: Exception) { // 그 외 예외 (거의 발생 안 함)
+            } catch (e: Exception) {
+                // 그 외 예외 (거의 발생 안 함)
                 log.error("Error processing gateway headers for ScopedValue", e)
                 sendErrorResponse(response, ErrorCode.INTERNAL_ERROR) // 또는 다른 적절한 에러
                 return
@@ -142,15 +146,21 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
         }
     }
 
-    private fun doFilterAndHandleException(filterChain: FilterChain, request: HttpServletRequest, response: HttpServletResponse) {
+    private fun doFilterAndHandleException(
+        filterChain: FilterChain,
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+    ) {
         try {
             filterChain.doFilter(request, response)
         } catch (e: Exception) {
-            if (e is RuntimeException) throw e
-            else throw RuntimeException(e)
+            if (e is RuntimeException) {
+                throw e
+            } else {
+                throw RuntimeException(e)
+            }
         }
     }
-
 
     // getCachedRequestData, getHandlerMethod, computeIsPublicAnnotation,
     // computeIsPublicWithTokenCheck, computeRequiresAdminAuth, sendErrorResponse 메서드는
@@ -170,13 +180,14 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
         }
     }
 
-    private fun getHandlerMethod(request: HttpServletRequest): HandlerMethod? = try {
-        requestMappingHandlerMapping.getHandler(request)?.handler as? HandlerMethod
-    } catch (e: Exception) { // Tomcat의 IllegalStateException 등 처리
-        log.trace("Could not get handler method for request: {}", request.requestURI, e)
-        null
-    }
-
+    private fun getHandlerMethod(request: HttpServletRequest): HandlerMethod? =
+        try {
+            requestMappingHandlerMapping.getHandler(request)?.handler as? HandlerMethod
+        } catch (e: Exception) {
+            // Tomcat의 IllegalStateException 등 처리
+            log.trace("Could not get handler method for request: {}", request.requestURI, e)
+            null
+        }
 
     private fun computeIsPublicAnnotation(handlerMethod: HandlerMethod?): Boolean =
         when {

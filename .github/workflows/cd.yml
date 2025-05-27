@@ -1,163 +1,164 @@
-name: Backend Deploy
-
-on:
-  push:
-    branches: [ "main" ]
-
-jobs:
-  create-tag:
-    runs-on: ubuntu-latest
-    outputs:
-      new_tag: ${{ steps.tag_version.outputs.new_tag }}
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          default_bump: patch
-          release_branches: main
-
-  docker-build-and-push:
-    needs: create-tag
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up JDK 24
-        uses: actions/setup-java@v3
-        with:
-          java-version: '24'
-          distribution: 'zulu'
-          cache: gradle
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build app with Gradle
-        run: ./gradlew :app:bootJar
-        env:
-          SPRING_PROFILES_ACTIVE: prod
-
-      - name: Build config-server with Gradle
-        run: ./gradlew :jobstat-config-server:bootJar
-        env:
-          SPRING_PROFILES_ACTIVE: prod
-
-      - name: Login to DockerHub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: Build and push Docker images
-        env:
-          TAG: ${{ needs.create-tag.outputs.new_tag }}
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG \
-                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest -f app/Dockerfile .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest
-          
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:$TAG \
-                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:latest -f jobstat-config-server/Dockerfile .
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:$TAG
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:latest
-          
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG \
-                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:latest -f nginx/Dockerfile ./nginx
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:latest
-
-  deploy:
-    needs: [ docker-build-and-push, create-tag ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Get Github Actions IP
-        id: ip
-        uses: haythem/public-ip@v1.2
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2  # v1 -> v2로 업데이트 필요
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-northeast-2
-
-      - name: Add Github Actions IP to Security group
-        run: |
-          aws ec2 authorize-security-group-ingress \
-            --group-id ${{ secrets.AWS_SG_ID }} \
-            --protocol tcp \
-            --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
-            --region ap-northeast-2
-
-      - name: Copy configuration files to EC2
-        uses: appleboy/scp-action@master
-        with:
-          # config-repo 디렉토리도 함께 복사 (만약 Config Server가 jar 외부 파일을 참조한다면)
-          # 현재는 jar에 포함되므로, docker-compose.yml만 복사해도 될 수 있음.
-          # 하지만 docker-compose.yml에서 호스트 볼륨 마운트를 사용한다면 config-repo도 복사 필요.
-          # 여기서는 jar에 포함된 Config Server를 가정하고, config-repo 복사는 생략 (필요시 추가)
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.yml,nginx/"
-          target: "/home/ubuntu/jobstat/backend"
-
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            mkdir -p /home/ubuntu/jobstat/backend
-            cd /home/ubuntu/jobstat/backend
-            
-            # Create .env file securely
-            cat > .env << EOL
-            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
-            BACKEND_TAG=${{ needs.create-tag.outputs.new_tag }}
-            DB_USERNAME=${{ secrets.DB_USERNAME }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-            MONGO_USERNAME=${{ secrets.MONGO_USERNAME }}
-            MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }}
-            SENTRY_DSN=${{ secrets.SENTRY_DSN }}
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
-            JWT_SECRET=${{ secrets.JWT_SECRET }}
-            DB_HOST=${{ secrets.DB_HOST }}
-            MONGO_HOST=${{ secrets.MONGO_HOST }}
-            REDIS_HOST=${{ secrets.REDIS_HOST }}
-            CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
-            DDNS_DOMAIN=${{ secrets.DDNS_DOMAIN }}
-            GMAIL_ID=${{ secrets.GMAIL_ID }}
-            GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}
-            ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
-            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
-            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
-            REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
-            KAFKA_SERVERS=${{ secrets.KAFKA_SERVERS }}
-            EOL
-            
-            chmod 600 .env
-            
-            docker-compose pull
-            docker-compose up -d
-            docker system prune -af
-
-      - name: Remove Github Actions IP from Security group
-        if: always()
-        run: |
-          aws ec2 revoke-security-group-ingress \
-            --group-id ${{ secrets.AWS_SG_ID }} \
-            --protocol tcp \
-            --port 22 \
-            --cidr ${{ steps.ip.outputs.ipv4 }}/32
+## MSA 배포버전으로 변경필요
+#name: Backend Deploy
+#
+#on:
+#  push:
+#    branches: [ "main" ]
+#
+#jobs:
+#  create-tag:
+#    runs-on: ubuntu-latest
+#    outputs:
+#      new_tag: ${{ steps.tag_version.outputs.new_tag }}
+#    steps:
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0
+#
+#      - name: Bump version and push tag
+#        id: tag_version
+#        uses: mathieudutour/github-tag-action@v6.1
+#        with:
+#          github_token: ${{ secrets.GITHUB_TOKEN }}
+#          default_bump: patch
+#          release_branches: main
+#
+#  docker-build-and-push:
+#    needs: create-tag
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Set up JDK 24
+#        uses: actions/setup-java@v3
+#        with:
+#          java-version: '24'
+#          distribution: 'zulu'
+#          cache: gradle
+#
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x gradlew
+#
+#      - name: Build app with Gradle
+#        run: ./gradlew :app:bootJar
+#        env:
+#          SPRING_PROFILES_ACTIVE: prod
+#
+#      - name: Build config-server with Gradle
+#        run: ./gradlew :jobstat-config-server:bootJar
+#        env:
+#          SPRING_PROFILES_ACTIVE: prod
+#
+#      - name: Login to DockerHub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: Build and push Docker images
+#        env:
+#          TAG: ${{ needs.create-tag.outputs.new_tag }}
+#        run: |
+#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG \
+#                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest -f app/Dockerfile .
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:$TAG
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-app:latest
+#
+#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:$TAG \
+#                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:latest -f jobstat-config-server/Dockerfile .
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:$TAG
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-config-server:latest
+#
+#          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG \
+#                      -t ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:latest -f nginx/Dockerfile ./nginx
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:$TAG
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/jobstat-nginx:latest
+#
+#  deploy:
+#    needs: [ docker-build-and-push, create-tag ]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v3
+#
+#      - name: Get Github Actions IP
+#        id: ip
+#        uses: haythem/public-ip@v1.2
+#
+#      - name: Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v2  # v1 -> v2로 업데이트 필요
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: ap-northeast-2
+#
+#      - name: Add Github Actions IP to Security group
+#        run: |
+#          aws ec2 authorize-security-group-ingress \
+#            --group-id ${{ secrets.AWS_SG_ID }} \
+#            --protocol tcp \
+#            --port 22 \
+#            --cidr ${{ steps.ip.outputs.ipv4 }}/32 \
+#            --region ap-northeast-2
+#
+#      - name: Copy configuration files to EC2
+#        uses: appleboy/scp-action@master
+#        with:
+#          # config-repo 디렉토리도 함께 복사 (만약 Config Server가 jar 외부 파일을 참조한다면)
+#          # 현재는 jar에 포함되므로, docker-compose.yml만 복사해도 될 수 있음.
+#          # 하지만 docker-compose.yml에서 호스트 볼륨 마운트를 사용한다면 config-repo도 복사 필요.
+#          # 여기서는 jar에 포함된 Config Server를 가정하고, config-repo 복사는 생략 (필요시 추가)
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_SSH_KEY }}
+#          source: "docker-compose.yml,nginx/"
+#          target: "/home/ubuntu/jobstat/backend"
+#
+#      - name: Deploy to EC2
+#        uses: appleboy/ssh-action@master
+#        with:
+#          host: ${{ secrets.EC2_HOST }}
+#          username: ${{ secrets.EC2_USERNAME }}
+#          key: ${{ secrets.EC2_SSH_KEY }}
+#          script: |
+#            mkdir -p /home/ubuntu/jobstat/backend
+#            cd /home/ubuntu/jobstat/backend
+#
+#            # Create .env file securely
+#            cat > .env << EOL
+#            DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}
+#            BACKEND_TAG=${{ needs.create-tag.outputs.new_tag }}
+#            DB_USERNAME=${{ secrets.DB_USERNAME }}
+#            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+#            MONGO_USERNAME=${{ secrets.MONGO_USERNAME }}
+#            MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }}
+#            SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+#            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+#            JWT_SECRET=${{ secrets.JWT_SECRET }}
+#            DB_HOST=${{ secrets.DB_HOST }}
+#            MONGO_HOST=${{ secrets.MONGO_HOST }}
+#            REDIS_HOST=${{ secrets.REDIS_HOST }}
+#            CORS_ALLOWED_ORIGINS=${{ secrets.CORS_ALLOWED_ORIGINS }}
+#            DDNS_DOMAIN=${{ secrets.DDNS_DOMAIN }}
+#            GMAIL_ID=${{ secrets.GMAIL_ID }}
+#            GMAIL_PASSWORD=${{ secrets.GMAIL_PASSWORD }}
+#            ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+#            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+#            REDIS_PASSWORD=${{ secrets.REDIS_PASSWORD }}
+#            REDIS_USERNAME=${{ secrets.REDIS_USERNAME }}
+#            KAFKA_SERVERS=${{ secrets.KAFKA_SERVERS }}
+#            EOL
+#
+#            chmod 600 .env
+#
+#            docker-compose pull
+#            docker-compose up -d
+#            docker system prune -af
+#
+#      - name: Remove Github Actions IP from Security group
+#        if: always()
+#        run: |
+#          aws ec2 revoke-security-group-ingress \
+#            --group-id ${{ secrets.AWS_SG_ID }} \
+#            --protocol tcp \
+#            --port 22 \
+#            --cidr ${{ steps.ip.outputs.ipv4 }}/32

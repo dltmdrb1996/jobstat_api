@@ -33,15 +33,15 @@ dependencyManagement {
     }
 }
 
-
 tasks.named<BootJar>("bootJar") {
     archiveClassifier.set("boot")
 }
 
-val copyConfigRepo = tasks.register<Copy>("copyConfigRepo") {
-    from(layout.projectDirectory.dir("../config-repo"))
-    into(layout.buildDirectory.dir("resources/main/config-repo"))
-}
+val copyConfigRepo =
+    tasks.register<Copy>("copyConfigRepo") {
+        from(layout.projectDirectory.dir("../config-repo"))
+        into(layout.buildDirectory.dir("resources/main/config-repo"))
+    }
 
 tasks.named("processResources") {
     dependsOn(copyConfigRepo)

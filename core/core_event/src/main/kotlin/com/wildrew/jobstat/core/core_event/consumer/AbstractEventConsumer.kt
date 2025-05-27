@@ -10,7 +10,7 @@ abstract class AbstractEventConsumer {
     protected val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
     @Autowired
-    protected lateinit var handlerRegistry: EventHandlerRegistry
+    protected lateinit var handlerRegistry: EventHandlerRegistryService
 
     @Autowired
     protected lateinit var dataSerializer: DataSerializer

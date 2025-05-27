@@ -6,7 +6,6 @@ import com.wildrew.jobstat.core.core_token.model.TokenType
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import java.time.Instant
 import java.util.*
 import javax.crypto.SecretKey
@@ -26,7 +25,7 @@ class JwtTokenGenerator(
     fun getRefreshTokenExpiration(): Long = refreshTokenExpiration.toLong()
 
     init {
-        log.info("JWT Token Generator initialized with secret key length: ${secret} characters")
+        log.info("JWT Token Generator initialized with secret key length: $secret characters")
     }
 
     private fun createToken(
