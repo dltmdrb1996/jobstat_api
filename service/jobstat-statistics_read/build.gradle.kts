@@ -128,10 +128,14 @@ tasks.jacocoTestReport {
 tasks.named("generateSentryBundleIdJava") {
     dependsOn("kspKotlin")
 }
+
 tasks.named("sentryCollectSourcesJava") {
     dependsOn("kspKotlin")
 }
 
+tasks.named("sentryCollectSourcesJava") {
+    dependsOn("kspTestKotlin")
+}
 tasks.named<BootJar>("bootJar") {
     archiveClassifier.set("boot")
 }

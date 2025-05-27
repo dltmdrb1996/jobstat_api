@@ -94,12 +94,11 @@ kotlin {
     }
 }
 
-// Sentry 설정 (기존 app 모듈과 동일)
 sentry {
-    includeSourceContext.set(true)
-    org.set("wildrew-5w")
-    projectName.set("java-spring-boot-auth")
-    authToken.set(System.getenv("SENTRY_AUTH_TOKEN"))
+    includeSourceContext = true
+    org = "wildrew-5w"
+    projectName = "java-spring-boot"
+    authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
