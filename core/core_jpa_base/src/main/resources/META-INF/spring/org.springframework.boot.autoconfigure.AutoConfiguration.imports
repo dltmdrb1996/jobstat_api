@@ -1,0 +1,3 @@
+# core jpa
+com.wildrew.jobstat.core.core_jpa_base.id_generator.CoreIdGeneratorAutoConfiguration
+com.wildrew.jobstat.core.core_jpa_base.CoreJpaBaseAutoConfiguration

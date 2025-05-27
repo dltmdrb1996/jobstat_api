@@ -1,0 +1,61 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:dev_jobstat}?
+      serverTimezone=Asia/Seoul&useSSL=false
+      &allowPublicKeyRetrieval=true
+      &rewriteBatchedStatements=true
+      &useServerPrepStmts=false
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      idle-timeout: 30000
+      connection-timeout: 20000
+      maximum-pool-size: 5
+      minimum-idle: 2
+      initialization-fail-timeout: 30000
+      connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DB:1}
+      password: ${REDIS_PASSWORD}
+      username: default
+      client-type: lettuce
+      connect-timeout: 5000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.wildrew.app.community: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.kafka: DEBUG
+    org.springframework.transaction: DEBUG
+
+jobstat:
+  core:
+    openapi:
+      title: "JobStat Community API (Development)"
+      server:
+        urls: "http://localhost:${server.port:8083}" # jobstat-auth.yml의 server.port 값 참조
+        description: "Community Development Server"
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+  default-models-expand-depth: 2

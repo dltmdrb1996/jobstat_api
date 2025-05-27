@@ -2,13 +2,13 @@ version: '3.8'
 
 networks:
   public:
-    name: public           # 실제 Docker 네트워크 이름을 'public'으로 사용
-    external: false        # 없으면 새로 만든다(Compose가 직접 관리)
+    name: public
+    external: false
   internal:
     name: internal
     driver: bridge
-    internal: true         # 외부 라우팅 차단(내부 전용)
-    external: false        # 없으면 만들고, 있으면 재사용
+    internal: true
+    external: false
 
 services:
   nginx:
@@ -26,17 +26,35 @@ services:
       - public     # 외부와 통신
       - internal   # 내부 서비스와 통신
     depends_on:
-      spring-app:
+      jobstat-app:
         condition: service_healthy
     restart: always
 
-  spring-app:
+  jobstat-config-server:
+    container_name: jobstat-config-server
+    image: ${DOCKERHUB_USERNAME}/jobstat-config-server:${BACKEND_TAG}
+    ports: # 외부에서 직접 접근할 필요가 없다면 포트 노출 불필요, app에서만 내부적으로 접근
+    expose:
+      - "8888"
+    volumes:
+      - /home/ubuntu/jobstat/logs/config-server:/app/logs
+    networks:
+      - internal
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8888/actuator/health || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  jobstat-app:
     container_name: spring-app
     image: ${DOCKERHUB_USERNAME}/jobstat-app:${BACKEND_TAG}
     ports:
       - "8081:8081"
     volumes:
-      - /home/ubuntu/jobstat/logs:/app/logs
+      - /home/ubuntu/jobstat/logs/app:/app/logs
     healthcheck:
       test: [ "CMD-SHELL", "wget --spider -q http://localhost:8081/actuator/health || exit 1" ]
       interval: 60s
