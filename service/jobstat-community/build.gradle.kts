@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm")
     kotlin("plugin.spring")
     kotlin("plugin.jpa")
+//    id("com.google.devtools.ksp")
     id("io.sentry.jvm.gradle")
 }
 
@@ -29,6 +30,7 @@ dependencies {
     implementation(project(":core:core_error"))
     implementation(project(":core:core_event"))
     implementation(project(":core:core_jpa_base"))
+    implementation(project(":core:core_jdbc_batch"))
     implementation(project(":core:core_monitoring"))
     implementation(project(":core:core_open_api"))
     implementation(project(":core:core_security"))
@@ -63,6 +65,9 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+//    if (project.rootProject.file("ksp").exists()) {
+//        ksp(project(":ksp"))
+//    }
 
     // 로깅
     implementation("org.slf4j:slf4j-api")
@@ -100,6 +105,18 @@ sentry {
     projectName = "java-spring-boot"
     authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
+
+// tasks.named("generateSentryBundleIdJava") {
+//    dependsOn("kspKotlin")
+// }
+//
+// tasks.named("sentryCollectSourcesJava") {
+//    dependsOn("kspKotlin")
+// }
+//
+// tasks.named("sentryCollectSourcesJava") {
+//    dependsOn("kspTestKotlin")
+// }
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)

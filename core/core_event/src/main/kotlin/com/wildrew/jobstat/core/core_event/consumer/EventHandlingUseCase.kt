@@ -10,7 +10,7 @@ abstract class EventHandlingUseCase<T : EventType, P : EventPayload, R> {
 
     abstract val eventType: T
 
-    operator fun invoke(event: Event<out EventPayload>): R {
+    open operator fun invoke(event: Event<out EventPayload>): R {
         if (event.type != eventType) {
             throw IllegalArgumentException("이벤트 타입이 일치하지 않습니다: expected=$eventType, actual=${event.type}")
         }

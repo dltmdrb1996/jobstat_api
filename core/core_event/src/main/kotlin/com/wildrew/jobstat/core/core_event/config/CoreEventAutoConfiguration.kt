@@ -2,9 +2,7 @@ package com.wildrew.jobstat.core.core_event.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.wildrew.jobstat.core.core_coroutine.CoroutineModuleConfig
-import com.wildrew.jobstat.core.core_event.consumer.EventHandlerRegistry
-import com.wildrew.jobstat.core.core_event.consumer.EventHandlerRegistryService
-import com.wildrew.jobstat.core.core_event.consumer.EventHandlingUseCase
+import com.wildrew.jobstat.core.core_event.consumer.*
 import com.wildrew.jobstat.core.core_event.dlt.DLTConsumer
 import com.wildrew.jobstat.core.core_event.dlt.DeadLetterTopicRepository
 import com.wildrew.jobstat.core.core_event.outbox.*
@@ -25,11 +23,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
 import org.springframework.kafka.core.ConsumerFactory
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
@@ -45,6 +45,7 @@ import org.springframework.kafka.listener.ContainerProperties
         CoreSerializerAutoConfiguration::class,
         CoreIdGeneratorAutoConfiguration::class,
         CoroutineModuleConfig::class,
+        RedisAutoConfiguration::class,
     ],
 )
 @ConditionalOnClass(KafkaOperations::class)
@@ -189,5 +190,15 @@ class CoreEventAutoConfiguration {
             maxRetryCountForScheduler,
             schedulerEnabled,
         )
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(IdempotencyChecker::class)
+    @ConditionalOnBean(StringRedisTemplate::class)
+    fun redisIdempotencyChecker(
+        stringRedisTemplate: StringRedisTemplate,
+    ): IdempotencyChecker {
+        log.info("CoreEventAutoConfiguration: RedisIdempotencyChecker 빈을 명시적으로 생성합니다.")
+        return RedisIdempotencyChecker(stringRedisTemplate)
     }
 }

@@ -38,7 +38,6 @@ abstract class AbstractEventPublisher(
         }
     }
 
-    // 이 메소드는 추상 클래스를 상속받는 서비스의 구체 Publisher 클래스에서 구현해야 함.
     abstract override fun getSupportedEventTypes(): Set<EventType>
 
     private fun validateEventType(type: EventType) {

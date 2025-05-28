@@ -1,5 +1,6 @@
 package com.wildrew.jobstat.core.core_jpa_base.base
 
+import com.wildrew.jobstat.core.core_global.model.BaseEntity
 import jakarta.persistence.*
 import org.hibernate.proxy.HibernateProxy
 import org.springframework.data.annotation.CreatedDate
@@ -13,7 +14,7 @@ import java.util.*
 abstract class BaseAutoIncEntity : BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    override val id: Long = 0L
+    override var id: Long = 0L
 
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)

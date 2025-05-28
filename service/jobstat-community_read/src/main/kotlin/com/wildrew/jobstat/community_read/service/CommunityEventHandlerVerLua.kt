@@ -7,10 +7,13 @@ import com.wildrew.jobstat.community_read.repository.CommunityEventUpdateReposit
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_event.model.payload.board.*
+import com.wildrew.jobstat.core.core_event.model.payload.board.item.BoardIncrementItem
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.wildrew.jobstat.core.core_serializer.DataSerializer
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataAccessException
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,6 +21,7 @@ class CommunityEventHandlerVerLua(
     private val communityEventUpdateRepository: CommunityEventUpdateRepository,
     private val boardDetailRepository: BoardDetailRepository,
     private val commentDetailRepository: CommentDetailRepository,
+    private val stringRedisTemplate: StringRedisTemplate,
     private val dataSerializer: DataSerializer,
 ) : CommunityEventHandler {
     private val log = LoggerFactory.getLogger(this::class.java)
@@ -185,6 +189,51 @@ class CommunityEventHandlerVerLua(
             logOutcome(success, "댓글 삭제", "commentId=${payload.commentId}, boardId=${payload.boardId}")
         } catch (e: Exception) {
             handleException(e, "댓글 삭제", "commentId=${payload.commentId}")
+        }
+    }
+
+    override fun handleBulkBoardIncrements(payload: BulkBoardIncrementsPayload) {
+        if (payload.items.isEmpty()) {
+            log.info("캐시 업데이트할 증분 항목이 없습니다. batchId: {}", payload.batchId)
+            return
+        }
+
+        log.debug("게시글 카운터 증분 정보 수신 (캐시 업데이트용). batchId: {}, 항목 수: {}", payload.batchId, payload.items.size)
+
+        try {
+            val results =
+                stringRedisTemplate.executePipelined { connection ->
+                    payload.items.forEach { item: BoardIncrementItem ->
+                        val viewKey = "community:counter:view:${item.boardId}"
+                        val likeKey = "community:counter:like:${item.boardId}"
+
+                        if (item.viewIncrement != 0) {
+                            log.debug("Pipelining INCRBY: key={}, delta={}", viewKey, item.viewIncrement)
+                            connection.stringCommands().incrBy(viewKey.toByteArray(), item.viewIncrement.toLong())
+                        }
+                        if (item.likeIncrement != 0) {
+                            log.debug("Pipelining INCRBY: key={}, delta={}", likeKey, item.likeIncrement)
+                            connection.stringCommands().incrBy(likeKey.toByteArray(), item.likeIncrement.toLong())
+                        }
+                    }
+                    null
+                }
+
+            log.info("Redis 캐시 카운터 증분 파이프라인 실행 완료. batchId: {}, 처리된 Redis 명령어 수 (추정): {}", payload.batchId, results?.size ?: 0)
+        } catch (e: DataAccessException) {
+            log.error(
+                "Redis 캐시 카운터 증분 처리 중 DataAccessException 발생. batchId: {}. 메시지는 재시도될 수 있습니다.",
+                payload.batchId,
+                e,
+            )
+            throw e
+        } catch (e: Exception) {
+            log.error(
+                "Redis 캐시 카운터 증분 처리 중 예상치 못한 오류 발생. batchId: {}.",
+                payload.batchId,
+                e,
+            )
+            throw e
         }
     }
 

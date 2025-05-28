@@ -13,6 +13,7 @@ include(
     "core:core_error",
     "core:core_event",
     "core:core_jpa_base",
+    "core:core_jdbc_batch",
     "core:core_monitoring",
     "core:core_open_api",
     "core:core_security",

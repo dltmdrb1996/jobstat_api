@@ -1,1 +1,2 @@
 com.wildrew.ksp.converter.MongoEntityProcessorProvider
+com.wildrew.ksp.processor.KspBatchProcessorProvider

@@ -3,6 +3,9 @@ package com.wildrew.jobstat.community.counting
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import org.slf4j.LoggerFactory
+import org.springframework.dao.DataAccessException
+import org.springframework.data.redis.core.RedisOperations
+import org.springframework.data.redis.core.SessionCallback
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.data.redis.core.script.RedisScript
 import org.springframework.stereotype.Repository
@@ -17,6 +20,7 @@ class RedisCounterRepository(
     private val getAndDeleteScript: RedisScript<String>,
     private val atomicIncrementAndAddPendingScript: RedisScript<Long>,
     private val getCountersAndLikedStatusScript: RedisScript<List<Any>>,
+    private val spopMultipleScript: RedisScript<List<String>>,
 ) : CounterRepository {
     companion object {
         private const val SEPARATOR = ":"
@@ -255,10 +259,10 @@ class RedisCounterRepository(
             detailInfo = "${keys.size} keys",
             errorCode = ErrorCode.REDIS_OPERATION_FAILED,
         ) {
-            val results =
+            val results: List<String?> =
                 redisTemplate.executePipelined { connection ->
                     keys.forEach { key ->
-                        connection.scriptingCommands().eval<ByteArray>(
+                        connection.scriptingCommands().eval<String>(
                             getAndDeleteScript.scriptAsString.toByteArray(),
                             org.springframework.data.redis.connection.ReturnType.VALUE,
                             1,
@@ -266,17 +270,10 @@ class RedisCounterRepository(
                         )
                     }
                     null
-                }
-            results.map { result ->
-                when (result) {
-                    is String -> result.toIntOrNull()
-                    is ByteArray -> String(result).toIntOrNull()
-                    null -> null
-                    else -> {
-                        log.warn("Get&Delete 파이프라인에서 예상치 못한 결과 타입: ${result::class.java} - $result")
-                        null
-                    }
-                }
+                } as List<String?>
+
+            results.map { stringValue ->
+                stringValue?.toIntOrNull()
             }
         }
     }
@@ -300,6 +297,65 @@ class RedisCounterRepository(
         ) {
             redisTemplate.opsForSet().members(PENDING_UPDATES) ?: emptySet()
         }
+
+    override fun popPendingBoardIdsAtomically(count: Long): List<String> {
+        if (count <= 0) return emptyList()
+        return executeRedisOperation(
+            operationName = "대기 목록 원자적 Pop (SPOP Lua Script)",
+            detailInfo = "count=$count",
+            errorCode = ErrorCode.REDIS_OPERATION_FAILED,
+        ) {
+            val resultList =
+                redisTemplate.execute(
+                    spopMultipleScript,
+                    listOf(PENDING_UPDATES),
+                    count.toString(),
+                )
+            resultList ?: emptyList()
+        }
+    }
+
+    override fun addBoardIdsToPending(boardIds: Collection<String>) {
+        if (boardIds.isEmpty()) return
+        executeRedisOperation(
+            operationName = "대기 목록에 ID들 추가 (SADD)",
+            detailInfo = "Adding ${boardIds.size} items to $PENDING_UPDATES",
+            errorCode = ErrorCode.REDIS_OPERATION_FAILED,
+        ) {
+            redisTemplate.opsForSet().add(PENDING_UPDATES, *boardIds.toTypedArray())
+        }
+    }
+
+    override fun rollbackIncrements(incrementsToRollback: Map<Long, Pair<Int, Int>>) {
+        if (incrementsToRollback.isEmpty()) return
+        executeRedisOperation(
+            operationName = "증분값 롤백 (INCRBY Pipelined)",
+            detailInfo = "Rolling back ${incrementsToRollback.size} board counters",
+            errorCode = ErrorCode.REDIS_OPERATION_FAILED,
+        ) {
+            redisTemplate.executePipelined(
+                object : SessionCallback<List<Any?>> { // SessionCallback 명시
+                    @Throws(DataAccessException::class)
+                    override fun <K : Any?, V : Any?> execute(operations: RedisOperations<K, V>): List<Any?>? {
+                        val stringOps = operations as RedisOperations<String, String> // 타입 캐스팅
+                        incrementsToRollback.forEach { (boardId, increments) ->
+                            val viewIncrement = increments.first
+                            val likeIncrement = increments.second
+
+                            if (viewIncrement != 0) {
+                                stringOps.opsForValue().increment(viewCountKey(boardId), viewIncrement.toLong())
+                            }
+                            if (likeIncrement != 0) {
+                                stringOps.opsForValue().increment(likeCountKey(boardId), likeIncrement.toLong())
+                            }
+                        }
+                        return null
+                    }
+                },
+            )
+        }
+        log.info("증분값 롤백 시도 완료. 대상 보드 수: {}", incrementsToRollback.size)
+    }
 
     private fun <T> executeRedisOperation(
         operationName: String,

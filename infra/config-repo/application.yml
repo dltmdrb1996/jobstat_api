@@ -102,6 +102,13 @@ kafka:
         attempts: 3
         delay-ms: 1000
         multiplier: 2.0
+    community-command-for-read-model:
+      topic: community-command-${spring.profiles.active:dev}
+      group-id: community-command-read-model-updater-group-${spring.profiles.active:dev}-${spring.application.name}
+      retry:
+        attempts: 3
+        delay-ms: 1000
+        multiplier: 2.0
     common:
       dlt-suffix: .DLT
       auto-create-dlt: true

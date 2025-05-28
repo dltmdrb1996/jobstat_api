@@ -24,8 +24,10 @@ import com.wildrew.jobstat.core.core_serializer.ObjectMapperDataSerializer
 import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
+import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.redis.core.StringRedisTemplate
 
 @DisplayName("CommunityEventHandlerVerLua 단위 테스트 (Fakes 사용)")
 class CommunityEventHandlerVerLuaTest {
@@ -74,6 +76,7 @@ class CommunityEventHandlerVerLuaTest {
                 fakeCommunityEventUpdateRepository,
                 fakeBoardDetailRepository,
                 fakeCommentDetailRepository,
+                Mockito.mock(StringRedisTemplate::class.java),
                 dataSerializer,
             )
     }
@@ -195,6 +198,7 @@ class CommunityEventHandlerVerLuaTest {
                     fakeCommunityEventUpdateRepository,
                     fakeBoardDetailRepository,
                     fakeCommentDetailRepository,
+                    Mockito.mock(StringRedisTemplate::class.java),
                     mockSerializer,
                 )
 

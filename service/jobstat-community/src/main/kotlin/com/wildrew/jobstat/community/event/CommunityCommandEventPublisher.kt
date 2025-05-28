@@ -4,6 +4,7 @@ import com.wildrew.jobstat.community.board.entity.Board
 import com.wildrew.jobstat.community.comment.entity.Comment
 import com.wildrew.jobstat.core.core_event.model.EventType
 import com.wildrew.jobstat.core.core_event.model.payload.board.*
+import com.wildrew.jobstat.core.core_event.model.payload.board.item.BoardIncrementItem
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentDeletedEventPayload
 import com.wildrew.jobstat.core.core_event.model.payload.comment.CommentUpdatedEventPayload
 import com.wildrew.jobstat.core.core_event.outbox.OutboxEventPublisher
@@ -33,6 +34,7 @@ class CommunityCommandEventPublisher(
                 EventType.BOARD_UNLIKED,
                 EventType.BOARD_RANKING_UPDATED,
                 EventType.BOARD_VIEWED,
+                EventType.BULK_BOARD_INCREMENTS,
                 // 댓글 이벤트 타입
                 EventType.COMMENT_CREATED,
                 EventType.COMMENT_UPDATED,
@@ -199,5 +201,19 @@ class CommunityCommandEventPublisher(
                 eventTs = System.currentTimeMillis(),
             )
         publish(EventType.BOARD_RANKING_UPDATED, payload)
+    }
+
+    fun publishBulkBoardIncrements(
+        batchId: String,
+        items: List<BoardIncrementItem>,
+        eventTs: Long = System.currentTimeMillis(),
+    ) {
+        val payload =
+            BulkBoardIncrementsPayload(
+                batchId = batchId,
+                items = items,
+                eventTs = eventTs,
+            )
+        publish(EventType.BULK_BOARD_INCREMENTS, payload)
     }
 }

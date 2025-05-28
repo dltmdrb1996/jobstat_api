@@ -1,4 +1,3 @@
-// core-error/build.gradle.kts
 plugins {
     `java-library`
     kotlin("jvm")
@@ -15,27 +14,26 @@ java {
 }
 
 dependencies {
-    api(project(":core:core_web_util")) // ApiResponse 사용
+    api(project(":core:core_web_util"))
 
-    api("org.springframework:spring-web") // HttpStatus, @ExceptionHandler, ResponseEntity
-    api("org.springframework.boot:spring-boot-autoconfigure") // @AutoConfiguration
+    api("org.springframework:spring-web")
+    api("org.springframework.boot:spring-boot-autoconfigure")
 
-    // ExceptionHandlers.kt 내부 구현에 사용 (공개 API에는 노출 안 됨)
-    implementation("org.springframework.data:spring-data-jpa") // DataIntegrityViolationException 등
-    implementation("org.hibernate.orm:hibernate-core") // org.hibernate.exception.ConstraintViolationException
-    implementation("jakarta.validation:jakarta.validation-api") // ConstraintViolationException (from jakarta.validation)
+    implementation("org.springframework.data:spring-data-jpa")
+    implementation("org.hibernate.orm:hibernate-core")
+    implementation("jakarta.validation:jakarta.validation-api")
 
     implementation("org.slf4j:slf4j-api")
-    implementation("io.sentry:sentry:8.12.0") // Sentry SDK 직접 사용
+    implementation("io.sentry:sentry:8.12.0")
 
-    compileOnly("org.springframework:spring-webmvc") // DispatcherServlet, NoHandlerFoundException 등 포함
-    compileOnly("jakarta.servlet:jakarta.servlet-api") // HttpServletRequest (provided)
-    compileOnly("org.springframework:spring-beans") // @Value 등
-    compileOnly("org.springframework:spring-context") // Environment 등
+    compileOnly("org.springframework:spring-webmvc")
+    compileOnly("jakarta.servlet:jakarta.servlet-api")
+    compileOnly("org.springframework:spring-beans")
+    compileOnly("org.springframework:spring-context")
     compileOnly("org.springframework:spring-core")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testImplementation("org.springframework.boot:spring-boot-starter-test") // 테스트 환경 구성
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 dependencyManagement {

@@ -7,11 +7,11 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "comments")
-class Comment protected constructor(
+class Comment(
     content: String,
     author: String,
     password: String?,
-    board: Board,
+    boardId: Long,
     userId: Long?,
 ) : AuditableEntitySnow() {
     @Column(nullable = false, length = CommentConstants.MAX_CONTENT_LENGTH)
@@ -30,9 +30,13 @@ class Comment protected constructor(
     var password: String? = password
         protected set
 
+    @Column(name = "board_id", nullable = false)
+    var boardId: Long = boardId
+        protected set
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id", nullable = false)
-    var board: Board = board
+    @JoinColumn(name = "board_id", insertable = false, updatable = false)
+    lateinit var board: Board
         protected set
 
     fun updateContent(newContent: String) {
@@ -55,9 +59,11 @@ class Comment protected constructor(
                 CommentConstants.ErrorMessages.INVALID_CONTENT
             }
             require(author.isNotBlank()) { CommentConstants.ErrorMessages.AUTHOR_REQUIRED }
-            return Comment(content, author, password, board, userId).also {
-                board.addComment(it)
-            }
+            val comment = Comment(content, author, password, board.id, userId)
+            comment.board = board
+
+            board.addComment(comment)
+            return comment
         }
     }
 }

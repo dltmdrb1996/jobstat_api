@@ -8,7 +8,7 @@ import jakarta.persistence.*
     name = "board_categories",
     indexes = [Index(name = "idx_category_name", columnList = "name", unique = true)],
 )
-class BoardCategory protected constructor(
+class BoardCategory(
     name: String,
     displayName: String,
     description: String,

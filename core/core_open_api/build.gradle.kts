@@ -1,4 +1,3 @@
-// core-open-api/build.gradle.kts
 plugins {
     `java-library`
     kotlin("jvm")
@@ -15,16 +14,16 @@ java {
 }
 
 dependencies {
-    api(project(":core:core_web_util")) // CustomModelConverter가 @CommonApiResponseWrapper 참조
+    api(project(":core:core_web_util"))
 
-    api("io.swagger.core.v3:swagger-models-jakarta") // CustomModelConverter가 ModelConverter, Schema 등 사용
-    api("org.springdoc:springdoc-openapi-starter-common:2.8.4") // OpenAPI 빈, GroupedOpenApi 등 제공. UI는 app에서.
+    api("io.swagger.core.v3:swagger-models-jakarta")
+    api("org.springdoc:springdoc-openapi-starter-common:2.8.4")
 
     implementation("org.slf4j:slf4j-api")
 
     compileOnly("org.springframework.boot:spring-boot-autoconfigure")
-    compileOnly("org.springframework:spring-beans") // @Value, @Bean 등
-    compileOnly("org.springframework:spring-context") // @Configuration
+    compileOnly("org.springframework:spring-beans")
+    compileOnly("org.springframework:spring-context")
     compileOnly("org.springframework:spring-core")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")

@@ -117,4 +117,19 @@ class LuaScriptConfig {
         script.setResultType(List::class.java as Class<List<Any>>)
         return script
     }
+
+    @Bean
+    fun spopMultipleScript(): RedisScript<List<String>> {
+        val script = DefaultRedisScript<List<String>>()
+        script.setScriptText(
+            """
+            -- KEYS[1]: setName (Set의 키 이름)
+            -- ARGV[1]: count (가져올 멤버의 수)
+            return redis.call('SPOP', KEYS[1], ARGV[1])
+            """.trimIndent(),
+        )
+        // SPOP key count는 multi-bulk reply를 반환하므로 List<String>이 적절
+        script.setResultType(List::class.java as Class<List<String>>)
+        return script
+    }
 }

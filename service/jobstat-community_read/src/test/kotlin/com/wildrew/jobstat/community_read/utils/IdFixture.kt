@@ -1,6 +1,6 @@
 package com.wildrew.jobstat.community_read.utils
 
-import com.wildrew.jobstat.core.core_jpa_base.base.BaseEntity
+import com.wildrew.jobstat.core.core_global.model.BaseEntity
 import java.lang.reflect.Field
 
 abstract class IdFixture<T : BaseEntity> : TestFixture<T> {

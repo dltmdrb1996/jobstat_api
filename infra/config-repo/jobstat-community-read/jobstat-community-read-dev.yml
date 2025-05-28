@@ -45,10 +45,7 @@ eureka:
 
 logging:
   level:
-    com.wildrew.app.community_read: DEBUG
-    org.springframework.kafka: DEBUG
-    org.springframework.data.redis: DEBUG
-
+    com.wildrew.app.community_read: INFO
 
 jobstat:
   core:

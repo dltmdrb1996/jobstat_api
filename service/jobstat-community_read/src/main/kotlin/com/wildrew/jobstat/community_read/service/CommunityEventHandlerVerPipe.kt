@@ -321,6 +321,9 @@ class CommunityEventHandlerVerPipe(
         }
     }
 
+    override fun handleBulkBoardIncrements(payload: BulkBoardIncrementsPayload) {
+    }
+
     private fun checkEventTs(
         conn: StringRedisConnection,
         key: String,

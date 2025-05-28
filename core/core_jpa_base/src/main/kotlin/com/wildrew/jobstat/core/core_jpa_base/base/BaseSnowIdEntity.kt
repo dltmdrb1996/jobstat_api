@@ -1,5 +1,6 @@
 package com.wildrew.jobstat.core.core_jpa_base.base
 
+import com.wildrew.jobstat.core.core_global.model.BaseEntity
 import com.wildrew.jobstat.core.core_jpa_base.id_generator.SnowflakeId
 import jakarta.persistence.Id
 import jakarta.persistence.MappedSuperclass
@@ -10,7 +11,7 @@ import java.util.*
 abstract class BaseSnowIdEntity : BaseEntity {
     @Id
     @SnowflakeId
-    override val id: Long = 0L
+    override var id: Long = 0L
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

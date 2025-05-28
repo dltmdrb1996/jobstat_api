@@ -1,4 +1,3 @@
-// core-security/build.gradle.kts
 plugins {
     `java-library`
     kotlin("jvm")
@@ -15,20 +14,20 @@ java {
 }
 
 dependencies {
-    api(project(":core:core_error")) // 공개 클래스/메소드가 AppException 사용
-    api(project(":core:core_token")) // 공개 클래스/메소드가 JwtTokenParser 등 사용
-    api(project(":core:core_web_util")) // 공개 에러 핸들러가 ApiResponse 사용
+    api(project(":core:core_error"))
+    api(project(":core:core_token"))
+    api(project(":core:core_web_util"))
 
-    api("org.springframework.boot:spring-boot-starter-security") // 보안 설정을 제공 (SecurityFilterChain 등)
-    api("org.springframework:spring-webmvc") // RequestMappingHandlerMapping (필터 빈의 생성자 파라미터)
+    api("org.springframework.boot:spring-boot-starter-security")
+    api("org.springframework:spring-webmvc")
 
-    implementation(project(":core:core_serializer")) // JwtAuthenticationEntryPoint 내부 ObjectMapper 사용
-    implementation("com.github.ben-manes.caffeine:caffeine:3.2.0") // 필터 내부 캐시 구현용
+    implementation(project(":core:core_serializer"))
+    implementation("com.github.ben-manes.caffeine:caffeine:3.2.0")
     implementation("org.slf4j:slf4j-api")
-    implementation("org.aspectj:aspectjrt") // RateLimitAspect 런타임용
+    implementation("org.aspectj:aspectjrt")
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
-    compileOnly("org.aspectj:aspectjweaver") // AOP 컴파일용
+    compileOnly("org.aspectj:aspectjweaver")
     compileOnly("org.springframework.boot:spring-boot-autoconfigure")
     compileOnly("org.springframework:spring-beans")
     compileOnly("org.springframework:spring-context")

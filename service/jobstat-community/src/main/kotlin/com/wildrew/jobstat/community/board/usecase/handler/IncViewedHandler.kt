@@ -12,9 +12,6 @@ class IncViewedHandler(
 ) : EventHandlingUseCase<EventType, IncViewEventPayload, Unit>() {
     override val eventType: EventType = EventType.BOARD_INC_VIEW
 
-    /**
-     * BoardViewed 이벤트를 수신하여 조회수를 증가시키는 로직 실행
-     */
     override fun execute(payload: IncViewEventPayload) {
         log.debug("BoardViewed 이벤트 처리 시작: boardId={}", payload.boardId)
 

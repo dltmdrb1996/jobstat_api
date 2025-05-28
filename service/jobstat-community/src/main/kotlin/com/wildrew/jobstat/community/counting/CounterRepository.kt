@@ -32,4 +32,10 @@ interface CounterRepository {
     fun removePendingBoardIds(boardIds: List<String>)
 
     fun fetchPendingBoardIds(): Set<String>
+
+    fun popPendingBoardIdsAtomically(count: Long): List<String> // 또는 List<String>
+
+    fun addBoardIdsToPending(boardIds: Collection<String>)
+
+    fun rollbackIncrements(incrementsToRollback: Map<Long, Pair<Int, Int>>)
 }

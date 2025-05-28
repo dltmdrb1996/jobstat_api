@@ -61,9 +61,9 @@
         <logger name="org.hibernate.SQL" level="INFO" additivity="false">
             <appender-ref ref="CONSOLE"/>
         </logger>
-        <logger name="org.springframework.orm.jpa" level="INFO" additivity="false">
-            <appender-ref ref="CONSOLE"/>
-        </logger>
+<!--        <logger name="org.springframework.orm.jpa" level="INFO" additivity="false">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </logger>-->
 <!--        <logger name="org.springframework.data.repository.config.RepositoryConfigurationDelegate" level="INFO" additivity="false">-->
 <!--            <appender-ref ref="CONSOLE"/>-->
 <!--        </logger>-->

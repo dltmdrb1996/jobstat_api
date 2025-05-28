@@ -1,8 +1,7 @@
-// core-event/build.gradle.kts
 plugins {
     `java-library`
     kotlin("jvm")
-    kotlin("plugin.jpa") // Outbox, DLT Entity
+    kotlin("plugin.jpa")
     id("io.spring.dependency-management")
     kotlin("plugin.spring")
 }
@@ -16,17 +15,17 @@ java {
 }
 
 dependencies {
-    api(project(":core:core_serializer")) // DataSerializer, Event<T>.toJson, ObjectMapper
-    api(project(":core:core_error")) // AppException
-    api(project(":core:core_jpa_base")) // AuditableEntitySnow, SnowflakeGenerator
-    api(project(":core:core_coroutine")) // OutboxMessageRelay 에서 CoroutineScope 사용
+    api(project(":core:core_serializer"))
+    api(project(":core:core_error"))
+    api(project(":core:core_jpa_base"))
+    api(project(":core:core_coroutine"))
     implementation(project(":core:core_global"))
 
-    api("org.springframework.kafka:spring-kafka") // Kafka 관련 빈(ContainerFactory, KafkaTemplate) 제공
-    // ObjectMapper는 core-serializer를 통해 api로 이미 제공됨. DLTConsumer 등이 주입받아 사용.
-    // 추가적인 Jackson 의존성이 직접 필요하다면 implementation으로 추가 (예: 특정 모듈)
+    api("org.springframework.kafka:spring-kafka")
+
     implementation("org.slf4j:slf4j-api")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa") // OutboxRepository 등 사용위해
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 
     compileOnly("org.springframework.boot:spring-boot-autoconfigure")
     compileOnly("org.springframework:spring-beans")
@@ -40,7 +39,7 @@ dependencies {
 
 kotlin {
     allOpen {
-        annotation("jakarta.persistence.Entity") // Outbox, DeadLetterTopicEvent
+        annotation("jakarta.persistence.Entity")
     }
 }
 

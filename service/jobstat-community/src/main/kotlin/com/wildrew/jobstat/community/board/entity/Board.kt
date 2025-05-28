@@ -4,15 +4,16 @@ import com.wildrew.jobstat.community.board.utils.BoardConstants
 import com.wildrew.jobstat.community.comment.entity.Comment
 import com.wildrew.jobstat.core.core_jpa_base.base.AuditableEntitySnow
 import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "boards")
-class Board protected constructor(
+class Board(
     title: String,
     content: String,
     author: String,
     password: String?,
-    category: BoardCategory,
+    categoryId: Long,
     userId: Long?,
 ) : AuditableEntitySnow() {
     @Column(nullable = false, length = BoardConstants.MAX_TITLE_LENGTH)
@@ -47,9 +48,13 @@ class Board protected constructor(
     var commentCount: Int = 0
         protected set
 
+    @Column(name = "category_id", nullable = false)
+    var categoryId: Long = categoryId
+        protected set
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    var category: BoardCategory = category
+    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    lateinit var category: BoardCategory
         protected set
 
     @OneToMany(mappedBy = "board", cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
@@ -94,6 +99,26 @@ class Board protected constructor(
         likeCount += count
     }
 
+    fun setUpdatedAtForJdbc(updatedAt: LocalDateTime) {
+        this.updatedAt = updatedAt
+    }
+
+    fun setCreatedAtForJdbc(createdAt: LocalDateTime) {
+        this.createdAt = createdAt
+    }
+
+    fun setViewCountForJdbc(viewCount: Int) {
+        this.viewCount = viewCount
+    }
+
+    fun setLikeCountForJdbc(likeCount: Int) {
+        this.likeCount = likeCount
+    }
+
+    fun setCommentCountForJdbc(commentCount: Int) {
+        this.commentCount = commentCount
+    }
+
     companion object {
         fun create(
             title: String,
@@ -106,7 +131,9 @@ class Board protected constructor(
             validateTitle(title)
             validateContent(content)
             require(author.isNotBlank()) { BoardConstants.ErrorMessages.AUTHOR_REQUIRED }
-            return Board(title, content, author, password, category, userId)
+            val board = Board(title, content, author, password, category.id, userId)
+            board.category = category
+            return board
         }
 
         private fun validateTitle(title: String) {
