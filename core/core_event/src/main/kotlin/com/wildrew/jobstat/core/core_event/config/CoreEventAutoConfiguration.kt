@@ -72,6 +72,7 @@ class CoreEventAutoConfiguration {
         @Value("\${spring.kafka.bootstrap-servers}") bootstrapServers: String,
         @Value("\${jobstat.core.event.kafka.producer.acks-config:all}") acksConfig: String,
         @Value("\${jobstat.core.event.kafka.producer.idempotence.enabled:true}") idempotentProducerEnabled: Boolean,
+        @Value("\${jobstat.core.event.kafka.producer.transactional-id}") transactionalId: String,
     ): KafkaTemplate<String, String> {
         val configProps =
             HashMap<String, Any>().apply {
@@ -79,9 +80,8 @@ class CoreEventAutoConfiguration {
                 put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
                 put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
                 put(ProducerConfig.ACKS_CONFIG, acksConfig)
-                if (idempotentProducerEnabled) {
-                    put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true")
-                }
+                put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true")
+                put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionalId)
             }
         return KafkaTemplate(DefaultKafkaProducerFactory(configProps))
     }

@@ -119,6 +119,9 @@ jobstat: # 애플리케이션 특정 설정 네임스페이스
       global-handler:
         enabled: true
     event:
+      kafka:
+        producer:
+          transactional-id: "${spring.application.name}-kafka-producer-${spring.profiles.active:dev}"
       dlt:
         consumer: # DLT 소비자 설정
           enabled: true # 알림 서비스가 DLT를 소비할 경우 활성화

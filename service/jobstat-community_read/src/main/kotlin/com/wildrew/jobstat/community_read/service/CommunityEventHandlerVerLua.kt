@@ -192,7 +192,7 @@ class CommunityEventHandlerVerLua(
         }
     }
 
-    override fun handleBulkBoardIncrements(payload: BulkBoardIncrementsPayload) {
+    override fun handleBulkBoardIncrements(payload: BulkBoardIncrementsForReadPayload) {
         if (payload.items.isEmpty()) {
             log.info("캐시 업데이트할 증분 항목이 없습니다. batchId: {}", payload.batchId)
             return

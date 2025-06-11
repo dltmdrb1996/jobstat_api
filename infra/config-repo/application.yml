@@ -130,6 +130,10 @@ outbox:
     max-retry-count:
 
 jobstat:
+  event:
+    kafka:
+      producer:
+        transactional-id: "${spring.application.name}-kafka-producer-${spring.profiles.active:dev}"
   core:
     token:
       jwt:

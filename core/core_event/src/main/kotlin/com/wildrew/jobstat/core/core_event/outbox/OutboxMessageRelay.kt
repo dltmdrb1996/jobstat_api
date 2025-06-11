@@ -31,11 +31,6 @@ class OutboxMessageRelay(
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     fun saveOutboxOnEvent(outbox: Outbox) {
-        if (!TransactionSynchronizationManager.isActualTransactionActive()) {
-            log.warn("트랜잭션 외부에서 Outbox 이벤트 발행 시도됨 (저장되지 않음): eventType={}", outbox.eventType)
-            return
-        }
-
         log.debug("아웃박스 저장 시도 (BEFORE_COMMIT): eventType={}", outbox.eventType)
         try {
             outboxRepository.save(outbox)

@@ -1,11 +1,12 @@
 package com.wildrew.jobstat.community.board.usecase.handler
 
 import com.wildrew.jobstat.community.board.repository.batch.BoardBatchRepositoryImpl
+import com.wildrew.jobstat.community.event.CommunityCommandEventPublisher
 import com.wildrew.jobstat.core.core_event.consumer.EventHandlingUseCase
 import com.wildrew.jobstat.core.core_event.model.Event
 import com.wildrew.jobstat.core.core_event.model.EventPayload
 import com.wildrew.jobstat.core.core_event.model.EventType
-import com.wildrew.jobstat.core.core_event.model.payload.board.BulkBoardIncrementsPayload
+import com.wildrew.jobstat.core.core_event.model.payload.board.BulkBoardIncrementsForCommandPayload
 import com.wildrew.jobstat.core.core_jdbc_batch.core.model.BatchOptions
 import com.wildrew.jobstat.core.core_jdbc_batch.infrastructure.update.ColumnType
 import com.wildrew.jobstat.core.core_jdbc_batch.infrastructure.update.ColumnUpdate
@@ -15,26 +16,24 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class BulkBoardIncrementsHandler(
     private val boardBatchRepositoryImpl: BoardBatchRepositoryImpl,
-) : EventHandlingUseCase<EventType, BulkBoardIncrementsPayload, Unit>() {
-    override val eventType: EventType = EventType.BULK_BOARD_INCREMENTS
+    private val publisher: CommunityCommandEventPublisher
+) : EventHandlingUseCase<EventType, BulkBoardIncrementsForCommandPayload, Unit>() {
+    override val eventType: EventType = EventType.BULK_BOARD_INCREMENTS_COMMAND
 
     @Transactional
     override fun invoke(event: Event<out EventPayload>) {
         super.invoke(event)
     }
 
-    override fun execute(payload: BulkBoardIncrementsPayload) {
+    override fun execute(payload: BulkBoardIncrementsForCommandPayload) {
         if (payload.items.isEmpty()) {
             log.info("배치 ID: ${payload.batchId}에 대한 처리할 항목이 없습니다")
             return
         }
 
-        // DB 컬럼명 (실제 사용하는 컬럼명으로 변경)
         val likeColumnName = "like_count"
         val viewColumnName = "view_count"
 
-        // 좋아요 수 증가 업데이트 준비
-        // BoardIncrementItem의 likeIncrement가 0이 아닌 경우에만 업데이트 목록에 추가
         val likeUpdates =
             payload.items
                 .filter { it.likeIncrement != 0 }
@@ -47,8 +46,6 @@ class BulkBoardIncrementsHandler(
                         )
                 }
 
-        // 조회 수 증가 업데이트 준비
-        // BoardIncrementItem의 viewIncrement가 0이 아닌 경우에만 업데이트 목록에 추가
         val viewUpdates =
             payload.items
                 .filter { it.viewIncrement != 0 }
@@ -85,6 +82,12 @@ class BulkBoardIncrementsHandler(
         log.info(
             "배치 ID: ${payload.batchId}에 대한 게시판 증가 일괄 처리 완료. " +
                 "좋아요 업데이트: ${totalLikesUpdated}개, 조회수 업데이트: ${totalViewsUpdated}개",
+        )
+
+        publisher.publishBulkBoardIncrementsRead(
+            batchId = payload.batchId,
+            items = payload.items,
+            eventTs = payload.eventTs,
         )
     }
 }

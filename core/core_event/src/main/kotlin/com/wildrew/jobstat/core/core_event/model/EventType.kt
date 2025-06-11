@@ -20,8 +20,9 @@ enum class EventType(
     BOARD_UNLIKED(BoardUnlikedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
     BOARD_VIEWED(BoardViewedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
     BOARD_RANKING_UPDATED(BoardRankingUpdatedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
+    BULK_BOARD_INCREMENTS_READ(BulkBoardIncrementsForReadPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),
 
-    BULK_BOARD_INCREMENTS(BulkBoardIncrementsPayload::class.java, CONSUMER_NAME_COMMUNITY_COMMAND),
+    BULK_BOARD_INCREMENTS_COMMAND(BulkBoardIncrementsForCommandPayload::class.java, CONSUMER_NAME_COMMUNITY_COMMAND),
     BOARD_INC_VIEW(IncViewEventPayload::class.java, CONSUMER_NAME_COMMUNITY_COMMAND),
 
     COMMENT_CREATED(CommentCreatedEventPayload::class.java, CONSUMER_NAME_COMMUNITY_READ),

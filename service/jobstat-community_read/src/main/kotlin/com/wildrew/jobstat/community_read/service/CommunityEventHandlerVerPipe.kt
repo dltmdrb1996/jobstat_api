@@ -321,7 +321,7 @@ class CommunityEventHandlerVerPipe(
         }
     }
 
-    override fun handleBulkBoardIncrements(payload: BulkBoardIncrementsPayload) {
+    override fun handleBulkBoardIncrements(payload: BulkBoardIncrementsForReadPayload) {
     }
 
     private fun checkEventTs(

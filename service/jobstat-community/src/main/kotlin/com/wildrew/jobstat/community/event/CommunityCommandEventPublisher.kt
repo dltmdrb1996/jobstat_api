@@ -34,7 +34,8 @@ class CommunityCommandEventPublisher(
                 EventType.BOARD_UNLIKED,
                 EventType.BOARD_RANKING_UPDATED,
                 EventType.BOARD_VIEWED,
-                EventType.BULK_BOARD_INCREMENTS,
+                EventType.BULK_BOARD_INCREMENTS_COMMAND,
+                EventType.BULK_BOARD_INCREMENTS_READ,
                 // 댓글 이벤트 타입
                 EventType.COMMENT_CREATED,
                 EventType.COMMENT_UPDATED,
@@ -209,11 +210,25 @@ class CommunityCommandEventPublisher(
         eventTs: Long = System.currentTimeMillis(),
     ) {
         val payload =
-            BulkBoardIncrementsPayload(
+            BulkBoardIncrementsForCommandPayload(
                 batchId = batchId,
                 items = items,
                 eventTs = eventTs,
             )
-        publish(EventType.BULK_BOARD_INCREMENTS, payload)
+        publish(EventType.BULK_BOARD_INCREMENTS_COMMAND, payload)
+    }
+
+    fun publishBulkBoardIncrementsRead(
+        batchId: String,
+        items: List<BoardIncrementItem>,
+        eventTs: Long = System.currentTimeMillis(),
+    ) {
+        val payload =
+            BulkBoardIncrementsForReadPayload(
+                batchId = batchId,
+                items = items,
+                eventTs = eventTs,
+            )
+        publish(EventType.BULK_BOARD_INCREMENTS_READ, payload)
     }
 }

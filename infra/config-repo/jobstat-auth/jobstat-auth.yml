@@ -114,7 +114,10 @@ jobstat:
     error:
       global-handler:
         enabled: true # 전역 에러 핸들러 사용
-
+    event:
+      kafka:
+        producer:
+          transactional-id: "${spring.application.name}-kafka-producer-${spring.profiles.active:dev}"
 
 outbox:
   relay:

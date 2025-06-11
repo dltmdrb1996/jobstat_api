@@ -23,5 +23,5 @@ interface CommunityEventHandler {
 
     fun handleCommentDeleted(payload: CommentDeletedEventPayload)
 
-    fun handleBulkBoardIncrements(payload: BulkBoardIncrementsPayload)
+    fun handleBulkBoardIncrements(payload: BulkBoardIncrementsForReadPayload)
 }

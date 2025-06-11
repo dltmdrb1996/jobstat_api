@@ -95,6 +95,10 @@ jobstat:
     error:
       global-handler:
         enabled: true
+    event:
+      kafka:
+        producer:
+          transactional-id: "${spring.application.name}-kafka-producer-${spring.profiles.active:dev}"
 
   statistics-read:
     mongodb:
