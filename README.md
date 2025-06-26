@@ -1,3 +1,6 @@
+## Wiki
+프로젝트에 대한 더 자세한 문서는 [공식 Wiki](https://github.com/dltmdrb1996/jobstat_api/wiki)를 참고해주세요.
+
 # 프로젝트 구성도
 ![system-architecture-new](https://github.com/user-attachments/assets/6f9a8ac2-ffc7-4b00-91af-1d76b87e629c)
 
