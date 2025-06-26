@@ -1,113 +1,8 @@
-## Wiki
-프로젝트에 대한 더 자세한 문서는 [Wiki](https://github.com/dltmdrb1996/jobstat_api/wiki)를 참고해주세요.
-
 # 프로젝트 구성도
 ![system-architecture-new](https://github.com/user-attachments/assets/6f9a8ac2-ffc7-4b00-91af-1d76b87e629c)
 
-# 프로젝트 트리구조
-
-```
-├── main
-│   ├── kotlin
-│   │   └── com
-│   │       └── example
-│   │           └── jobstat
-│   │               ├── auth
-│   │               │   ├── email
-│   │               │   │   ├── entity
-│   │               │   │   ├── repository
-│   │               │   │   ├── service
-│   │               │   │   └── usecase
-│   │               │   ├── token
-│   │               │   │   ├── service
-│   │               │   │   └── usecase
-│   │               │   └── user
-│   │               │       ├── entity
-│   │               │       ├── repository
-│   │               │       ├── service
-│   │               │       └── usecase
-│   │               ├── community
-│   │               │   ├── board
-│   │               │   │   ├── entity
-│   │               │   │   ├── model
-│   │               │   │   ├── repository
-│   │               │   │   ├── service
-│   │               │   │   └── usecase
-│   │               │   └── comment
-│   │               │       ├── entity
-│   │               │       ├── repository
-│   │               │       ├── service
-│   │               │       └── usecase
-│   │               ├── core
-│   │               │   ├── base
-│   │               │   │   ├── mongo
-│   │               │   │   │   ├── ranking
-│   │               │   │   │   └── stats
-│   │               │   │   └── repository
-│   │               │   ├── config
-│   │               │   ├── constants
-│   │               │   ├── converter
-│   │               │   ├── error
-│   │               │   ├── extension
-│   │               │   ├── security
-│   │               │   │   └── annotation
-│   │               │   ├── state
-│   │               │   ├── usecase
-│   │               │   │   └── impl
-│   │               │   ├── utils
-│   │               │   └── wrapper
-│   │               └── statistics
-│   │                   ├── rankings
-│   │                   │   ├── document
-│   │                   │   ├── model
-│   │                   │   │   └── rankingtype
-│   │                   │   ├── repository
-│   │                   │   ├── service
-│   │                   │   └── usecase
-│   │                   │       └── analyze
-│   │                   └── stats
-│   │                       ├── document
-│   │                       ├── registry
-│   │                       ├── repository
-│   │                       ├── service
-│   │                       └── usecase
-│   └── resources
-│       └── static
-└── test
-    └── kotlin
-        └── com
-            └── example
-                └── jobstat
-                    ├── auth
-                    │   ├── token
-                    │   │   └── service
-                    │   └── user
-                    │       ├── fake
-                    │       ├── repository
-                    │       ├── service
-                    │       └── usecase
-                    ├── community
-                    │   ├── fake
-                    │   │   └── repository
-                    │   ├── repository
-                    │   ├── service
-                    │   └── usecase
-                    ├── core
-                    │   └── base
-                    │       └── repository
-                    ├── rankings
-                    │   ├── fake
-                    │   └── service
-                    ├── statistics
-                    │   ├── fake
-                    │   └── stats
-                    │       ├── fake
-                    │       └── service
-                    └── utils
-                        ├── base
-                        ├── config
-                        └── dummy
-```
+## Wiki
+프로젝트에 대한 더 자세한 문서는 [Wiki](https://github.com/dltmdrb1996/jobstat_api/wiki)를 참고해주세요.
 
 # 테스트 커버리지
 <img width="1553" alt="스크린샷 2025-03-24 오후 8 02 15" src="https://github.com/user-attachments/assets/1cbc9595-77c6-47f6-9185-6534a1ebe4cf" />
@@ -1100,3 +995,587 @@ flowchart TD
 최종 통계정보 생성을 위해서는 총 4단계 과정이 필요합니다. 파싱 대상 URL 스크래핑, URL 파싱, 메타데이터 및 매핑데이터 추출, 통계데이터 가공으로 구성됩니다. 각 단계는 명확한 책임 경계를 가진 독립적인 컴포넌트로 구현되어 있어 특정 단계의 실패가 전체 파이프라인에 영향을 미치지 않습니다. 각 과정의 결과는 DB에 개별적으로 저장되며 순차적인 실행으로 처리 순서를 보장합니다.  스크래핑을 통해 획득한 원시 데이터는 HTML 구조 분석을 통해 우선 정형화 가능한 부분을 추출한 후, 비정형 텍스트에 대해서는 NLP 기반 토큰화 및 분류 체계를 적용했습니다. OCR 기술을 활용하여 이미지 형태의 정보도 텍스트로 변환함으로써 데이터 수집 범위를 확장했습니다. 이 스크래핑 과정에서는 쓰레드의 블로킹이 빈번하게 발생하기 때문에 쓰레드 가용성을 높이기 위해 코루틴 기반의 병렬 처리 방식으로 구성하였습니다.
 
 토큰화된 데이터는 기존에 저장된 메타데이터에 대한 키워드 매핑 테이블을 통해 다양한 은어, 약어 등 여러 표현 형태와 연결되어 공고와 메타데이터를 정확히 매핑하도록 설계하였습니다. 또한 반복적인 데이터 강화를 위해 기존 키워드 목록에 포함되지 않는 토큰들도 빈도 분석 후 데이터베이스에 저장하여 지속적인 어휘 확장 및 매핑 정확도 향상에 활용하였습니다.
+
+
+# 프로젝트 트리구조
+
+```
+├── build
+│   ├── intermediates
+│   │   └── ktLint
+│   └── reports
+│       └── ktlint
+│           ├── ktlintKotlinScriptCheck
+│           └── ktlintKotlinScriptFormat
+├── core
+│   ├── build
+│   │   ├── intermediates
+│   │   │   └── ktLint
+│   │   └── tmp
+│   ├── core_coroutine
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_coroutine
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_error
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_error
+│   │       │   │                       ├── handler
+│   │       │   │                       └── model
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_event
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_event
+│   │       │   │                       ├── config
+│   │       │   │                       ├── consumer
+│   │       │   │                       ├── dlt
+│   │       │   │                       ├── model
+│   │       │   │                       │   └── payload
+│   │       │   │                       │       ├── board
+│   │       │   │                       │       │   └── item
+│   │       │   │                       │       ├── comment
+│   │       │   │                       │       └── notification
+│   │       │   │                       ├── outbox
+│   │       │   │                       └── publisher
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           │   └── com
+│   │           │       └── wildrew
+│   │           │           └── jobstat
+│   │           │               └── core
+│   │           │                   └── core_event
+│   │           └── resources
+│   ├── core_global
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_global
+│   │       │   │                       ├── model
+│   │       │   │                       └── state
+│   │       │   └── resources
+│   │       │       └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_jdbc_batch
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_jdbc_batch
+│   │       │   │                       ├── core
+│   │       │   │                       │   ├── exception
+│   │       │   │                       │   ├── interfaces
+│   │       │   │                       │   └── model
+│   │       │   │                       └── infrastructure
+│   │       │   │                           ├── repository
+│   │       │   │                           ├── sql
+│   │       │   │                           └── update
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_jpa_base
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_jpa_base
+│   │       │   │                       ├── base
+│   │       │   │                       ├── converter
+│   │       │   │                       └── id_generator
+│   │       │   │                           └── sharded
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_monitoring
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_monitoring
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_open_api
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_open_api
+│   │       │   │                       └── converter
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           └── kotlin
+│   ├── core_security
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_security
+│   │       │   │                       ├── annotation
+│   │       │   │                       ├── aspect
+│   │       │   │                       ├── config
+│   │       │   │                       ├── filter
+│   │       │   │                       └── util
+│   │       │   │                           └── context_util
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_serializer
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_serializer
+│   │       │   │                       └── config
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_token
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_token
+│   │       │   │                       ├── config
+│   │       │   │                       └── model
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── core_usecase
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── jobstat
+│   │       │   │               └── core
+│   │       │   │                   └── core_usecase
+│   │       │   │                       ├── aspect
+│   │       │   │                       └── base
+│   │       │   └── resources
+│   │       │       └── META-INF
+│   │       │           └── spring
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   └── core_web_util
+│       └── src
+│           ├── main
+│           │   ├── kotlin
+│           │   │   └── com
+│           │   │       └── wildrew
+│           │   │           └── jobstat
+│           │   │               └── core
+│           │   │                   └── core_web_util
+│           │   └── resources
+│           │       └── META-INF
+│           └── test
+│               ├── kotlin
+│               └── resources
+├── gradle
+│   └── wrapper
+├── infra
+│   ├── build
+│   │   └── intermediates
+│   │       └── ktLint
+│   ├── config-repo
+│   │   ├── jobstat-api-gateway
+│   │   ├── jobstat-auth
+│   │   ├── jobstat-community
+│   │   ├── jobstat-community-read
+│   │   ├── jobstat-eureka-server
+│   │   ├── jobstat-notification
+│   │   └── jobstat-statistics-read
+│   ├── jobstat-api-gateway
+│   │   └── src
+│   │       ├── main
+│   │       │   ├── kotlin
+│   │       │   │   └── com
+│   │       │   │       └── wildrew
+│   │       │   │           └── apigateway
+│   │       │   └── resources
+│   │       └── test
+│   │           ├── kotlin
+│   │           └── resources
+│   ├── jobstat-config-server
+│   │   └── src
+│   │       └── main
+│   │           ├── kotlin
+│   │           │   └── com
+│   │           │       └── wildrew
+│   │           │           └── config
+│   │           └── resources
+│   └── jobstat-eureka-server
+│       └── src
+│           ├── main
+│           │   ├── kotlin
+│           │   │   └── com
+│           │   │       └── wildrew
+│           │   │           └── eurekaserver
+│           │   └── resources
+│           └── test
+│               ├── kotlin
+│               └── resources
+├── jobstat-api-gateway
+│   └── build
+│       └── intermediates
+│           └── ktLint
+├── jobstat-auth
+│   └── build
+│       └── intermediates
+│           └── ktLint
+├── jobstat-community
+│   └── build
+│       └── intermediates
+│           └── ktLint
+├── jobstat-community_read
+│   └── build
+│       └── intermediates
+│           └── ktLint
+├── jobstat-notification
+│   └── build
+│       └── intermediates
+│           └── ktLint
+├── jobstat-statistics_read
+│   └── build
+│       └── intermediates
+│           └── ktLint
+├── ksp
+│   ├── bin
+│   │   ├── main
+│   │   │   ├── META-INF
+│   │   │   │   └── services
+│   │   │   └── com
+│   │   │       └── wildrew
+│   │   │           └── ksp
+│   │   │               ├── converter
+│   │   │               └── processor
+│   │   └── test
+│   │       └── com
+│   │           └── wildrew
+│   │               └── ksp
+│   ├── gradle
+│   │   └── wrapper
+│   └── src
+│       ├── main
+│       │   ├── kotlin
+│       │   │   └── com
+│       │   │       └── wildrew
+│       │   │           └── ksp
+│       │   │               ├── converter
+│       │   │               └── processor
+│       │   └── resources
+│       │       └── META-INF
+│       │           └── services
+│       └── test
+│           └── kotlin
+│               └── com
+│                   └── wildrew
+│                       └── ksp
+├── logs
+│   ├── dev
+│   └── prod
+├── nginx
+│   └── conf
+└── service
+    ├── build
+    │   └── intermediates
+    │       └── ktLint
+    ├── jobstat-auth
+    │   ├── build
+    │   │   └── tmp
+    │   └── src
+    │       ├── main
+    │       │   ├── kotlin
+    │       │   │   └── com
+    │       │   │       └── wildrew
+    │       │   │           └── jobstat
+    │       │   │               └── auth
+    │       │   │                   ├── common
+    │       │   │                   ├── email
+    │       │   │                   │   ├── entity
+    │       │   │                   │   ├── repository
+    │       │   │                   │   ├── service
+    │       │   │                   │   └── usecase
+    │       │   │                   ├── token
+    │       │   │                   │   ├── service
+    │       │   │                   │   └── usecase
+    │       │   │                   └── user
+    │       │   │                       ├── entity
+    │       │   │                       ├── model
+    │       │   │                       ├── repository
+    │       │   │                       ├── service
+    │       │   │                       └── usecase
+    │       │   └── resources
+    │       └── test
+    │           ├── kotlin
+    │           │   └── com
+    │           │       └── wildrew
+    │           │           └── jobstat
+    │           │               └── auth
+    │           │                   ├── token
+    │           │                   │   └── service
+    │           │                   ├── user
+    │           │                   │   ├── fake
+    │           │                   │   ├── repository
+    │           │                   │   ├── service
+    │           │                   │   └── usecase
+    │           │                   └── utils
+    │           │                       ├── auth
+    │           │                       │   └── token
+    │           │                       ├── base
+    │           │                       ├── config
+    │           │                       └── payload
+    │           └── resources
+    ├── jobstat-community
+    │   └── src
+    │       ├── main
+    │       │   ├── kotlin
+    │       │   │   └── com
+    │       │   │       └── wildrew
+    │       │   │           └── jobstat
+    │       │   │               └── community
+    │       │   │                   ├── board
+    │       │   │                   │   ├── controller
+    │       │   │                   │   ├── entity
+    │       │   │                   │   ├── repository
+    │       │   │                   │   │   └── batch
+    │       │   │                   │   ├── service
+    │       │   │                   │   ├── usecase
+    │       │   │                   │   │   ├── command
+    │       │   │                   │   │   ├── get
+    │       │   │                   │   │   │   └── dto
+    │       │   │                   │   │   └── handler
+    │       │   │                   │   └── utils
+    │       │   │                   │       └── model
+    │       │   │                   ├── comment
+    │       │   │                   │   ├── controller
+    │       │   │                   │   ├── entity
+    │       │   │                   │   ├── repository
+    │       │   │                   │   ├── service
+    │       │   │                   │   ├── usecase
+    │       │   │                   │   │   ├── command
+    │       │   │                   │   │   └── get
+    │       │   │                   │   └── utils
+    │       │   │                   ├── common
+    │       │   │                   ├── config
+    │       │   │                   ├── counting
+    │       │   │                   └── event
+    │       │   └── resources
+    │       └── test
+    │           ├── kotlin
+    │           │   └── com
+    │           │       └── wildrew
+    │           │           └── jobstat
+    │           │               └── community
+    │           │                   ├── board
+    │           │                   │   ├── fixture
+    │           │                   │   ├── repository
+    │           │                   │   ├── service
+    │           │                   │   └── usecase
+    │           │                   │       ├── command
+    │           │                   │       └── get
+    │           │                   ├── comment
+    │           │                   │   ├── fixture
+    │           │                   │   ├── repository
+    │           │                   │   ├── service
+    │           │                   │   └── usecase
+    │           │                   │       ├── command
+    │           │                   │       └── get
+    │           │                   ├── counting
+    │           │                   └── utils
+    │           │                       ├── auth
+    │           │                       │   └── token
+    │           │                       ├── base
+    │           │                       ├── config
+    │           │                       └── payload
+    │           └── resources
+    ├── jobstat-community_read
+    │   └── src
+    │       ├── main
+    │       │   ├── kotlin
+    │       │   │   └── com
+    │       │   │       └── wildrew
+    │       │   │           └── jobstat
+    │       │   │               └── community_read
+    │       │   │                   ├── client
+    │       │   │                   │   └── response
+    │       │   │                   ├── common
+    │       │   │                   ├── controller
+    │       │   │                   ├── event
+    │       │   │                   ├── model
+    │       │   │                   ├── repository
+    │       │   │                   │   └── impl
+    │       │   │                   ├── scheduler
+    │       │   │                   ├── service
+    │       │   │                   ├── usecase
+    │       │   │                   │   ├── handler
+    │       │   │                   │   └── query
+    │       │   │                   └── utils
+    │       │   │                       └── config
+    │       │   └── resources
+    │       └── test
+    │           ├── kotlin
+    │           │   └── com
+    │           │       └── wildrew
+    │           │           └── jobstat
+    │           │               └── community_read
+    │           │                   ├── community_read
+    │           │                   │   ├── fixture
+    │           │                   │   ├── repository
+    │           │                   │   │   └── fake
+    │           │                   │   └── service
+    │           │                   ├── payload
+    │           │                   └── utils
+    │           │                       ├── auth
+    │           │                       │   └── token
+    │           │                       ├── base
+    │           │                       ├── config
+    │           │                       └── payload
+    │           └── resources
+    ├── jobstat-notification
+    │   └── src
+    │       ├── main
+    │       │   ├── kotlin
+    │       │   │   └── com
+    │       │   │       └── wildrew
+    │       │   │           └── jobstat
+    │       │   │               └── notification
+    │       │   │                   ├── common
+    │       │   │                   ├── email
+    │       │   │                   └── phone
+    │       │   └── resources
+    │       └── test
+    │           ├── kotlin
+    │           └── resources
+    └── jobstat-statistics_read
+        └── src
+            ├── main
+            │   ├── kotlin
+            │   │   └── com
+            │   │       └── wildrew
+            │   │           └── jobstat
+            │   │               └── statistics_read
+            │   │                   ├── common
+            │   │                   ├── core
+            │   │                   │   ├── core_model
+            │   │                   │   └── core_mongo_base
+            │   │                   │       ├── config
+            │   │                   │       ├── converter
+            │   │                   │       ├── model
+            │   │                   │       │   ├── ranking
+            │   │                   │       │   └── stats
+            │   │                   │       └── repository
+            │   │                   ├── rankings
+            │   │                   │   ├── document
+            │   │                   │   ├── model
+            │   │                   │   │   └── rankingtype
+            │   │                   │   ├── repository
+            │   │                   │   ├── service
+            │   │                   │   └── usecase
+            │   │                   │       └── analyze
+            │   │                   └── stats
+            │   │                       ├── document
+            │   │                       ├── registry
+            │   │                       ├── repository
+            │   │                       ├── service
+            │   │                       └── usecase
+            │   └── resources
+            └── test
+                ├── kotlin
+                │   └── com
+                │       └── wildrew
+                │           └── jobstat
+                │               └── statistics_read
+                │                   ├── fake
+                │                   ├── rankings
+                │                   │   ├── fake
+                │                   │   └── service
+                │                   ├── repository
+                │                   ├── stats
+                │                   │   ├── fake
+                │                   │   └── service
+                │                   └── utils
+                │                       ├── base
+                │                       ├── config
+                │                       └── dummy
+                └── resources
+
+
+```
