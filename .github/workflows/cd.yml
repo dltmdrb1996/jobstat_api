@@ -43,6 +43,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: 권한 확인용 테스트 푸시
+        run: |
+          docker pull busybox
+          docker tag busybox ${DOCKERHUB_USERNAME}/_ci-test:tmp
+          docker push      ${DOCKERHUB_USERNAME}/_ci-test:tmp
+
       - name: Get changed files
         id: changed_files
         if: github.event_name == 'push'
