@@ -176,14 +176,6 @@ jobs:
           DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
           MODULES='${{ needs.build.outputs.modules_json }}'
 
-#          for module in $(echo "${MODULES}" | jq -r '.[]'); do
-#            service_name_base=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
-#            service_name_k8s="jobstat-${service_name_base}"
-#            echo "Setting image for ${service_name_k8s} to tag ${IMAGE_TAG}"
-#            # [핵심] 올바른 형식: image_name=new_image_name:new_tag
-#            kustomize edit set image "${DOCKER_USER}/${service_name_k8s}=${DOCKER_USER}/${service_name_k8s}:${IMAGE_TAG}" overlays/local-k3d
-#          done
-
           for module in $(echo "${MODULES}" | jq -r '.[]'); do
             service_name_base=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
             service_name_k8s="jobstat-${service_name_base}"
