@@ -46,8 +46,8 @@ jobs:
       - name: 권한 확인용 테스트 푸시
         run: |
           docker pull busybox
-          docker tag busybox ${{ secrets.DOCKERHUB_USERNAME }}/_ci-test:tmp
-          docker push      ${{ secrets.DOCKERHUB_USERNAME }}/_ci-test:tmp
+          docker tag busybox ${{ secrets.DOCKERHUB_USERNAME }}/ci-test:tmp
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ci-test:tmp
 
       - name: Get changed files
         id: changed_files
