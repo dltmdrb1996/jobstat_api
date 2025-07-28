@@ -2,6 +2,7 @@
 
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 
 plugins {
     id("org.springframework.boot") version "3.4.5" apply false
@@ -38,6 +39,12 @@ subprojects {
         }
         filter {
             exclude("**/build/generated/**")
+        }
+    }
+
+    plugins.withType<org.springframework.boot.gradle.plugin.SpringBootPlugin> {
+        tasks.withType<BootBuildImage> {
+            publish.set(true)
         }
     }
 
