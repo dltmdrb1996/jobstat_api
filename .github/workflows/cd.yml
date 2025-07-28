@@ -35,19 +35,6 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # [디버깅 추가] 체크아웃된 파일 구조와 Gradle 버전 확인
-      - name: Verify checked out files and Gradle setup
-        run: |
-          cd app
-          echo "--- Current Directory: $(pwd) ---"
-          echo "--- Listing root files ---"
-          ls -l
-          echo "--- Verifying settings.gradle.kts ---"
-          cat settings.gradle.kts
-          echo "--- Verifying Gradle version and projects ---"
-          ./gradlew --version
-          ./gradlew projects
-
       - name: Get changed files
         id: changed_files
         if: github.event_name == 'push'
@@ -57,10 +44,9 @@ jobs:
 
       - name: Determine services to build
         id: set_services
+        # working-directory 제거
         run: |
-          # 이 스크립트는 루트에서 실행되므로 경로 문제 없음
-          cd app
-          # ... (이전과 동일한 스크립트) ...
+          cd app # <-- 명시적으로 이동
           ALL_MODULES="infra/jobstat-eureka-server infra/jobstat-api-gateway infra/jobstat-config-server service/jobstat-auth service/jobstat-community service/jobstat-community_read service/jobstat-notification service/jobstat-statistics_read"
           MODULE_LIST_JSON="[]"
           if [ "${{ github.event_name }}" == "push" ]; then
@@ -78,9 +64,7 @@ jobs:
                 if [[ "$file" == infra/* || "$file" == service/* ]]; then
                   module_path=$(echo "$file" | cut -d/ -f1-2);
                   if [[ "$module_path" != "infra/config-repo" ]]; then
-                    if ! echo "$CHANGED_MODULES" | grep -q "$module_path"; then
-                      CHANGED_MODULES="$CHANGED_MODULES $module_path";
-                    fi
+                    if ! echo "$CHANGED_MODULES" | grep -q "$module_path"; then CHANGED_MODULES="$CHANGED_MODULES $module_path"; fi
                   fi
                 fi
               done
@@ -98,32 +82,31 @@ jobs:
               if [ -n "$MODULE_LIST" ]; then MODULE_LIST_JSON=$(echo "$MODULE_LIST" | sed 's/^ *//' | jq -R 'split(" ")' | jq -c '.'); fi
             fi
           fi
-          # GITHUB_OUTPUT은 절대 경로를 사용해야 하므로 cd 밖에서 echo
+          # GITHUB_OUTPUT은 절대 경로를 사용하므로 cd 밖에서 echo 해야 합니다.
           echo "modules_json=$MODULE_LIST_JSON" >> $GITHUB_OUTPUT
 
       - name: Build and Push Images
         id: build_images
         if: steps.set_services.outputs.modules_json != '[]' && steps.set_services.outputs.modules_json != '[""]'
+        # working-directory 제거
         run: |
-          cd app
+          cd app # <-- 명시적으로 이동
           IMAGE_TAG=${GITHUB_SHA::7}
           MODULES='${{ steps.set_services.outputs.modules_json }}'
           for module in $(echo "${MODULES}" | jq -r '.[]'); do
             service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
             image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
             echo "Building and pushing: ${image_name}"
-            # 명확하게 gradlew 경로 지정
             ./gradlew ":${module}:bootBuildImage" --imageName="${image_name}"
           done
-          # GITHUB_OUTPUT은 절대 경로를 사용해야 하므로 cd 밖에서 echo
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
-      # ... (이하 매니페스트 업데이트 부분은 동일) ...
       - name: Install Kustomize
         if: steps.build_images.outputs.image_tag
         run: |
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
           sudo mv kustomize /usr/local/bin/
+
       - name: Checkout Manifests Repository
         if: steps.build_images.outputs.image_tag
         uses: actions/checkout@v4
@@ -131,10 +114,12 @@ jobs:
           repository: dltmdrb1996/jobstat-api-manifests
           path: manifests
           token: ${{ secrets.PAT }}
+
       - name: Update Image Tags in Manifests
         if: steps.build_images.outputs.image_tag
+        # working-directory 제거
         run: |
-          cd manifests
+          cd manifests # <-- 명시적으로 이동
           IMAGE_TAG=${{ steps.build_images.outputs.image_tag }}
           DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
           MODULES='${{ steps.set_services.outputs.modules_json }}'
@@ -144,10 +129,12 @@ jobs:
             echo "Setting image for ${service_name_k8s} to tag ${IMAGE_TAG}"
             kustomize edit set image "${DOCKER_USER}/${service_name_k8s}=${DOCKER_USER}/${service_name_k8s}:${IMAGE_TAG}" overlays/local-k3d
           done
+
       - name: Commit and Push Manifest Changes
         if: steps.build_images.outputs.image_tag
+        # working-directory 제거
         run: |
-          cd manifests
+          cd manifests # <-- 명시적으로 이동
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add overlays/local-k3d/kustomization.yaml
