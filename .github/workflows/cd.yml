@@ -102,7 +102,7 @@ jobs:
           echo "--- Images to be built and pushed ---"
           for module in $(echo "${MODULES}" | jq -r '.[]'); do
             service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
-            image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
+            image_name="lsg1996/jobstat-${service_name}:${IMAGE_TAG}"
             echo "--> ${image_name}"
           done
           echo "---------------------------------------"
@@ -111,7 +111,7 @@ jobs:
           for module in $(echo "${MODULES}" | jq -r '.[]'); do
             gradle_path="${module//\//:}"
             service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
-            image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
+            image_name="lsg1996/jobstat-${service_name}:${IMAGE_TAG}"
 
             # [핵심 수정] --imageName='${image_name}'  ->  --imageName=${image_name}
             # 값에 작은따옴표가 포함되지 않도록 수정합니다.
