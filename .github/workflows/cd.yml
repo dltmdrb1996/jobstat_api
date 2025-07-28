@@ -98,6 +98,14 @@ jobs:
 
           IMAGE_TAG=${GITHUB_SHA::7}
           MODULES="$MODULE_LIST_JSON"
+          
+          echo "--- Images to be built and pushed ---"
+          for module in $(echo "${MODULES}" | jq -r '.[]'); do
+            service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
+            image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
+            echo "--> ${image_name}"
+          done
+          echo "---------------------------------------"
 
           GRADLE_COMMANDS=""
           for module in $(echo "${MODULES}" | jq -r '.[]'); do
