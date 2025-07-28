@@ -124,7 +124,7 @@ jobs:
 
             # [핵심 수정] --imageName='${image_name}'  ->  --imageName=${image_name}
             # 값에 작은따옴표가 포함되지 않도록 수정합니다.
-            GRADLE_COMMANDS="$GRADLE_COMMANDS :${gradle_path}:bootBuildImage --imageName=${image_name}"
+            GRADLE_COMMANDS="$GRADLE_COMMANDS :${gradle_path}:bootBuildImage --imageName=${image_name} --publishImage"
           done
 
           echo "--- Generated Gradle Commands ---"

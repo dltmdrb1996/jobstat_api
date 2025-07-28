@@ -43,32 +43,31 @@ subprojects {
         }
     }
 
-    if ((path.startsWith(":infra") || path.startsWith(":service"))
-        && plugins.hasPlugin("org.springframework.boot")
-    ) {
 
-        tasks.withType<BootBuildImage>().configureEach {
 
-            val dockerUser = System.getenv("DOCKERHUB_USERNAME") ?: "local"
-            val dockerPassword = System.getenv("DOCKERHUB_TOKEN")
-                ?: "비밀번호" // 로컬 빌드 대비
-            val tag        = System.getenv("GITHUB_SHA")?.take(7)
-                ?: "dev-${LocalDate.now()}"
+    tasks.withType<BootBuildImage>().configureEach {
+        val dockerUser = System.getenv("DOCKERHUB_USERNAME") ?: "local"
+        val dockerPassword = System.getenv("DOCKERHUB_TOKEN")
+            ?: "비밀번호" // 로컬 빌드 대비
+        val tag = System.getenv("GITHUB_SHA")?.take(7)
+            ?: "dev-${LocalDate.now()}"
 
-            println("DEBUG > dockerUser = '$dockerUser', tag = '$tag'")
-            println("DEBUG > dockerPassword = '${dockerPassword}'")
 
-            val svcName = project.name
-                .removePrefix("jobstat-")
-                .replace('_', '-')
 
-            imageName.set("$dockerUser/jobstat-$svcName:$tag")
-            publish.set(true)
-            docker {
-                publishRegistry {
-                    username.set(dockerUser)
-                    password.set(dockerPassword)
-                }
+        val svcName = project.name
+            .removePrefix("jobstat-")
+            .replace('_', '-')
+
+        println("DEBUG > dockerUser = '$dockerUser', tag = '$tag'")
+        println("DEBUG > dockerPassword = '${dockerPassword}'")
+        println("DEBUG > svcName = '$svcName'")
+
+        imageName.set("$dockerUser/jobstat-$svcName:$tag")
+        publish.set(true)
+        docker {
+            publishRegistry {
+                username.set(dockerUser)
+                password.set(dockerPassword)
             }
         }
     }
