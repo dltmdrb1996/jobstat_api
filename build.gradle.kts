@@ -73,12 +73,12 @@ subprojects {
         }
     }
 
-    plugins.withType<org.springframework.boot.gradle.plugin.SpringBootPlugin> {
-        println("DEBUG > registry user = '${System.getenv("DOCKERHUB_USERNAME")}'")
-        tasks.withType<BootBuildImage> {
-            publish.set(true)
-        }
-    }
+//    plugins.withType<org.springframework.boot.gradle.plugin.SpringBootPlugin> {
+//        println("DEBUG > registry user = '${System.getenv("DOCKERHUB_USERNAME")}'")
+//        tasks.withType<BootBuildImage> {
+//            publish.set(true)
+//        }
+//    }
 
     // --- 이하 다른 공통 설정들 ---
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
