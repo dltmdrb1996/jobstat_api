@@ -99,13 +99,22 @@ jobs:
           IMAGE_TAG=${GITHUB_SHA::7}
           MODULES="$MODULE_LIST_JSON"
           
+          # [핵심 수정] 모든 Gradle 명령을 하나의 문자열로 만들어 마지막에 실행
+          GRADLE_COMMANDS=""
           for module in $(echo "${MODULES}" | jq -r '.[]'); do
             service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
             image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
-            echo "Building and pushing: ${image_name}"
-            # [최종 수정] -x test 옵션을 추가하여 불필요한 테스트를 건너뜁니다.
-            ./gradlew ":${module}:bootBuildImage" --imageName="${image_name}" -x test
+          
+            # 각 모듈에 대한 빌드 명령을 GRADLE_COMMANDS 변수에 추가
+            GRADLE_COMMANDS="$GRADLE_COMMANDS :${module}:bootBuildImage --imageName='${image_name}'"
           done
+          
+          echo "--- Generated Gradle Commands ---"
+          echo "./gradlew $GRADLE_COMMANDS -x test --no-daemon"
+          echo "---------------------------------"
+          
+          # [핵심 수정] 생성된 모든 명령을 한 번에 실행
+          ./gradlew $GRADLE_COMMANDS -x test --no-daemon
           
           echo "build_succeeded=true" >> $GITHUB_OUTPUT
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
