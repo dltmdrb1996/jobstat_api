@@ -51,8 +51,8 @@ jobs:
         id: execute_build
         run: |
           cd app
-          
-          # --- 1. Determine services to build ---
+
+          # --- 1. Determine services to build (이 부분은 수정 없음) ---
           ALL_MODULES="infra/jobstat-eureka-server infra/jobstat-api-gateway infra/jobstat-config-server service/jobstat-auth service/jobstat-community service/jobstat-community_read service/jobstat-notification service/jobstat-statistics_read"
           MODULE_LIST_JSON="[]"
           if [ "${{ github.event_name }}" == "push" ]; then
@@ -88,7 +88,7 @@ jobs:
               if [ -n "$MODULE_LIST" ]; then MODULE_LIST_JSON=$(echo "$MODULE_LIST" | sed 's/^ *//' | jq -R 'split(" ")' | jq -c '.'); fi
             fi
           fi
-          
+
           # --- 2. Build and Push Images ---
           if [[ "$MODULE_LIST_JSON" == "[]" || "$MODULE_LIST_JSON" == "[\"\"]" ]]; then
             echo "No modules to build. Exiting."
@@ -98,25 +98,24 @@ jobs:
 
           IMAGE_TAG=${GITHUB_SHA::7}
           MODULES="$MODULE_LIST_JSON"
-          
+
           GRADLE_COMMANDS=""
           for module in $(echo "${MODULES}" | jq -r '.[]'); do
-            # --- [핵심 수정] 파일 시스템 경로(/)를 Gradle 프로젝트 경로(:)로 변환 ---
             gradle_path="${module//\//:}"
-
             service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
             image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
-          
-            # 변환된 gradle_path를 사용하여 명령을 구성
-            GRADLE_COMMANDS="$GRADLE_COMMANDS :${gradle_path}:bootBuildImage --imageName='${image_name}'"
+
+            # [핵심 수정] --imageName='${image_name}'  ->  --imageName=${image_name}
+            # 값에 작은따옴표가 포함되지 않도록 수정합니다.
+            GRADLE_COMMANDS="$GRADLE_COMMANDS :${gradle_path}:bootBuildImage --imageName=${image_name}"
           done
-          
+
           echo "--- Generated Gradle Commands ---"
           echo "./gradlew $GRADLE_COMMANDS -x test --no-daemon"
           echo "---------------------------------"
-          
+
           ./gradlew $GRADLE_COMMANDS -x test --no-daemon
-          
+
           echo "build_succeeded=true" >> $GITHUB_OUTPUT
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "modules_json=${MODULES}" >> $GITHUB_OUTPUT
