@@ -12,130 +12,144 @@ on:
         type: string
 
 jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    env:
+#      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#      DOCKERHUB_TOKEN:   ${{ secrets.DOCKERHUB_TOKEN }}
+#    outputs:
+#      image_tag: ${{ steps.execute_build.outputs.image_tag }}
+#      modules_json: ${{ steps.execute_build.outputs.modules_json }}
+#      build_succeeded: ${{ steps.execute_build.outputs.build_succeeded }}
+#
+#    steps:
+#      - name: Checkout Application Code
+#        uses: actions/checkout@v4
+#        with:
+#          path: app
+#          fetch-depth: 0
+#
+#      - name: Set up JDK 21
+#        uses: actions/setup-java@v4
+#        with:
+#          java-version: '21'
+#          distribution: 'temurin'
+#      - name: Setup Gradle
+#        uses: gradle/actions/setup-gradle@v3
+#
+#      - name: Login to Docker Hub
+#        uses: docker/login-action@v3
+#        with:
+#          username: ${{ secrets.DOCKERHUB_USERNAME }}
+#          password: ${{ secrets.DOCKERHUB_TOKEN }}
+#
+#      - name: 권한 확인용 테스트 푸시
+#        run: |
+#          docker pull busybox
+#          docker tag busybox ${{ secrets.DOCKERHUB_USERNAME }}/ci-test:tmp
+#          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ci-test:tmp
+#
+#      - name: Get changed files
+#        id: changed_files
+#        if: github.event_name == 'push'
+#        uses: tj-actions/changed-files@v44
+#        with:
+#          path: app
+#
+#      - name: Determine, Build, and Push
+#        id: execute_build
+#        run: |
+#          cd app
+#
+#          # --- 1. Determine services to build (이 부분은 수정 없음) ---
+#          ALL_MODULES="infra/jobstat-eureka-server infra/jobstat-api-gateway infra/jobstat-config-server service/jobstat-auth service/jobstat-community service/jobstat-community_read service/jobstat-notification service/jobstat-statistics_read"
+#          MODULE_LIST_JSON="[]"
+#          if [ "${{ github.event_name }}" == "push" ]; then
+#            build_all_flag=false
+#            for file in ${{ steps.changed_files.outputs.all_changed_files }}; do
+#              if [[ "$file" == build.gradle.kts || "$file" == settings.gradle.kts || "$file" == "gradle/"* || "$file" == core/* ]]; then
+#                build_all_flag=true; break;
+#              fi
+#            done
+#            if [ "$build_all_flag" = true ]; then
+#              MODULE_LIST_JSON=$(echo "$ALL_MODULES" | jq -R 'split(" ")' | jq -c '.');
+#            else
+#              CHANGED_MODULES=""
+#              for file in ${{ steps.changed_files.outputs.all_changed_files }}; do
+#                if [[ "$file" == infra/* || "$file" == service/* ]]; then
+#                  module_path=$(echo "$file" | cut -d/ -f1-2);
+#                  if [[ "$module_path" != "infra/config-repo" ]]; then
+#                    if ! echo "$CHANGED_MODULES" | grep -q "$module_path"; then CHANGED_MODULES="$CHANGED_MODULES $module_path"; fi
+#                  fi
+#                fi
+#              done
+#              if [ -n "$CHANGED_MODULES" ]; then MODULE_LIST_JSON=$(echo "$CHANGED_MODULES" | sed 's/^ *//' | jq -R 'split(" ")' | jq -c '.'); fi
+#            fi
+#          else
+#            INPUT_SERVICES="${{ inputs.services_to_deploy }}"
+#            if [ "$INPUT_SERVICES" == "all" ]; then MODULE_LIST_JSON=$(echo "$ALL_MODULES" | jq -R 'split(" ")' | jq -c '.');
+#            else
+#              MODULE_LIST=""; FORMATTED_SERVICES=$(echo "$INPUT_SERVICES" | tr -d ' ' | sed 's/,/ /g')
+#              for service in $FORMATTED_SERVICES; do
+#                MATCH=$(echo "$ALL_MODULES" | grep -oE "([^ ]*jobstat-${service//_/-})");
+#                if [ -n "$MATCH" ]; then MODULE_LIST="$MODULE_LIST $MATCH"; fi
+#              done
+#              if [ -n "$MODULE_LIST" ]; then MODULE_LIST_JSON=$(echo "$MODULE_LIST" | sed 's/^ *//' | jq -R 'split(" ")' | jq -c '.'); fi
+#            fi
+#          fi
+#
+#          # --- 2. Build and Push Images ---
+#          if [[ "$MODULE_LIST_JSON" == "[]" || "$MODULE_LIST_JSON" == "[\"\"]" ]]; then
+#            echo "No modules to build. Exiting."
+#            echo "build_succeeded=false" >> $GITHUB_OUTPUT
+#            exit 0
+#          fi
+#
+#          IMAGE_TAG=${GITHUB_SHA::7}
+#          MODULES="$MODULE_LIST_JSON"
+#
+#          echo "--- Images to be built and pushed ---"
+#          for module in $(echo "${MODULES}" | jq -r '.[]'); do
+#            service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
+#            image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
+#            echo "--> ${image_name}"
+#          done
+#          echo "---------------------------------------"
+#
+#          GRADLE_COMMANDS=""
+#          for module in $(echo "${MODULES}" | jq -r '.[]'); do
+#            gradle_path="${module//\//:}"
+#            service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
+#            image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
+#
+#            # [핵심 수정] --imageName='${image_name}'  ->  --imageName=${image_name}
+#            # 값에 작은따옴표가 포함되지 않도록 수정합니다.
+#            GRADLE_COMMANDS="$GRADLE_COMMANDS :${gradle_path}:bootBuildImage --imageName=${image_name} --publishImage"
+#          done
+#
+#          echo "--- Generated Gradle Commands ---"
+#          echo "./gradlew $GRADLE_COMMANDS -x test --no-daemon --no-parallel" # <-- 옵션 추가
+#          echo "---------------------------------"
+#
+#          ./gradlew $GRADLE_COMMANDS -x test --no-daemon --no-parallel # <-- 옵션 추가
+#
+#          echo "build_succeeded=true" >> $GITHUB_OUTPUT
+#          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
+#          echo "modules_json=${MODULES}" >> $GITHUB_OUTPUT
+
   build:
     runs-on: ubuntu-latest
-    env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN:   ${{ secrets.DOCKERHUB_TOKEN }}
     outputs:
-      image_tag: ${{ steps.execute_build.outputs.image_tag }}
-      modules_json: ${{ steps.execute_build.outputs.modules_json }}
-      build_succeeded: ${{ steps.execute_build.outputs.build_succeeded }}
-
+      image_tag: ${{ steps.out.outputs.image_tag }}
+      modules_json: ${{ steps.out.outputs.modules_json }}
+      build_succeeded: ${{ steps.out.outputs.build_succeeded }}
     steps:
-      - name: Checkout Application Code
-        uses: actions/checkout@v4
-        with:
-          path: app
-          fetch-depth: 0
-
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-
-      - name: 권한 확인용 테스트 푸시
+      - id: out
         run: |
-          docker pull busybox
-          docker tag busybox ${{ secrets.DOCKERHUB_USERNAME }}/ci-test:tmp
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/ci-test:tmp
-
-      - name: Get changed files
-        id: changed_files
-        if: github.event_name == 'push'
-        uses: tj-actions/changed-files@v44
-        with:
-          path: app
-
-      - name: Determine, Build, and Push
-        id: execute_build
-        run: |
-          cd app
-
-          # --- 1. Determine services to build (이 부분은 수정 없음) ---
-          ALL_MODULES="infra/jobstat-eureka-server infra/jobstat-api-gateway infra/jobstat-config-server service/jobstat-auth service/jobstat-community service/jobstat-community_read service/jobstat-notification service/jobstat-statistics_read"
-          MODULE_LIST_JSON="[]"
-          if [ "${{ github.event_name }}" == "push" ]; then
-            build_all_flag=false
-            for file in ${{ steps.changed_files.outputs.all_changed_files }}; do
-              if [[ "$file" == build.gradle.kts || "$file" == settings.gradle.kts || "$file" == "gradle/"* || "$file" == core/* ]]; then
-                build_all_flag=true; break;
-              fi
-            done
-            if [ "$build_all_flag" = true ]; then
-              MODULE_LIST_JSON=$(echo "$ALL_MODULES" | jq -R 'split(" ")' | jq -c '.');
-            else
-              CHANGED_MODULES=""
-              for file in ${{ steps.changed_files.outputs.all_changed_files }}; do
-                if [[ "$file" == infra/* || "$file" == service/* ]]; then
-                  module_path=$(echo "$file" | cut -d/ -f1-2);
-                  if [[ "$module_path" != "infra/config-repo" ]]; then
-                    if ! echo "$CHANGED_MODULES" | grep -q "$module_path"; then CHANGED_MODULES="$CHANGED_MODULES $module_path"; fi
-                  fi
-                fi
-              done
-              if [ -n "$CHANGED_MODULES" ]; then MODULE_LIST_JSON=$(echo "$CHANGED_MODULES" | sed 's/^ *//' | jq -R 'split(" ")' | jq -c '.'); fi
-            fi
-          else
-            INPUT_SERVICES="${{ inputs.services_to_deploy }}"
-            if [ "$INPUT_SERVICES" == "all" ]; then MODULE_LIST_JSON=$(echo "$ALL_MODULES" | jq -R 'split(" ")' | jq -c '.');
-            else
-              MODULE_LIST=""; FORMATTED_SERVICES=$(echo "$INPUT_SERVICES" | tr -d ' ' | sed 's/,/ /g')
-              for service in $FORMATTED_SERVICES; do
-                MATCH=$(echo "$ALL_MODULES" | grep -oE "([^ ]*jobstat-${service//_/-})");
-                if [ -n "$MATCH" ]; then MODULE_LIST="$MODULE_LIST $MATCH"; fi
-              done
-              if [ -n "$MODULE_LIST" ]; then MODULE_LIST_JSON=$(echo "$MODULE_LIST" | sed 's/^ *//' | jq -R 'split(" ")' | jq -c '.'); fi
-            fi
-          fi
-
-          # --- 2. Build and Push Images ---
-          if [[ "$MODULE_LIST_JSON" == "[]" || "$MODULE_LIST_JSON" == "[\"\"]" ]]; then
-            echo "No modules to build. Exiting."
-            echo "build_succeeded=false" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
-          IMAGE_TAG=${GITHUB_SHA::7}
-          MODULES="$MODULE_LIST_JSON"
-          
-          echo "--- Images to be built and pushed ---"
-          for module in $(echo "${MODULES}" | jq -r '.[]'); do
-            service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
-            image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
-            echo "--> ${image_name}"
-          done
-          echo "---------------------------------------"
-
-          GRADLE_COMMANDS=""
-          for module in $(echo "${MODULES}" | jq -r '.[]'); do
-            gradle_path="${module//\//:}"
-            service_name=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
-            image_name="${{ secrets.DOCKERHUB_USERNAME }}/jobstat-${service_name}:${IMAGE_TAG}"
-
-            # [핵심 수정] --imageName='${image_name}'  ->  --imageName=${image_name}
-            # 값에 작은따옴표가 포함되지 않도록 수정합니다.
-            GRADLE_COMMANDS="$GRADLE_COMMANDS :${gradle_path}:bootBuildImage --imageName=${image_name} --publishImage"
-          done
-
-          echo "--- Generated Gradle Commands ---"
-          echo "./gradlew $GRADLE_COMMANDS -x test --no-daemon --no-parallel" # <-- 옵션 추가
-          echo "---------------------------------"
-
-          ./gradlew $GRADLE_COMMANDS -x test --no-daemon --no-parallel # <-- 옵션 추가
-          
+          echo "image_tag=a7c9a17" >> $GITHUB_OUTPUT
+          # ◀️ 실제로 태그가 존재하는 모든 모듈을 배열로 기입
+          echo 'modules_json=["infra/jobstat-eureka-server","infra/jobstat-api-gateway","infra/jobstat-config-server","service/jobstat-auth","service/jobstat-community","service/jobstat-community_read","service/jobstat-notification","service/jobstat-statistics_read"]' >> $GITHUB_OUTPUT
           echo "build_succeeded=true" >> $GITHUB_OUTPUT
-          echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
-          echo "modules_json=${MODULES}" >> $GITHUB_OUTPUT
 
   update-manifests:
     runs-on: ubuntu-latest
@@ -161,12 +175,21 @@ jobs:
           IMAGE_TAG=${{ needs.build.outputs.image_tag }}
           DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
           MODULES='${{ needs.build.outputs.modules_json }}'
-          
+
+#          for module in $(echo "${MODULES}" | jq -r '.[]'); do
+#            service_name_base=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
+#            service_name_k8s="jobstat-${service_name_base}"
+#            echo "Setting image for ${service_name_k8s} to tag ${IMAGE_TAG}"
+#            # [핵심] 올바른 형식: image_name=new_image_name:new_tag
+#            kustomize edit set image "${DOCKER_USER}/${service_name_k8s}=${DOCKER_USER}/${service_name_k8s}:${IMAGE_TAG}" overlays/local-k3d
+#          done
+
           for module in $(echo "${MODULES}" | jq -r '.[]'); do
             service_name_base=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
             service_name_k8s="jobstat-${service_name_base}"
             echo "Setting image for ${service_name_k8s} to tag ${IMAGE_TAG}"
-            kustomize edit set image "${DOCKER_USER}/${service_name_k8s}=${DOCKER_USER}/${service_name_k8s}:${IMAGE_TAG}" overlays/local-k3d
+            # [핵심] 올바른 형식: image_name=new_image_name:new_tag
+            kustomize edit --kustomization overlays/local-k3d/kustomization.yaml set image "${DOCKER_USER}/${service_name_k8s}=${DOCKER_USER}/${service_name_k8s}:${IMAGE_TAG}"
           done
 
       - name: Commit and Push Manifest Changes
