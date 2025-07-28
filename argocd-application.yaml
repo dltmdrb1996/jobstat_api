@@ -1,0 +1,35 @@
+# 파일명: argocd-application.yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  # 애플리케이션의 이름과 Argo CD가 설치된 네임스페이스
+  name: jobstat-api
+  namespace: argocd
+spec:
+  # 배포할 프로젝트 (기본값 default 사용)
+  project: default
+
+  # 소스: 어디에 있는 매니페스트를 가져올 것인가?
+  source:
+    # 2-3 단계에서 연결한 매니페스트 저장소의 SSH 주소
+    repoURL: 'git@github.com:dltmdrb1996/jobstat-api-manifests.git'
+    # 감시할 브랜치
+    targetRevision: main
+    # 저장소 내에서 Kustomize 빌드를 실행할 경로
+    path: k8s/overlays/local-k3d
+
+  # 목적지: 어디에 배포할 것인가?
+  destination:
+    # Argo CD가 설치된 바로 그 클러스터를 의미
+    server: 'https://kubernetes.default.svc'
+    # 애플리케이션들이 배포될 네임스페이스 (보통 default)
+    namespace: default
+
+  # 동기화 정책: 어떻게 배포할 것인가?
+  syncPolicy:
+    automated:
+      # Git에 변경이 생기면 자동으로 동기화(배포)
+      prune: true # Git에서 사라진 리소스는 클러스터에서도 자동 삭제
+      selfHeal: true # 클러스터의 상태가 Git과 달라지면 자동으로 Git 상태로 복구
+    syncOptions:
+      - CreateNamespace=true # 배포 대상 네임스페이스가 없으면 자동 생성

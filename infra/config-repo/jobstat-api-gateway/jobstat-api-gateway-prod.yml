@@ -7,8 +7,8 @@ spring:
 
 eureka:
   instance:
-    hostname: ${EUREKA_INSTANCE_HOSTNAME_GATEWAY_PROD:${EUREKA_INSTANCE_HOSTNAME_GATEWAY:jobstat-api-gateway}} # Docker 서비스 이름 등
-    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS_GATEWAY_PROD:${EUREKA_INSTANCE_PREFER_IP_ADDRESS_GATEWAY:true}}
+    hostname: jobstat-api-gateway-service # 쿠버네티스 내부 서비스 이름
+    prefer-ip-address: true # 쿠버네티스 환경에서는 IP 주소 선호
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_DEFAULT_ZONE_GATEWAY_PROD:${EUREKA_DEFAULT_ZONE_GATEWAY:http://jobstat-eureka-server:8761/eureka/}}
+      defaultZone: http://jobstat-eureka-server:8761/eureka/ # 쿠버네티스 내부 Eureka 서비스 이름

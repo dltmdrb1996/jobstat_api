@@ -7,11 +7,11 @@ spring:
       on-profile: dev
   data:
     mongodb:
-      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:dev_database}?maxPoolSize=5&minPoolSize=2&maxIdleTimeMS=30000
+      uri: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_HOST:host.k3d.internal}:${MONGO_PORT:27017}/${MONGO_DB:dev_database}?maxPoolSize=5&minPoolSize=2&maxIdleTimeMS=30000
       database: ${MONGO_DB:dev_database}
       auto-index-creation: true
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:host.k3d.internal}
       port: ${REDIS_PORT:6379}
       database: ${REDIS_DB:1}
       password: ${REDIS_PASSWORD}
@@ -27,10 +27,10 @@ spring:
 
 eureka:
   instance:
-    hostname: ${EUREKA_INSTANCE_HOSTNAME_STATS_READ_DEV:localhost}
+    hostname: jobstat-statistics-read-service
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_DEFAULT_ZONE_STATS_READ_DEV:http://localhost:8761/eureka/}
+      defaultZone: http://eureka-service:8761/eureka/
 
 logging:
   level:

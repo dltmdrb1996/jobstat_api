@@ -27,9 +27,9 @@ include(
     "infra:jobstat-api-gateway",
     ":ksp",
 )
-include("jobstat-api-gateway")
-include("jobstat-auth")
-include("jobstat-community")
-include("jobstat-community_read")
-include("jobstat-notification")
-include("jobstat-statistics_read")
+//include("jobstat-api-gateway")
+//include("jobstat-auth")
+//include("jobstat-community")
+//include("jobstat-community_read")
+//include("jobstat-notification")
+//include("jobstat-statistics_read")
