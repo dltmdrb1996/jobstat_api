@@ -111,11 +111,11 @@ jobs:
           done
 
           echo "--- Generated Gradle Commands ---"
-          echo "./gradlew $GRADLE_COMMANDS -x test --no-daemon"
+          echo "./gradlew $GRADLE_COMMANDS -x test --no-daemon --no-parallel" # <-- 옵션 추가
           echo "---------------------------------"
 
-          ./gradlew $GRADLE_COMMANDS -x test --no-daemon
-
+          ./gradlew $GRADLE_COMMANDS -x test --no-daemon --no-parallel # <-- 옵션 추가
+          
           echo "build_succeeded=true" >> $GITHUB_OUTPUT
           echo "image_tag=${IMAGE_TAG}" >> $GITHUB_OUTPUT
           echo "modules_json=${MODULES}" >> $GITHUB_OUTPUT
