@@ -2,7 +2,7 @@ name: Build and Update Manifests
 
 on:
   push:
-    branches: [ '**' ] # 모든 브랜치에 push 할 때 실행
+    branches: [ '**' ]
   workflow_dispatch:
     inputs:
       services_to_deploy:
@@ -54,7 +54,15 @@ jobs:
             for file in ${{ steps.changed_files.outputs.all_changed_files }}; do
               if [[ "$file" == infra/* || "$file" == service/* ]]; then
                 module_path=$(echo "$file" | cut -d/ -f1-2);
-                if ! echo "$CHANGED_MODULES" | grep -q "$module_path"; then CHANGED_MODULES="$CHANGED_MODULES $module_path"; fi
+                # --- [수정된 부분 시작] ---
+                # config-repo는 더 이상 빌드 대상이 아니므로 명시적으로 제외합니다.
+                if [[ "$module_path" != "infra/config-repo" ]]; then
+                  if ! echo "$CHANGED_MODULES" | grep -q "$module_path"; then
+                    CHANGED_MODULES="$CHANGED_MODULES $module_path"
+                    echo "Module '$module_path' added to build list due to change in '$file'."
+                  fi
+                fi
+                # --- [수정된 부분 끝] ---
               fi
             done
             if [ -n "$CHANGED_MODULES" ]; then MODULE_LIST_JSON=$(echo "$CHANGED_MODULES" | sed 's/^ *//' | jq -R 'split(" ")' | jq -c '.'); fi
@@ -127,4 +135,4 @@ jobs:
             git push
           else
             echo "No image changes to commit."
-          fi
+          fi```
