@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:dev_jobstat}?
+    url: jdbc:mysql://${DB_HOST:host.k3d.internal}:${DB_PORT:3306}/${DB_NAME:dev_jobstat}?
       serverTimezone=Asia/Seoul&useSSL=false
       &allowPublicKeyRetrieval=true
       &rewriteBatchedStatements=true
@@ -20,7 +20,7 @@ spring:
       connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
   data:
     redis:
-      host: ${REDIS_HOST:localhost}
+      host: ${REDIS_HOST:host.k3d.internal}
       port: ${REDIS_PORT:6379}
       database: ${REDIS_DB:1}
       password: ${REDIS_PASSWORD}

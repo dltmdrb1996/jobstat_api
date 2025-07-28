@@ -7,8 +7,8 @@ spring:
 
 eureka:
   instance:
-    hostname: ${EUREKA_INSTANCE_HOSTNAME_GATEWAY_DEV:${EUREKA_INSTANCE_HOSTNAME_GATEWAY:localhost}}
-    prefer-ip-address: ${EUREKA_INSTANCE_PREFER_IP_ADDRESS_GATEWAY_DEV:${EUREKA_INSTANCE_PREFER_IP_ADDRESS_GATEWAY:false}}
+    hostname: jobstat-api-gateway-service
+    prefer-ip-address: false
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_DEFAULT_ZONE_GATEWAY_DEV:${EUREKA_DEFAULT_ZONE_GATEWAY:http://localhost:8761/eureka/}}
+      defaultZone: http://eureka-service:8761/eureka/

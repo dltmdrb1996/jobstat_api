@@ -3,11 +3,7 @@ spring:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:prod_jobstat}?
-      serverTimezone=Asia/Seoul&useSSL=true
-      &allowPublicKeyRetrieval=true
-      &rewriteBatchedStatements=true
-      &useServerPrepStmts=false
+    url: jdbc:mysql://host.k3d.internal:3306/prod_jobstat?serverTimezone=Asia/Seoul&useSSL=true&allowPublicKeyRetrieval=true&rewriteBatchedStatements=true&useServerPrepStmts=false
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -19,9 +15,9 @@ spring:
       initialization-fail-timeout: 30000
       connection-init-sql: "SET sql_mode='NO_ENGINE_SUBSTITUTION'"
     redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
-      database: ${REDIS_DB:2}
+      host: host.k3d.internal
+      port: 6379
+      database: 2
       password: ${REDIS_PASSWORD}
       username: default
       client-type: lettuce
@@ -51,11 +47,11 @@ jobstat:
 
 eureka:
   instance:
-    hostname: ${EUREKA_INSTANCE_HOSTNAME_COMMUNITY_PROD:jobstat-community-service}
+    hostname: jobstat-community-service # 쿠버네티스 내부 서비스 이름
     prefer-ip-address: true
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_DEFAULT_ZONE_COMMUNITY_PROD:http://jobstat-eureka-server:8761/eureka/}
+      defaultZone: http://jobstat-eureka-server:8761/eureka/ # 쿠버네티스 내부 Eureka 서비스 이름
 
 springdoc:
   swagger-ui:

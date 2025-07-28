@@ -1,22 +1,7 @@
 server:
   port: 8888
-
 spring:
   application:
     name: jobstat-config-server
   profiles:
-    active: native
-  cloud:
-    config:
-      server:
-        native:
-          search-locations: >-
-            classpath:/config-repo/,
-            classpath:/config-repo/jobstat/,
-            classpath:/config-repo/jobstat-auth/,
-            classpath:/config-repo/jobstat-community/,
-            classpath:/config-repo/jobstat-community-read/,
-            classpath:/config-repo/jobstat-api-gateway/,
-            classpath:/config-repo/jobstat-statistics-read/,
-            classpath:/config-repo/jobstat-notification/,
-            classpath:/config-repo/jobstat-eureka-server/
+    active: git
