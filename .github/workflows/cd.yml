@@ -155,6 +155,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: needs.build.outputs.build_succeeded == 'true'
+    # [핵심 수정 1] env 컨텍스트를 사용하여 modules_json 값을 환경 변수로 설정
+    env:
+      MODULES_JSON: ${{ needs.build.outputs.modules_json }}
 
     steps:
       - name: Install Kustomize
@@ -174,20 +177,16 @@ jobs:
           cd manifests
           IMAGE_TAG=${{ needs.build.outputs.image_tag }}
           DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
-          MODULES='${{ needs.build.outputs.modules_json }}'
-          
-          for module in $(echo "${MODULES}" | jq -r '.[]'); do
+          # [핵심 수정 2] 환경 변수로 설정된 값을 따옴표 문제 없이 바로 사용
+
+          for module in $(echo "${MODULES_JSON}" | jq -r '.[]'); do
             service_name_base=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
             service_name_k8s="jobstat-${service_name_base}"
-          
-            # 원본 이미지의 전체 이름 (태그 제외)
             original_image_name="${DOCKER_USER}/${service_name_k8s}"
-          
+
             echo "Setting image for ${original_image_name} to tag ${IMAGE_TAG}"
-          
-            # [핵심 수정] 더 간단하고 명확한 'image:newtag' 형식 사용
             kustomize edit set image "${original_image_name}:${IMAGE_TAG}" overlays/local-k3d
-          done```
+          done
 
       - name: Commit and Push Manifest Changes
         run: |
