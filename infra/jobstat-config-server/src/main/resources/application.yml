@@ -5,3 +5,10 @@ spring:
     name: jobstat-config-server
   profiles:
     active: git
+  cloud:
+    config:
+      server:
+        git:
+          search-paths:
+            - .
+            - '{application}'
