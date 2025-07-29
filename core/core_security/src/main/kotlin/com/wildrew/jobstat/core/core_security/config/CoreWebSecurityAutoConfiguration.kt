@@ -97,6 +97,7 @@ class CoreWebSecurityAutoConfiguration {
                 "http://localhost:8081",
                 "http://localhost:3000",
                 "http://localhost:8080",
+                "localhost:5173",
             )
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type")

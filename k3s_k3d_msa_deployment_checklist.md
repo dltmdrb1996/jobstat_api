@@ -32,7 +32,7 @@
 
 *   **Exporter 설정 확인**: `k8s/base/infra/monitoring` 디렉터리 내의 익스포터 YAML 파일들(`mysql-exporter-deployment.yaml`, `mongodb-exporter-deployment.yaml`, `redis-exporter-deployment.yaml`, `grafana-deployment.yaml`)에서 Secret 참조(`DB_USERNAME`, `MONGO_USERNAME`, `REDIS_USERNAME`, `GRAFANA_ADMIN_USER` 등)가 올바르게 되어 있는지 최종 확인합니다.
 *   **`infra/config-repo` 파일 검토**: 제가 변경한 `*-dev.yml` 파일들과 `application.yml` 파일의 `localhost` 참조가 쿠버네티스 서비스 이름 또는 `host.k3d.internal`로 올바르게 변경되었는지 최종 확인합니다.
-*   **개별 서비스 `application.yml` 파일 검토**: 제가 변경한 `CONFIG_SERVER_URI`/`CONFIG_SERVER_URL`이 `http://jobstat-config-server:8888`로 올바르게 변경되었는지 최종 확인합니다.
+*   **개별 서비스 `application.yml` 파일 검토**: 제가 변경한 `CONFIG_SERVER_URI`/`CONFIG_SERVER_URI`이 `http://jobstat-config-server:8888`로 올바르게 변경되었는지 최종 확인합니다.
 
 ---
 
