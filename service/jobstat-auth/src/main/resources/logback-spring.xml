@@ -1,19 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-}] %-5level %logger{36} - %msg%n"/>
-    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />
+
+    <!-- ─────────── 공통 설정 ─────────── -->
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-}] %-5level %logger{36} - %msg%n"/>
+
+    <statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener"/>
+
+    <!-- 모든 프로필에서 사용하는 콘솔 Appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>${LOG_PATTERN}</pattern>
         </encoder>
     </appender>
 
+    <!-- ───────────────── dev 프로필 ───────────────── -->
     <springProfile name="dev">
+
         <property name="LOG_FILE_PATH" value="./logs/dev"/>
         <property name="LOG_FILE_NAME" value="dev-app"/>
 
+        <!-- 일반 로그 파일 -->
         <appender name="DEV_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <prudent>true</prudent> <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
+            <prudent>true</prudent>
+            <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
             <encoder>
                 <pattern>${LOG_PATTERN}</pattern>
             </encoder>
@@ -25,6 +35,7 @@
             </rollingPolicy>
         </appender>
 
+        <!-- 에러 전용 로그 파일 -->
         <appender name="DEV_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
             <prudent>true</prudent>
             <file>${LOG_FILE_PATH}/dev-error.log</file>
@@ -42,6 +53,7 @@
             </filter>
         </appender>
 
+        <!-- 루트 및 패키지별 레벨 -->
         <root level="DEBUG">
             <appender-ref ref="CONSOLE"/>
         </root>
@@ -58,87 +70,42 @@
             <appender-ref ref="DEV_ERROR_FILE"/>
         </logger>
 
-        <logger name="org.hibernate.SQL" level="INFO" additivity="false">
-            <appender-ref ref="CONSOLE"/>
-        </logger>
-        <logger name="org.springframework.orm.jpa" level="INFO" additivity="false">
-            <appender-ref ref="CONSOLE"/>
-        </logger>
-<!--        <logger name="org.springframework.data.repository.config.RepositoryConfigurationDelegate" level="INFO" additivity="false">-->
-<!--            <appender-ref ref="CONSOLE"/>-->
-<!--        </logger>-->
-        <logger name="org.hibernate.type.descriptor.sql" level="INFO" additivity="false">
-            <appender-ref ref="CONSOLE"/>
-        </logger>
-        <logger name="com.netflix.discovery" level="DEBUG" additivity="false">
-            <appender-ref ref="CONSOLE"/>
-        </logger>
-        <logger name="org.springframework.cloud.netflix.eureka" level="DEBUG" additivity="false">
-            <appender-ref ref="CONSOLE"/>
-        </logger>
+        <!-- 기타 라이브러리 레벨 조정 -->
+        <logger name="org.hibernate.SQL" level="INFO"/>
+        <logger name="org.springframework.orm.jpa" level="INFO"/>
+        <logger name="org.hibernate.type.descriptor.sql" level="INFO"/>
+        <logger name="com.netflix.discovery" level="DEBUG"/>
+        <logger name="org.springframework.cloud.netflix.eureka" level="DEBUG"/>
         <logger name="org.springframework.cloud.config.client" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="DEV_FILE"/>
         </logger>
-<!--        <logger name="org.springframework.boot.context.config" level="DEBUG" additivity="false">-->
-<!--            <appender-ref ref="CONSOLE"/>-->
-<!--            <appender-ref ref="DEV_FILE"/>-->
-<!--        </logger>-->
         <logger name="org.springframework.cloud.bootstrap" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="DEV_FILE"/>
         </logger>
     </springProfile>
 
+    <!-- ───────────────── prod 프로필 ───────────────── -->
     <springProfile name="prod">
-        <property name="LOG_FILE_PATH" value="./logs/prod"/>
-        <property name="LOG_FILE_NAME" value="prod-app"/>
 
-        <appender name="PROD_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_FILE_PATH}/${LOG_FILE_NAME}.log</file>
-            <encoder>
-                <pattern>${LOG_PATTERN}</pattern>
-            </encoder>
-            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE_PATH}/${LOG_FILE_NAME}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <maxFileSize>50MB</maxFileSize>
-                <maxHistory>30</maxHistory>
-                <totalSizeCap>3GB</totalSizeCap>
-            </rollingPolicy>
-        </appender>
-
-        <appender name="PROD_ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-            <file>${LOG_FILE_PATH}/prod-error.log</file>
-            <encoder>
-                <pattern>${LOG_PATTERN}</pattern>
-            </encoder>
-            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-                <fileNamePattern>${LOG_FILE_PATH}/prod-error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-                <maxFileSize>50MB</maxFileSize>
-                <maxHistory>30</maxHistory>
-                <totalSizeCap>1GB</totalSizeCap>
-            </rollingPolicy>
-            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-                <level>ERROR</level>
-            </filter>
-        </appender>
-
+        <!-- 파일 Appender 없이 콘솔만 사용 -->
         <root level="INFO">
-            <appender-ref ref="PROD_FILE"/>
-            <appender-ref ref="PROD_ERROR_FILE"/>
+            <appender-ref ref="CONSOLE"/>
         </root>
 
         <logger name="com.wildrew.jobstat.auth" level="INFO" additivity="false">
-            <appender-ref ref="PROD_FILE"/>
-            <appender-ref ref="PROD_ERROR_FILE"/>
+            <appender-ref ref="CONSOLE"/>
         </logger>
 
+        <!-- 패키지별 레벨 -->
         <logger name="org.springframework" level="WARN"/>
-        <logger name="org.hibernate" level="WARN"/> <logger name="org.apache" level="WARN"/>
+        <logger name="org.hibernate" level="WARN"/>
+        <logger name="org.apache" level="WARN"/>
         <logger name="io.lettuce" level="WARN"/>
         <logger name="com.zaxxer.hikari" level="WARN"/>
         <logger name="org.springframework.security" level="WARN"/>
         <logger name="com.wildrew.jobstat.core.core_security.filter.JwtTokenFilterWithScopedValue" level="WARN"/>
-
     </springProfile>
+
 </configuration>
