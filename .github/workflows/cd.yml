@@ -155,7 +155,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     if: needs.build.outputs.build_succeeded == 'true'
-    # [핵심 수정 1] env 컨텍스트를 사용하여 modules_json 값을 환경 변수로 설정
+
     env:
       MODULES_JSON: ${{ needs.build.outputs.modules_json }}
 
@@ -174,28 +174,28 @@ jobs:
 
       - name: Update Image Tags in Manifests
         run: |
-          cd manifests
           IMAGE_TAG=${{ needs.build.outputs.image_tag }}
           DOCKER_USER=${{ secrets.DOCKERHUB_USERNAME }}
-          # [핵심 수정 2] 환경 변수로 설정된 값을 따옴표 문제 없이 바로 사용
+
+          # 오버레이 디렉터리로 이동
+          cd manifests/overlays/local-k3d
 
           for module in $(echo "${MODULES_JSON}" | jq -r '.[]'); do
-            service_name_base=$(basename "$module" | sed 's/jobstat-//' | sed 's/_/-/g')
-            service_name_k8s="jobstat-${service_name_base}"
-            original_image_name="${DOCKER_USER}/${service_name_k8s}"
-
-            echo "Setting image for ${original_image_name} to tag ${IMAGE_TAG}"
-            kustomize edit set image "${original_image_name}:${IMAGE_TAG}" overlays/local-k3d
+            svc=$(basename "$module" | sed 's/jobstat-//' | tr '_' '-')
+            img="${DOCKER_USER}/jobstat-${svc}"
+            echo "Setting image ${img}:${IMAGE_TAG}"
+            # 현재 디렉터리의 kustomization.yaml 수정
+            kustomize edit set image "${img}=${img}:${IMAGE_TAG}"
           done
 
       - name: Commit and Push Manifest Changes
         run: |
-          cd manifests
+          cd manifests/overlays/local-k3d
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
-          git add overlays/local-k3d/kustomization.yaml
+          git add kustomization.yaml
           if ! git diff --staged --quiet; then
-            git commit -m "Update image tags for services by ${{ github.actor }} from branch ${{ github.ref_name }}"
+            git commit -m "Update image tags to ${IMAGE_TAG} by ${{ github.actor }} "
             git push
           else
             echo "No image changes to commit."
