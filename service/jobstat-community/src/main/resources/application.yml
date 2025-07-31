@@ -1,7 +1,12 @@
 spring:
   application:
     name: jobstat-community
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_URI:http://config-server-service:8888}
+
   config:
-    import: "optional:configserver:${CONFIG_SERVER_URI:http://jobstat-config-server:8888}"
+    import: "optional:configserver:"
+
   profiles:
     active: ${APP_PROFILE:dev}
