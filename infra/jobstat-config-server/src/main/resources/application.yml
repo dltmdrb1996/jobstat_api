@@ -1,14 +1,38 @@
 server:
   port: 8888
+
 spring:
   application:
     name: jobstat-config-server
   profiles:
-    active: git
+    active: ${CONFIG_SERVER_PROFILE:native}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: git
   cloud:
     config:
       server:
         git:
+          uri: git@github.com:dltmdrb1996/jobstat-config-repo.git
+          ignore-local-ssh-settings: true
           search-paths:
-            - .
+            - '.'
             - '{application}'
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: native
+  cloud:
+    config:
+      server:
+        native:
+          search-locations:
+            - file:///Users/lsg_mac_mini/IntelliJProject/jobstat-config-repo/
+            - file:///Users/lsg_mac_mini/IntelliJProject/jobstat-config-repo/{application}/
