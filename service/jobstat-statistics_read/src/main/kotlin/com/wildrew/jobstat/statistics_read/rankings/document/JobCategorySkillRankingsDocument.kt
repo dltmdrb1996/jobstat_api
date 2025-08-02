@@ -1,19 +1,21 @@
 package com.wildrew.jobstat.statistics_read.rankings.document
 
-import com.wildrew.jobstat.statistics_read.core.core_model.EntityType
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingMetrics
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RelationshipRankingDocument
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.wildrew.jobstat.statistics_read.core.core_model.EntityType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
 @Document(collection = "job_category_skill_rankings")
 class JobCategorySkillRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: JobCategorySkillMetrics,
     @Field("primary_entity_type")
@@ -61,6 +63,8 @@ class JobCategorySkillRankingsDocument(
     }
 
     data class JobCategorySkillRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -79,6 +83,8 @@ class JobCategorySkillRankingsDocument(
         override val relatedRankings: List<SkillRank>,
         @Field("total_postings")
         val totalPostings: Int,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("skill_diversity")
         val skillDiversity: Double,
     ) : RelationshipRankingEntry {
@@ -101,7 +107,7 @@ class JobCategorySkillRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.relatedRankings.isNotEmpty() }) { "모든 직무 카테고리는 관련 기술을 가지고 있어야 합니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.relatedRankings.isNotEmpty() }) { "All job categories must have related skills" }
     }
 }

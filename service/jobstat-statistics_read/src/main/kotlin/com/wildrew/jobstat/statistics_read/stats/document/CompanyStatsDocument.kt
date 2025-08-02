@@ -1,24 +1,25 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
+import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
-import java.io.Serializable
 
 @Document(collection = "company_stats_monthly")
 class CompanyStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("name")
     val name: String,
     @Field("stats")
@@ -108,7 +109,7 @@ class CompanyStatsDocument(
         val hiringDifficultyScore: Double,
         @Field("turnover_rate")
         val turnoverRate: Double,
-    ) : Serializable {
+    ) {
         data class JobCategorySkillRequirement(
             @Field("skill_id")
             val skillId: Long,
@@ -118,7 +119,7 @@ class CompanyStatsDocument(
             val requiredCount: Int,
             @Field("importance_score")
             val importanceScore: Double,
-        ) : Serializable
+        )
     }
 
     data class CompanySkill(
@@ -138,7 +139,7 @@ class CompanyStatsDocument(
         val experienceRequirementAvg: Double,
         @Field("market_competitiveness")
         val marketCompetitiveness: Double,
-    ) : Serializable
+    )
 
     data class CompanyBenefit(
         @Field("benefit_id")
@@ -153,7 +154,7 @@ class CompanyStatsDocument(
         val marketComparison: Double,
         @Field("cost_per_employee")
         val costPerEmployee: Long?,
-    ) : Serializable
+    )
 
     data class CompanyExperienceDistribution(
         @Field("range")
@@ -211,7 +212,7 @@ class CompanyStatsDocument(
         val growthPositions: List<GrowthPosition>,
         @Field("hiring_forecast")
         val hiringForecast: HiringForecast,
-    ) : Serializable {
+    ) {
         data class GrowthPosition(
             @Field("job_category_id")
             val jobCategoryId: Long,
@@ -221,7 +222,7 @@ class CompanyStatsDocument(
             val growthRate: Double,
             @Field("hiring_plan")
             val hiringPlan: Int,
-        ) : Serializable
+        )
 
         data class HiringForecast(
             @Field("next_quarter_estimate")
@@ -230,7 +231,7 @@ class CompanyStatsDocument(
             val yearEndEstimate: Int,
             @Field("growth_areas")
             val growthAreas: List<String>,
-        ) : Serializable
+        )
     }
 
     data class ContractTypeDistribution(
@@ -257,10 +258,10 @@ class CompanyStatsDocument(
         val management: Double,
         @Field("workplace_culture")
         val workplaceCulture: Double,
-    ) : Serializable
+    )
 
     data class CompanyRankingInfo(
-        @Field("current_rank")
+       @Field("current_rank")
         override val currentRank: Int,
         @Field("previous_rank")
         override val previousRank: Int?,
@@ -270,6 +271,8 @@ class CompanyStatsDocument(
         override val percentile: Double?,
         @Field("ranking_score")
         override val rankingScore: RankingScore,
+        @Field("value_change")
+        override val valueChange: Double?,
     ) : RankingInfo
 
     override fun validate() {

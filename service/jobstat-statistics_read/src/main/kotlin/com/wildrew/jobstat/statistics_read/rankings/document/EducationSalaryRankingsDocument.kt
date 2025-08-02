@@ -10,9 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "education_salary_rankings")
 class EducationSalaryRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: EducationSalaryMetrics,
     @Field("rankings")
@@ -68,6 +70,8 @@ class EducationSalaryRankingsDocument(
     }
 
     data class EducationSalaryRankingEntry(
+       @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -80,6 +84,8 @@ class EducationSalaryRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("salary_metrics")
         val salaryMetrics: SalaryMetrics,
         @Field("education_impact")
@@ -140,12 +146,12 @@ class EducationSalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.salaryMetrics.avgSalary > 0 }) { "평균 급여는 양수여야 합니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.salaryMetrics.avgSalary > 0 }) { "Average salary must be positive" }
         require(
             rankings.all {
                 it.educationImpact.employmentMetrics.employmentRate in 0.0..100.0
             },
-        ) { "고용률은 0에서 100 퍼센트 사이여야 합니다" }
+        ) { "Employment rate must be between 0 and 100 percent" }
     }
 }

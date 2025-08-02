@@ -3,8 +3,8 @@ package com.wildrew.jobstat.statistics_read.rankings.repository
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.SkillPostingCountRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.SKILL_POSTING_COUNT)
 @NoRepositoryBean
-interface SkillPostingCountRankingsRepository : SimpleRankingRepository<SkillPostingCountRankingsDocument, SkillPostingCountRankingsDocument.SkillPostingRankingEntry, String> {
+interface SkillPostingCountRankingsRepository
+    : SimpleRankingRepository<SkillPostingCountRankingsDocument, SkillPostingCountRankingsDocument.SkillPostingRankingEntry, String> {
     // 산업별 수요 분석
     fun findByIndustryDemand(
         baseDate: String,
@@ -38,6 +38,7 @@ interface SkillPostingCountRankingsRepository : SimpleRankingRepository<SkillPos
 }
 
 @Repository
+@RankingRepositoryType(RankingType.SKILL_POSTING_COUNT)
 class SkillPostingCountRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<SkillPostingCountRankingsDocument, String>,
     private val mongoOperations: MongoOperations,

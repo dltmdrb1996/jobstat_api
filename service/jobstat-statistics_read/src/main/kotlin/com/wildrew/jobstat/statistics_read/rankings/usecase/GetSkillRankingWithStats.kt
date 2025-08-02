@@ -19,7 +19,8 @@ class GetSkillRankingWithStats(
     private val rankingAnalysisService: RankingAnalysisService,
     private val validator: Validator,
 ) : UseCase<GetSkillRankingWithStats.Request, GetSkillRankingWithStats.Response> {
-    companion object {
+
+        companion object {
         val SKILL_RANKING_TYPES =
             setOf(
                 RankingType.SKILL_SALARY,

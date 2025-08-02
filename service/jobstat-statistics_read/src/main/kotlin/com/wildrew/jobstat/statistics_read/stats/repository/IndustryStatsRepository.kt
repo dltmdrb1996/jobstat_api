@@ -2,8 +2,8 @@ package com.wildrew.jobstat.statistics_read.stats.repository
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.stats.document.IndustryStatsDocument
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsRepositoryType
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsType
@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@StatsRepositoryType(StatsType.INDUSTRY)
 @NoRepositoryBean
 interface IndustryStatsRepository : StatsMongoRepository<IndustryStatsDocument, String> {
     fun findBySkillId(skillId: Long): List<IndustryStatsDocument>
@@ -30,6 +29,7 @@ interface IndustryStatsRepository : StatsMongoRepository<IndustryStatsDocument, 
 }
 
 @Repository
+@StatsRepositoryType(StatsType.INDUSTRY)
 class IndustryStatsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<IndustryStatsDocument, String>,
     private val mongoOperations: MongoOperations,

@@ -2,8 +2,8 @@ package com.wildrew.jobstat.statistics_read.stats.repository
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.stats.document.LocationStatsDocument
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsRepositoryType
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsType
@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@StatsRepositoryType(StatsType.LOCATION)
 @NoRepositoryBean
 interface LocationStatsRepository : StatsMongoRepository<LocationStatsDocument, String> {
     fun findByCostOfLivingIndexLessThan(index: Double): List<LocationStatsDocument>
@@ -28,6 +27,7 @@ interface LocationStatsRepository : StatsMongoRepository<LocationStatsDocument, 
 }
 
 @Repository
+@StatsRepositoryType(StatsType.LOCATION)
 class LocationStatsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<LocationStatsDocument, String>,
     private val mongoOperations: MongoOperations,

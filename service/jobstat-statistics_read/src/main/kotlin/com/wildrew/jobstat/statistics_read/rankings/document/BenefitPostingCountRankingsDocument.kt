@@ -11,20 +11,22 @@ import org.springframework.data.mongodb.core.mapping.Field
 class BenefitPostingCountRankingsDocument(
     id: String? = null,
     page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: BenefitPostingMetrics,
     @Field("rankings")
     override val rankings: List<BenefitPostingRankingEntry>,
 ) : SimpleRankingDocument<BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry>(
-        id,
-        baseDate,
-        period,
-        metrics,
-        rankings,
-        page,
-    ) {
+    id,
+    baseDate,
+    period,
+    metrics,
+    rankings,
+    page,
+) {
     data class BenefitPostingMetrics(
         @Field("total_count")
         override val totalCount: Int,
@@ -68,6 +70,8 @@ class BenefitPostingCountRankingsDocument(
     }
 
     data class BenefitPostingRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -80,6 +84,8 @@ class BenefitPostingCountRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("benefit_details")
         val benefitDetails: BenefitDetails,
         @Field("offering_metrics")

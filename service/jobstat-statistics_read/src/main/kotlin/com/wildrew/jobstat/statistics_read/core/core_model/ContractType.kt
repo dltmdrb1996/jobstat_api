@@ -5,4 +5,5 @@ enum class ContractType {
     CONTRACT,
     FREELANCE,
     INTERN,
+    UNKNOWN;
 }

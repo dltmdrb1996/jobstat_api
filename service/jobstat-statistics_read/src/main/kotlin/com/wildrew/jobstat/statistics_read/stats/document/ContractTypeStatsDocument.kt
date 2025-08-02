@@ -1,24 +1,25 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
+import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
-import java.io.Serializable
 
 @Document(collection = "contract_type_stats_monthly")
 class ContractTypeStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("type")
     val type: String, // FULL_TIME, CONTRACT, FREELANCE, INTERN
     @Field("stats")
@@ -94,7 +95,7 @@ class ContractTypeStatsDocument(
         val growthRate: Double,
         @Field("industry_trend")
         val industryTrend: String,
-    ) : Serializable
+    )
 
     data class ContractTypeJobCategory(
         @Field("job_category_id")
@@ -111,7 +112,7 @@ class ContractTypeStatsDocument(
         val successRate: Double,
         @Field("demand_score")
         val demandScore: Double,
-    ) : Serializable
+    )
 
     data class ContractTypeCompanySize(
         @Field("size")
@@ -126,7 +127,7 @@ class ContractTypeStatsDocument(
         val satisfactionScore: Double,
         @Field("retention_rate")
         val retentionRate: Double,
-    ) : Serializable
+    )
 
     data class ContractTypeLocation(
         @Field("location_id")
@@ -141,7 +142,7 @@ class ContractTypeStatsDocument(
         val remoteRatio: Double,
         @Field("local_demand")
         val localDemand: Double,
-    ) : Serializable
+    )
 
     data class ContractTypeExperience(
         @Field("range")
@@ -171,7 +172,7 @@ class ContractTypeStatsDocument(
         val avgSalary: Long,
         @Field("demand_score")
         val demandScore: Double,
-    ) : Serializable
+    )
 
     data class ContractTypeCompensation(
         @Field("avg_hourly_rate")
@@ -184,7 +185,7 @@ class ContractTypeStatsDocument(
         val compensationGrowth: Double,
         @Field("market_rate_comparison")
         val marketRateComparison: Double,
-    ) : Serializable {
+    ) {
         data class SalaryRange(
             @Field("min")
             val min: Long,
@@ -192,7 +193,7 @@ class ContractTypeStatsDocument(
             val max: Long,
             @Field("median")
             val median: Long,
-        ) : Serializable
+        )
     }
 
     data class ContractTypeEmployment(
@@ -204,7 +205,7 @@ class ContractTypeStatsDocument(
         val stabilityIndex: Double,
         @Field("satisfaction_metrics")
         val satisfactionMetrics: SatisfactionMetrics,
-    ) : Serializable {
+    ) {
         data class SatisfactionMetrics(
             @Field("employer_satisfaction")
             val employerSatisfaction: Double,
@@ -212,7 +213,7 @@ class ContractTypeStatsDocument(
             val employeeSatisfaction: Double,
             @Field("recommendation_rate")
             val recommendationRate: Double,
-        ) : Serializable
+        )
     }
 
     data class ContractTypeConversion(
@@ -224,13 +225,13 @@ class ContractTypeStatsDocument(
         val successFactors: List<SuccessFactor>,
         @Field("career_progression")
         val careerProgression: CareerProgression,
-    ) : Serializable {
+    ) {
         data class SuccessFactor(
             @Field("factor")
             val factor: String,
             @Field("importance_score")
             val importanceScore: Double,
-        ) : Serializable
+        )
 
         data class CareerProgression(
             @Field("promotion_rate")
@@ -239,11 +240,11 @@ class ContractTypeStatsDocument(
             val skillDevelopmentRate: Double,
             @Field("career_growth_score")
             val careerGrowthScore: Double,
-        ) : Serializable
+        )
     }
 
     data class ContractTypeRankingInfo(
-        @Field("current_rank")
+       @Field("current_rank")
         override val currentRank: Int,
         @Field("previous_rank")
         override val previousRank: Int?,
@@ -253,6 +254,8 @@ class ContractTypeStatsDocument(
         override val percentile: Double?,
         @Field("ranking_score")
         override val rankingScore: RankingScore,
+        @Field("value_change")
+        override val valueChange: Double?,
     ) : RankingInfo
 
     override fun validate() {

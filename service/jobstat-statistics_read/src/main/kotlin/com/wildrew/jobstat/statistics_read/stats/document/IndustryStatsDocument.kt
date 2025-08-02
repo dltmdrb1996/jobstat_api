@@ -1,32 +1,33 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
+import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
-import java.io.Serializable
 
 @CompoundIndexes(
     CompoundIndex(
         name = "skill_posting_lookup_idx",
-        def = "{'skills.posting_count': -1}",
-    ),
+        def = "{'skills.posting_count': -1}"
+    )
 )
 @Document(collection = "industry_stats_monthly")
 class IndustryStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("name")
     val name: String,
     @Field("stats")
@@ -114,7 +115,7 @@ class IndustryStatsDocument(
         val skillDiversity: Double,
         @Field("remote_work_ratio")
         val remoteWorkRatio: Double,
-    ) : Serializable
+    )
 
     data class IndustrySkill(
         @Field("skill_id")
@@ -133,7 +134,7 @@ class IndustryStatsDocument(
         val requiredRatio: Double,
         @Field("preferred_ratio")
         val preferredRatio: Double,
-    ) : Serializable
+    )
 
     data class IndustryCompany(
         @Field("company_id")
@@ -152,7 +153,7 @@ class IndustryStatsDocument(
         val growthRate: Double,
         @Field("market_share")
         val marketShare: Double,
-    ) : Serializable
+    )
 
     data class ExperienceDistribution(
         @Field("range")
@@ -247,6 +248,8 @@ class IndustryStatsDocument(
         override val percentile: Double?,
         @Field("ranking_score")
         override val rankingScore: RankingScore,
+        @Field("value_change")
+        override val valueChange: Double?,
     ) : RankingInfo
 
     override fun validate() {

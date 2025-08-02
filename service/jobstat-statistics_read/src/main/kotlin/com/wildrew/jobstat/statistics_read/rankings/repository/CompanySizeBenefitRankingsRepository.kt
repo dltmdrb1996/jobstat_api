@@ -5,19 +5,19 @@ import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepositoryImpl
-import com.wildrew.jobstat.statistics_read.rankings.document.CompanySizeBenefitRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
+import com.wildrew.jobstat.statistics_read.rankings.document.CompanySizeBenefitRankingsDocument
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.COMPANY_SIZE_BENEFIT)
 @NoRepositoryBean
-interface CompanySizeBenefitRankingsRepository : DistributionRankingRepository<CompanySizeBenefitRankingsDocument, CompanySizeBenefitRankingsDocument.CompanySizeBenefitRankingEntry, String> {
+interface CompanySizeBenefitRankingsRepository
+    : DistributionRankingRepository<CompanySizeBenefitRankingsDocument, CompanySizeBenefitRankingsDocument.CompanySizeBenefitRankingEntry, String> {
     // 회사 규모별 특화 복리후생 패턴 분석
     fun findDistinctiveBenefitsByCompanySize(
         baseDate: String,
@@ -39,6 +39,7 @@ interface CompanySizeBenefitRankingsRepository : DistributionRankingRepository<C
 }
 
 @Repository
+@RankingRepositoryType(RankingType.COMPANY_SIZE_BENEFIT)
 class CompanySizeBenefitRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<CompanySizeBenefitRankingsDocument, String>,
     private val mongoOperations: MongoOperations,

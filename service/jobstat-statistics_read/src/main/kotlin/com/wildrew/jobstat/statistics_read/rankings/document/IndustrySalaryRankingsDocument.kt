@@ -10,9 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "industry_salary_rankings")
 class IndustrySalaryRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: IndustrySalaryMetrics,
     @Field("rankings")
@@ -62,6 +64,8 @@ class IndustrySalaryRankingsDocument(
     }
 
     data class IndustrySalaryRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -74,6 +78,8 @@ class IndustrySalaryRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("salary_details")
         val salaryDetails: SalaryDetails,
         @Field("compensation_structure")
@@ -110,14 +116,14 @@ class IndustrySalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.salaryDetails.avgSalary > 0 }) { "급여는 양수여야 합니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.salaryDetails.avgSalary > 0 }) { "Salary must be positive" }
         require(
             rankings.all {
                 it.compensationStructure.baseRatio +
                     it.compensationStructure.bonusRatio +
                     (it.compensationStructure.equityRatio ?: 0.0) <= 1.0
             },
-        ) { "보상 비율의 합은 1 이하여야 합니다" }
+        ) { "Compensation ratios must sum to less than or equal to 1" }
     }
 }

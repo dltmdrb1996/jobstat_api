@@ -1,9 +1,10 @@
 package com.wildrew.jobstat.statistics_read.rankings.repository
 
 import com.mongodb.client.model.*
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.CompanyGrowthRankingsDocument
+import com.wildrew.jobstat.statistics_read.rankings.document.CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
@@ -12,9 +13,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.COMPANY_GROWTH)
 @NoRepositoryBean
-interface CompanyGrowthRankingsRepository : SimpleRankingRepository<CompanyGrowthRankingsDocument, CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry, String> {
+interface CompanyGrowthRankingsRepository
+    : SimpleRankingRepository<CompanyGrowthRankingsDocument, CompanyGrowthRankingEntry, String> {
     // 다각적 성장 분석 (매출, 직원, 시장점유율 모두 성장하는 기업)
     fun findBalancedGrowthCompanies(
         baseDate: String,
@@ -36,13 +37,14 @@ interface CompanyGrowthRankingsRepository : SimpleRankingRepository<CompanyGrowt
 }
 
 @Repository
+@RankingRepositoryType(RankingType.COMPANY_GROWTH)
 class CompanyGrowthRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<CompanyGrowthRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
-) : SimpleRankingRepositoryImpl<CompanyGrowthRankingsDocument, CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry, String>(
-        entityInformation,
-        mongoOperations,
-    ),
+) : SimpleRankingRepositoryImpl<CompanyGrowthRankingsDocument, CompanyGrowthRankingEntry, String>(
+    entityInformation,
+    mongoOperations,
+),
     CompanyGrowthRankingsRepository {
     override fun findBalancedGrowthCompanies(
         baseDate: String,

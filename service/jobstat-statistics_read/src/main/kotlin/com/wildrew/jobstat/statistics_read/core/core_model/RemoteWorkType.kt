@@ -4,4 +4,5 @@ enum class RemoteWorkType {
     NONE,
     HYBRID,
     FULL,
+    UNKNOWN;
 }

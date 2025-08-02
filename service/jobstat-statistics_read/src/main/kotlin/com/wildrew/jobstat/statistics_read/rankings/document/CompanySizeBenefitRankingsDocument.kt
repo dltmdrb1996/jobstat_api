@@ -1,19 +1,21 @@
 package com.wildrew.jobstat.statistics_read.rankings.document
 
-import com.wildrew.jobstat.statistics_read.core.core_model.EntityType
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.DistributionRankingDocument
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingMetrics
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.VolatilityMetrics
+import com.wildrew.jobstat.statistics_read.core.core_model.EntityType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
 @Document(collection = "company_size_benefit_rankings")
 class CompanySizeBenefitRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: CompanySizeBenefitMetrics,
     @Field("group_entity_type")
@@ -68,6 +70,8 @@ class CompanySizeBenefitRankingsDocument(
     }
 
     data class CompanySizeBenefitRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -86,6 +90,8 @@ class CompanySizeBenefitRankingsDocument(
         override val distributionMetrics: DistributionMetrics,
         @Field("total_postings")
         val totalPostings: Int,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("benefit_metrics")
         val benefitMetrics: BenefitMetrics,
         @Field("category_distribution")

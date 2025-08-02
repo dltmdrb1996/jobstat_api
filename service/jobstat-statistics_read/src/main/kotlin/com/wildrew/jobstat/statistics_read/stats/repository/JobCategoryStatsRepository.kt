@@ -2,8 +2,8 @@ package com.wildrew.jobstat.statistics_read.stats.repository
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.stats.document.JobCategoryStatsDocument
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsRepositoryType
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsType
@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@StatsRepositoryType(StatsType.JOB_CATEGORY)
 @NoRepositoryBean
 interface JobCategoryStatsRepository : StatsMongoRepository<JobCategoryStatsDocument, String> {
     fun findByCompetitionRateGreaterThan(rate: Double): List<JobCategoryStatsDocument>
@@ -28,6 +27,7 @@ interface JobCategoryStatsRepository : StatsMongoRepository<JobCategoryStatsDocu
 }
 
 @Repository
+@StatsRepositoryType(StatsType.JOB_CATEGORY)
 class JobCategoryStatsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<JobCategoryStatsDocument, String>,
     private val mongoOperations: MongoOperations,

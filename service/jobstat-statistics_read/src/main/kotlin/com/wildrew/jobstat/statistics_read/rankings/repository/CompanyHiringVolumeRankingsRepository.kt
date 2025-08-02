@@ -3,9 +3,10 @@ package com.wildrew.jobstat.statistics_read.rankings.repository
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.CompanyHiringVolumeRankingsDocument
+import com.wildrew.jobstat.statistics_read.rankings.document.CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
@@ -13,9 +14,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.COMPANY_HIRING_VOLUME)
 @NoRepositoryBean
-interface CompanyHiringVolumeRankingsRepository : SimpleRankingRepository<CompanyHiringVolumeRankingsDocument, CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry, String> {
+interface CompanyHiringVolumeRankingsRepository
+    : SimpleRankingRepository<CompanyHiringVolumeRankingsDocument, CompanyHiringRankingEntry, String> {
     // 부서별 채용 트렌드 분석
     fun findTopHiringDepartments(
         baseDate: String,
@@ -37,10 +38,11 @@ interface CompanyHiringVolumeRankingsRepository : SimpleRankingRepository<Compan
 }
 
 @Repository
+@RankingRepositoryType(RankingType.COMPANY_HIRING_VOLUME)
 class CompanyHiringVolumeRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<CompanyHiringVolumeRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
-) : SimpleRankingRepositoryImpl<CompanyHiringVolumeRankingsDocument, CompanyHiringVolumeRankingsDocument.CompanyHiringRankingEntry, String>(
+) : SimpleRankingRepositoryImpl<CompanyHiringVolumeRankingsDocument, CompanyHiringRankingEntry, String>(
         entityInformation,
         mongoOperations,
     ),

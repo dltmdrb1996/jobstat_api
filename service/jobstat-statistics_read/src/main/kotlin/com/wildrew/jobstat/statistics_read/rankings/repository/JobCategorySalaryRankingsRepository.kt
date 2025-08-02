@@ -3,8 +3,8 @@ package com.wildrew.jobstat.statistics_read.rankings.repository
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.JobCategorySalaryRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
@@ -13,24 +13,24 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.JOB_CATEGORY_SALARY)
 @NoRepositoryBean
-interface JobCategorySalaryRankingsRepository : SimpleRankingRepository<JobCategorySalaryRankingsDocument, JobCategorySalaryRankingsDocument.JobCategorySalaryRankingEntry, String> {
-    // 생활비 조정 급여 분석
+interface JobCategorySalaryRankingsRepository
+    : SimpleRankingRepository<JobCategorySalaryRankingsDocument, JobCategorySalaryRankingsDocument.JobCategorySalaryRankingEntry, String> {
+    // 산업별 급여 비교 분석
     fun findSalaryByIndustry(
         baseDate: String,
         industryId: Long,
         minMarketPosition: Double,
     ): List<JobCategorySalaryRankingsDocument>
 
-    // 원격 근무 영향도 분석
+    // 경력별 프리미엄 분석
     fun findByExperienceImpact(
         baseDate: String,
         experienceLevel: String,
         minPremium: Double,
     ): List<JobCategorySalaryRankingsDocument>
 
-    // 지역별 산업 집중도 분석
+    // 기업 규모별 급여 편차 분석
     fun findBySizeVariance(
         baseDate: String,
         companySize: String,
@@ -39,6 +39,7 @@ interface JobCategorySalaryRankingsRepository : SimpleRankingRepository<JobCateg
 }
 
 @Repository
+@RankingRepositoryType(RankingType.JOB_CATEGORY_SALARY)
 class JobCategorySalaryRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<JobCategorySalaryRankingsDocument, String>,
     private val mongoOperations: MongoOperations,

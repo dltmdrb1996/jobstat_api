@@ -4,8 +4,8 @@ import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.IndustryGrowthRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
@@ -14,9 +14,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.INDUSTRY_GROWTH)
 @NoRepositoryBean
-interface IndustryGrowthRankingsRepository : SimpleRankingRepository<IndustryGrowthRankingsDocument, IndustryGrowthRankingsDocument.IndustryGrowthRankingEntry, String> {
+interface IndustryGrowthRankingsRepository
+    : SimpleRankingRepository<IndustryGrowthRankingsDocument, IndustryGrowthRankingsDocument.IndustryGrowthRankingEntry, String> {
     // 혁신 지수 기반 분석
     fun findHighInnovationIndustries(
         baseDate: String,
@@ -37,6 +37,7 @@ interface IndustryGrowthRankingsRepository : SimpleRankingRepository<IndustryGro
 }
 
 @Repository
+@RankingRepositoryType(RankingType.INDUSTRY_GROWTH)
 class IndustryGrowthRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<IndustryGrowthRankingsDocument, String>,
     private val mongoOperations: MongoOperations,

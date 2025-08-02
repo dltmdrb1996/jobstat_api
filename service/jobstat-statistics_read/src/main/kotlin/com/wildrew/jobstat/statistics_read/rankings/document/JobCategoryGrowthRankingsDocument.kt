@@ -10,9 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "job_category_growth_rankings")
 class JobCategoryGrowthRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: JobCategoryGrowthMetrics,
     @Field("rankings")
@@ -56,6 +58,8 @@ class JobCategoryGrowthRankingsDocument(
     }
 
     data class JobCategoryGrowthRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -68,6 +72,8 @@ class JobCategoryGrowthRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("growth_metrics")
         val growthMetrics: GrowthMetrics,
         @Field("future_outlook")
@@ -97,11 +103,11 @@ class JobCategoryGrowthRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
         require(
             rankings.all {
                 it.growthMetrics.postingGrowth >= -100.0
             },
-        ) { "성장률은 -100% 미만이 될 수 없습니다" }
+        ) { "Growth rate cannot be less than -100%" }
     }
 }

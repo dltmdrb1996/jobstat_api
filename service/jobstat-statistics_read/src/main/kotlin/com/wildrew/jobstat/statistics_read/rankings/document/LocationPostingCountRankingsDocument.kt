@@ -10,9 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "location_posting_count_rankings")
 class LocationPostingCountRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: LocationPostingMetrics,
     @Field("rankings")
@@ -24,7 +26,7 @@ class LocationPostingCountRankingsDocument(
         metrics,
         rankings,
         page,
-    ) {
+) {
     data class LocationPostingMetrics(
         @Field("total_count")
         override val totalCount: Int,
@@ -62,6 +64,8 @@ class LocationPostingCountRankingsDocument(
     }
 
     data class LocationPostingRankingEntry(
+       @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -74,6 +78,8 @@ class LocationPostingCountRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("posting_stats")
         val postingStats: PostingStats,
         @Field("market_indicators")
@@ -103,11 +109,11 @@ class LocationPostingCountRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
         require(
             rankings.all {
                 it.postingStats.totalPostings >= it.postingStats.activePostings
             },
-        ) { "활성 채용공고 수는 전체 채용공고 수를 초과할 수 없습니다" }
+        ) { "Active postings cannot exceed total postings" }
     }
 }

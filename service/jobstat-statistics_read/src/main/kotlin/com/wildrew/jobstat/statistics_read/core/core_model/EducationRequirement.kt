@@ -7,4 +7,5 @@ enum class EducationRequirement {
     MASTER,
     DOCTORATE,
     OTHER,
+    UNKNOWN,
 }

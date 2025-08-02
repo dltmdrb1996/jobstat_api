@@ -1,24 +1,25 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
+import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
-import java.io.Serializable
 
 @Document(collection = "benefit_stats_monthly")
 class BenefitStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("name")
     val name: String,
     @Field("stats")
@@ -92,7 +93,7 @@ class BenefitStatsDocument(
         val growthRate: Double,
         @Field("industry_standard_score")
         val industryStandardScore: Double,
-    ) : Serializable
+    )
 
     data class BenefitJobCategory(
         @Field("job_category_id")
@@ -109,7 +110,7 @@ class BenefitStatsDocument(
         val satisfactionScore: Double,
         @Field("retention_impact")
         val retentionImpact: Double,
-    ) : Serializable
+    )
 
     data class BenefitCompanySize(
         @Field("size")
@@ -124,7 +125,7 @@ class BenefitStatsDocument(
         val satisfactionScore: Double,
         @Field("market_competitiveness")
         val marketCompetitiveness: Double,
-    ) : Serializable
+    )
 
     data class BenefitLocation(
         @Field("location_id")
@@ -139,7 +140,7 @@ class BenefitStatsDocument(
         val localImportance: Double,
         @Field("cost_of_living_adjusted_value")
         val costOfLivingAdjustedValue: Double,
-    ) : Serializable
+    )
 
     data class BenefitExperience(
         @Field("range")
@@ -167,7 +168,7 @@ class BenefitStatsDocument(
         val totalCompensationRatio: Double,
         @Field("market_value_comparison")
         val marketValueComparison: Double,
-    ) : Serializable
+    )
 
     data class BenefitSatisfactionMetrics(
         @Field("overall_satisfaction")
@@ -182,7 +183,7 @@ class BenefitStatsDocument(
         val retentionCorrelation: Double,
         @Field("feedback_analysis")
         val feedbackAnalysis: FeedbackMetrics,
-    ) : Serializable {
+    ) {
         data class FeedbackMetrics(
             @Field("positive_feedback_ratio")
             val positiveFeedbackRatio: Double,
@@ -190,7 +191,7 @@ class BenefitStatsDocument(
             val improvementSuggestions: List<String>,
             @Field("satisfaction_factors")
             val satisfactionFactors: Map<String, Double>,
-        ) : Serializable
+        )
     }
 
     data class BenefitCostMetrics(
@@ -202,7 +203,7 @@ class BenefitStatsDocument(
         val roiMetrics: RoiMetrics,
         @Field("cost_trend")
         val costTrend: CostTrend,
-    ) : Serializable {
+    ) {
         data class RoiMetrics(
             @Field("retention_roi")
             val retentionRoi: Double,
@@ -210,7 +211,7 @@ class BenefitStatsDocument(
             val productivityImpact: Double,
             @Field("cost_benefit_ratio")
             val costBenefitRatio: Double,
-        ) : Serializable
+        )
 
         data class CostTrend(
             @Field("year_over_year_change")
@@ -219,7 +220,7 @@ class BenefitStatsDocument(
             val costEfficiencyScore: Double,
             @Field("market_cost_comparison")
             val marketCostComparison: Double,
-        ) : Serializable
+        )
     }
 
     data class BenefitRankingInfo(
@@ -233,10 +234,12 @@ class BenefitStatsDocument(
         override val percentile: Double?,
         @Field("ranking_score")
         override val rankingScore: RankingScore,
+        @Field("value_change")
+        override val valueChange: Double?,
     ) : RankingInfo
 
     override fun validate() {
-        TODO("아직 구현되지 않음")
+        TODO("Not yet implemented")
     }
 
     fun copy(

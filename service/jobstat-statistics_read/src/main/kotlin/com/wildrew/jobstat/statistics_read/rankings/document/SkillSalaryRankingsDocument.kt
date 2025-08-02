@@ -10,13 +10,15 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "skill_salary_rankings")
 class SkillSalaryRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: SkillSalaryMetrics,
     @Field("rankings")
-    override val rankings: List<SkillSalaryRankingEntry>,
+    override var rankings: List<SkillSalaryRankingEntry>,
 ) : SimpleRankingDocument<SkillSalaryRankingsDocument.SkillSalaryRankingEntry>(
         id,
         baseDate,
@@ -45,11 +47,13 @@ class SkillSalaryRankingsDocument(
             @Field("percentiles")
             val percentiles: Map<Int, Long>,
             @Field("industry_comparison")
-            val industryComparison: Map<Long, Double>,
+            val industryComparison: Map<String, Long>,
         )
     }
 
     data class SkillSalaryRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -62,6 +66,8 @@ class SkillSalaryRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("avg_salary")
         val avgSalary: Long,
         @Field("median_salary")
@@ -80,7 +86,7 @@ class SkillSalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.avgSalary > 0 }) { "모든 급여는 양수여야 합니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.avgSalary > 0 }) { "All salaries must be positive" }
     }
 }

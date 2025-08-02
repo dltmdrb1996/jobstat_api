@@ -11,20 +11,22 @@ import org.springframework.data.mongodb.core.mapping.Field
 class CompanyGrowthRankingsDocument(
     id: String? = null,
     page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: CompanyGrowthMetrics,
     @Field("rankings")
     override val rankings: List<CompanyGrowthRankingEntry>,
 ) : SimpleRankingDocument<CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry>(
-        id,
-        baseDate,
-        period,
-        metrics,
-        rankings,
-        page,
-    ) {
+    id,
+    baseDate,
+    period,
+    metrics,
+    rankings,
+    page,
+) {
     data class CompanyGrowthMetrics(
         @Field("total_count")
         override val totalCount: Int,
@@ -68,6 +70,8 @@ class CompanyGrowthRankingsDocument(
     }
 
     data class CompanyGrowthRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -80,6 +84,8 @@ class CompanyGrowthRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("growth_metrics")
         val growthMetrics: GrowthMetrics,
         @Field("business_metrics")
@@ -125,11 +131,11 @@ class CompanyGrowthRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
         require(
             rankings.all {
                 it.growthMetrics.revenueGrowth >= -100.0
             },
-        ) { "매출 성장률은 -100% 미만이 될 수 없습니다" }
+        ) { "Revenue growth cannot be less than -100%" }
     }
 }

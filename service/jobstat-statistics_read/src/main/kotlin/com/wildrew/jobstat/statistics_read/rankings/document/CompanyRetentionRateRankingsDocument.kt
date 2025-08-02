@@ -10,9 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "company_retention_rate_rankings")
 class CompanyRetentionRateRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: CompanyRetentionMetrics,
     @Field("rankings")
@@ -68,6 +70,8 @@ class CompanyRetentionRateRankingsDocument(
     }
 
     data class CompanyRetentionRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -80,6 +84,8 @@ class CompanyRetentionRateRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("retention_details")
         val retentionDetails: RetentionDetails,
         @Field("employee_insights")
@@ -137,11 +143,11 @@ class CompanyRetentionRateRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
         require(
             rankings.all {
                 it.retentionDetails.overallRetention in 0.0..100.0
             },
-        ) { "유지율은 0에서 100 퍼센트 사이여야 합니다" }
+        ) { "Retention rate must be between 0 and 100 percent" }
     }
 }

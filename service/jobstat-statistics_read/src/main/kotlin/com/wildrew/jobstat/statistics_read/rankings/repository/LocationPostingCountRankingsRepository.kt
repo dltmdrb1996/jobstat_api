@@ -4,9 +4,10 @@ import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.LocationPostingCountRankingsDocument
+import com.wildrew.jobstat.statistics_read.rankings.document.LocationPostingCountRankingsDocument.LocationPostingRankingEntry
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
@@ -14,9 +15,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.LOCATION_POSTING_COUNT)
 @NoRepositoryBean
-interface LocationPostingCountRankingsRepository : SimpleRankingRepository<LocationPostingCountRankingsDocument, LocationPostingCountRankingsDocument.LocationPostingRankingEntry, String> {
+interface LocationPostingCountRankingsRepository
+    : SimpleRankingRepository<LocationPostingCountRankingsDocument, LocationPostingRankingEntry, String> {
     // 지역 고용 시장 분석
     fun findByEmploymentStats(
         baseDate: String,
@@ -37,10 +38,11 @@ interface LocationPostingCountRankingsRepository : SimpleRankingRepository<Locat
 }
 
 @Repository
+@RankingRepositoryType(RankingType.LOCATION_POSTING_COUNT)
 class LocationPostingCountRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<LocationPostingCountRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
-) : SimpleRankingRepositoryImpl<LocationPostingCountRankingsDocument, LocationPostingCountRankingsDocument.LocationPostingRankingEntry, String>(
+) : SimpleRankingRepositoryImpl<LocationPostingCountRankingsDocument, LocationPostingRankingEntry, String>(
         entityInformation,
         mongoOperations,
     ),

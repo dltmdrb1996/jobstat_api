@@ -1,22 +1,25 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
+
 
 @Document(collection = "skill_stats_monthly")
 class SkillStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("name")
     val name: String,
     @Field("stats")
@@ -34,17 +37,20 @@ class SkillStatsDocument(
     @Field("related_job_categories")
     val relatedJobCategories: List<RelatedJobCategory>,
     @Field("rankings")
-    override val rankings: Map<RankingType, SkillRankingInfo>,
-) : BaseStatsDocument(id, baseDate, period, entityId, stats, mapOf()) {
+    override val rankings: Map<RankingType, SkillRankingInfo>
+) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     override fun validate() {
-//        require(experienceLevels.isNotEmpty()) { "경력 수준이 비어있으면 안됩니다" }
-//        require(companySizeDistribution.isNotEmpty()) { "회사 규모 분포가 비어있으면 안됩니다" }
-//        require(industryDistribution.isNotEmpty()) { "산업 분포가 비어있으면 안됩니다" }
-//        require(relatedJobCategories.isNotEmpty()) { "관련 직무 카테고리가 비어있으면 안됩니다" }
+        require(experienceLevels.isNotEmpty()) { "Experience levels must not be empty" }
+        require(companySizeDistribution.isNotEmpty()) { "Company size distribution must not be empty" }
+        require(industryDistribution.isNotEmpty()) { "Industry distribution must not be empty" }
+        require(relatedJobCategories.isNotEmpty()) { "Related job categories must not be empty" }
     }
 
+    override fun toString(): String =
+        "SkillStatsDocument(id=$id, entityId=$entityId, baseDate='$baseDate', period=$period, name='$name', stats=$stats, experienceLevels=$experienceLevels, companySizeDistribution=$companySizeDistribution, industryDistribution=$industryDistribution, isSoftSkill=$isSoftSkill, isEmergingSkill=$isEmergingSkill, relatedJobCategories=$relatedJobCategories, rankings=$rankings)"
+
     data class SkillRankingInfo(
-        @Field("current_rank")
+       @Field("current_rank")
         override val currentRank: Int,
         @Field("previous_rank")
         override val previousRank: Int?,
@@ -54,6 +60,8 @@ class SkillStatsDocument(
         override val percentile: Double?,
         @Field("ranking_score")
         override val rankingScore: RankingScore,
+        @Field("value_change")
+        override val valueChange: Double?,
     ) : RankingInfo
 
     data class SkillStats(
@@ -140,20 +148,19 @@ class SkillStatsDocument(
         isEmergingSkill: Boolean = this.isEmergingSkill,
         relatedJobCategories: List<RelatedJobCategory> = this.relatedJobCategories,
         rankings: Map<RankingType, SkillRankingInfo> = this.rankings,
-    ): SkillStatsDocument =
-        SkillStatsDocument(
-            id = this.id,
-            entityId = entityId,
-            baseDate = baseDate,
-            period = period,
-            name = name,
-            stats = stats,
-            experienceLevels = experienceLevels,
-            companySizeDistribution = companySizeDistribution,
-            industryDistribution = industryDistribution,
-            isSoftSkill = isSoftSkill,
-            isEmergingSkill = isEmergingSkill,
-            relatedJobCategories = relatedJobCategories,
-            rankings = rankings,
-        )
+    ): SkillStatsDocument = SkillStatsDocument(
+        id = this.id,
+        entityId = entityId,
+        baseDate = baseDate,
+        period = period,
+        name = name,
+        stats = stats,
+        experienceLevels = experienceLevels,
+        companySizeDistribution = companySizeDistribution,
+        industryDistribution = industryDistribution,
+        isSoftSkill = isSoftSkill,
+        isEmergingSkill = isEmergingSkill,
+        relatedJobCategories = relatedJobCategories,
+        rankings = rankings,
+    )
 }

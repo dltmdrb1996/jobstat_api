@@ -1,4 +1,5 @@
-# file: .../jobstat-auth/src/main/resources/application.yml
+#8082
+
 spring:
   application:
     name: jobstat-auth

@@ -10,21 +10,24 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "skill_posting_count_rankings")
 class SkillPostingCountRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: SkillPostingMetrics,
     @Field("rankings")
-    override val rankings: List<SkillPostingRankingEntry>,
+    override var rankings: List<SkillPostingRankingEntry>,
 ) : SimpleRankingDocument<SkillPostingCountRankingsDocument.SkillPostingRankingEntry>(
         id,
         baseDate,
         period,
         metrics,
         rankings,
-        page,
+        page
     ) {
+
     data class SkillPostingMetrics(
         @Field("total_count")
         override val totalCount: Int,
@@ -39,6 +42,8 @@ class SkillPostingCountRankingsDocument(
     ) : RankingMetrics
 
     data class SkillPostingRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -51,6 +56,8 @@ class SkillPostingCountRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("total_postings")
         val totalPostings: Int,
         @Field("active_postings")
@@ -69,7 +76,7 @@ class SkillPostingCountRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.totalPostings >= it.activePostings }) { "활성 채용공고 수는 전체 채용공고 수를 초과할 수 없습니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.totalPostings >= it.activePostings }) { "Active postings cannot exceed total postings" }
     }
 }

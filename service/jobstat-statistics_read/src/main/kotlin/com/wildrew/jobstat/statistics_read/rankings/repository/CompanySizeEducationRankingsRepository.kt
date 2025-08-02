@@ -1,8 +1,8 @@
 package com.wildrew.jobstat.statistics_read.rankings.repository
 
 import com.mongodb.client.model.*
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.CompanySizeEducationRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
@@ -12,9 +12,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.COMPANY_SIZE_EDUCATION)
 @NoRepositoryBean
-interface CompanySizeEducationRankingsRepository : DistributionRankingRepository<CompanySizeEducationRankingsDocument, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry, String> {
+interface CompanySizeEducationRankingsRepository
+    : DistributionRankingRepository<CompanySizeEducationRankingsDocument, CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry,String> {
     // 교육 수준별 급여 분포 분석
     fun findSalaryDistributionByEducation(
         baseDate: String,
@@ -36,6 +36,7 @@ interface CompanySizeEducationRankingsRepository : DistributionRankingRepository
 }
 
 @Repository
+@RankingRepositoryType(RankingType.COMPANY_SIZE_EDUCATION)
 class CompanySizeEducationRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<CompanySizeEducationRankingsDocument, String>,
     private val mongoOperations: MongoOperations,

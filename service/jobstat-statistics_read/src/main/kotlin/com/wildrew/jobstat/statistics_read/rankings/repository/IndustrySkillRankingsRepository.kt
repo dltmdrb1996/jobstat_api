@@ -3,8 +3,8 @@ package com.wildrew.jobstat.statistics_read.rankings.repository
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.RelationshipRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.RelationshipRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.RelationshipRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.IndustrySkillRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.INDUSTRY_SKILL)
 @NoRepositoryBean
-interface IndustrySkillRankingsRepository : RelationshipRankingRepository<IndustrySkillRankingsDocument, IndustrySkillRankingsDocument.IndustrySkillRankingEntry, String> {
+interface IndustrySkillRankingsRepository
+    : RelationshipRankingRepository<IndustrySkillRankingsDocument, IndustrySkillRankingsDocument.IndustrySkillRankingEntry, String> {
     // 산업 간 공통 스킬 분석
     fun findCrossIndustrySkills(
         baseDate: String,
@@ -36,6 +36,7 @@ interface IndustrySkillRankingsRepository : RelationshipRankingRepository<Indust
 }
 
 @Repository
+@RankingRepositoryType(RankingType.INDUSTRY_SKILL)
 class IndustrySkillRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<IndustrySkillRankingsDocument, String>,
     private val mongoOperations: MongoOperations,

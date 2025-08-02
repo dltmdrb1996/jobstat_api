@@ -1,24 +1,25 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
+import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
-import java.io.Serializable
 
 @Document(collection = "certification_stats_monthly")
 class CertificationStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("name")
     val name: String,
     @Field("stats")
@@ -43,8 +44,6 @@ class CertificationStatsDocument(
     val investmentMetrics: CertificationInvestmentMetrics,
     @Field("rankings")
     override val rankings: Map<RankingType, CertificationRankingInfo>,
-    @Field("type")
-    val type: String, // "HIGH_SCHOOL", "ASSOCIATE", "BACHELOR", "MASTER", "DOCTORATE", "OTHER" -> "고등학교", "전문학사", "학사", "석사", "박사", "기타"
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     data class CertificationStats(
         @Field("posting_count")
@@ -98,7 +97,7 @@ class CertificationStatsDocument(
         val salaryPremium: Double,
         @Field("career_advancement_rate")
         val careerAdvancementRate: Double,
-    ) : Serializable
+    )
 
     data class CertificationIndustry(
         @Field("industry_id")
@@ -115,7 +114,7 @@ class CertificationStatsDocument(
         val growthRate: Double,
         @Field("industry_importance")
         val industryImportance: Double,
-    ) : Serializable
+    )
 
     data class CertificationSkill(
         @Field("skill_id")
@@ -130,7 +129,7 @@ class CertificationStatsDocument(
         val skillSynergy: Double,
         @Field("combined_salary_premium")
         val combinedSalaryPremium: Double,
-    ) : Serializable
+    )
 
     data class CertificationExperience(
         @Field("range")
@@ -162,7 +161,7 @@ class CertificationStatsDocument(
         val avgSalary: Long,
         @Field("value_recognition")
         val valueRecognition: Double,
-    ) : Serializable
+    )
 
     data class CertificationLocation(
         @Field("location_id")
@@ -177,7 +176,7 @@ class CertificationStatsDocument(
         val demandIndex: Double,
         @Field("local_importance")
         val localImportance: Double,
-    ) : Serializable
+    )
 
     data class CertificationExamMetrics(
         @Field("pass_rate")
@@ -192,7 +191,7 @@ class CertificationStatsDocument(
         val difficultyRating: Double,
         @Field("preparation_resources")
         val preparationResources: PreparationResources,
-    ) : Serializable {
+    ) {
         data class PreparationResources(
             @Field("recommended_study_time")
             val recommendedStudyTime: Int, // 단위: 시간
@@ -200,7 +199,7 @@ class CertificationStatsDocument(
             val materialCosts: Long,
             @Field("training_availability")
             val trainingAvailability: Double,
-        ) : Serializable
+        )
     }
 
     data class CertificationCareerImpact(
@@ -216,7 +215,7 @@ class CertificationStatsDocument(
         val industryMobility: Double,
         @Field("skill_development_opportunities")
         val skillDevelopmentOpportunities: List<SkillOpportunity>,
-    ) : Serializable {
+    ) {
         data class SkillOpportunity(
             @Field("skill_id")
             val skillId: Long,
@@ -224,7 +223,7 @@ class CertificationStatsDocument(
             val name: String,
             @Field("relevance_score")
             val relevanceScore: Double,
-        ) : Serializable
+        )
     }
 
     data class CertificationInvestmentMetrics(
@@ -240,10 +239,10 @@ class CertificationStatsDocument(
         val marketDemandScore: Double,
         @Field("investment_rating")
         val investmentRating: Double,
-    ) : Serializable
+    )
 
     data class CertificationRankingInfo(
-        @Field("current_rank")
+       @Field("current_rank")
         override val currentRank: Int,
         @Field("previous_rank")
         override val previousRank: Int?,
@@ -253,10 +252,12 @@ class CertificationStatsDocument(
         override val percentile: Double?,
         @Field("ranking_score")
         override val rankingScore: RankingScore,
+        @Field("value_change")
+        override val valueChange: Double?,
     ) : RankingInfo
 
     override fun validate() {
-        TODO("아직 구현되지 않음")
+        TODO("Not yet implemented")
     }
 
     fun copy(
@@ -276,7 +277,6 @@ class CertificationStatsDocument(
         careerImpact: CertificationCareerImpact = this.careerImpact,
         investmentMetrics: CertificationInvestmentMetrics = this.investmentMetrics,
         rankings: Map<RankingType, CertificationRankingInfo> = this.rankings,
-        type: String = this.type,
     ) = CertificationStatsDocument(
         id,
         entityId,
@@ -294,6 +294,5 @@ class CertificationStatsDocument(
         careerImpact,
         investmentMetrics,
         rankings,
-        type,
     )
 }

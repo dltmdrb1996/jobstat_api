@@ -1,23 +1,24 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
+import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
-import java.io.Serializable
 
 @Document(collection = "education_stats_monthly")
 class EducationStatsDocument(
     id: String? = null,
     @Field("entity_id")
     override val entityId: Long,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("level")
     val level: String, // HIGH_SCHOOL, ASSOCIATE, BACHELOR, MASTER, DOCTORATE, OTHER
     @Field("stats")
@@ -93,7 +94,7 @@ class EducationStatsDocument(
         val valueRecognition: Double,
         @Field("industry_relevance")
         val industryRelevance: Double,
-    ) : Serializable
+    )
 
     data class EducationJobCategory(
         @Field("job_category_id")
@@ -110,7 +111,7 @@ class EducationStatsDocument(
         val careerPotential: Double,
         @Field("skill_match_rate")
         val skillMatchRate: Double,
-    ) : Serializable
+    )
 
     data class EducationCompanySize(
         @Field("size")
@@ -125,7 +126,7 @@ class EducationStatsDocument(
         val growthOpportunities: Double,
         @Field("hiring_preference")
         val hiringPreference: Double,
-    ) : Serializable
+    )
 
     data class EducationLocation(
         @Field("location_id")
@@ -140,7 +141,7 @@ class EducationStatsDocument(
         val jobMarketFit: Double,
         @Field("opportunity_index")
         val opportunityIndex: Double,
-    ) : Serializable
+    )
 
     data class EducationSkill(
         @Field("skill_id")
@@ -155,7 +156,7 @@ class EducationStatsDocument(
         val skillGap: Double,
         @Field("learning_curve")
         val learningCurve: Double,
-    ) : Serializable
+    )
 
     data class EducationCareerMetrics(
         @Field("career_progression")
@@ -164,7 +165,7 @@ class EducationStatsDocument(
         val employmentOutcomes: EmploymentOutcomes,
         @Field("skill_utilization")
         val skillUtilization: SkillUtilization,
-    ) : Serializable {
+    ) {
         data class CareerProgression(
             @Field("promotion_rate")
             val promotionRate: Double,
@@ -172,7 +173,7 @@ class EducationStatsDocument(
             val managementTrackRatio: Double,
             @Field("specialization_opportunities")
             val specializationOpportunities: Double,
-        ) : Serializable
+        )
 
         data class EmploymentOutcomes(
             @Field("time_to_employment")
@@ -181,7 +182,7 @@ class EducationStatsDocument(
             val jobSatisfaction: Double,
             @Field("career_stability")
             val careerStability: Double,
-        ) : Serializable
+        )
 
         data class SkillUtilization(
             @Field("knowledge_application")
@@ -190,7 +191,7 @@ class EducationStatsDocument(
             val skillRelevance: Double,
             @Field("continuous_learning")
             val continuousLearning: Double,
-        ) : Serializable
+        )
     }
 
     data class EducationRoiMetrics(
@@ -200,7 +201,7 @@ class EducationStatsDocument(
         val careerValue: CareerValue,
         @Field("market_performance")
         val marketPerformance: MarketPerformance,
-    ) : Serializable {
+    ) {
         data class FinancialMetrics(
             @Field("education_cost")
             val educationCost: Long,
@@ -208,7 +209,7 @@ class EducationStatsDocument(
             val salaryPremium: Double,
             @Field("break_even_time")
             val breakEvenTime: Double,
-        ) : Serializable
+        )
 
         data class CareerValue(
             @Field("career_opportunities")
@@ -217,7 +218,7 @@ class EducationStatsDocument(
             val skillDevelopment: Double,
             @Field("network_value")
             val networkValue: Double,
-        ) : Serializable
+        )
 
         data class MarketPerformance(
             @Field("market_demand")
@@ -226,7 +227,7 @@ class EducationStatsDocument(
             val competitiveAdvantage: Double,
             @Field("future_prospects")
             val futureProspects: Double,
-        ) : Serializable
+        )
     }
 
     data class EducationMarketDemand(
@@ -236,7 +237,7 @@ class EducationStatsDocument(
         val futureOutlook: FutureOutlook,
         @Field("competitive_landscape")
         val competitiveLandscape: CompetitiveLandscape,
-    ) : Serializable {
+    ) {
         data class CurrentDemand(
             @Field("demand_score")
             val demandScore: Double,
@@ -244,7 +245,7 @@ class EducationStatsDocument(
             val marketSaturation: Double,
             @Field("requirement_trend")
             val requirementTrend: String,
-        ) : Serializable
+        )
 
         data class FutureOutlook(
             @Field("growth_projection")
@@ -253,7 +254,7 @@ class EducationStatsDocument(
             val emergingOpportunities: List<String>,
             @Field("risk_factors")
             val riskFactors: List<String>,
-        ) : Serializable
+        )
 
         data class CompetitiveLandscape(
             @Field("competition_level")
@@ -262,11 +263,11 @@ class EducationStatsDocument(
             val marketPosition: Double,
             @Field("differentiation_factors")
             val differentiationFactors: List<String>,
-        ) : Serializable
+        )
     }
 
     data class EducationRankingInfo(
-        @Field("current_rank")
+       @Field("current_rank")
         override val currentRank: Int,
         @Field("previous_rank")
         override val previousRank: Int?,
@@ -276,6 +277,8 @@ class EducationStatsDocument(
         override val percentile: Double?,
         @Field("ranking_score")
         override val rankingScore: RankingScore,
+        @Field("value_change")
+        override val valueChange: Double?,
     ) : RankingInfo
 
     override fun validate() {

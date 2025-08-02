@@ -10,21 +10,23 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "location_salary_rankings")
 class LocationSalaryRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: LocationSalaryMetrics,
     @Field("rankings")
     override val rankings: List<LocationSalaryRankingEntry>,
 ) : SimpleRankingDocument<LocationSalaryRankingsDocument.LocationSalaryRankingEntry>(
-        id,
-        baseDate,
-        period,
-        metrics,
-        rankings,
-        page,
-    ) {
+    id,
+    baseDate,
+    period,
+    metrics,
+    rankings,
+    page,
+) {
     data class LocationSalaryMetrics(
         @Field("total_count")
         override val totalCount: Int,
@@ -62,6 +64,8 @@ class LocationSalaryRankingsDocument(
     }
 
     data class LocationSalaryRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -74,6 +78,8 @@ class LocationSalaryRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("salary_metrics")
         val salaryMetrics: SalaryMetrics,
         @Field("location_factors")
@@ -110,8 +116,8 @@ class LocationSalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.salaryMetrics.nominalAvgSalary > 0 }) { "명목 평균 급여는 양수여야 합니다" }
-        require(rankings.all { it.salaryMetrics.adjustedAvgSalary > 0 }) { "조정된 평균 급여는 양수여야 합니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.salaryMetrics.nominalAvgSalary > 0 }) { "Nominal salary must be positive" }
+        require(rankings.all { it.salaryMetrics.adjustedAvgSalary > 0 }) { "Adjusted salary must be positive" }
     }
 }

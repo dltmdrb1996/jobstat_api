@@ -10,9 +10,11 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "company_salary_rankings")
 class CompanySalaryRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: CompanySalaryMetrics,
     @Field("rankings")
@@ -68,6 +70,8 @@ class CompanySalaryRankingsDocument(
     }
 
     data class CompanySalaryRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -80,6 +84,8 @@ class CompanySalaryRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("salary_details")
         val salaryDetails: SalaryDetails,
         @Field("compensation_package")
@@ -135,12 +141,12 @@ class CompanySalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.salaryDetails.avgSalary > 0 }) { "평균 급여는 양수여야 합니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.salaryDetails.avgSalary > 0 }) { "Average salary must be positive" }
         require(
             rankings.all {
                 it.compensationPackage.baseSalaryRatio in 0.0..1.0
             },
-        ) { "기본급 비율은 0과 1 사이여야 합니다" }
+        ) { "Base salary ratio must be between 0 and 1" }
     }
 }

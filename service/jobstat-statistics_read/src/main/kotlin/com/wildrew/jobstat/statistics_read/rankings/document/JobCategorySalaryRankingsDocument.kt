@@ -11,18 +11,18 @@ import org.springframework.data.mongodb.core.mapping.Field
 class JobCategorySalaryRankingsDocument(
     id: String? = null,
     page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    @Field("base_date") override val baseDate: String,
+    @Field("period") override val period: SnapshotPeriod,
     @Field("metrics") override val metrics: JobCategorySalaryMetrics,
     @Field("rankings") override val rankings: List<JobCategorySalaryRankingEntry>,
 ) : SimpleRankingDocument<JobCategorySalaryRankingsDocument.JobCategorySalaryRankingEntry>(
-        id,
-        baseDate,
-        period,
-        metrics,
-        rankings,
-        page,
-    ) {
+    id,
+    baseDate,
+    period,
+    metrics,
+    rankings,
+    page,
+) {
     data class JobCategorySalaryMetrics(
         @Field("total_count") override val totalCount: Int,
         @Field("ranked_count") override val rankedCount: Int,
@@ -45,12 +45,14 @@ class JobCategorySalaryRankingsDocument(
     }
 
     data class JobCategorySalaryRankingEntry(
+        @Field("document_id") override val documentId: String,
         @Field("entity_id") override val entityId: Long,
         @Field("name") override val name: String,
         @Field("rank") override val rank: Int,
         @Field("previous_rank") override val previousRank: Int?,
         @Field("rank_change") override val rankChange: Int?,
         @Field("value") override val score: Double,
+        @Field("value_change") override val valueChange: Double = 0.0,
         @Field("avg_salary") val avgSalary: Long,
         @Field("median_salary") val medianSalary: Long,
         @Field("salary_details") val salaryDetails: SalaryDetails,
@@ -71,8 +73,8 @@ class JobCategorySalaryRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.avgSalary > 0 }) { "평균 급여는 양수여야 합니다" }
-        require(rankings.all { it.medianSalary > 0 }) { "중간값 급여는 양수여야 합니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.avgSalary > 0 }) { "Average salary must be positive" }
+        require(rankings.all { it.medianSalary > 0 }) { "Median salary must be positive" }
     }
 }

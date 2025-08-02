@@ -13,27 +13,13 @@ class StatsRepositoryRegistry(
 
     private fun initializeRepositoryMap(repositories: List<StatsMongoRepository<*, *>>): Map<StatsType, StatsMongoRepository<*, *>> =
         repositories.associateBy { repo ->
-            repo.javaClass.kotlin
-                .findAnnotation<StatsRepositoryType>()
-                ?.type
-                ?: getStatsTypeFromCollectionName(repo.getCollectionName())
-                ?: throw IllegalArgumentException("리포지토리의 StatsType을 결정할 수 없습니다: ${repo.javaClass}")
-        }
-
-    private fun getStatsTypeFromCollectionName(collectionName: String): StatsType? =
-        when {
-            collectionName.contains("benefit") -> StatsType.BENEFIT
-            collectionName.contains("certification") -> StatsType.CERTIFICATION
-            collectionName.contains("company") -> StatsType.COMPANY
-            collectionName.contains("contract_type") -> StatsType.CONTRACT_TYPE
-            collectionName.contains("education") -> StatsType.EDUCATION
-            collectionName.contains("experience") -> StatsType.EXPERIENCE
-            collectionName.contains("industry") -> StatsType.INDUSTRY
-            collectionName.contains("job_category") -> StatsType.JOB_CATEGORY
-            collectionName.contains("location") -> StatsType.LOCATION
-            collectionName.contains("remote_work") -> StatsType.REMOTE_WORK
-            collectionName.contains("skill") -> StatsType.SKILL
-            else -> null
+            val actualClass = if (repo.javaClass.name.contains("SpringCGLIB")) {
+                repo.javaClass.superclass.kotlin
+            } else {
+                repo.javaClass.kotlin
+            }
+            actualClass.findAnnotation<StatsRepositoryType>()?.type
+                ?: throw IllegalArgumentException("StatsRepositoryType annotation not found on ${repo.javaClass.simpleName}")
         }
 
     @Suppress("UNCHECKED_CAST")

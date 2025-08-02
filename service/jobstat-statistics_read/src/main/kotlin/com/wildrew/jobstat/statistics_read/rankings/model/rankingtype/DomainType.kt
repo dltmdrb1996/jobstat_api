@@ -15,8 +15,8 @@ enum class SkillRankingType(
     @Schema(description = "기술별 성장률")
     SKILL_GROWTH(RankingType.SKILL_GROWTH),
 
-//    @Schema(description = "기술별 경쟁률")
-//    SKILL_COMPETITION_RATE(RankingType.SKILL_COMPETITION_RATE),
+    @Schema(description = "기술별 경쟁률")
+    SKILL_COMPETITION_RATE(RankingType.SKILL_COMPETITION_RATE),
     ;
 
     fun toDomain(): RankingType = domain
@@ -26,11 +26,11 @@ enum class SkillRankingType(
 enum class JobCategoryRankingType(
     val domain: RankingType,
 ) {
-    //    @Schema(description = "직무별 기술 선호도")
-//    JOB_CATEGORY_SKILL(RankingType.JOB_CATEGORY_SKILL),
-//
-//    @Schema(description = "직무 지원율")
-//    JOB_CATEGORY_APPLICATION_RATE(RankingType.JOB_CATEGORY_APPLICATION_RATE),
+        @Schema(description = "직무별 기술 선호도")
+    JOB_CATEGORY_SKILL(RankingType.JOB_CATEGORY_SKILL),
+
+    @Schema(description = "직무 지원율")
+    JOB_CATEGORY_APPLICATION_RATE(RankingType.JOB_CATEGORY_APPLICATION_RATE),
 
     @Schema(description = "직무 공고 증가율")
     JOB_CATEGORY_GROWTH(RankingType.JOB_CATEGORY_GROWTH),
@@ -49,14 +49,17 @@ enum class JobCategoryRankingType(
 enum class IndustryRankingType(
     val domain: RankingType,
 ) {
-    //    @Schema(description = "업종별 기술 선호도")
-//    INDUSTRY_SKILL(RankingType.INDUSTRY_SKILL),
+        @Schema(description = "업종별 기술 선호도")
+    INDUSTRY_SKILL(RankingType.INDUSTRY_SKILL),
 
     @Schema(description = "채용 성장 TOP 산업")
     INDUSTRY_GROWTH(RankingType.INDUSTRY_GROWTH),
 
     @Schema(description = "업종별 평균 급여")
     INDUSTRY_SALARY(RankingType.INDUSTRY_SALARY),
+
+    @Schema(description = "업종별 채용공고 수")
+    INDUSTRY_POSTING_COUNT(RankingType.INDUSTRY_POSTING_COUNT),
     ;
 
     fun toDomain(): RankingType = domain
@@ -89,8 +92,8 @@ enum class LocationRankingType(
     @Schema(description = "지역별 채용공고 수")
     LOCATION_POSTING_COUNT(RankingType.LOCATION_POSTING_COUNT),
 
-//    @Schema(description = "지역별 채용공고 증가율")
-//    LOCATION_GROWTH(RankingType.LOCATION_GROWTH),
+    @Schema(description = "지역별 채용공고 증가율")
+    LOCATION_GROWTH(RankingType.LOCATION_GROWTH),
     ;
 
     fun toDomain(): RankingType = domain
@@ -157,8 +160,47 @@ enum class BenefitRankingType(
 enum class EducationRankingType(
     val domain: RankingType,
 ) {
+    @Schema(description = "학력별 채용공고 수")
+    EDUCATION_POSTING_COUNT(RankingType.EDUCATION_POSTING_COUNT),
+
     @Schema(description = "학력별 평균 급여")
     EDUCATION_SALARY(RankingType.EDUCATION_SALARY),
+    ;
+
+    fun toDomain(): RankingType = domain
+}
+
+@Schema(description = "경력 순위 전용 타입")
+enum class ExperienceRankingType(
+    val domain: RankingType,
+) {
+    @Schema(description = "경력별 채용공고 수")
+    EXPERIENCE_POSTING_COUNT(RankingType.EXPERIENCE_POSTING_COUNT),
+
+    @Schema(description = "경력별 평균 급여")
+    EXPERIENCE_SALARY(RankingType.EXPERIENCE_SALARY),
+    ;
+
+    fun toDomain(): RankingType = domain
+}
+
+@Schema(description = "계약 형태 순위 전용 타입")
+enum class ContractTypeRankingType(
+    val domain: RankingType,
+) {
+    @Schema(description = "계약 유형별 채용공고 수")
+    CONTRACT_TYPE_POSTING_COUNT(RankingType.CONTRACT_TYPE_POSTING_COUNT),
+    ;
+
+    fun toDomain(): RankingType = domain
+}
+
+@Schema(description = "원격 근무 순위 전용 타입")
+enum class RemoteWorkTypeRankingType(
+    val domain: RankingType,
+) {
+    @Schema(description = "원격 근무 형태별 채용공고 수")
+    REMOTE_WORK_TYPE_POSTING_COUNT(RankingType.REMOTE_WORK_TYPE_POSTING_COUNT),
     ;
 
     fun toDomain(): RankingType = domain

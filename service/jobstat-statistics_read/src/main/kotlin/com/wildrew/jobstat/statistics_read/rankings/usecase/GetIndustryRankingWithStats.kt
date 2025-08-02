@@ -25,6 +25,7 @@ class GetIndustryRankingWithStats(
                 RankingType.INDUSTRY_SKILL,
                 RankingType.INDUSTRY_GROWTH,
                 RankingType.INDUSTRY_SALARY,
+                RankingType.INDUSTRY_POSTING_COUNT,
             )
     }
 

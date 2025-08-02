@@ -10,13 +10,15 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "skill_growth_rankings")
 class SkillGrowthRankingsDocument(
     id: String? = null,
-    page: Int = 1,
-    baseDate: String,
-    period: SnapshotPeriod,
+    page : Int = 1,
+    @Field("base_date")
+    override val baseDate: String,
+    @Field("period")
+    override val period: SnapshotPeriod,
     @Field("metrics")
     override val metrics: SkillGrowthMetrics,
     @Field("rankings")
-    override val rankings: List<SkillGrowthRankingEntry>,
+    override var rankings: List<SkillGrowthRankingEntry>,
 ) : SimpleRankingDocument<SkillGrowthRankingsDocument.SkillGrowthRankingEntry>(
         id,
         baseDate,
@@ -50,6 +52,8 @@ class SkillGrowthRankingsDocument(
     }
 
     data class SkillGrowthRankingEntry(
+        @Field("document_id")
+        override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,
         @Field("name")
@@ -62,12 +66,14 @@ class SkillGrowthRankingsDocument(
         override val rankChange: Int?,
         @Field("value")
         override val score: Double,
+        @Field("value_change")
+        override val valueChange: Double = 0.0,
         @Field("growth_rate")
         val growthRate: Double,
         @Field("growth_consistency")
         val growthConsistency: Double,
         @Field("growth_factors")
-        val growthFactors: GrowthFactors,
+        var growthFactors: GrowthFactors,
     ) : SimpleRankingEntry {
         data class GrowthFactors(
             @Field("demand_growth")
@@ -82,9 +88,11 @@ class SkillGrowthRankingsDocument(
     }
 
     override fun validate() {
-        require(rankings.isNotEmpty()) { "순위 목록이 비어있으면 안됩니다" }
-        require(rankings.all { it.growthRate >= -100.0 }) { "성장률은 -100% 미만이 될 수 없습니다" }
+        require(rankings.isNotEmpty()) { "Rankings must not be empty" }
+        require(rankings.all { it.growthRate >= -100.0 }) { "Growth rate cannot be less than -100%" }
     }
+
+
 
     fun copy(
         id: String? = this.id,
@@ -92,6 +100,6 @@ class SkillGrowthRankingsDocument(
         period: SnapshotPeriod = this.period,
         metrics: SkillGrowthMetrics = this.metrics,
         rankings: List<SkillGrowthRankingEntry> = this.rankings,
-        page: Int = this.page,
+        page: Int = this.page
     ): SkillGrowthRankingsDocument = SkillGrowthRankingsDocument(id, page, baseDate, period, metrics, rankings)
 }

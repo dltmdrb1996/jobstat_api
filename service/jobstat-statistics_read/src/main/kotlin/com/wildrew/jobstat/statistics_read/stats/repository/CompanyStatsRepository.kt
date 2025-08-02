@@ -2,8 +2,8 @@ package com.wildrew.jobstat.statistics_read.stats.repository
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.stats.document.CompanyStatsDocument
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsRepositoryType
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsType
@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@StatsRepositoryType(StatsType.COMPANY)
 @NoRepositoryBean
 interface CompanyStatsRepository : StatsMongoRepository<CompanyStatsDocument, String> {
     fun findByCompanySizeAndBaseDateBetween(
@@ -29,6 +28,7 @@ interface CompanyStatsRepository : StatsMongoRepository<CompanyStatsDocument, St
 }
 
 @Repository
+@StatsRepositoryType(StatsType.COMPANY)
 class CompanyStatsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<CompanyStatsDocument, String>,
     private val mongoOperations: MongoOperations,
@@ -82,4 +82,6 @@ class CompanyStatsRepositoryImpl(
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }
+
+
 }

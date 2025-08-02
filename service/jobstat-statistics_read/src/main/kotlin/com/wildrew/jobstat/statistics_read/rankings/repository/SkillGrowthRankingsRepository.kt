@@ -4,19 +4,20 @@ import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.SkillGrowthRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
+import com.wildrew.jobstat.statistics_read.rankings.document.SkillGrowthRankingsDocument.SkillGrowthRankingEntry
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.SKILL_GROWTH)
 @NoRepositoryBean
-interface SkillGrowthRankingsRepository : SimpleRankingRepository<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String> {
+interface SkillGrowthRankingsRepository
+    : SimpleRankingRepository<SkillGrowthRankingsDocument, SkillGrowthRankingEntry, String> {
     // 성장 일관성 분석
     fun findByGrowthConsistency(
         baseDate: String,
@@ -39,14 +40,14 @@ interface SkillGrowthRankingsRepository : SimpleRankingRepository<SkillGrowthRan
 }
 
 @Repository
+@RankingRepositoryType(RankingType.SKILL_GROWTH)
 class SkillGrowthRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<SkillGrowthRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
-) : SimpleRankingRepositoryImpl<SkillGrowthRankingsDocument, SkillGrowthRankingsDocument.SkillGrowthRankingEntry, String>(
-        entityInformation,
-        mongoOperations,
-    ),
-    SkillGrowthRankingsRepository {
+) : SimpleRankingRepositoryImpl<SkillGrowthRankingsDocument, SkillGrowthRankingEntry, String>(
+    entityInformation,
+    mongoOperations,
+), SkillGrowthRankingsRepository {
     override fun findByGrowthConsistency(
         baseDate: String,
         minConsistency: Double,

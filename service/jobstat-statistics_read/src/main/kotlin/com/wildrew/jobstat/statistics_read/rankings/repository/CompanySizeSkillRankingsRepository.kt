@@ -4,18 +4,19 @@ import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.RelationshipRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.RelationshipRankingRepositoryImpl
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.RelationshipRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.CompanySizeSkillRankingsDocument
+import com.wildrew.jobstat.statistics_read.rankings.document.CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-@RankingRepositoryType(RankingType.COMPANY_SIZE_SKILL_DEMAND)
 @NoRepositoryBean
-interface CompanySizeSkillRankingsRepository : RelationshipRankingRepository<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry, String> {
+interface CompanySizeSkillRankingsRepository
+    : RelationshipRankingRepository<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingEntry, String> {
     // 회사 규모별 핵심 스킬 분석
     fun findCoreSkillsByCompanySize(
         baseDate: String,
@@ -44,10 +45,11 @@ interface CompanySizeSkillRankingsRepository : RelationshipRankingRepository<Com
 }
 
 @Repository
+@RankingRepositoryType(RankingType.COMPANY_SIZE_SKILL_DEMAND)
 class CompanySizeSkillRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<CompanySizeSkillRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
-) : RelationshipRankingRepositoryImpl<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingsDocument.CompanySizeSkillRankingEntry, String>(
+) : RelationshipRankingRepositoryImpl<CompanySizeSkillRankingsDocument, CompanySizeSkillRankingEntry, String>(
         entityInformation,
         mongoOperations,
     ),

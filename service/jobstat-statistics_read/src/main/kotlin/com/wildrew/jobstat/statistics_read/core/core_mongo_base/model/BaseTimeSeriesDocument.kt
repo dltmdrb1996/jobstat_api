@@ -1,11 +1,11 @@
 package com.wildrew.jobstat.statistics_read.core.core_mongo_base.model
 
-import org.springframework.data.mongodb.core.mapping.Field
 
 abstract class BaseTimeSeriesDocument(
     id: String? = null,
-    @Field("base_date")
+    @org.springframework.data.annotation.Transient
     open val baseDate: String,
-    @Field("period")
+    @org.springframework.data.annotation.Transient
     open val period: SnapshotPeriod,
 ) : BaseDocument(id)
+
