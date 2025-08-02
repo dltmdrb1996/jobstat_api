@@ -1,5 +1,6 @@
 package com.wildrew.jobstat.core.core_event.outbox
 
+import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.*
 import kotlinx.coroutines.future.await
 import org.slf4j.Logger
@@ -7,6 +8,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.DisposableBean
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.transaction.event.TransactionPhase
@@ -28,6 +30,39 @@ class OutboxMessageRelay(
     private val schedulerEnabled: Boolean,
 ) : DisposableBean {
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
+
+    @PostConstruct
+    fun checkInjectedKafkaTemplate() {
+        try {
+            val producerFactory = outboxKafkaTemplate.producerFactory
+            val configurationProperties = producerFactory.configurationProperties
+
+            log.warn("===== [KAFKA TEMPLATE DEBUG] =====")
+            log.warn("주입된 KafkaTemplate의 ProducerFactory 클래스: {}", producerFactory.javaClass.name)
+
+            // 트랜잭션 ID 접두사 설정을 직접 확인합니다.
+            val txIdPrefixConfig = configurationProperties["transactional.id.prefix"]
+
+            // DefaultKafkaProducerFactory 인지 확인하고, 내부 상태를 검사합니다.
+            if (producerFactory is DefaultKafkaProducerFactory) {
+                // 이 메소드는 팩토리가 트랜잭션을 지원하도록 초기화되었는지 여부를 반환합니다.
+                val supportsTransactions = producerFactory.transactionCapable()
+
+                if (supportsTransactions) {
+                    log.warn("이 팩토리는 트랜잭션을 지원합니다! Transactional ID Prefix: {}", txIdPrefixConfig)
+                } else {
+                    log.error("***** 이 팩토리는 트랜잭션을 지원하지 않습니다! Transactional ID Prefix: {} *****", txIdPrefixConfig)
+                }
+            } else {
+                log.warn("주입된 ProducerFactory가 DefaultKafkaProducerFactory 타입이 아닙니다. 수동 검사가 필요합니다.")
+            }
+
+            log.warn("전체 프로듀서 설정: {}", configurationProperties)
+            log.warn("==================================")
+        } catch (e: Exception) {
+            log.error("KafkaTemplate 디버깅 중 오류 발생", e)
+        }
+    }
 
     @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     fun saveOutboxOnEvent(outbox: Outbox) {
@@ -53,7 +88,7 @@ class OutboxMessageRelay(
             return
         }
         log.debug("트랜잭션 커밋 확인, 즉시 발행 시도 (비동기): outboxId={}, eventType={}", outbox.id, outbox.eventType)
-        coroutineScope.launch {
+        coroutineScope.launch(Dispatchers.IO) {
             try {
                 publishEventExecute(outbox)
             } catch (e: Exception) {
@@ -62,14 +97,17 @@ class OutboxMessageRelay(
         }
     }
 
+
     private suspend fun publishEventExecute(outbox: Outbox) {
         log.debug("즉시 발행 실행 (코루틴): outboxId={}, type={}, topic={}", outbox.id, outbox.eventType, outbox.eventType.getTopicName())
         try {
             withTimeout(kafkaSendTimeoutSeconds.toDuration(DurationUnit.SECONDS)) {
-                outboxKafkaTemplate.send(outbox.eventType.getTopicName(), outbox.id.toString(), outbox.event).await()
+                outboxKafkaTemplate.executeInTransaction { template ->
+                    template.send(outbox.eventType.getTopicName(), outbox.id.toString(), outbox.event)
+                }
             }
-            log.info("즉시 발행 성공 (코루틴): outboxId={}, type={}", outbox.id, outbox.eventType)
 
+            log.info("즉시 발행 성공 (코루틴): outboxId={}, type={}", outbox.id, outbox.eventType)
             try {
                 outboxRepository.deleteById(outbox.id)
 

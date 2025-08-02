@@ -12,7 +12,6 @@ import com.wildrew.jobstat.core.core_serializer.DataSerializer
 import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
 import kotlinx.coroutines.CoroutineScope
 import org.apache.kafka.clients.producer.ProducerConfig
-import org.apache.kafka.common.serialization.StringSerializer
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -25,6 +24,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration
+import org.springframework.boot.autoconfigure.kafka.KafkaProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.context.annotation.Bean
@@ -51,7 +51,7 @@ import org.springframework.kafka.listener.ContainerProperties
 @ConditionalOnClass(KafkaOperations::class)
 @ConditionalOnProperty(name = ["spring.kafka.bootstrap-servers"])
 @ConditionalOnBean(ConsumerFactory::class)
-@EnableConfigurationProperties(KafkaConsumersConfiguration::class)
+@EnableConfigurationProperties(KafkaConsumersConfiguration::class, KafkaProperties::class)
 class CoreEventAutoConfiguration {
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
@@ -69,22 +69,56 @@ class CoreEventAutoConfiguration {
     @Bean("outboxKafkaTemplate")
     @Primary
     fun outboxKafkaTemplate(
-        @Value("\${spring.kafka.bootstrap-servers}") bootstrapServers: String,
-        @Value("\${jobstat.core.event.kafka.producer.acks-config:all}") acksConfig: String,
-        @Value("\${jobstat.core.event.kafka.producer.idempotence.enabled:true}") idempotentProducerEnabled: Boolean,
-        @Value("\${jobstat.core.event.kafka.producer.transactional-id}") transactionalId: String,
+        kafkaProperties: KafkaProperties
     ): KafkaTemplate<String, String> {
-        val configProps =
-            HashMap<String, Any>().apply {
-                put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
-                put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
-                put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
-                put(ProducerConfig.ACKS_CONFIG, acksConfig)
-                put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true")
-                put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionalId)
-            }
-        return KafkaTemplate(DefaultKafkaProducerFactory(configProps))
+        log.info("===== [Outbox KafkaTemplate 생성 시작] =====")
+
+        val producerProperties = kafkaProperties.buildProducerProperties(null)
+        log.info("yml로부터 빌드된 Producer 속성들을 확인합니다:")
+        producerProperties.forEach { (key, value) ->
+            log.info("  - 설정 키: {}, 설정 값: {}", key, value)
+        }
+
+        // 이 속성 맵으로 ProducerFactory를 생성합니다.
+        val producerFactory = DefaultKafkaProducerFactory<String, String>(producerProperties)
+
+        // --- 수정된 부분 시작 ---
+        // KafkaProperties에서 직접 transaction-id-prefix를 가져와 ProducerFactory에 설정합니다.
+        val transactionalIdPrefix = kafkaProperties.producer.transactionIdPrefix
+        if (transactionalIdPrefix != null) {
+            producerFactory.setTransactionIdPrefix(transactionalIdPrefix)
+            log.warn(">>> 핵심 확인: Transactional ID Prefix '{}'(이)가 ProducerFactory에 성공적으로 설정되었습니다. <<<", transactionalIdPrefix)
+        } else {
+            log.error(">>> !!! 문제 발견: spring.kafka.producer.transaction-id-prefix가 설정되지 않았습니다. yml 설정을 다시 확인하세요. !!! <<<")
+        }
+        // --- 수정된 부분 끝 ---
+
+        log.info("트랜잭션을 지원하는 ProducerFactory로 outboxKafkaTemplate 빈을 생성합니다.")
+        log.info("==============================================")
+
+        // 생성된 팩토리로 KafkaTemplate 빈을 생성하여 반환합니다.
+        return KafkaTemplate(producerFactory)
     }
+
+//    @Bean("outboxKafkaTemplate")
+//    @Primary
+//    fun outboxKafkaTemplate(
+//        @Value("\${spring.kafka.bootstrap-servers}") bootstrapServers: String,
+//        @Value("\${jobstat.core.event.kafka.producer.acks-config:all}") acksConfig: String,
+//        @Value("\${jobstat.core.event.kafka.producer.idempotence.enabled:true}") idempotentProducerEnabled: Boolean,
+//        @Value("\${jobstat.core.event.kafka.producer.transactional-id}") transactionalId: String,
+//    ): KafkaTemplate<String, String> {
+//        val configProps =
+//            HashMap<String, Any>().apply {
+//                put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers)
+//                put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
+//                put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer::class.java)
+//                put(ProducerConfig.ACKS_CONFIG, acksConfig)
+//                put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, "true")
+//                put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, transactionalId)
+//            }
+//        return KafkaTemplate(DefaultKafkaProducerFactory(configProps))
+//    }
 
     @Bean
     @ConditionalOnMissingBean(EventHandlerRegistryService::class)
