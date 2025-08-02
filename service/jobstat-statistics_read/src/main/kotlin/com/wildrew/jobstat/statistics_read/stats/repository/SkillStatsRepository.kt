@@ -1,16 +1,13 @@
 package com.wildrew.jobstat.statistics_read.stats.repository
 
-import com.mongodb.client.model.Accumulators
-import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepositoryImpl
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepositoryImpl
+import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.wildrew.jobstat.statistics_read.stats.document.SkillStatsDocument
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsRepositoryType
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsType
-import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
@@ -29,16 +26,22 @@ interface SkillStatsRepository : StatsMongoRepository<SkillStatsDocument, String
         baseDate: String,
     ): List<SkillStatsDocument>
 
-    fun calculateRank(type: RankingType, value: Double): Int
+    fun calculateRank(
+        type: RankingType,
+        value: Double,
+    ): Int
 
-    fun calculatePercentile(type: RankingType, value: Double): Double
+    fun calculatePercentile(
+        type: RankingType,
+        value: Double,
+    ): Double
 
     fun calculateMedianSalary(): Long
 
     fun findByEntityIdAndBaseDateBetween(
         entityId: Long,
         startDate: String,
-        endDate: String
+        endDate: String,
     ): List<SkillStatsDocument>
 }
 
@@ -96,9 +99,10 @@ class SkillStatsRepositoryImpl(
             .toList()
     }
 
-
-
-    override fun calculateRank(type: RankingType, value: Double): Int {
+    override fun calculateRank(
+        type: RankingType,
+        value: Double,
+    ): Int {
         TODO()
 //        val collection = mongoOperations.getCollection(entityInformation.collectionName)
 //
@@ -112,7 +116,10 @@ class SkillStatsRepositoryImpl(
 //            ).toInt() + 1 // 1을 더해서 1-based rank 반환
     }
 
-    override fun calculatePercentile(type: RankingType, value: Double): Double {
+    override fun calculatePercentile(
+        type: RankingType,
+        value: Double,
+    ): Double {
         TODO()
 //        val collection = mongoOperations.getCollection(entityInformation.collectionName)
 //
@@ -170,7 +177,7 @@ class SkillStatsRepositoryImpl(
     override fun findByEntityIdAndBaseDateBetween(
         entityId: Long,
         startDate: String,
-        endDate: String
+        endDate: String,
     ): List<SkillStatsDocument> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
@@ -179,10 +186,9 @@ class SkillStatsRepositoryImpl(
                 Filters.and(
                     Filters.eq("entity_id", entityId),
                     Filters.gte("base_date", startDate),
-                    Filters.lte("base_date", endDate)
-                )
-            )
-            .sort(Sorts.descending("base_date"))
+                    Filters.lte("base_date", endDate),
+                ),
+            ).sort(Sorts.descending("base_date"))
             .hintString("snapshot_lookup_idx")
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
@@ -195,7 +201,6 @@ class SkillStatsRepositoryImpl(
             .find(Filters.eq("entity_id", entityId))
             .sort(Sorts.descending("base_date"))
             .limit(1)
-            .hintString("snapshot_lookup_idx")
             .firstOrNull()
             ?.let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
     }

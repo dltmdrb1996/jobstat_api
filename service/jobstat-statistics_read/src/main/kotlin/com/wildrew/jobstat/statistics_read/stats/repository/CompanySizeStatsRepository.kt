@@ -2,9 +2,9 @@ package com.wildrew.jobstat.statistics_read.stats.repository
 
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepositoryImpl
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
 import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepository
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.StatsMongoRepositoryImpl
 import com.wildrew.jobstat.statistics_read.stats.document.CompanySizeStatsDocument
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsRepositoryType
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsType
@@ -16,8 +16,11 @@ import org.springframework.stereotype.Repository
 @NoRepositoryBean
 interface CompanySizeStatsRepository : StatsMongoRepository<CompanySizeStatsDocument, String> {
     fun findBySize(size: CompanySize): List<CompanySizeStatsDocument>
+
     fun findByAvgSalaryGreaterThan(salary: Long): List<CompanySizeStatsDocument>
+
     fun findByBenefitProvisionRateGreaterThan(rate: Double): List<CompanySizeStatsDocument>
+
     fun findTopByHiringVolume(limit: Int): List<CompanySizeStatsDocument>
 }
 
@@ -28,7 +31,6 @@ class CompanySizeStatsRepositoryImpl(
     private val mongoOperations: MongoOperations,
 ) : StatsMongoRepositoryImpl<CompanySizeStatsDocument, String>(entityInformation, mongoOperations),
     CompanySizeStatsRepository {
-
     override fun findBySize(size: CompanySize): List<CompanySizeStatsDocument> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 

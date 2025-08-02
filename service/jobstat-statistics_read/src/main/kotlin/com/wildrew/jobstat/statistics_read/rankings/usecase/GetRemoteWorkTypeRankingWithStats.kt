@@ -10,6 +10,7 @@ import com.wildrew.jobstat.statistics_read.stats.document.RemoteWorkTypeStatsDoc
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validator
+import jakarta.validation.constraints.Max
 import jakarta.validation.constraints.NotNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,13 +27,7 @@ class GetRemoteWorkTypeRankingWithStats(
             )
     }
 
-//    @Cacheable(
-//        cacheNames = ["statsWithRanking"],
-//        key = "#request.rankingType + ':' + #request.baseDate + ':' + #request.page",
-//        unless = "#result == null",
-//    )
     override operator fun invoke(request: Request): Response {
-        // 요청 유효성 검증
         validateRequest(request)
         return execute(request)
     }
@@ -47,18 +42,18 @@ class GetRemoteWorkTypeRankingWithStats(
     @Transactional
     fun execute(request: Request): Response =
         with(request) {
-            // 통계 데이터와 함께 순위 조회
             rankingAnalysisService
                 .findStatsWithRanking<RemoteWorkTypeStatsDocument>(
                     rankingType = rankingType.toDomain(),
                     baseDate = baseDate,
-                    page = page,
+                    cursor = cursor,
+                    limit = limit,
                 ).let { result ->
-                    // 응답 생성
                     Response(
                         rankingType = rankingType.toDomain(),
                         totalCount = result.totalCount,
                         hasNextPage = result.hasNextPage,
+                        nextCursor = result.nextCursor,
                         items = result.items,
                     )
                 }
@@ -67,7 +62,8 @@ class GetRemoteWorkTypeRankingWithStats(
     data class Request(
         @field:NotNull val rankingType: RemoteWorkTypeRankingType,
         @field:NotNull val baseDate: BaseDate,
-        val page: Int? = null,
+        val cursor: Int? = null,
+        @field:Max(100) val limit: Int = 20,
     )
 
     @Schema(name = "GetRemoteWorkTypeRankingWithStatsResponse", description = "원격 근무 형태 순위 조회 응답")
@@ -78,6 +74,8 @@ class GetRemoteWorkTypeRankingWithStats(
         val totalCount: Int,
         @Schema(description = "다음 페이지 존재 여부", example = "true")
         val hasNextPage: Boolean,
+        @Schema(description = "다음 페이지를 위한 커서 값", example = "20")
+        val nextCursor: Int?,
         @Schema(description = "순위 및 통계 데이터 목록")
         val items: List<RankingWithStats<RemoteWorkTypeStatsDocument>>,
     )

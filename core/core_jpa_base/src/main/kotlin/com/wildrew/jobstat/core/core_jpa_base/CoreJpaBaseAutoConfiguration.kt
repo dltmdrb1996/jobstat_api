@@ -27,8 +27,5 @@ class CoreJpaBaseAutoConfiguration {
 
     @Bean
     @Primary
-    fun transactionManager(entityManagerFactory: EntityManagerFactory): PlatformTransactionManager {
-        return JpaTransactionManager(entityManagerFactory)
-    }
-
+    fun transactionManager(entityManagerFactory: EntityManagerFactory): PlatformTransactionManager = JpaTransactionManager(entityManagerFactory)
 }

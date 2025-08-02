@@ -1,8 +1,8 @@
 package com.wildrew.jobstat.statistics_read.develop
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.BaseReferenceDocument
 import com.wildrew.jobstat.statistics_read.core.core_model.DocumentStatus
 import com.wildrew.jobstat.statistics_read.core.core_model.EntityType
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.BaseReferenceDocument
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 import java.time.Instant

@@ -3,8 +3,8 @@ package com.wildrew.jobstat.statistics_read.rankings.repository
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.rankings.document.JobCategoryGrowthRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
@@ -14,8 +14,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface JobCategoryGrowthRankingsRepository
-    : SimpleRankingRepository<JobCategoryGrowthRankingsDocument, JobCategoryGrowthRankingsDocument.JobCategoryGrowthRankingEntry, String> {
+interface JobCategoryGrowthRankingsRepository : SimpleRankingRepository<JobCategoryGrowthRankingsDocument, JobCategoryGrowthRankingsDocument.JobCategoryGrowthRankingEntry, String> {
     // 산업 연관성 분석
     fun findByIndustryCorrelation(
         baseDate: String,

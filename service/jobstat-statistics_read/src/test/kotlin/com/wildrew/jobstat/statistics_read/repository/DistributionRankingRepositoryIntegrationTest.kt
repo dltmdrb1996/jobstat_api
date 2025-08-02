@@ -80,6 +80,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         val dominantCategory = distribution.maxByOrNull { it.value }?.key ?: educationLevels.first()
 
         return CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry(
+            documentId = "doc_skewed_$rank",
             entityId = entityId,
             name = "Company_Size_$entityId",
             rank = rank,
@@ -134,6 +135,7 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         val distribution = createRandomDistribution(dominantCategory)
 
         return CompanySizeEducationRankingsDocument.CompanySizeEducationRankingEntry(
+            documentId = "doc_test_$rank",
             entityId = entityId,
             name = "Company_Size_$entityId",
             rank = rank,

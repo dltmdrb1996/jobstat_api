@@ -13,11 +13,12 @@ class StatsRepositoryRegistry(
 
     private fun initializeRepositoryMap(repositories: List<StatsMongoRepository<*, *>>): Map<StatsType, StatsMongoRepository<*, *>> =
         repositories.associateBy { repo ->
-            val actualClass = if (repo.javaClass.name.contains("SpringCGLIB")) {
-                repo.javaClass.superclass.kotlin
-            } else {
-                repo.javaClass.kotlin
-            }
+            val actualClass =
+                if (repo.javaClass.name.contains("SpringCGLIB")) {
+                    repo.javaClass.superclass.kotlin
+                } else {
+                    repo.javaClass.kotlin
+                }
             actualClass.findAnnotation<StatsRepositoryType>()?.type
                 ?: throw IllegalArgumentException("StatsRepositoryType annotation not found on ${repo.javaClass.simpleName}")
         }

@@ -20,13 +20,13 @@ class CompanyGrowthRankingsDocument(
     @Field("rankings")
     override val rankings: List<CompanyGrowthRankingEntry>,
 ) : SimpleRankingDocument<CompanyGrowthRankingsDocument.CompanyGrowthRankingEntry>(
-    id,
-    baseDate,
-    period,
-    metrics,
-    rankings,
-    page,
-) {
+        id,
+        baseDate,
+        period,
+        metrics,
+        rankings,
+        page,
+    ) {
     data class CompanyGrowthMetrics(
         @Field("total_count")
         override val totalCount: Int,

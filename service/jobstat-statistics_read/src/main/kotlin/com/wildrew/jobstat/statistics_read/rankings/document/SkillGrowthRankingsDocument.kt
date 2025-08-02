@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "skill_growth_rankings")
 class SkillGrowthRankingsDocument(
     id: String? = null,
-    page : Int = 1,
+    page: Int = 1,
     @Field("base_date")
     override val baseDate: String,
     @Field("period")
@@ -92,14 +92,12 @@ class SkillGrowthRankingsDocument(
         require(rankings.all { it.growthRate >= -100.0 }) { "Growth rate cannot be less than -100%" }
     }
 
-
-
     fun copy(
         id: String? = this.id,
         baseDate: String = this.baseDate,
         period: SnapshotPeriod = this.period,
         metrics: SkillGrowthMetrics = this.metrics,
         rankings: List<SkillGrowthRankingEntry> = this.rankings,
-        page: Int = this.page
+        page: Int = this.page,
     ): SkillGrowthRankingsDocument = SkillGrowthRankingsDocument(id, page, baseDate, period, metrics, rankings)
 }

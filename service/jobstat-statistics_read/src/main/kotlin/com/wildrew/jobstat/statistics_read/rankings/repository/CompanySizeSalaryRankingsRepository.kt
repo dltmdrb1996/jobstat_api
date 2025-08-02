@@ -4,9 +4,9 @@ import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepositoryImpl
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
 import com.wildrew.jobstat.statistics_read.core.core_model.ExperienceLevel
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepository
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.DistributionRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.rankings.document.CompanySizeSalaryRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
@@ -16,8 +16,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface CompanySizeSalaryRankingsRepository
-    : DistributionRankingRepository<CompanySizeSalaryRankingsDocument, CompanySizeSalaryRankingsDocument.CompanySizeSalaryRankingEntry, String> {
+interface CompanySizeSalaryRankingsRepository : DistributionRankingRepository<CompanySizeSalaryRankingsDocument, CompanySizeSalaryRankingsDocument.CompanySizeSalaryRankingEntry, String> {
     // 급여 공정성 분석
     fun findSalaryEquityByCompanySize(
         baseDate: String,

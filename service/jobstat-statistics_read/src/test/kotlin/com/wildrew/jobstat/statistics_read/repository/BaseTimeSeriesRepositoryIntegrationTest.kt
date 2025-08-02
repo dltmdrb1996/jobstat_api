@@ -31,14 +31,20 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
         }
     }
 
-    @BeforeAll
-    fun beforeAll() {
+    @BeforeEach
+    override fun setup() {
+        cleanupTestData() // Clean up before each test
+        allRecords.clear()
+        val baseDates = (1..12).map { "2024${it.toString().padStart(2, '0')}" }
+        baseDates.forEach { baseDate ->
+            val records = (1..10).map { createRandomDocument(baseDate) }
+            allRecords.addAll(testTimeSeriesRepository.bulkInsert(records))
+        }
     }
 
-    @AfterAll
-    fun afterAll() {
+    @AfterEach
+    override fun tearDown() {
         cleanupTestData()
-        printExecutionSummary()
     }
 
     private fun createSnapshotPeriod(baseDate: String): SnapshotPeriod {
@@ -227,22 +233,18 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Order(7)
     @DisplayName("대량의 데이터를 삭제할 수 있다")
     fun testBulkDelete() {
-        startTime = System.currentTimeMillis()
+        // given
+        val recordsToInsert = (1..5).map { createRandomDocument("202501") }
+        val insertedRecords = testTimeSeriesRepository.bulkInsert(recordsToInsert)
+        val recordIds = insertedRecords.mapNotNull { it.id }
+        Assertions.assertFalse(recordIds.isEmpty())
 
-        val recordIds = allRecords.mapNotNull { it.id }
-        var totalDeleted = 0
+        // when
+        val deletedCount = testTimeSeriesRepository.bulkDelete(recordIds)
 
-        for (batch in recordIds.chunked(batchSize)) {
-            val deletedCount = testTimeSeriesRepository.bulkDelete(batch)
-            totalDeleted += deletedCount
-        }
-
+        // then
+        Assertions.assertEquals(recordIds.size, deletedCount)
         val remainingRecords = testTimeSeriesRepository.findAllByQuery(Query())
-        Assertions.assertTrue(remainingRecords.isEmpty())
-
-        val endTime = System.currentTimeMillis()
-        val timeSeconds = (endTime - startTime) / 1000.0
-        log.debug("Bulk delete execution time: $timeSeconds seconds")
-        performanceMetrics["bulk_delete"] = timeSeconds
+        Assertions.assertTrue(remainingRecords.none { it.id in recordIds })
     }
 }

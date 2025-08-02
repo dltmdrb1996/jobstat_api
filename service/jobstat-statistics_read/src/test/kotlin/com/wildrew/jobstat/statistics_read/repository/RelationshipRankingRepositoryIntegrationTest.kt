@@ -67,6 +67,7 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         relatedRankings: List<IndustrySkillRankingsDocument.IndustrySkillRankingEntry.SkillRank>,
     ): IndustrySkillRankingsDocument.IndustrySkillRankingEntry =
         IndustrySkillRankingsDocument.IndustrySkillRankingEntry(
+            documentId = "doc_rel_${primaryEntityId}_$rank",
             entityId = primaryEntityId,
             name = "Industry_$primaryEntityId",
             rank = rank,

@@ -1,7 +1,5 @@
 package com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking
 
-import java.io.Serializable
-
 interface RankingEntry {
     val documentId: String
     val entityId: Long

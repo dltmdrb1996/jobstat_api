@@ -6,10 +6,7 @@ import com.wildrew.jobstat.core.core_global.model.BaseDate
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.rankings.model.RakingWithStatsPage
-import com.wildrew.jobstat.statistics_read.rankings.model.RankingData
-import com.wildrew.jobstat.statistics_read.rankings.model.RankingPage
-import com.wildrew.jobstat.statistics_read.rankings.model.RankingWithStats
+import com.wildrew.jobstat.statistics_read.rankings.model.*
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.toStatsType
 import com.wildrew.jobstat.statistics_read.rankings.repository.RankingRepositoryRegistry
@@ -19,6 +16,21 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 interface RankingAnalysisService {
+    fun findRankingOnly(
+        rankingType: RankingType,
+        baseDate: BaseDate,
+        cursor: Int?,
+        limit: Int,
+    ): PureRankingPage
+
+    fun <T : BaseStatsDocument> findStatsWithRanking(
+        rankingType: RankingType,
+        baseDate: BaseDate,
+        cursor: Int?,
+        limit: Int,
+    ): RakingWithStatsPage<T>
+
+    // ... (기존 다른 public 메소드들은 유지)
     fun findRankingPage(
         rankingType: RankingType,
         baseDate: BaseDate,
@@ -63,12 +75,6 @@ interface RankingAnalysisService {
         months: Int,
         minRankChange: Int,
     ): List<RankingEntry>
-
-    fun <T : BaseStatsDocument> findStatsWithRanking(
-        rankingType: RankingType,
-        baseDate: BaseDate,
-        page: Int?,
-    ): RakingWithStatsPage<T>
 }
 
 @Service
@@ -77,30 +83,36 @@ class RankingAnalysisServiceImpl(
     private val statsService: StatsAnalysisService,
 ) : RankingAnalysisService {
     companion object {
-        private const val CURSOR_KEY_PREFIX = "ranking:cursor"
         private const val PAGE_SIZE = 100
     }
 
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
+    override fun findRankingOnly(
+        rankingType: RankingType,
+        baseDate: BaseDate,
+        cursor: Int?,
+        limit: Int,
+    ): PureRankingPage = findPureRankings(rankingType, baseDate, cursor, limit)
+
     override fun <T : BaseStatsDocument> findStatsWithRanking(
         rankingType: RankingType,
         baseDate: BaseDate,
-        page: Int?,
+        cursor: Int?,
+        limit: Int,
     ): RakingWithStatsPage<T> {
         val statsType = rankingType.toStatsType()
-        val rankingPage = findRankingPage(rankingType, baseDate, page)
-        val rankings = rankingPage.items.data
-        val ids = rankings.map { it.entityId }
+        val pureRankingPage = findPureRankings(rankingType, baseDate, cursor, limit)
 
-        // stats를 Map으로 변환하여 빠른 검색이 가능하도록 함
-        val statsMap =
-            statsService
-                .findStatsByEntityIdsAndBaseDate<T>(statsType, baseDate, ids)
+        if (pureRankingPage.items.isEmpty()) {
+            return RakingWithStatsPage(emptyList(), 0, false, null)
+        }
 
-        // rankings의 순서를 유지하면서 매칭되는 stats를 찾아 결합
+        val ids = pureRankingPage.items.map { it.entityId }
+        val statsMap = statsService.findStatsByEntityIdsAndBaseDate<T>(statsType, baseDate, ids)
+
         val rankingWithStats =
-            rankings.map { ranking ->
+            pureRankingPage.items.map { ranking ->
                 RankingWithStats(
                     ranking = ranking,
                     stat = statsMap[ranking.entityId] ?: throw AppException.fromErrorCode(ErrorCode.RESOURCE_NOT_FOUND),
@@ -109,11 +121,50 @@ class RankingAnalysisServiceImpl(
 
         return RakingWithStatsPage(
             items = rankingWithStats,
-            rankingPage.rankedCount,
-            rankingPage.hasNextPage,
+            totalCount = pureRankingPage.totalCount,
+            hasNextPage = pureRankingPage.hasNextPage,
+            nextCursor = pureRankingPage.nextCursor,
         )
     }
 
+    private fun findPureRankings(
+        rankingType: RankingType,
+        baseDate: BaseDate,
+        cursor: Int?,
+        limit: Int,
+    ): PureRankingPage {
+        val repository = repositoryRegistry.getRepository<BaseRankingDocument<*>>(rankingType)
+
+        val startRank = cursor?.let { it + 1 } ?: 1
+        val endRank = startRank + limit - 1
+        val startPage = (startRank - 1) / PAGE_SIZE + 1
+        val endPage = (endRank - 1) / PAGE_SIZE + 1
+
+        val rankings =
+            repository
+                .findByPageRange(baseDate.toString(), startPage, endPage)
+                .flatMap { it.rankings }
+                .filter { it.rank in startRank..endRank }
+                .take(limit) // limit을 초과하는 경우 방지
+
+        if (rankings.isEmpty()) {
+            return PureRankingPage(emptyList(), 0, false, null)
+        }
+
+        val lastItem = rankings.last()
+        val totalCount = repository.findByPage(baseDate.toString(), 1).metrics.rankedCount
+        val hasNextPage = lastItem.rank < totalCount
+        val nextCursor = if (hasNextPage) lastItem.rank else null
+
+        return PureRankingPage(
+            items = rankings,
+            totalCount = totalCount,
+            hasNextPage = hasNextPage,
+            nextCursor = nextCursor,
+        )
+    }
+
+    // ... (기존 다른 public 메소드 구현은 그대로 유지)
     override fun findRankingPage(
         rankingType: RankingType,
         baseDate: BaseDate,

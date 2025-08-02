@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "location_posting_count_rankings")
 class LocationPostingCountRankingsDocument(
     id: String? = null,
-    page : Int = 1,
+    page: Int = 1,
     @Field("base_date")
     override val baseDate: String,
     @Field("period")
@@ -26,7 +26,7 @@ class LocationPostingCountRankingsDocument(
         metrics,
         rankings,
         page,
-) {
+    ) {
     data class LocationPostingMetrics(
         @Field("total_count")
         override val totalCount: Int,
@@ -64,7 +64,7 @@ class LocationPostingCountRankingsDocument(
     }
 
     data class LocationPostingRankingEntry(
-       @Field("document_id")
+        @Field("document_id")
         override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,

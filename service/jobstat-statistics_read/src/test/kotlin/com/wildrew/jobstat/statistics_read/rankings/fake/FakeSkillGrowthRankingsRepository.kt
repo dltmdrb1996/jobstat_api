@@ -20,8 +20,17 @@ class FakeSkillGrowthRankingsRepository :
         page: Int,
     ): SkillGrowthRankingsDocument =
         documents.values
-            .find { it.baseDate == baseDate }
+            .find { it.baseDate == baseDate && it.page == page }
             ?: throw NoSuchElementException("Document not found for baseDate: $baseDate, page: $page")
+
+    override fun findByPageRange(
+        baseDate: String,
+        startPage: Int,
+        endPage: Int,
+    ): List<SkillGrowthRankingsDocument> =
+        documents.values
+            .filter { it.baseDate == baseDate && it.page in startPage..endPage }
+            .sortedBy { it.page }
 
     override fun findTopMovers(
         startDate: String,

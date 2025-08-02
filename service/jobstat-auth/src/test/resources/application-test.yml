@@ -1,5 +1,7 @@
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   cloud:
     config:
       enabled: false # Config Client 비활성화 (명시적으로 유지)

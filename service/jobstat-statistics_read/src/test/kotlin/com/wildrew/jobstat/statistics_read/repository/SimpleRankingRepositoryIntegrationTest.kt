@@ -167,6 +167,7 @@ class SimpleRankingRepositoryIntegrationTest : BatchOperationTestSupport() {
         entityId: Long = rank.toLong(),
     ): SkillGrowthRankingsDocument.SkillGrowthRankingEntry =
         SkillGrowthRankingsDocument.SkillGrowthRankingEntry(
+            documentId = "doc_simple_$rank",
             entityId = entityId,
             name = "Skill_$rank",
             rank = rank,

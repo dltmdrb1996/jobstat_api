@@ -1,15 +1,14 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.CommonDistribution
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
-
 
 @Document(collection = "skill_stats_monthly")
 class SkillStatsDocument(
@@ -37,7 +36,7 @@ class SkillStatsDocument(
     @Field("related_job_categories")
     val relatedJobCategories: List<RelatedJobCategory>,
     @Field("rankings")
-    override val rankings: Map<RankingType, SkillRankingInfo>
+    override val rankings: Map<RankingType, SkillRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
     override fun validate() {
         require(experienceLevels.isNotEmpty()) { "Experience levels must not be empty" }
@@ -46,11 +45,10 @@ class SkillStatsDocument(
         require(relatedJobCategories.isNotEmpty()) { "Related job categories must not be empty" }
     }
 
-    override fun toString(): String =
-        "SkillStatsDocument(id=$id, entityId=$entityId, baseDate='$baseDate', period=$period, name='$name', stats=$stats, experienceLevels=$experienceLevels, companySizeDistribution=$companySizeDistribution, industryDistribution=$industryDistribution, isSoftSkill=$isSoftSkill, isEmergingSkill=$isEmergingSkill, relatedJobCategories=$relatedJobCategories, rankings=$rankings)"
+    override fun toString(): String = "SkillStatsDocument(id=$id, entityId=$entityId, baseDate='$baseDate', period=$period, name='$name', stats=$stats, experienceLevels=$experienceLevels, companySizeDistribution=$companySizeDistribution, industryDistribution=$industryDistribution, isSoftSkill=$isSoftSkill, isEmergingSkill=$isEmergingSkill, relatedJobCategories=$relatedJobCategories, rankings=$rankings)"
 
     data class SkillRankingInfo(
-       @Field("current_rank")
+        @Field("current_rank")
         override val currentRank: Int,
         @Field("previous_rank")
         override val previousRank: Int?,
@@ -148,19 +146,20 @@ class SkillStatsDocument(
         isEmergingSkill: Boolean = this.isEmergingSkill,
         relatedJobCategories: List<RelatedJobCategory> = this.relatedJobCategories,
         rankings: Map<RankingType, SkillRankingInfo> = this.rankings,
-    ): SkillStatsDocument = SkillStatsDocument(
-        id = this.id,
-        entityId = entityId,
-        baseDate = baseDate,
-        period = period,
-        name = name,
-        stats = stats,
-        experienceLevels = experienceLevels,
-        companySizeDistribution = companySizeDistribution,
-        industryDistribution = industryDistribution,
-        isSoftSkill = isSoftSkill,
-        isEmergingSkill = isEmergingSkill,
-        relatedJobCategories = relatedJobCategories,
-        rankings = rankings,
-    )
+    ): SkillStatsDocument =
+        SkillStatsDocument(
+            id = this.id,
+            entityId = entityId,
+            baseDate = baseDate,
+            period = period,
+            name = name,
+            stats = stats,
+            experienceLevels = experienceLevels,
+            companySizeDistribution = companySizeDistribution,
+            industryDistribution = industryDistribution,
+            isSoftSkill = isSoftSkill,
+            isEmergingSkill = isEmergingSkill,
+            relatedJobCategories = relatedJobCategories,
+            rankings = rankings,
+        )
 }

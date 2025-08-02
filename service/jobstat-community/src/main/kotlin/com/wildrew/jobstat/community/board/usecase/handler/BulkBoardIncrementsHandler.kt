@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class BulkBoardIncrementsHandler(
     private val boardBatchRepositoryImpl: BoardBatchRepositoryImpl,
-    private val publisher: CommunityCommandEventPublisher
+    private val publisher: CommunityCommandEventPublisher,
 ) : EventHandlingUseCase<EventType, BulkBoardIncrementsForCommandPayload, Unit>() {
     override val eventType: EventType = EventType.BULK_BOARD_INCREMENTS_COMMAND
 

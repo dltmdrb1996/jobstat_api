@@ -2,7 +2,6 @@ package com.wildrew.jobstat.core.core_event.outbox
 
 import jakarta.annotation.PostConstruct
 import kotlinx.coroutines.*
-import kotlinx.coroutines.future.await
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.DisposableBean
@@ -13,7 +12,6 @@ import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
-import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.time.LocalDateTime
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -96,7 +94,6 @@ class OutboxMessageRelay(
             }
         }
     }
-
 
     private suspend fun publishEventExecute(outbox: Outbox) {
         log.debug("즉시 발행 실행 (코루틴): outboxId={}, type={}, topic={}", outbox.id, outbox.eventType, outbox.eventType.getTopicName())

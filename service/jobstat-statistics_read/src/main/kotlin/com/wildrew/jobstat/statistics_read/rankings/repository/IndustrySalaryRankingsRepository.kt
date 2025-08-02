@@ -4,8 +4,8 @@ import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.rankings.document.IndustrySalaryRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
@@ -15,8 +15,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface IndustrySalaryRankingsRepository
-    : SimpleRankingRepository<IndustrySalaryRankingsDocument, IndustrySalaryRankingsDocument.IndustrySalaryRankingEntry,String> {
+interface IndustrySalaryRankingsRepository : SimpleRankingRepository<IndustrySalaryRankingsDocument, IndustrySalaryRankingsDocument.IndustrySalaryRankingEntry, String> {
     // 지역별 조정 급여 분석
     fun findRegionalAdjustedSalaries(
         baseDate: String,

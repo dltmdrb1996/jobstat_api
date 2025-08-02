@@ -1,14 +1,14 @@
 package com.wildrew.jobstat.statistics_read.stats.document
 
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
-import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
 import com.wildrew.jobstat.statistics_read.core.core_model.CompanySize
 import com.wildrew.jobstat.statistics_read.core.core_model.EducationLevel
 import com.wildrew.jobstat.statistics_read.core.core_model.ExperienceLevel
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.BaseStatsDocument
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.CommonStats
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingInfo
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.stats.RankingScore
+import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
 
@@ -46,7 +46,6 @@ class CompanySizeStatsDocument(
     @Field("rankings")
     override val rankings: Map<RankingType, CompanySizeRankingInfo>,
 ) : BaseStatsDocument(id, baseDate, period, entityId, stats, rankings) {
-
     data class CompanySizeStats(
         @Field("posting_count")
         override val postingCount: Int,
@@ -71,14 +70,14 @@ class CompanySizeStatsDocument(
         @Field("avg_years_of_experience_required")
         val avgYearsOfExperienceRequired: Double,
     ) : CommonStats(
-        postingCount,
-        activePostingCount,
-        avgSalary,
-        growthRate,
-        yearOverYearGrowth,
-        monthOverMonthChange,
-        demandTrend,
-    )
+            postingCount,
+            activePostingCount,
+            avgSalary,
+            growthRate,
+            yearOverYearGrowth,
+            monthOverMonthChange,
+            demandTrend,
+        )
 
     data class CompanySizeIndustry(
         @Field("industry_id")

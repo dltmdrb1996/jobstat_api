@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "skill_salary_rankings")
 class SkillSalaryRankingsDocument(
     id: String? = null,
-    page : Int = 1,
+    page: Int = 1,
     @Field("base_date")
     override val baseDate: String,
     @Field("period")

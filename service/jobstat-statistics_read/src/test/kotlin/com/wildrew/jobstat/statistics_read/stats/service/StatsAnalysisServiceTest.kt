@@ -143,16 +143,22 @@ class StatsAnalysisServiceTest {
                         previousRank = random.nextInt(1, 100),
                         rankChange = random.nextInt(-10, 10),
                         percentile = random.nextDouble(0.0, 100.0),
+                        valueChange = random.nextDouble(-5.0, 5.0),
                         rankingScore =
                             when (type) {
                                 // 채용공고 수 관련 랭킹
                                 RankingType.SKILL_POSTING_COUNT,
                                 RankingType.JOB_CATEGORY_POSTING_COUNT,
+                                RankingType.INDUSTRY_POSTING_COUNT,
                                 RankingType.CERTIFICATION_POSTING_COUNT,
                                 RankingType.LOCATION_POSTING_COUNT,
                                 RankingType.COMPANY_SIZE_POSTING_COUNT,
                                 RankingType.COMPANY_HIRING_VOLUME,
                                 RankingType.BENEFIT_POSTING_COUNT,
+                                RankingType.EDUCATION_POSTING_COUNT,
+                                RankingType.EXPERIENCE_POSTING_COUNT,
+                                RankingType.CONTRACT_TYPE_POSTING_COUNT,
+                                RankingType.REMOTE_WORK_TYPE_POSTING_COUNT,
                                 ->
                                     PostingCountScore(
                                         value = postingCount.toDouble(),
@@ -169,6 +175,7 @@ class StatsAnalysisServiceTest {
                                 RankingType.COMPANY_SIZE_SALARY,
                                 RankingType.COMPANY_SALARY,
                                 RankingType.EDUCATION_SALARY,
+                                RankingType.EXPERIENCE_SALARY,
                                 ->
                                     SalaryScore(
                                         value = avgSalary.toDouble(),

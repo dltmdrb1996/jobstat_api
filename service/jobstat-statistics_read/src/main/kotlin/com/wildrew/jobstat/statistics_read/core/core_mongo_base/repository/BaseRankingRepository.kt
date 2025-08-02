@@ -21,6 +21,13 @@ interface BaseRankingRepository<T : BaseRankingDocument<E>, E : RankingEntry, ID
         page: Int,
     ): T
 
+    // 페이지 범위 조회
+    fun findByPageRange(
+        baseDate: String,
+        startPage: Int,
+        endPage: Int,
+    ): List<T>
+
     // 전체 페이지 조회
     fun findAllPages(baseDate: String): Flow<T>
 
@@ -100,6 +107,25 @@ abstract class BaseRankingRepositoryImpl<T : BaseRankingDocument<E>, E : Ranking
             ).firstOrNull()
             .orThrowNotFound(entityInformation.collectionName, "baseDate: $baseDate, page: $page")
             .let { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
+    }
+
+    override fun findByPageRange(
+        baseDate: String,
+        startPage: Int,
+        endPage: Int,
+    ): List<T> {
+        val collection = mongoOperations.getCollection(entityInformation.collectionName)
+
+        return collection
+            .find(
+                Filters.and(
+                    Filters.eq("base_date", baseDate),
+                    Filters.gte("page", startPage),
+                    Filters.lte("page", endPage),
+                ),
+            ).sort(Sorts.ascending("page"))
+            .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
+            .toList()
     }
 
     override fun findAllPages(baseDate: String): Flow<T> =

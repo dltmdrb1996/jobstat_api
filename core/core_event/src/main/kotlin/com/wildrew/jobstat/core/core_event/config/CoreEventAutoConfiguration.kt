@@ -11,7 +11,6 @@ import com.wildrew.jobstat.core.core_jpa_base.id_generator.SnowflakeGenerator
 import com.wildrew.jobstat.core.core_serializer.DataSerializer
 import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
 import kotlinx.coroutines.CoroutineScope
-import org.apache.kafka.clients.producer.ProducerConfig
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
@@ -69,7 +68,7 @@ class CoreEventAutoConfiguration {
     @Bean("outboxKafkaTemplate")
     @Primary
     fun outboxKafkaTemplate(
-        kafkaProperties: KafkaProperties
+        kafkaProperties: KafkaProperties,
     ): KafkaTemplate<String, String> {
         log.info("===== [Outbox KafkaTemplate 생성 시작] =====")
 

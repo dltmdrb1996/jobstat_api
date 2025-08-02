@@ -10,7 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 @Document(collection = "education_salary_rankings")
 class EducationSalaryRankingsDocument(
     id: String? = null,
-    page : Int = 1,
+    page: Int = 1,
     @Field("base_date")
     override val baseDate: String,
     @Field("period")
@@ -70,7 +70,7 @@ class EducationSalaryRankingsDocument(
     }
 
     data class EducationSalaryRankingEntry(
-       @Field("document_id")
+        @Field("document_id")
         override val documentId: String,
         @Field("entity_id")
         override val entityId: Long,

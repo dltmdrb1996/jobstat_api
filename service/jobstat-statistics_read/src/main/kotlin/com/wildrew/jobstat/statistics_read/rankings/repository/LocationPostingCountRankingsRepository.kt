@@ -4,8 +4,8 @@ import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.rankings.document.LocationPostingCountRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.document.LocationPostingCountRankingsDocument.LocationPostingRankingEntry
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
@@ -16,8 +16,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface LocationPostingCountRankingsRepository
-    : SimpleRankingRepository<LocationPostingCountRankingsDocument, LocationPostingRankingEntry, String> {
+interface LocationPostingCountRankingsRepository : SimpleRankingRepository<LocationPostingCountRankingsDocument, LocationPostingRankingEntry, String> {
     // 지역 고용 시장 분석
     fun findByEmploymentStats(
         baseDate: String,

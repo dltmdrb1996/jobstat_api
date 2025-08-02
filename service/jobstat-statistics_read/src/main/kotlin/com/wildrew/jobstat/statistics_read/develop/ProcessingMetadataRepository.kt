@@ -7,7 +7,6 @@ import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
-
 @NoRepositoryBean
 interface ProcessingMetadataRepository : BaseMongoRepository<ProcessingMetadata, String>
 
@@ -16,6 +15,7 @@ class ProcessingMetadataRepositoryImpl(
     private val entityInformation: MongoEntityInformation<ProcessingMetadata, String>,
     private val mongoOperations: MongoOperations,
 ) : BaseMongoRepositoryImpl<ProcessingMetadata, String>(
-    entityInformation,
-    mongoOperations,
-), ProcessingMetadataRepository
+        entityInformation,
+        mongoOperations,
+    ),
+    ProcessingMetadataRepository

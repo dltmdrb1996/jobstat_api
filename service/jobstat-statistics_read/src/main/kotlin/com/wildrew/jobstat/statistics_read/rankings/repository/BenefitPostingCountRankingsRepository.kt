@@ -4,8 +4,8 @@ import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Field
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.rankings.document.BenefitPostingCountRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.document.BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
@@ -16,8 +16,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface BenefitPostingCountRankingsRepository :
-    SimpleRankingRepository<BenefitPostingCountRankingsDocument, BenefitPostingRankingEntry, String> {
+interface BenefitPostingCountRankingsRepository : SimpleRankingRepository<BenefitPostingCountRankingsDocument, BenefitPostingRankingEntry, String> {
     // 산업별 특화 복리후생 분석
     fun findUniqueIndustryBenefits(
         baseDate: String,
@@ -43,9 +42,9 @@ class BenefitPostingCountRankingsRepositoryImpl(
     private val entityInformation: MongoEntityInformation<BenefitPostingCountRankingsDocument, String>,
     private val mongoOperations: MongoOperations,
 ) : SimpleRankingRepositoryImpl<BenefitPostingCountRankingsDocument, BenefitPostingRankingEntry, String>(
-    entityInformation,
-    mongoOperations,
-),
+        entityInformation,
+        mongoOperations,
+    ),
     BenefitPostingCountRankingsRepository {
     override fun findUniqueIndustryBenefits(
         baseDate: String,

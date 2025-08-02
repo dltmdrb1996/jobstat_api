@@ -20,13 +20,13 @@ class BenefitPostingCountRankingsDocument(
     @Field("rankings")
     override val rankings: List<BenefitPostingRankingEntry>,
 ) : SimpleRankingDocument<BenefitPostingCountRankingsDocument.BenefitPostingRankingEntry>(
-    id,
-    baseDate,
-    period,
-    metrics,
-    rankings,
-    page,
-) {
+        id,
+        baseDate,
+        period,
+        metrics,
+        rankings,
+        page,
+    ) {
     data class BenefitPostingMetrics(
         @Field("total_count")
         override val totalCount: Int,

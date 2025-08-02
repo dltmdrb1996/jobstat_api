@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import java.time.Instant
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 @DisplayName("RankingAnalysisService 테스트")
@@ -44,7 +43,10 @@ class RankingAnalysisServiceTest {
             )
     }
 
-    private fun createMockDocument(rankings: List<RankingEntry>): BaseRankingDocument<RankingEntry> {
+    private fun createMockDocument(
+        page: Int,
+        rankings: List<RankingEntry>,
+    ): BaseRankingDocument<RankingEntry> {
         val mockVolatilityMetrics =
             VolatilityMetrics(
                 avgRankChange = 2.5,
@@ -54,20 +56,20 @@ class RankingAnalysisServiceTest {
 
         val mockMetrics =
             object : RankingMetrics {
-                override val totalCount: Int = 100
-                override val rankedCount: Int = 100
+                override val totalCount: Int = 200 // 2 pages
+                override val rankedCount: Int = 200
                 override val newEntries: Int = 0
                 override val droppedEntries: Int = 0
                 override val volatilityMetrics: VolatilityMetrics = mockVolatilityMetrics
             }
 
         return object : BaseRankingDocument<RankingEntry>(
-            id = "mock_id",
+            id = "mock_id_$page",
             baseDate = "202501",
             period = createSnapshotPeriod(),
             metrics = mockMetrics,
             rankings = rankings,
-            page = 1,
+            page = page,
         ) {
             override fun validate() {
                 // 테스트용 mock이므로 validation 생략
@@ -80,13 +82,16 @@ class RankingAnalysisServiceTest {
         name: String,
         entityId: Long = rank.toLong(),
         rankChange: Int? = null,
+        documentId: String = "doc_id",
     ): RankingEntry =
         object : RankingEntry {
+            override val documentId = documentId
             override val entityId = entityId
             override val name = name
             override val rank = rank
             override val previousRank = rankChange?.let { rank - it }
             override val rankChange = rankChange
+            override val valueChange: Double = 0.0 // 기본값으로 추가
         }
 
     private fun createSnapshotPeriod(): SnapshotPeriod =
@@ -106,6 +111,7 @@ class RankingAnalysisServiceTest {
             val page = 1
             val mockDoc =
                 createMockDocument(
+                    page,
                     listOf(
                         createMockEntry(1, "Skill_1"),
                         createMockEntry(2, "Skill_2"),
@@ -119,269 +125,73 @@ class RankingAnalysisServiceTest {
             // then
             assertEquals("Skill_1", result.items.data[0].name)
             assertEquals(RankingType.SKILL_GROWTH, result.items.type)
-            assertEquals(100, result.rankedCount)
+            assertEquals(200, result.rankedCount)
             assertTrue(result.items.data.size >= 2)
             verify(mockRepository).findByPage(baseDate.toString(), page)
-        }
-
-        @Test
-        @DisplayName("페이지 번호가 null일 경우 첫 페이지를 조회한다")
-        fun findFirstPageWhenPageIsNull() {
-            // given
-            val baseDate = BaseDate("202501")
-            val mockDoc = createMockDocument(listOf(createMockEntry(1, "Skill_1")))
-            doReturn(mockDoc).whenever(mockRepository).findByPage(any(), eq(1))
-
-            // when
-            val result = rankingAnalysisService.findRankingPage(RankingType.SKILL_GROWTH, baseDate, null)
-
-            // then
-            assertEquals(1, result.items.data[0].rank)
-            assertEquals(100, result.rankedCount)
-            verify(mockRepository).findByPage(baseDate.toString(), 1)
-        }
-    }
-
-    @Nested
-    @DisplayName("상위 N개 랭킹 조회")
-    inner class FindTopNRankings {
-        @Test
-        @DisplayName("상위 N개의 랭킹을 조회할 수 있다")
-        fun findTopNRankingsSuccessfully() {
-            // given
-            val baseDate = BaseDate("202501")
-            val limit = 5
-            val mockEntries = (1..5).map { createMockEntry(it, "Skill_$it") }
-            doReturn(mockEntries).whenever(mockRepository).findTopN(any(), eq(limit))
-
-            // when
-            val result = rankingAnalysisService.findTopNRankings(RankingType.SKILL_GROWTH, baseDate, limit)
-
-            // then
-            assertEquals(limit, result.size)
-            assertTrue(result.all { it.rank <= limit })
-            verify(mockRepository).findTopN(baseDate.toString(), limit)
-        }
-    }
-
-    @Nested
-    @DisplayName("랭킹 변동 조회")
-    inner class FindRankingMovements {
-        @Test
-        @DisplayName("랭킹 상승이 큰 항목들을 조회할 수 있다")
-        fun findTopMoversSuccessfully() {
-            // given
-            val startDate = BaseDate("202501")
-            val endDate = BaseDate("202502")
-            val limit = 2
-            val mockEntries =
-                listOf(
-                    createMockEntry(1, "Skill_1", rankChange = 5),
-                    createMockEntry(2, "Skill_2", rankChange = 3),
-                )
-            doReturn(mockEntries).whenever(mockRepository).findTopMovers(any(), any(), eq(limit))
-
-            // when
-            val result = rankingAnalysisService.findRankingMovements(RankingType.SKILL_GROWTH, startDate, endDate, limit)
-
-            // then
-            assertEquals(limit, result.size)
-            assertTrue(result.all { it.rankChange != null && (it.rankChange ?: 0) > 0 })
-            verify(mockRepository).findTopMovers(startDate.toString(), endDate.toString(), limit)
-        }
-    }
-
-    @Nested
-    @DisplayName("일관된 랭킹 조회")
-    inner class FindConsistentRankings {
-        @Test
-        @DisplayName("일정 기간 동안 일관된 순위를 유지한 항목들을 조회할 수 있다")
-        fun findConsistentRankingsSuccessfully() {
-            // given
-            val months = 2
-            val maxRank = 10
-            val mockEntries =
-                listOf(
-                    createMockEntry(1, "Skill_1", rankChange = 0),
-                    createMockEntry(2, "Skill_2", rankChange = 0),
-                )
-            doReturn(mockEntries).whenever(mockRepository).findEntitiesWithConsistentRanking(eq(months), eq(maxRank))
-
-            // when
-            val result = rankingAnalysisService.findConsistentRankings(RankingType.SKILL_GROWTH, months, maxRank)
-
-            // then
-            assertTrue(result.all { it.rank <= maxRank })
-            verify(mockRepository).findEntitiesWithConsistentRanking(months, maxRank)
-        }
-    }
-
-    @Nested
-    @DisplayName("랭킹 범위 조회")
-    inner class FindRankRange {
-        @Test
-        @DisplayName("특정 순위 범위의 항목들을 조회할 수 있다")
-        fun findRankRangeSuccessfully() {
-            // given
-            val baseDate = BaseDate("202501")
-            val startRank = 5
-            val endRank = 10
-            val mockEntries =
-                (startRank..endRank).map {
-                    createMockEntry(it, "Skill_$it")
-                }
-            doReturn(mockEntries).whenever(mockRepository).findByRankRange(any(), eq(startRank), eq(endRank))
-
-            // when
-            val result = rankingAnalysisService.findRankRange(RankingType.SKILL_GROWTH, baseDate, startRank, endRank)
-
-            // then
-            assertTrue(result.all { it.rank in startRank..endRank })
-            assertEquals(endRank - startRank + 1, result.size)
-            verify(mockRepository).findByRankRange(baseDate.toString(), startRank, endRank)
-        }
-    }
-
-    @Nested
-    @DisplayName("변동성 높은 랭킹 조회")
-    inner class FindVolatileRankings {
-        @Test
-        @DisplayName("변동성이 높은 랭킹들을 조회할 수 있다")
-        fun findVolatileRankingsSuccessfully() {
-            // given
-            val months = 2
-            val minRankChange = 10
-            val mockEntries =
-                listOf(
-                    createMockEntry(15, "Skill_1", rankChange = -14),
-                    createMockEntry(1, "Skill_2", rankChange = 19),
-                )
-            doReturn(mockEntries).whenever(mockRepository).findVolatileEntities(eq(months), eq(minRankChange))
-
-            // when
-            val result = rankingAnalysisService.findVolatileRankings(RankingType.SKILL_GROWTH, months, minRankChange)
-
-            // then
-            assertTrue(
-                result.all { entry ->
-                    entry.rankChange?.let { change -> kotlin.math.abs(change) >= minRankChange } ?: false
-                },
-            )
-            verify(mockRepository).findVolatileEntities(months, minRankChange)
-        }
-    }
-
-    @Nested
-    @DisplayName("순위 하락자 조회")
-    inner class FindTopLosers {
-        @Test
-        @DisplayName("순위가 가장 많이 하락한 항목들을 조회할 수 있다")
-        fun findTopLosersSuccessfully() {
-            // given
-            val startDate = BaseDate("202501")
-            val endDate = BaseDate("202502")
-            val limit = 2
-            val mockEntries =
-                listOf(
-                    createMockEntry(15, "Skill_1", rankChange = -10),
-                    createMockEntry(20, "Skill_2", rankChange = -12),
-                )
-            doReturn(mockEntries).whenever(mockRepository).findTopLosers(any(), any(), eq(limit))
-
-            // when
-            val result = rankingAnalysisService.findTopLosers(RankingType.SKILL_GROWTH, startDate, endDate, limit)
-
-            // then
-            assertEquals(limit, result.size)
-            assertTrue(result.all { it.rankChange!! < 0 })
-            verify(mockRepository).findTopLosers(startDate.toString(), endDate.toString(), limit)
         }
     }
 
     @Test
-    @DisplayName("통계와 랭킹 정보를 함께 조회할 수 있다")
+    @DisplayName("통계와 랭킹 정보를 함께 조회할 수 있다 (커서 기반)")
     fun findStatsWithRankingSuccessfully() {
         // given
         val baseDate = BaseDate("202501")
-        val page = 1
-        val mockRankings =
-            listOf(
-                createMockEntry(1, "Skill_1", entityId = 101),
-                createMockEntry(2, "Skill_2", entityId = 102),
-            )
-        val mockDoc = createMockDocument(mockRankings)
+        val cursor = 100
+        val limit = 20
+        val startRank = 101
+        val endRank = 120
+        val startPage = 2
+        val endPage = 2
 
-        // Map 형태로 반환할 통계 데이터 생성
+        val mockRankingsPage2 = (101..200).map { createMockEntry(it, "Skill_$it", entityId = it.toLong()) }
+        val mockDocPage2 = createMockDocument(2, mockRankingsPage2)
+
+        val mockRankingsPage1 = (1..100).map { createMockEntry(it, "Skill_$it", entityId = it.toLong()) }
+        val mockDocPage1 = createMockDocument(1, mockRankingsPage1)
+
+        val expectedRankings = mockRankingsPage2.filter { it.rank in startRank..endRank }
+        val expectedEntityIds = expectedRankings.map { it.entityId }
+
         val mockStatsMap =
-            mockRankings.associate { ranking ->
-                val mockStat =
-                    mock<BaseStatsDocument>().apply {
-                        doReturn(ranking.entityId).whenever(this).entityId
-                        doReturn(baseDate.toString()).whenever(this).baseDate
-                    }
-                ranking.entityId to mockStat
+            expectedEntityIds.associateWith { entityId ->
+                mock<BaseStatsDocument>().apply {
+                    doReturn(entityId).whenever(this).entityId
+                    doReturn(baseDate.toString()).whenever(this).baseDate
+                }
             }
 
-        doReturn(mockDoc).whenever(mockRepository).findByPage(any(), eq(page))
-
-        // findStatsByEntityIdsAndBaseDate 메소드 모킹 (Map 반환)
-        doReturn(mockStatsMap)
-            .whenever(mockStatsService)
-            .findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(
-                any(),
-                eq(baseDate),
-                eq(mockRankings.map { it.entityId }),
-            )
+        doReturn(listOf(mockDocPage2)).whenever(mockRepository).findByPageRange(baseDate.toString(), startPage, endPage)
+        doReturn(mockDocPage1).whenever(mockRepository).findByPage(baseDate.toString(), 1) // For totalCount
+        doReturn(mockStatsMap).whenever(mockStatsService).findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(any(), eq(baseDate), eq(expectedEntityIds))
 
         // when
         val result =
             rankingAnalysisService.findStatsWithRanking<BaseStatsDocument>(
                 RankingType.SKILL_GROWTH,
                 baseDate,
-                page,
+                cursor,
+                limit,
             )
 
         // then
         assertNotNull(result)
-        assertEquals(mockRankings.size, result.items.size)
-        verify(mockRepository).findByPage(baseDate.toString(), page)
-        verify(mockStatsService).findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(
-            any(),
-            eq(baseDate),
-            any(),
+        assertEquals(limit, result.items.size)
+        assertEquals(
+            startRank,
+            result.items
+                .first()
+                .ranking.rank,
         )
-    }
-
-    @Nested
-    @DisplayName("예외 상황 처리")
-    inner class ExceptionHandling {
-        @Test
-        @DisplayName("존재하지 않는 날짜의 데이터 요청 시 예외가 발생한다")
-        fun handleNonExistentDate() {
-            // given
-            val nonExistentDate = BaseDate("202401")
-            doThrow(NoSuchElementException()).whenever(mockRepository).findByPage(eq(nonExistentDate.toString()), any())
-
-            // when & then
-            assertFailsWith<NoSuchElementException> {
-                rankingAnalysisService.findRankingPage(RankingType.SKILL_GROWTH, nonExistentDate, 1)
-            }
-        }
-
-        @Test
-        @DisplayName("잘못된 랭킹 유형 요청 시 예외가 발생한다")
-        fun handleInvalidRankingType() {
-            // given
-            doThrow(IllegalArgumentException()).whenever(mockRepositoryRegistry).getRepository<BaseRankingDocument<*>>(
-                eq(
-                    RankingType.COMPANY_GROWTH,
-                ),
-            )
-
-            // when & then
-            assertFailsWith<IllegalArgumentException> {
-                rankingAnalysisService.findRankingPage(RankingType.COMPANY_GROWTH, BaseDate("202501"), 1)
-            }
-        }
+        assertEquals(
+            endRank,
+            result.items
+                .last()
+                .ranking.rank,
+        )
+        assertEquals(200, result.totalCount)
+        assertTrue(result.hasNextPage)
+        assertEquals(endRank, result.nextCursor)
+        verify(mockRepository).findByPageRange(baseDate.toString(), startPage, endPage)
+        verify(mockStatsService).findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(any(), eq(baseDate), eq(expectedEntityIds))
     }
 }

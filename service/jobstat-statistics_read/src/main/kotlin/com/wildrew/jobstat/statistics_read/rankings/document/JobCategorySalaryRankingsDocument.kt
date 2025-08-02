@@ -16,13 +16,13 @@ class JobCategorySalaryRankingsDocument(
     @Field("metrics") override val metrics: JobCategorySalaryMetrics,
     @Field("rankings") override val rankings: List<JobCategorySalaryRankingEntry>,
 ) : SimpleRankingDocument<JobCategorySalaryRankingsDocument.JobCategorySalaryRankingEntry>(
-    id,
-    baseDate,
-    period,
-    metrics,
-    rankings,
-    page,
-) {
+        id,
+        baseDate,
+        period,
+        metrics,
+        rankings,
+        page,
+    ) {
     data class JobCategorySalaryMetrics(
         @Field("total_count") override val totalCount: Int,
         @Field("ranked_count") override val rankedCount: Int,

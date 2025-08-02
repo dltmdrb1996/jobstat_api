@@ -4,10 +4,10 @@ import com.mongodb.client.model.Accumulators
 import com.mongodb.client.model.Aggregates
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
-import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
-import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepository
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.SimpleRankingRepositoryImpl
 import com.wildrew.jobstat.statistics_read.rankings.document.CompanySalaryRankingsDocument
+import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.RankingType
 import org.bson.Document
 import org.springframework.data.mongodb.core.MongoOperations
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
@@ -15,8 +15,7 @@ import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.stereotype.Repository
 
 @NoRepositoryBean
-interface CompanySalaryRankingsRepository
-    : SimpleRankingRepository<CompanySalaryRankingsDocument, CompanySalaryRankingsDocument.CompanySalaryRankingEntry, String> {
+interface CompanySalaryRankingsRepository : SimpleRankingRepository<CompanySalaryRankingsDocument, CompanySalaryRankingsDocument.CompanySalaryRankingEntry, String> {
     // 산업별 급여 분포 분석
     fun findCompaniesAboveIndustryMedian(
         baseDate: String,

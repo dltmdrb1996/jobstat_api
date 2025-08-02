@@ -37,4 +37,3 @@ enum class EntityType(
                 ?: throw IllegalArgumentException("Invalid entity type code: $code")
     }
 }
-

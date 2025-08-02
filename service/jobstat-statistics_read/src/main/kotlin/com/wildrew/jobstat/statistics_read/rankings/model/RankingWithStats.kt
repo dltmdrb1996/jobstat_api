@@ -7,6 +7,7 @@ data class RakingWithStatsPage<T : BaseStatsDocument>(
     val items: List<RankingWithStats<T>>,
     val totalCount: Int,
     val hasNextPage: Boolean,
+    val nextCursor: Int?,
 )
 
 data class RankingWithStats<T : Any>(

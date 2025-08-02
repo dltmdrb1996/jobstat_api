@@ -14,11 +14,12 @@ class RankingRepositoryRegistry(
 
     private fun initializeRepositoryMap(repositories: List<BaseRankingRepository<*, *, *>>): Map<RankingType, BaseRankingRepository<*, *, *>> =
         repositories.associateBy { repo ->
-            val actualClass = if (repo.javaClass.name.contains("SpringCGLIB")) {
-                repo.javaClass.superclass.kotlin
-            } else {
-                repo.javaClass.kotlin
-            }
+            val actualClass =
+                if (repo.javaClass.name.contains("SpringCGLIB")) {
+                    repo.javaClass.superclass.kotlin
+                } else {
+                    repo.javaClass.kotlin
+                }
             actualClass.findAnnotation<RankingRepositoryType>()?.type
                 ?: throw IllegalArgumentException("RankingRepositoryType annotation not found on ${repo.javaClass.simpleName}")
         }
