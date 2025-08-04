@@ -56,7 +56,7 @@ class RankingAnalysisServiceTest {
 
         val mockMetrics =
             object : RankingMetrics {
-                override val totalCount: Int = 200 // 2 pages
+                override val totalCount: Int = 200
                 override val rankedCount: Int = 200
                 override val newEntries: Int = 0
                 override val droppedEntries: Int = 0
@@ -72,7 +72,6 @@ class RankingAnalysisServiceTest {
             page = page,
         ) {
             override fun validate() {
-                // 테스트용 mock이므로 validation 생략
             }
         }
     }
@@ -91,7 +90,7 @@ class RankingAnalysisServiceTest {
             override val rank = rank
             override val previousRank = rankChange?.let { rank - it }
             override val rankChange = rankChange
-            override val valueChange: Double = 0.0 // 기본값으로 추가
+            override val valueChange: Double = 0.0
         }
 
     private fun createSnapshotPeriod(): SnapshotPeriod =
@@ -106,7 +105,6 @@ class RankingAnalysisServiceTest {
         @Test
         @DisplayName("정상적으로 랭킹 페이지를 조회할 수 있다")
         fun findRankingPageSuccessfully() {
-            // given
             val baseDate = BaseDate("202501")
             val page = 1
             val mockDoc =
@@ -119,10 +117,8 @@ class RankingAnalysisServiceTest {
                 )
             doReturn(mockDoc).whenever(mockRepository).findByPage(any(), eq(page))
 
-            // when
             val result = rankingAnalysisService.findRankingPage(RankingType.SKILL_GROWTH, baseDate, page)
 
-            // then
             assertEquals("Skill_1", result.items.data[0].name)
             assertEquals(RankingType.SKILL_GROWTH, result.items.type)
             assertEquals(200, result.rankedCount)
@@ -134,7 +130,6 @@ class RankingAnalysisServiceTest {
     @Test
     @DisplayName("통계와 랭킹 정보를 함께 조회할 수 있다 (커서 기반)")
     fun findStatsWithRankingSuccessfully() {
-        // given
         val baseDate = BaseDate("202501")
         val cursor = 100
         val limit = 20
@@ -161,10 +156,9 @@ class RankingAnalysisServiceTest {
             }
 
         doReturn(listOf(mockDocPage2)).whenever(mockRepository).findByPageRange(baseDate.toString(), startPage, endPage)
-        doReturn(mockDocPage1).whenever(mockRepository).findByPage(baseDate.toString(), 1) // For totalCount
+        doReturn(mockDocPage1).whenever(mockRepository).findByPage(baseDate.toString(), 1)
         doReturn(mockStatsMap).whenever(mockStatsService).findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(any(), eq(baseDate), eq(expectedEntityIds))
 
-        // when
         val result =
             rankingAnalysisService.findStatsWithRanking<BaseStatsDocument>(
                 RankingType.SKILL_GROWTH,
@@ -173,7 +167,6 @@ class RankingAnalysisServiceTest {
                 limit,
             )
 
-        // then
         assertNotNull(result)
         assertEquals(limit, result.items.size)
         assertEquals(

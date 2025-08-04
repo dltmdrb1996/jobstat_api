@@ -152,7 +152,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                         valueChange = Random.nextDouble(-5.0, 5.0),
                         rankingScore =
                             when (type) {
-                                // 채용공고 수 관련 랭킹
                                 RankingType.SKILL_POSTING_COUNT,
                                 RankingType.JOB_CATEGORY_POSTING_COUNT,
                                 RankingType.INDUSTRY_POSTING_COUNT,
@@ -172,7 +171,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                                         activePostings = activePostingCount,
                                     )
 
-                                // 급여 관련 랭킹
                                 RankingType.SKILL_SALARY,
                                 RankingType.JOB_CATEGORY_SALARY,
                                 RankingType.INDUSTRY_SALARY,
@@ -189,7 +187,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                                         medianSalary = avgSalary + Random.nextLong(-5000, 5000),
                                     )
 
-                                // 성장률 관련 랭킹
                                 RankingType.SKILL_GROWTH,
                                 RankingType.JOB_CATEGORY_GROWTH,
                                 RankingType.INDUSTRY_GROWTH,
@@ -203,7 +200,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                                         consistencyScore = Random.nextDouble(0.0, 1.0),
                                     )
 
-                                // 수요도/선호도 관련 랭킹
                                 RankingType.SKILL_COMPETITION_RATE,
                                 RankingType.JOB_CATEGORY_SKILL,
                                 RankingType.INDUSTRY_SKILL,
@@ -216,7 +212,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                                         marketDemand = Random.nextDouble(0.0, 1.0),
                                     )
 
-                                // 회사 관련 특수 랭킹
                                 RankingType.COMPANY_RETENTION_RATE ->
                                     CompanyWorkLifeBalanceScore(
                                         value = Random.nextDouble(0.0, 100.0),
@@ -226,7 +221,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                                         remoteWorkScore = Random.nextDouble(0.0, 1.0),
                                     )
 
-                                // 복리후생 관련 랭킹
                                 RankingType.COMPANY_SIZE_BENEFIT,
                                 RankingType.COMPANY_BENEFIT_COUNT,
                                 ->
@@ -238,7 +232,6 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                                         remoteWorkScore = Random.nextDouble(0.0, 1.0),
                                     )
 
-                                // 교육/학력 관련 랭킹
                                 RankingType.COMPANY_SIZE_EDUCATION ->
                                     EntryLevelFriendlinessScore(
                                         value = Random.nextDouble(0.0, 100.0),
@@ -437,7 +430,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
         log.debug("results: ${results.joinToString { it.toString() }}")
         Assertions.assertTrue(results.isNotEmpty())
         Assertions.assertTrue(results.size <= limit)
-        // Verify growth rates are in descending order
+
         val growthRates = results.map { it.stats.growthRate }
         Assertions.assertEquals(growthRates, growthRates.sortedDescending())
 
@@ -516,7 +509,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                 doc.relatedJobCategories.any { it.jobCategoryId == jobCategoryId }
             },
         )
-        // Verify importance scores are in descending order
+
         val scores =
             results.map { doc ->
                 doc.relatedJobCategories.first { it.jobCategoryId == jobCategoryId }.importanceScore
@@ -572,7 +565,7 @@ class StatsMongoRepositoryIntegrationTest : BatchOperationTestSupport() {
                     doc.industryDistribution.any { it.industryId == industryId }
             },
         )
-        // Verify growth rates are in descending order
+
         val growthRates = results.map { it.stats.growthRate }
         Assertions.assertEquals(growthRates, growthRates.sortedDescending())
 

@@ -9,20 +9,17 @@ import org.springframework.data.repository.NoRepositoryBean
 
 @NoRepositoryBean
 interface SimpleRankingRepository<T : SimpleRankingDocument<E>, E : SimpleRankingDocument.SimpleRankingEntry, ID : Any> : BaseRankingRepository<T, E, ID> {
-    // Value(score) 범위 기반 검색
     fun findByValueRange(
         baseDate: String,
         minValue: Double,
         maxValue: Double,
     ): List<E>
 
-    // Rank 변화량 기반 Rising Stars 검색
     fun findRisingStars(
         months: Int,
         minRankImprovement: Int,
     ): List<E>
 
-    // 특정 baseDate의 entityId로 조회
     fun findByEntityIdAndBaseDate(
         entityId: Long,
         baseDate: String,

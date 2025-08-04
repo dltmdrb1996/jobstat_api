@@ -106,8 +106,8 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         val weights =
             educationLevels.associateWith { category ->
                 when (category) {
-                    dominantCategory -> Random.nextDouble(0.6, 0.8) // 매우 높은 비중
-                    else -> Random.nextDouble(0.05, 0.1) // 매우 낮은 비중
+                    dominantCategory -> Random.nextDouble(0.6, 0.8)
+                    else -> Random.nextDouble(0.05, 0.1)
                 }
             }
 
@@ -274,7 +274,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(1)
     @DisplayName("분포 패턴과 유사한 데이터를 찾을 수 있다")
     fun `findByDistributionPattern - should find similar distributions`() {
-        // given
         val baseDate = BaseDate("202401")
         val pattern =
             mapOf(
@@ -284,10 +283,8 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
             )
         val threshold = 0.7
 
-        // when
         val results = companySizeEducationRepository.findByDistributionPattern(baseDate, pattern, threshold)
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one matching distribution")
 
@@ -304,14 +301,11 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(2)
     @DisplayName("지정된 주요 카테고리를 가진 데이터를 찾을 수 있다")
     fun `findByDominantCategory - should find entries with specified dominant category`() {
-        // given
         val baseDate = BaseDate("202401")
         val category = "BACHELOR"
 
-        // when
         val results = companySizeEducationRepository.findByDominantCategory(baseDate, category)
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one matching entry")
 
@@ -328,7 +322,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(3)
     @DisplayName("분포 트렌드를 조회할 수 있다")
     fun `findDistributionTrends - should return distribution history`() {
-        // given
         val entityId =
             allRecords
                 .first()
@@ -337,10 +330,8 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
                 .entityId
         val months = 2
 
-        // when
         val results = companySizeEducationRepository.findDistributionTrends(entityId, months)
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one trend entry")
         assertTrue(results.size <= months, "Should not exceed specified months")
@@ -356,14 +347,11 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(4)
     @DisplayName("중요한 분포 변화를 식별할 수 있다")
     fun `findSignificantDistributionChanges - should identify major changes`() {
-        // given
         val startDate = BaseDate("202401")
         val endDate = BaseDate("202402")
 
-        // when
         val results = companySizeEducationRepository.findSignificantDistributionChanges(startDate, endDate)
 
-        // then
         assertNotNull(results)
         results.forEach { entry ->
             val distributionChange = entry.rankChange
@@ -375,14 +363,11 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(5)
     @DisplayName("균일한 분포를 찾을 수 있다")
     fun `findUniformDistributions - should find distributions with low variance`() {
-        // given
         val baseDate = BaseDate("202401")
         val maxVariance = 0.3
 
-        // when
         val results = companySizeEducationRepository.findUniformDistributions(baseDate, maxVariance)
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one uniform distribution")
         results.forEach { entry ->
@@ -397,18 +382,14 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(6)
     @DisplayName("치우친 분포를 찾을 수 있다")
     fun `findSkewedDistributions - should find distributions with high concentration`() {
-        // given
         val baseDate = BaseDate("202401")
-        val minSkewness = 0.4 // 임계값을 더 현실적으로 조정
+        val minSkewness = 0.4
 
-        // 매우 치우친 분포를 가진 테스트 데이터 추가
         val skewedDocument = createTestDocument("202401", 1, true)
         companySizeEducationRepository.save(skewedDocument)
 
-        // when
         val results = companySizeEducationRepository.findSkewedDistributions(baseDate, minSkewness)
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one skewed distribution")
 
@@ -419,7 +400,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
                 "Each result should have concentration >= $minSkewness (actual: $concentration)",
             )
 
-            // 실제 분포 검증
             val maxValue = entry.distribution.values.maxOrNull() ?: 0.0
             assertTrue(
                 maxValue >= minSkewness,
@@ -432,12 +412,10 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(7)
     @DisplayName("유사한 분포를 찾을 수 있다")
     fun `findSimilarDistributions - should find distributions similar to target`() {
-        // given
         val baseDate = BaseDate("202401")
         val targetEntity = allRecords.first().rankings.first()
-        val similarity = 0.75 // 임계값을 좀 더 현실적으로 조정
+        val similarity = 0.75
 
-        // when
         val results =
             companySizeEducationRepository.findSimilarDistributions(
                 targetEntity.entityId,
@@ -445,7 +423,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
                 similarity,
             )
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one similar distribution")
         assertFalse(
@@ -470,7 +447,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(8)
     @DisplayName("시간에 따른 분포 변화를 추적할 수 있다")
     fun `findDistributionChanges - should track distribution changes over time`() {
-        // given
         val entityId =
             allRecords
                 .first()
@@ -479,15 +455,12 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
                 .entityId
         val months = 2
 
-        // when
         val results = companySizeEducationRepository.findDistributionChanges(entityId, months)
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one change record")
         assertTrue(results.size <= months, "Should not exceed specified months")
 
-        // Verify results are ordered by date descending
         val dates = results.map { it.baseDate }
         assertEquals(dates.sortedDescending(), dates, "Results should be ordered by date descending")
     }
@@ -496,12 +469,10 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(9)
     @DisplayName("카테고리 우세도를 찾을 수 있다")
     fun `findCategoryDominance - should find entries with high category percentage`() {
-        // given
         val baseDate = BaseDate("202401")
         val category = "BACHELOR"
         val minPercentage = 0.4
 
-        // when
         val results =
             companySizeEducationRepository.findCategoryDominance(
                 baseDate,
@@ -509,7 +480,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
                 minPercentage,
             )
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty(), "Should find at least one dominant entry")
 
@@ -520,7 +490,6 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
             )
         }
 
-        // Verify results are sorted by category percentage
         val percentages = results.map { it.distribution[category] ?: 0.0 }
         assertEquals(
             percentages.sortedDescending(),
@@ -536,26 +505,21 @@ class DistributionRankingRepositoryIntegrationTest : BatchOperationTestSupport()
         val startTime = System.currentTimeMillis()
         val baseDate = BaseDate("202401")
 
-        // Test various operations with timing
         val performanceMetrics = mutableMapOf<String, Double>()
 
-        // Test findByDistributionPattern
         measureOperation("find_by_pattern") {
             val pattern = mapOf("BACHELOR" to 0.5, "MASTER" to 0.3)
             companySizeEducationRepository.findByDistributionPattern(baseDate, pattern, 0.7)
         }?.let { performanceMetrics["find_by_pattern"] = it }
 
-        // Test findByDominantCategory
         measureOperation("find_by_dominant") {
             companySizeEducationRepository.findByDominantCategory(baseDate, "BACHELOR")
         }?.let { performanceMetrics["find_by_dominant"] = it }
 
-        // Test findUniformDistributions
         measureOperation("find_uniform") {
             companySizeEducationRepository.findUniformDistributions(baseDate, 0.3)
         }?.let { performanceMetrics["find_uniform"] = it }
 
-        // Verify performance metrics
         performanceMetrics.forEach { (operation, time) ->
             assertTrue(
                 time <

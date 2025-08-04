@@ -90,9 +90,9 @@ class JobCategoryPostingCountRankingsDocument(
             @Field("application_rate")
             val applicationRate: Double,
             @Field("time_to_fill")
-            val timeToFill: Double, // 평균 채용 소요 기간
+            val timeToFill: Double,
             @Field("competition_rate")
-            val competitionRate: Double, // 지원자 대비 채용 비율
+            val competitionRate: Double,
         )
     }
 

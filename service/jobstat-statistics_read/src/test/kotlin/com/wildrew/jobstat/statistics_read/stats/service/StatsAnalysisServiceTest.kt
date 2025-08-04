@@ -146,7 +146,6 @@ class StatsAnalysisServiceTest {
                         valueChange = random.nextDouble(-5.0, 5.0),
                         rankingScore =
                             when (type) {
-                                // 채용공고 수 관련 랭킹
                                 RankingType.SKILL_POSTING_COUNT,
                                 RankingType.JOB_CATEGORY_POSTING_COUNT,
                                 RankingType.INDUSTRY_POSTING_COUNT,
@@ -166,7 +165,6 @@ class StatsAnalysisServiceTest {
                                         activePostings = activePostingCount,
                                     )
 
-                                // 급여 관련 랭킹
                                 RankingType.SKILL_SALARY,
                                 RankingType.JOB_CATEGORY_SALARY,
                                 RankingType.INDUSTRY_SALARY,
@@ -183,7 +181,6 @@ class StatsAnalysisServiceTest {
                                         medianSalary = avgSalary + random.nextLong(-5000, 5000),
                                     )
 
-                                // 성장률 관련 랭킹
                                 RankingType.SKILL_GROWTH,
                                 RankingType.JOB_CATEGORY_GROWTH,
                                 RankingType.INDUSTRY_GROWTH,
@@ -197,7 +194,6 @@ class StatsAnalysisServiceTest {
                                         consistencyScore = random.nextDouble(0.0, 1.0),
                                     )
 
-                                // 수요도/선호도 관련 랭킹
                                 RankingType.SKILL_COMPETITION_RATE,
                                 RankingType.JOB_CATEGORY_SKILL,
                                 RankingType.INDUSTRY_SKILL,
@@ -210,7 +206,6 @@ class StatsAnalysisServiceTest {
                                         marketDemand = random.nextDouble(0.0, 1.0),
                                     )
 
-                                // 회사 관련 특수 랭킹
                                 RankingType.COMPANY_RETENTION_RATE ->
                                     CompanyWorkLifeBalanceScore(
                                         value = random.nextDouble(0.0, 100.0),
@@ -220,7 +215,6 @@ class StatsAnalysisServiceTest {
                                         remoteWorkScore = random.nextDouble(0.0, 1.0),
                                     )
 
-                                // 복리후생 관련 랭킹
                                 RankingType.COMPANY_SIZE_BENEFIT,
                                 RankingType.COMPANY_BENEFIT_COUNT,
                                 ->
@@ -232,7 +226,6 @@ class StatsAnalysisServiceTest {
                                         remoteWorkScore = random.nextDouble(0.0, 1.0),
                                     )
 
-                                // 교육/학력 관련 랭킹
                                 RankingType.COMPANY_SIZE_EDUCATION ->
                                     EntryLevelFriendlinessScore(
                                         value = random.nextDouble(0.0, 100.0),
@@ -252,7 +245,6 @@ class StatsAnalysisServiceTest {
         @Test
         @DisplayName("정상적으로 통계를 조회할 수 있다")
         fun findStatsSuccessfully() {
-            // given
             val statsType = StatsType.SKILL
             val baseDate = BaseDate("202501")
             val entityId = 1L
@@ -262,7 +254,6 @@ class StatsAnalysisServiceTest {
                 .`when`(mockRepository)
                 .findByEntityIdAndBaseDate(eq(entityId), eq(baseDate))
 
-            // when
             val result =
                 statsAnalysisService.findStatsByEntityIdAndBaseDate<SkillStatsDocument>(
                     statsType,
@@ -270,7 +261,6 @@ class StatsAnalysisServiceTest {
                     entityId,
                 )
 
-            // then
             assertNotNull(result)
             assertEquals(entityId, result.entityId)
             assertEquals(baseDate.toString(), result.baseDate)
@@ -284,7 +274,6 @@ class StatsAnalysisServiceTest {
         @Test
         @DisplayName("정상적으로 여러 엔티티의 통계를 조회할 수 있다")
         fun findStatsByEntityIdsSuccessfully() {
-            // given
             val statsType = StatsType.SKILL
             val baseDate = BaseDate("202501")
             val entityIds = listOf(1L, 2L, 3L)
@@ -297,7 +286,6 @@ class StatsAnalysisServiceTest {
                 .`when`(mockRepository)
                 .findByBaseDateAndEntityIds(eq(baseDate), eq(entityIds))
 
-            // when
             val result =
                 statsAnalysisService.findStatsByEntityIds<SkillStatsDocument>(
                     statsType,
@@ -305,7 +293,6 @@ class StatsAnalysisServiceTest {
                     entityIds,
                 )
 
-            // then
             assertEquals(entityIds.size, result.size)
             assertTrue(result.map { it.entityId }.containsAll(entityIds))
             verify(mockRepository).findByBaseDateAndEntityIds(eq(baseDate), eq(entityIds))
@@ -314,12 +301,10 @@ class StatsAnalysisServiceTest {
         @Test
         @DisplayName("엔티티 ID 리스트가 비어있을 경우 빈 리스트를 반환한다")
         fun returnEmptyListWhenEntityIdsIsEmpty() {
-            // given
             val statsType = StatsType.SKILL
             val baseDate = BaseDate("202501")
             val entityIds = emptyList<Long>()
 
-            // when
             val result =
                 statsAnalysisService.findStatsByEntityIds<SkillStatsDocument>(
                     statsType,
@@ -327,7 +312,6 @@ class StatsAnalysisServiceTest {
                     entityIds,
                 )
 
-            // then
             assertTrue(result.isEmpty())
             verify(mockRepository, never()).findByBaseDateAndEntityIds(any(), any())
         }
@@ -339,7 +323,6 @@ class StatsAnalysisServiceTest {
         @Test
         @DisplayName("정상적으로 최신 통계를 조회할 수 있다")
         fun findLatestStatsSuccessfully() {
-            // given
             val statsType = StatsType.SKILL
             val entityId = 1L
             val mockStats = createSkillStatsDocument(entityId, "202412")
@@ -348,14 +331,12 @@ class StatsAnalysisServiceTest {
                 .`when`(mockRepository)
                 .findLatestStatsByEntityId(eq(entityId))
 
-            // when
             val result =
                 statsAnalysisService.findLatestStats<SkillStatsDocument>(
                     statsType,
                     entityId,
                 )
 
-            // then
             assertNotNull(result)
             assertEquals(entityId, result.entityId)
             verify(mockRepository).findLatestStatsByEntityId(eq(entityId))
@@ -368,7 +349,6 @@ class StatsAnalysisServiceTest {
         @Test
         @DisplayName("정상적으로 엔티티의 모든 통계를 조회할 수 있다")
         fun findStatsByEntityIdSuccessfully() {
-            // given
             val statsType = StatsType.SKILL
             val entityId = 1L
             val mockStats =
@@ -381,14 +361,12 @@ class StatsAnalysisServiceTest {
                 .`when`(mockRepository)
                 .findByEntityId(eq(entityId))
 
-            // when
             val result =
                 statsAnalysisService.findStatsByEntityId<SkillStatsDocument>(
                     statsType,
                     entityId,
                 )
 
-            // then
             assertNotNull(result)
             assertTrue(result!!.all { it.entityId == entityId })
             assertEquals(2, result.size)

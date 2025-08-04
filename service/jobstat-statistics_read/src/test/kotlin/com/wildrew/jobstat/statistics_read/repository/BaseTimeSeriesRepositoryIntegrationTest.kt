@@ -33,7 +33,7 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
     @BeforeEach
     override fun setup() {
-        cleanupTestData() // Clean up before each test
+        cleanupTestData()
         allRecords.clear()
         val baseDates = (1..12).map { "2024${it.toString().padStart(2, '0')}" }
         baseDates.forEach { baseDate ->
@@ -53,7 +53,6 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
 
         val startDate = Instant.parse("$year-${month.toString().padStart(2, '0')}-01T00:00:00Z")
 
-        // 다음 달의 첫날을 구한 후 1초를 빼서 해당 월의 마지막 날 23:59:59로 설정
         val nextMonth =
             if (month == 12) {
                 "${year + 1}-01-01T00:00:00Z"
@@ -233,16 +232,13 @@ class BaseTimeSeriesRepositoryIntegrationTest : BatchOperationTestSupport() {
     @Order(7)
     @DisplayName("대량의 데이터를 삭제할 수 있다")
     fun testBulkDelete() {
-        // given
         val recordsToInsert = (1..5).map { createRandomDocument("202501") }
         val insertedRecords = testTimeSeriesRepository.bulkInsert(recordsToInsert)
         val recordIds = insertedRecords.mapNotNull { it.id }
         Assertions.assertFalse(recordIds.isEmpty())
 
-        // when
         val deletedCount = testTimeSeriesRepository.bulkDelete(recordIds)
 
-        // then
         Assertions.assertEquals(recordIds.size, deletedCount)
         val remainingRecords = testTimeSeriesRepository.findAllByQuery(Query())
         Assertions.assertTrue(remainingRecords.none { it.id in recordIds })

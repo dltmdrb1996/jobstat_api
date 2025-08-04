@@ -16,7 +16,6 @@ import java.util.*
 class StatisticsReadServiceApplication
 
 fun main(args: Array<String>) {
-    // JVM 전체에 대한 기본 시간대 설정
     TimeZone.setDefault(TimeZone.getTimeZone(KOREA_TIME_ZONE_ID))
     System.setProperty("user.timezone", KOREA_TIME_ZONE_ID)
 

@@ -9,13 +9,12 @@ abstract class IdFixture<T : BaseEntity> : TestFixture<T> {
         entity: T,
         newId: Long,
     ) {
-        // entity의 실제 클래스에서 시작하여 상위 클래스로 올라가며 'id' 필드를 찾음
         val idField = findFieldRecursive(entity::class.java, "id")
 
         if (idField != null) {
             try {
-                idField.isAccessible = true // 접근 제한자 무시 설정
-                idField.set(entity, newId) // entity 객체의 필드 값 변경
+                idField.isAccessible = true
+                idField.set(entity, newId)
             } catch (e: IllegalAccessException) {
                 System.err.println("Error setting ID via reflection (Illegal Access) for ${entity::class.java.name}: ${e.message}")
                 throw RuntimeException("Failed to set ID for ${entity::class.java.name} due to access restrictions", e)

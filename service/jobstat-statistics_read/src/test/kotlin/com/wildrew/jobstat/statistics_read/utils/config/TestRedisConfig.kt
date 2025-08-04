@@ -8,21 +8,20 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 
 @TestConfiguration
-@Testcontainers // Testcontainers 활성화
+@Testcontainers
 class TestRedisConfig {
     companion object {
         private val log = LoggerFactory.getLogger(TestRedisConfig::class.java)
-        private const val REDIS_IMAGE = "redis:7-alpine" // 사용할 Redis 이미지 지정 (버전 변경 가능)
+        private const val REDIS_IMAGE = "redis:7-alpine"
         const val REDIS_PORT = 6379
 
-        @Container // Testcontainers가 관리할 컨테이너임을 명시
+        @Container
         val redisContainer =
             GenericContainer(
                 DockerImageName.parse(REDIS_IMAGE),
-            ).withExposedPorts(REDIS_PORT) // Redis 기본 포트 노출
-                .withReuse(true) // 컨테이너 재사용 설정 (선택 사항)
+            ).withExposedPorts(REDIS_PORT)
+                .withReuse(true)
 
-        // 클래스 로딩 시점에 컨테이너 시작
         init {
             try {
                 if (!redisContainer.isRunning) {

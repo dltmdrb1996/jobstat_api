@@ -39,12 +39,6 @@ class UserDashboardConfigRepositoryImpl(
 ) : BaseMongoRepositoryImpl<UserDashboardConfigDocument, String>(entityInformation, mongoOperations),
     UserDashboardConfigRepository {
     init {
-//        mongoOperations.indexOps(entityInformation.javaType).ensureIndex(
-//            Index()
-//                .on("user_id", Sort.Direction.ASC)
-//                .unique()
-//                .background()
-//        )
     }
 
     override fun findByUserId(userId: Long): UserDashboardConfigDocument? {

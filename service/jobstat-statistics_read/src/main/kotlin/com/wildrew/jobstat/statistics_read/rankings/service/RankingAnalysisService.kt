@@ -30,7 +30,6 @@ interface RankingAnalysisService {
         limit: Int,
     ): RakingWithStatsPage<T>
 
-    // ... (기존 다른 public 메소드들은 유지)
     fun findRankingPage(
         rankingType: RankingType,
         baseDate: BaseDate,
@@ -145,7 +144,7 @@ class RankingAnalysisServiceImpl(
                 .findByPageRange(baseDate.toString(), startPage, endPage)
                 .flatMap { it.rankings }
                 .filter { it.rank in startRank..endRank }
-                .take(limit) // limit을 초과하는 경우 방지
+                .take(limit)
 
         if (rankings.isEmpty()) {
             return PureRankingPage(emptyList(), 0, false, null)
@@ -164,7 +163,6 @@ class RankingAnalysisServiceImpl(
         )
     }
 
-    // ... (기존 다른 public 메소드 구현은 그대로 유지)
     override fun findRankingPage(
         rankingType: RankingType,
         baseDate: BaseDate,

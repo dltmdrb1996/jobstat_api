@@ -256,7 +256,7 @@ abstract class StatsMongoRepositoryImpl<T : BaseStatsDocument, ID : Any>(
                     Filters.gte("base_date", startDate.toString()),
                     Filters.lte("base_date", endDate.toString()),
                 ),
-            ).sort(Sorts.ascending("base_date")) // 기간 조회는 과거->최신 정렬 필요
+            ).sort(Sorts.ascending("base_date"))
             .batchSize(OPTIMAL_BATCH_SIZE)
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()

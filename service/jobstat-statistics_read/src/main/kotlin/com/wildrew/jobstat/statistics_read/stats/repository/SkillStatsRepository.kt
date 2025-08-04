@@ -104,16 +104,6 @@ class SkillStatsRepositoryImpl(
         value: Double,
     ): Int {
         TODO()
-//        val collection = mongoOperations.getCollection(entityInformation.collectionName)
-//
-//        // 현재 value보다 큰 값을 가진 문서의 수를 계산
-//        return collection
-//            .countDocuments(
-//                Filters.and(
-//                    Filters.gt("rankings.${type.name}.value", value),
-//                    Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate())
-//                )
-//            ).toInt() + 1 // 1을 더해서 1-based rank 반환
     }
 
     override fun calculatePercentile(
@@ -121,57 +111,10 @@ class SkillStatsRepositoryImpl(
         value: Double,
     ): Double {
         TODO()
-//        val collection = mongoOperations.getCollection(entityInformation.collectionName)
-//
-//        // 전체 문서 수
-//        val totalCount = collection.countDocuments(
-//            Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate())
-//        ).toDouble()
-//
-//        // value보다 작거나 같은 값을 가진 문서의 수
-//        val belowCount = collection.countDocuments(
-//            Filters.and(
-//                Filters.lte("rankings.${type.name}.value", value),
-//                Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate())
-//            )
-//        ).toDouble()
-//
-//        return (belowCount / totalCount) * 100
     }
 
     override fun calculateMedianSalary(): Long {
         TODO()
-//        val collection = mongoOperations.getCollection(entityInformation.collectionName)
-//
-//        // 현재 기준 월의 모든 salary를 가져와서 중간값 계산
-//        val pipeline = listOf(
-//            Aggregates.match(
-//                Filters.eq("base_date", StatisticsCalculationUtil.calculateLastMonthDate())
-//            ),
-//            Aggregates.group(null, Accumulators.push("salaries", "\$stats.avg_salary")),
-//            Aggregates.project(
-//                Document(
-//                    "\$arrayElemAt",
-//                    listOf(
-//                        "\$salaries",
-//                        Document(
-//                            "\$floor",
-//                            Document(
-//                                "\$divide",
-//                                listOf(Document("\$size", "\$salaries"), 2)
-//                            )
-//                        )
-//                    )
-//                )
-//            )
-//        )
-//
-//        return collection
-//            .aggregate(pipeline)
-//            .firstOrNull()
-//            ?.getDouble("salary")
-//            ?.toLong()
-//            ?: 0L
     }
 
     override fun findByEntityIdAndBaseDateBetween(

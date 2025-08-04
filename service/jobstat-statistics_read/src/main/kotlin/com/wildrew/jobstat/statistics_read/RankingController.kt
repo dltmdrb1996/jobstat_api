@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/${RestConstants.Versions.V1}/rankings")
 @Tag(name = "순위", description = "각종 통계 순위 조회 관련 API")
 class RankingController(
-    // Heavy UseCases
     private val getSkillRankingWithStats: GetSkillRankingWithStats,
     private val getJobCategoryRankingWithStats: GetJobCategoryRankingWithStats,
     private val getIndustryRankingWithStats: GetIndustryRankingWithStats,
@@ -29,7 +28,6 @@ class RankingController(
     private val getCompanyRankingWithStats: GetCompanyRankingWithStats,
     private val getCertificationRankingWithStats: GetCertificationRankingWithStats,
     private val getEducationRankingWithStats: GetEducationRankingWithStats,
-    // Light UseCases
     private val getSkillRanking: GetSkillRanking,
     private val getJobCategoryRanking: GetJobCategoryRanking,
     private val getIndustryRanking: GetIndustryRanking,
@@ -43,7 +41,6 @@ class RankingController(
     private val getCertificationRanking: GetCertificationRanking,
     private val getEducationRanking: GetEducationRanking,
 ) {
-    // --- Skill ---
     @Public
     @GetMapping("/skills/{rankingType}/{baseDate}/stats")
     fun getSkillRankingsWithStats(
@@ -68,7 +65,6 @@ class RankingController(
         return ApiResponse.ok(getSkillRanking(req))
     }
 
-    // --- Job Category ---
     @Public
     @GetMapping("/category/{rankingType}/{baseDate}/stats")
     fun getJobCategoryRankingsWithStats(
@@ -93,7 +89,6 @@ class RankingController(
         return ApiResponse.ok(getJobCategoryRanking(req))
     }
 
-    // --- Industry ---
     @Public
     @GetMapping("/industry/{rankingType}/{baseDate}/stats")
     fun getIndustryRankingsWithStats(
@@ -118,7 +113,6 @@ class RankingController(
         return ApiResponse.ok(getIndustryRanking(req))
     }
 
-    // --- Location ---
     @Public
     @GetMapping("/location/{rankingType}/{baseDate}/stats")
     fun getLocationRankingsWithStats(
@@ -143,7 +137,6 @@ class RankingController(
         return ApiResponse.ok(getLocationRanking(req))
     }
 
-    // --- Benefit ---
     @Public
     @GetMapping("/benefit/{rankingType}/{baseDate}/stats")
     fun getBenefitRankingsWithStats(
@@ -168,7 +161,6 @@ class RankingController(
         return ApiResponse.ok(getBenefitRanking(req))
     }
 
-    // --- Company Size ---
     @Public
     @GetMapping("/company-size/{rankingType}/{baseDate}/stats")
     fun getCompanySizeRankingsWithStats(
@@ -193,7 +185,6 @@ class RankingController(
         return ApiResponse.ok(getCompanySizeRanking(req))
     }
 
-    // --- Experience ---
     @Public
     @GetMapping("/experience/{rankingType}/{baseDate}/stats")
     fun getExperienceRankingsWithStats(
@@ -218,7 +209,6 @@ class RankingController(
         return ApiResponse.ok(getExperienceRanking(req))
     }
 
-    // --- Contract Type ---
     @Public
     @GetMapping("/contract-type/{rankingType}/{baseDate}/stats")
     fun getContractTypeRankingsWithStats(
@@ -243,7 +233,6 @@ class RankingController(
         return ApiResponse.ok(getContractTypeRanking(req))
     }
 
-    // --- Remote Work Type ---
     @Public
     @GetMapping("/remote-work-type/{rankingType}/{baseDate}/stats")
     fun getRemoteWorkTypeRankingsWithStats(
@@ -268,7 +257,6 @@ class RankingController(
         return ApiResponse.ok(getRemoteWorkTypeRanking(req))
     }
 
-    // --- Company ---
     @Public
     @GetMapping("/company/{rankingType}/{baseDate}/stats")
     fun getCompanyRankingsWithStats(
@@ -293,7 +281,6 @@ class RankingController(
         return ApiResponse.ok(getCompanyRanking(req))
     }
 
-    // --- Certification ---
     @Public
     @GetMapping("/certification/{rankingType}/{baseDate}/stats")
     fun getCertificationRankingsWithStats(
@@ -318,7 +305,6 @@ class RankingController(
         return ApiResponse.ok(getCertificationRanking(req))
     }
 
-    // --- Education ---
     @Public
     @GetMapping("/education/{rankingType}/{baseDate}/stats")
     fun getEducationRankingsWithStats(

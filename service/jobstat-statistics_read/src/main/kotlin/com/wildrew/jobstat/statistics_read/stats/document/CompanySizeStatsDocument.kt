@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.mapping.Field
 class CompanySizeStatsDocument(
     id: String? = null,
     @Field("entity_id")
-    override val entityId: Long, // CompanySize.ordinal
+    override val entityId: Long,
     @Field("base_date")
     override val baseDate: String,
     @Field("period")
@@ -194,7 +194,6 @@ class CompanySizeStatsDocument(
     ) : RankingInfo
 
     override fun validate() {
-        // TODO: Implement validation logic if needed
     }
 
     fun copy(

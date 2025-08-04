@@ -20,7 +20,7 @@ class EducationStatsDocument(
     @Field("period")
     override val period: SnapshotPeriod,
     @Field("level")
-    val level: String, // HIGH_SCHOOL, ASSOCIATE, BACHELOR, MASTER, DOCTORATE, OTHER
+    val level: String,
     @Field("stats")
     override val stats: EducationStats,
     @Field("industry_distribution")

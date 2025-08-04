@@ -18,7 +18,7 @@ class RemoteWorkStatsDocument(
     baseDate: String,
     period: SnapshotPeriod,
     @Field("type")
-    val type: String, // FULL_REMOTE, HYBRID, NONE
+    val type: String,
     @Field("stats")
     override val stats: RemoteWorkStats,
     @Field("industry_distribution")

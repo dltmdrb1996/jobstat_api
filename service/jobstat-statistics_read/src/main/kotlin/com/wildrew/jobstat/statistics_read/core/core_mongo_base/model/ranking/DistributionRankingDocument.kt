@@ -8,11 +8,11 @@ import org.springframework.data.mongodb.core.index.CompoundIndexes
 
 @CompoundIndexes(
     CompoundIndex(
-        name = "group_entity_idx", // 그룹 엔티티 인덱스
+        name = "group_entity_idx",
         def = "{'group_entity_type': 1, 'rankings.entity_id': 1, 'base_date': -1}",
     ),
     CompoundIndex(
-        name = "distribution_pattern_idx", // 분포 패턴 인덱스
+        name = "distribution_pattern_idx",
         def = "{'base_date': -1, 'rankings.dominant_category': 1, 'rankings.distribution_metrics.concentration': -1}",
     ),
 )

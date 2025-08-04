@@ -20,7 +20,6 @@ class GetStatsByEntityIds(
     @Transactional
     override fun execute(request: Request): Response<*> =
         with(request) {
-            // 여러 엔티티 ID에 해당하는 통계 조회
             statsAnalysisService
                 .findStatsByEntityIds<BaseStatsDocument>(
                     statsType = statsType,

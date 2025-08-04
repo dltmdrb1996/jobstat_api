@@ -143,7 +143,7 @@ class CompanySizeEducationRankingsDocument(
         require(rankings.isNotEmpty()) { "Rankings must not be empty" }
         require(
             rankings.all {
-                it.distribution.values.sum() in 0.99..1.01 // 허용 오차 범위 내의 100%
+                it.distribution.values.sum() in 0.99..1.01
             },
         ) { "Distribution percentages must sum to approximately 100%" }
         require(

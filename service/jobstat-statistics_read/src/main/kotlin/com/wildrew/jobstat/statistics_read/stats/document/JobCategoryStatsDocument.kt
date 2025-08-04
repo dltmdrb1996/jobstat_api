@@ -122,8 +122,6 @@ class JobCategoryStatsDocument(
         val preferredRatio: Double,
         @Field("emerging_skill")
         val emergingSkill: Boolean,
-//        @Field("skills_correlation")
-//        val skillsCorrelation: Map<Long, Double>,
     )
 
     data class JobCategoryCertification(
@@ -201,7 +199,6 @@ class JobCategoryStatsDocument(
         val growthRate: Double,
     ) : CommonDistribution(count, ratio, avgSalary)
 
-    // JobCategoryStatsDocument의 나머지 data class들
     data class IndustryDistribution(
         @Field("industry_id")
         val industryId: Long,

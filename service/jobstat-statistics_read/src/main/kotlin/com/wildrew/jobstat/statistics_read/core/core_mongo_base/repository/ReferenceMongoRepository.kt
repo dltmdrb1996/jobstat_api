@@ -42,13 +42,6 @@ abstract class ReferenceMongoRepositoryImpl<T : BaseReferenceDocument, ID : Any>
 ) : BaseMongoRepositoryImpl<T, ID>(entityInformation, mongoOperations),
     ReferenceMongoRepository<T, ID> {
     init {
-        // Create compound index for reference lookups
-//        mongoOperations.indexOps(entityInformation.javaType).ensureIndex(
-//            Index()
-//                .on("reference_id", Sort.Direction.ASC)
-//                .on("entity_type", Sort.Direction.ASC)
-//                .background()
-//        )
     }
 
     /**

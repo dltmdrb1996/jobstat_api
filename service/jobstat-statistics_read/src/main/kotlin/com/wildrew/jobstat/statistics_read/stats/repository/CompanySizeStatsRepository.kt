@@ -36,7 +36,7 @@ class CompanySizeStatsRepositoryImpl(
 
         return collection
             .find(
-                Filters.eq("size", size.name), // Enums are stored as strings
+                Filters.eq("size", size.name),
             ).map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
     }

@@ -22,20 +22,16 @@ class CacheConfig : CachingConfigurer {
         const val RANKING_CACHE_SIZE = 100L
         val EXPIRE_AFTER_ACCESS = Duration.ofDays(1)
 
-        // 캐시 이름 상수화
         const val STATS_DOCUMENT_CACHE = "StatsDocument"
         const val STATS_WITH_RANKING_CACHE = "statsWithRanking"
     }
 
     @Bean
     override fun cacheManager(): CacheManager {
-        // SimpleCacheManager 생성
         val simpleCacheManager = SimpleCacheManager()
 
-        // 캐시 목록 생성
         val caches = mutableListOf<org.springframework.cache.Cache>()
 
-        // statsWithRanking - 랭킹 캐싱
         caches.add(
             CaffeineCache(
                 STATS_WITH_RANKING_CACHE,

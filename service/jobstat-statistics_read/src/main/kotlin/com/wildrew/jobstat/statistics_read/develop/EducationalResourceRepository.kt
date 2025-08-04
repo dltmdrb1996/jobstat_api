@@ -28,12 +28,6 @@ class EducationalResourceRepositoryImpl(
     private val mongoOperations: MongoOperations,
 ) : ReferenceMongoRepositoryImpl<EducationalResourceDocument, String>(entityInformation, mongoOperations),
     EducationalResourceRepository {
-    init {
-        // 검색을 위한 텍스트 인덱스 생성
-//        mongoOperations.indexOps(entityInformation.javaType).ensureIndex(
-//        )
-    }
-
     override fun findBySkillCategories(categories: List<String>): List<EducationalResourceDocument> {
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 

@@ -20,7 +20,7 @@ class ExperienceStatsDocument(
     @Field("period")
     override val period: SnapshotPeriod,
     @Field("range")
-    val range: String, // 0-2, 3-5, 5+ 등
+    val range: String,
     @Field("stats")
     override val stats: ExperienceStats,
     @Field("industry_distribution")

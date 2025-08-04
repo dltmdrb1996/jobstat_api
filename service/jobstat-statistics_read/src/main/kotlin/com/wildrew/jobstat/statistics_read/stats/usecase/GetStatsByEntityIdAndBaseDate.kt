@@ -20,7 +20,6 @@ class GetStatsByEntityIdAndBaseDate(
     @Transactional
     override fun execute(request: Request): Response<*> =
         with(request) {
-            // 엔티티 ID와 기준일자에 해당하는 통계 조회
             statsAnalysisService
                 .findStatsByEntityIdAndBaseDate<BaseStatsDocument>(
                     statsType = statsType,

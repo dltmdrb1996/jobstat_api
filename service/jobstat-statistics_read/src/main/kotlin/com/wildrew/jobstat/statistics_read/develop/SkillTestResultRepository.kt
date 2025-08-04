@@ -38,12 +38,6 @@ class SkillTestResultRepositoryImpl(
 ) : ReferenceMongoRepositoryImpl<SkillTestResultDocument, String>(entityInformation, mongoOperations),
     SkillTestResultRepository {
     init {
-//        mongoOperations.indexOps(entityInformation.javaType).ensureIndex(
-//            Index()
-//                .on("skill_id", Sort.Direction.ASC)
-//                .on("avg_score", Sort.Direction.DESC)
-//                .background()
-//        )
     }
 
     override fun findBySkillId(skillId: Long): List<SkillTestResultDocument> {

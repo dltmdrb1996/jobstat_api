@@ -86,7 +86,6 @@ class FakeSkillGrowthRankingsRepository :
 
         val entityRanks = mutableMapOf<Long, List<Int>>()
 
-        // 각 엔티티별로 순위 변화를 추적
         dates.forEach { date ->
             documents.values
                 .filter { it.baseDate == date }
@@ -98,18 +97,16 @@ class FakeSkillGrowthRankingsRepository :
                 }
         }
 
-        // 일관된 순위를 가진 엔티티 필터링
         val consistentEntityIds =
             entityRanks
                 .filter { (_, ranks) ->
                     ranks.size == months &&
-                        // 모든 기간에 데이터가 있고
+
                         ranks.all { it <= maxRank } &&
-                        // 모든 순위가 maxRank 이하이며
-                        ranks.toSet().size == 1 // 순위가 변하지 않았음
+
+                        ranks.toSet().size == 1
                 }.keys
 
-        // 최신 순위 데이터 반환
         return documents.values
             .filter { it.baseDate == dates.first() }
             .flatMap { it.rankings }
@@ -129,7 +126,7 @@ class FakeSkillGrowthRankingsRepository :
                 .take(months)
 
         return documents.values
-            .filter { it.baseDate == dates.first() } // 최신 데이터만 사용
+            .filter { it.baseDate == dates.first() }
             .flatMap { it.rankings }
             .filter { entry ->
                 entry.rankChange?.let { change ->
@@ -149,7 +146,7 @@ class FakeSkillGrowthRankingsRepository :
             .filter { it.baseDate == endDate }
             .flatMap { it.rankings }
             .filter { it.rankChange != null && (it.rankChange ?: 0) < 0 }
-            .sortedBy { it.rankChange } // 음수값이므로 오름차순 정렬하면 가장 큰 하락폭 순
+            .sortedBy { it.rankChange }
             .take(limit)
     }
 

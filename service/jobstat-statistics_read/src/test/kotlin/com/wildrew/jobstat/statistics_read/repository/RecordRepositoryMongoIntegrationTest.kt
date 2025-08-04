@@ -106,7 +106,6 @@ class RecordRepositoryMongoIntegrationTest : BatchOperationTestSupport() {
         for (batch in recordIds.chunked(batchSize)) {
             val foundRecords = recordRepository.bulkFindByIds(batch)
             totalFound += foundRecords.size
-//            log.debug("Found ${foundRecords.size} records in current batch")
         }
 
         log.debug("Total records found: $totalFound")

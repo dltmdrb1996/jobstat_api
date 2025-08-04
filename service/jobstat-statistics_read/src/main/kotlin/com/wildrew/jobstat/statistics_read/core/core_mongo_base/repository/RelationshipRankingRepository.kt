@@ -14,38 +14,32 @@ interface RelationshipRankingRepository<
     E : RelationshipRankingDocument.RelationshipRankingEntry,
     ID : Any,
 > : BaseRankingRepository<T, E, ID> {
-    // 주요 엔티티로 조회
     fun findByPrimaryEntityId(
         primaryEntityId: Long,
         baseDate: BaseDate,
     ): E?
 
-    // 주요 엔티티의 관련 엔티티 Top N 조회
     fun findTopNRelatedEntities(
         primaryEntityId: Long,
         baseDate: BaseDate,
         limit: Int,
     ): List<RelationshipRankingDocument.RelatedEntityRank>
 
-    // 관련 엔티티로 조회
     fun findByRelatedEntityId(
         relatedEntityId: Long,
         baseDate: BaseDate,
     ): List<E>
 
-    // 강한 관계를 가진 엔티티들 조회
     fun findStrongRelationships(
         baseDate: BaseDate,
         minScore: Double,
     ): List<E>
 
-    // 가장 강한 관계를 가진 엔티티 쌍 조회
     fun findStrongestPairs(
         baseDate: BaseDate,
         limit: Int,
     ): List<E>
 
-    // 공통 관계를 가진 엔티티들 조회
     fun findCommonRelationships(
         primaryEntityId1: Long,
         primaryEntityId2: Long,

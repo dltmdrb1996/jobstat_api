@@ -33,13 +33,6 @@ class InterviewQuestionRepositoryImpl(
 ) : ReferenceMongoRepositoryImpl<InterviewQuestionDocument, String>(entityInformation, mongoOperations),
     InterviewQuestionRepository {
     init {
-        // 검색을 위한 텍스트 인덱스 생성
-//        mongoOperations.indexOps(entityInformation.javaType).ensureIndex(
-//            Index()
-//                .text("questions.question")
-//                .text("questions.tips")
-//                .background()
-//        )
     }
 
     override fun findByJobCategoryId(jobCategoryId: Long): List<InterviewQuestionDocument> {

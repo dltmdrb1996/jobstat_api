@@ -6,7 +6,6 @@ import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.index.CompoundIndex
 import org.springframework.data.mongodb.core.index.CompoundIndexes
 
-// Relationship Ranking Document
 @CompoundIndexes(
     CompoundIndex(
         name = "primary_entity_idx",

@@ -1,4 +1,4 @@
-package com.wildrew.jobstat.statistics_read.utils.base // 또는 적절한 패키지 위치
+package com.wildrew.jobstat.statistics_read.utils.base
 
 import com.wildrew.jobstat.statistics_read.utils.config.BaseIntegrationTest
 import org.springframework.beans.factory.annotation.Autowired

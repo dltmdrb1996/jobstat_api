@@ -182,7 +182,7 @@ class CertificationStatsDocument(
         @Field("pass_rate")
         val passRate: Double,
         @Field("avg_preparation_time")
-        val avgPreparationTime: Int, // 단위: 개월
+        val avgPreparationTime: Int,
         @Field("exam_frequency")
         val examFrequency: String,
         @Field("avg_attempts")
@@ -194,7 +194,7 @@ class CertificationStatsDocument(
     ) {
         data class PreparationResources(
             @Field("recommended_study_time")
-            val recommendedStudyTime: Int, // 단위: 시간
+            val recommendedStudyTime: Int,
             @Field("material_costs")
             val materialCosts: Long,
             @Field("training_availability")
@@ -230,7 +230,7 @@ class CertificationStatsDocument(
         @Field("total_cost")
         val totalCost: Long,
         @Field("roi_timeframe")
-        val roiTimeframe: Double, // 단위: 개월
+        val roiTimeframe: Double,
         @Field("salary_roi")
         val salaryRoi: Double,
         @Field("career_value_score")

@@ -8,7 +8,7 @@ import java.io.Serializable
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
     include = JsonTypeInfo.As.PROPERTY,
-    property = "score_type", // 타입 정보를 저장할 필드
+    property = "score_type",
 )
 @JsonSubTypes(
     JsonSubTypes.Type(value = PostingCountScore::class, name = "posting_count_score"),
@@ -49,7 +49,7 @@ data class GrowthScore(
     @Field("growth_rate")
     val growthRate: Double,
     @Field("consistency_score")
-    val consistencyScore: Double?, // 성장의 일관성 점수
+    val consistencyScore: Double?,
 ) : RankingScore
 
 data class DemandScore(

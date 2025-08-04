@@ -10,7 +10,7 @@ import java.time.Instant
 @Document(collection = "resume_analysis_results")
 class ResumeAnalysisDocument(
     id: String? = null,
-    referenceId: Long, // candidate_id
+    referenceId: Long,
     @Field("analysis_date")
     val analysisDate: Instant,
     @Field("matched_skills")

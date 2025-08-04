@@ -39,7 +39,7 @@ class JobCategorySalaryRankingsDocument(
             data class SalaryComparison(
                 val avgSalary: Long,
                 val medianSalary: Long,
-                val marketPosition: Double, // 시장 평균 대비 위치
+                val marketPosition: Double,
             )
         }
     }

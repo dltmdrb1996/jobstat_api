@@ -29,7 +29,6 @@ fun Map<*, *>.toJsonString(): String {
     return sb.toString()
 }
 
-// boolean extension
 fun Boolean.trueOrThrow(exceptionSupplier: () -> Exception): Boolean {
     if (!this) {
         throw exceptionSupplier()

@@ -19,12 +19,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 @RequestMapping("/api/${RestConstants.Versions.V1}/stats")
 @Tag(name = "통계", description = "개별 통계 조회 관련 API")
 class StatsController(
-    // Existing UseCases
     private val getStatsByEntityId: GetStatsByEntityId,
     private val getStatsByEntityIds: GetStatsByEntityIds,
     private val getLatestStats: GetLatestStats,
     private val getStatsByEntityIdAndBaseDate: GetStatsByEntityIdAndBaseDate,
-    // New UseCases
     private val getSkillProfile: GetSkillProfile,
     private val compareSkills: CompareSkills,
 ) {
@@ -161,8 +159,6 @@ class StatsController(
             )
         return ApiResponse.ok(getStatsByEntityIdAndBaseDate(req))
     }
-
-    // --- New Endpoints ---
 
     @Public
     @GetMapping("/skills/{skillId}/profile")

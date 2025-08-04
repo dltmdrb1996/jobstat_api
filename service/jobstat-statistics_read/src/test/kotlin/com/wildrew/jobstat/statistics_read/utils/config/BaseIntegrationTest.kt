@@ -62,7 +62,7 @@ abstract class BaseIntegrationTest {
         private val log: Logger by lazy { LoggerFactory.getLogger(BaseIntegrationTest::class.java) }
 
         @JvmStatic
-        @DynamicPropertySource // MongoDB 동적 속성
+        @DynamicPropertySource
         fun mongoProperties(registry: DynamicPropertyRegistry) {
             val container = TestMongoConfig.mongoContainer
             if (!container.isRunning) {
@@ -91,7 +91,7 @@ abstract class BaseIntegrationTest {
             val host = container.host
             val port = container.getMappedPort(TestRedisConfig.REDIS_PORT)
             registry.add("spring.data.redis.host") { host }
-            registry.add("spring.data.redis.port") { port.toString() } // 포트는 문자열로 전달
+            registry.add("spring.data.redis.port") { port.toString() }
             log.debug("Dynamically set Redis Host: {}, Port: {}", host, port)
         }
     }

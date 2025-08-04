@@ -37,7 +37,6 @@ interface StatsBulkCacheManager {
 class StatsBulkCacheManagerImpl : StatsBulkCacheManager {
     private val log = LoggerFactory.getLogger(this::class.java)
 
-    // 별도의 타입 안전한 캐시 인스턴스 생성 (필요한 타입 캐스팅 최소화)
     private val statsDocumentCache: Cache<String, BaseStatsDocument> =
         Caffeine
             .newBuilder()
@@ -63,7 +62,6 @@ class StatsBulkCacheManagerImpl : StatsBulkCacheManager {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : BaseStatsDocument> getAll(keys: Collection<String>): Map<String, T> {
-        // 타입 변환 없이 직접 bulk 조회
         val result = statsDocumentCache.getAllPresent(keys)
         return result.mapValues { it.value as T }
     }
@@ -88,18 +86,4 @@ class StatsBulkCacheManagerImpl : StatsBulkCacheManager {
     override fun invalidateAll() {
         statsDocumentCache.invalidateAll()
     }
-
-//    @Scheduled(fixedRate = 5000) // 1분마다 로깅
-//    fun logBulkCacheStats() {
-//        val stats = statsDocumentCache.stats()
-//        log.debug(
-//            """
-//        StatsDocument Bulk 캐시 통계:
-//        - 히트: ${stats.hitCount()}
-//        - 미스: ${stats.missCount()}
-//        - 히트율: ${String.format("%.2f", stats.hitRate() * 100)}%
-//        - 제거: ${stats.evictionCount()}
-//        """.trimIndent()
-//        )
-//    }
 }

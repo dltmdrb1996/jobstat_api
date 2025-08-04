@@ -123,7 +123,6 @@ abstract class BaseFakeRepository<T : BaseEntity, F : TestFixture<T>> {
                 throw RuntimeException("Failed to set field '$fieldName' for ${entity::class.java.name} via reflection", e)
             }
         } else {
-            // 필드를 찾지 못한 경우 명시적인 예외 발생
             throw NoSuchFieldException("Field '$fieldName' not found in the class hierarchy of ${entity::class.java.name}")
         }
     }

@@ -94,10 +94,9 @@ class StatsAnalysisServiceImpl(
         entityIds: List<Long>,
     ): List<T> {
         if (entityIds.isEmpty()) return emptyList()
-        // 캐시를 통한 조회 활용
+
         val resultMap = findStatsByEntityIdsAndBaseDate<T>(statsType, baseDate, entityIds)
 
-        // 결과를 리스트 형태로 변환하여 반환 (null 값 제외)
         return resultMap.values.filterNotNull()
     }
 
@@ -111,14 +110,12 @@ class StatsAnalysisServiceImpl(
     ): T? {
         val cacheKey = statsBulkCacheManager.createCacheKey(baseDate, statsType, entityId)
 
-        // 캐시에서 먼저 조회
         val cached = statsBulkCacheManager.get<T>(cacheKey)
         if (cached != null) {
             log.trace("Cache hit for latest stats: {}", cacheKey)
             return cached
         }
 
-        // 캐시에 없으면 DB에서 조회 후 캐시에 저장
         val result = statsRepositoryRegistry.getRepository<T>(statsType).findLatestStatsByEntityId(entityId)
         if (result != null) {
             log.trace("Caching latest stats: {}", cacheKey)
@@ -137,14 +134,12 @@ class StatsAnalysisServiceImpl(
     ): T? {
         val cacheKey = statsBulkCacheManager.createCacheKey(baseDate, statsType, entityId)
 
-        // 캐시에서 먼저 조회
         val cached = statsBulkCacheManager.get<T>(cacheKey)
         if (cached != null) {
             log.trace("Cache hit for stats by date: {}", cacheKey)
             return cached
         }
 
-        // 캐시에 없으면 DB에서 조회 후 캐시에 저장
         val result = statsRepositoryRegistry.getRepository<T>(statsType).findByEntityIdAndBaseDate(entityId, baseDate)
         if (result != null) {
             log.trace("Caching stats by date: {}", cacheKey)
@@ -165,43 +160,36 @@ class StatsAnalysisServiceImpl(
             return emptyMap()
         }
 
-        // 모든 엔티티에 대한 캐시 키 생성
         val cacheKeys =
             entityIds
                 .map { entityId ->
                     entityId to statsBulkCacheManager.createCacheKey(baseDate, statsType, entityId)
                 }.toMap()
 
-        // 캐시에서 일괄 조회
         val cachedResults = statsBulkCacheManager.getAll<T>(cacheKeys.values)
 
-        // 캐시 미스된 엔티티 ID 확인
         val missingEntityIds =
             entityIds.filter { entityId ->
                 val key = cacheKeys[entityId]
                 key !in cachedResults
             }
 
-        // 캐시 미스가 없으면 캐시 결과 바로 반환
         if (missingEntityIds.isEmpty()) {
             log.debug("Bulk cache hit for all {} entities", entityIds.size)
-            // 결과 변환: 캐시 키 → 엔티티 ID 기준으로 변환
+
             return entityIds.associateWith { entityId ->
                 cachedResults[cacheKeys[entityId]]
             }
         }
 
-        // 캐시 미스된 엔티티들만 DB에서 일괄 조회
         log.debug("Bulk cache miss for {} entities", missingEntityIds.size)
         val dbResults =
             statsRepositoryRegistry
                 .getRepository<T>(statsType)
                 .findByBaseDateAndEntityIds(baseDate, missingEntityIds)
 
-        // DB 결과를 엔티티 ID로 매핑
         val dbResultsMap = dbResults.associateBy { it.entityId }
 
-        // DB 결과를 캐시에 일괄 저장
         val toCache =
             dbResults
                 .mapNotNull { document ->
@@ -216,7 +204,6 @@ class StatsAnalysisServiceImpl(
 
         statsBulkCacheManager.putAll(toCache)
 
-        // 캐시 결과와 DB 결과 합쳐서 반환
         return entityIds.associateWith { entityId ->
             cachedResults[cacheKeys[entityId]] ?: dbResultsMap[entityId]
         }
@@ -234,35 +221,30 @@ class StatsAnalysisServiceImpl(
             return emptyMap()
         }
 
-        // 모든 엔티티에 대한 캐시 키 생성
         val cacheKeys =
             entityIds
                 .map { entityId ->
                     entityId to statsBulkCacheManager.createCacheKey(baseDate, statsType, entityId)
                 }.toMap()
 
-        // 캐시에서 일괄 조회
         val cachedResults = statsBulkCacheManager.getAll<T>(cacheKeys.values)
 
-        // 캐시 미스된 엔티티 ID 확인
         val missingEntityIds =
             entityIds.filter { entityId ->
                 val key = cacheKeys[entityId]
                 key !in cachedResults
             }
 
-        // 캐시 미스가 없으면 캐시 결과 바로 반환
         if (missingEntityIds.isEmpty()) {
             log.debug("Bulk cache hit for all {} entities", entityIds.size)
-            // 결과 변환: 캐시 키 → 엔티티 ID 기준으로 변환
+
             return entityIds.associateWith { entityId ->
                 cachedResults[cacheKeys[entityId]]
             }
         }
 
-        // 캐시 미스된 엔티티들만 DB에서 일괄 조회
         log.debug("Bulk cache miss for {} entities", missingEntityIds.size)
-        // findLatestStatsByEntityIds 메소드가 StatsMongoRepository에 없어서 개별 조회로 대체
+
         val dbResults =
             missingEntityIds.mapNotNull { entityId ->
                 val result = statsRepositoryRegistry.getRepository<T>(statsType).findLatestStatsByEntityId(entityId)
@@ -273,10 +255,8 @@ class StatsAnalysisServiceImpl(
                 }
             }
 
-        // DB 결과를 엔티티 ID로 매핑
         val dbResultsMap = dbResults.associateBy { it.entityId }
 
-        // DB 결과를 캐시에 일괄 저장
         val toCache =
             dbResults
                 .mapNotNull { document ->
@@ -291,7 +271,6 @@ class StatsAnalysisServiceImpl(
 
         statsBulkCacheManager.putAll(toCache)
 
-        // 캐시 결과와 DB 결과 합쳐서 반환
         return entityIds.associateWith { entityId ->
             cachedResults[cacheKeys[entityId]] ?: dbResultsMap[entityId]
         }

@@ -116,7 +116,6 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(1)
     @DisplayName("주요 엔티티 ID로 데이터를 조회할 수 있다")
     fun `findByPrimaryEntityId - should return correct entry for primary entity id`() {
-        // given
         val baseDate = BaseDate("202401")
         val primaryEntityId =
             allRecords
@@ -125,85 +124,22 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
                 .first()
                 .primaryEntityId
 
-        // when
         val result = industrySkillRankingsRepository.findByPrimaryEntityId(primaryEntityId, baseDate)
 
-        // then
         assertNotNull(result)
         assertEquals(primaryEntityId, result?.primaryEntityId)
         assertTrue(result?.relatedRankings?.isNotEmpty() ?: false)
     }
 
-//    @Test
-//    @Order(2)
-//    fun `findTopNRelatedEntities - should return limited number of related entities sorted by score`() {
-//        // given
-//        val baseDate = BaseDate("202401")
-//        val primaryEntityId = allRecords.first().rankings.first().primaryEntityId
-//        val limit = 5
-//
-//        // when
-//        val results = industrySkillRankingsRepository.findTopNRelatedEntities(primaryEntityId, baseDate, limit)
-//
-//        // log for debugging
-//        println("Base date used: ${baseDate}")
-//        println("Primary entity ID: $primaryEntityId")
-//        println("Results size: ${results.size}")
-//
-//        // then
-//        assertNotNull(results, "Results should not be null")
-//        assertTrue(results.isNotEmpty(), "Should return at least one related entity")
-//        assertTrue(results.size <= limit, "Results should not exceed limit")
-//
-//        if (results.isNotEmpty()) {
-//            val scores = results.map { it.score }
-//            assertEquals(
-//                scores.sortedByDescending { it },
-//                scores,
-//                "Results should be sorted by score in descending order"
-//            )
-//        }
-//    }
-//
-//    @Test
-//    @Order(3)
-//    fun `findByRelatedEntityId - should find all entries containing related entity id`() {
-//        // given
-//        val baseDate = BaseDate("202401")
-//        val relatedEntity = allRecords.first().rankings.first().relatedRankings.first()
-//
-//        // when
-//        val results = industrySkillRankingsRepository.findByRelatedEntityId(relatedEntity.entityId, baseDate)
-//
-//        // log for debugging
-//        println("Base date used: ${baseDate}")
-//        println("Related entity ID: ${relatedEntity.entityId}")
-//        println("Results size: ${results.size}")
-//
-//        // then
-//        assertNotNull(results, "Results should not be null")
-//        assertTrue(results.isNotEmpty(), "Should find at least one entry")
-//
-//        results.forEach { entry ->
-//            assertTrue(
-//                entry.relatedRankings.any { rank -> rank.entityId == relatedEntity.entityId },
-//                "Each entry should contain the related entity ID"
-//            )
-//        }
-//    }
-
     @Test
     @Order(4)
     @DisplayName("강한 관계를 가진 데이터를 찾을 수 있다")
     fun `findStrongRelationships - should find relationships with scores above threshold`() {
-        // given
         val baseDate = BaseDate("202401")
         val minScore = 0.8
 
-        // when
         val results = industrySkillRankingsRepository.findStrongRelationships(baseDate, minScore)
 
-        // then
         assertNotNull(results)
         assertTrue(
             results.all { entry ->
@@ -216,14 +152,11 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(5)
     @DisplayName("가장 강한 관계를 가진 상위 쌍을 찾을 수 있다")
     fun `findStrongestPairs - should return limited number of pairs with highest scores`() {
-        // given
         val baseDate = BaseDate("202401")
         val limit = 5
 
-        // when
         val results = industrySkillRankingsRepository.findStrongestPairs(baseDate, limit)
 
-        // then
         assertNotNull(results)
         assertTrue(results.isNotEmpty())
         assertTrue(results.size <= limit)
@@ -235,12 +168,10 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
     @Order(6)
     @DisplayName("공통 관계를 가진 데이터를 찾을 수 있다")
     fun `findCommonRelationships - should find shared relationships between entities`() {
-        // given
         val baseDate = BaseDate("202401")
         val primaryEntity1 = allRecords[0].rankings.first().primaryEntityId
         val primaryEntity2 = allRecords[1].rankings.first().primaryEntityId
 
-        // when
         val results =
             industrySkillRankingsRepository.findCommonRelationships(
                 primaryEntity1,
@@ -248,7 +179,6 @@ class RelationshipRankingRepositoryIntegrationTest : BatchOperationTestSupport()
                 baseDate,
             )
 
-        // then
         assertNotNull(results)
         if (results.isNotEmpty()) {
             val scores = results.map { it.score }

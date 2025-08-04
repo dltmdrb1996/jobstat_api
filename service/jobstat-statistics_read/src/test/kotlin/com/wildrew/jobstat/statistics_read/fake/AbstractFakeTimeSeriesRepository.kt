@@ -14,7 +14,6 @@ abstract class AbstractFakeTimeSeriesRepository<T : BaseTimeSeriesDocument>(
 ) : BaseTimeSeriesRepository<T, String> {
     protected val documents = mutableMapOf<String, T>()
 
-    // BaseTimeSeriesRepository 구현
     override fun findByBaseDate(baseDate: BaseDate): T? = documents[baseDate.toString()]
 
     override fun findByBaseDateBetween(
@@ -34,7 +33,6 @@ abstract class AbstractFakeTimeSeriesRepository<T : BaseTimeSeriesDocument>(
             .sortedByDescending { it.baseDate }
             .take(n)
 
-    // BaseMongoRepository 구현
     override fun findByCreatedAtBetween(
         start: Instant,
         end: Instant,
@@ -90,7 +88,6 @@ abstract class AbstractFakeTimeSeriesRepository<T : BaseTimeSeriesDocument>(
         )
     }
 
-    // MongoRepository의 기본 메서드들
     override fun <S : T> save(entity: S): S {
         documents[entity.baseDate] = entity
         return entity
@@ -131,7 +128,6 @@ abstract class AbstractFakeTimeSeriesRepository<T : BaseTimeSeriesDocument>(
         documents.clear()
     }
 
-    // Helper methods for testing
     fun addDocument(document: T) {
         documents[document.baseDate] = document
     }

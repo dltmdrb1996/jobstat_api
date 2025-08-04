@@ -21,7 +21,7 @@ class ContractTypeStatsDocument(
     @Field("period")
     override val period: SnapshotPeriod,
     @Field("type")
-    val type: String, // FULL_TIME, CONTRACT, FREELANCE, INTERN
+    val type: String,
     @Field("stats")
     override val stats: ContractTypeStats,
     @Field("industry_distribution")

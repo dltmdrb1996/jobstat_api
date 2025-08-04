@@ -32,16 +32,12 @@ interface BaseMongoRepository<T : BaseDocument, ID : Any> : MongoRepository<T, I
      */
     fun bulkFindByIds(ids: List<ID>): List<T>
 
-    // Insert Operations
     fun bulkInsert(entities: List<T>): List<T>
 
-    // Update Operations
     fun bulkUpdate(entities: List<T>): List<T>
 
-    // Delete Operations
     fun bulkDelete(ids: List<ID>): Int
 
-    // Upsert Operations
     fun bulkUpsert(entities: List<T>): BulkWriteResult
 }
 
@@ -66,7 +62,6 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
         start: Instant,
         end: Instant,
     ): List<T> {
-        // createdAt 인덱스를 활용한 범위 쿼리 (이미 @Indexed)
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         return collection
@@ -89,11 +84,10 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
         val objectIds = ids.map { ObjectId(it.toString()) }
 
-        // _id 인덱스를 활용한 정렬
         return collection
             .find(Filters.`in`("_id", objectIds))
             .sort(Sorts.ascending("_id"))
-            .hintString("_id_") // _id 인덱스 사용 명시
+            .hintString("_id_")
             .batchSize(OPTIMAL_BATCH_SIZE)
             .map { doc -> mongoOperations.converter.read(entityInformation.javaType, doc) }
             .toList()
@@ -112,14 +106,10 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
                 .find(filter)
                 .batchSize(OPTIMAL_BATCH_SIZE)
 
-        // 정렬이 요청된 경우 정렬 적용
         val sortBson = queryToSort(query)
         if (sortBson != null) {
             findIterable.sort(sortBson)
-            // 정렬 필드에 인덱스가 존재한다면 hint 지정 가능 (예: createdAt_1 등)
-            // 예: findIterable.hintString("createdAt_1")
         } else {
-            // 정렬 요청이 없을 경우 _id 기준으로 정렬하여 인덱스 스캔 최적화
             findIterable.sort(Sorts.ascending("_id"))
             findIterable.hintString("_id_")
         }
@@ -128,7 +118,6 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
     }
 
     fun findAllFast(): List<T> {
-        // _id 인덱스를 활용한 순차 스캔
         val collection = mongoOperations.getCollection(entityInformation.collectionName)
 
         return collection
@@ -321,7 +310,6 @@ abstract class BaseMongoRepositoryImpl<T : BaseDocument, ID : Any>(
                 }
 
                 key.contains(".") -> {
-                    // 필드 경로 쿼리에 대해서 인덱스가 있다면 활용 가능. 인덱스 패턴에 맞춰서 필드명 지정 필요.
                     filters.add(Filters.eq(key, value))
                 }
 
