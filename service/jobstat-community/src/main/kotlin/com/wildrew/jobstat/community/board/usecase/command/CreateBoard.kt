@@ -44,7 +44,7 @@ class CreateBoard(
                 Thread.currentThread().isVirtual,
             ) // isVirtual()은 JDK 21+
 
-            val userId = theadContextUtils.getCurrentUserId()
+            val userId = theadContextUtils.getCurrentUserIdOrNull()
             log.info("Retrieved userId from SecurityUtils: {}", userId) // userId 값 로깅
 
             // 로그인 상태가 아니면서 비밀번호가 없는 경우 예외 처리

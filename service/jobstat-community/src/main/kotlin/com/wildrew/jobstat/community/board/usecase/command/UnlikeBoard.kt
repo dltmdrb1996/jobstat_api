@@ -60,12 +60,7 @@ class UnlikeBoard(
         return Response(likeCount = likeCount)
     }
 
-    private fun getUserIdOrThrow(): Long =
-        theadContextUtils.getCurrentUserId()
-            ?: throw AppException.fromErrorCode(
-                ErrorCode.AUTHENTICATION_FAILURE,
-                "좋아요 취소를 위해서는 로그인이 필요합니다",
-            )
+    private fun getUserIdOrThrow(): Long = theadContextUtils.getCurrentUserIdOrFail()
 
     private fun validateBoardExists(boardId: Long) =
         try {

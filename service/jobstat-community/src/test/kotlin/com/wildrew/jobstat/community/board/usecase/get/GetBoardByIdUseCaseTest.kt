@@ -72,7 +72,7 @@ class GetBoardByIdUseCaseTest {
         @DisplayName("로그인 사용자가 게시글 상세 조회 성공")
         fun `given logged in user and existing boardId, when execute, then return board details with counters`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val expectedViewCount = testBoard.viewCount + 1 // 조회수 1 증가 예상
             val expectedLikeCount = testBoard.likeCount // 좋아요 수는 그대로
             val expectedUserLiked = true
@@ -113,7 +113,7 @@ class GetBoardByIdUseCaseTest {
             assertEquals(testBoard.updatedAt.toEpochMilli(), response.eventTs)
 
             // Verify
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
             verify(counterService).getSingleBoardCounters(any(), eq(testUserId.toString()), any(), any())
         }
 
@@ -121,7 +121,7 @@ class GetBoardByIdUseCaseTest {
         @DisplayName("비로그인 사용자가 게시글 상세 조회 성공")
         fun `given guest user and existing boardId, when execute, then return board details without user liked info`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId) // 비로그인
             val expectedViewCount = testBoard.viewCount + 1
             val expectedLikeCount = testBoard.likeCount
             val expectedUserLiked = false // 비로그인은 항상 false
@@ -153,7 +153,7 @@ class GetBoardByIdUseCaseTest {
             assertFalse(response.userLiked) // 비로그인 확인
 
             // Verify
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
             verify(counterService).getSingleBoardCounters(any(), eq(null), any(), any())
         }
     }
@@ -166,7 +166,7 @@ class GetBoardByIdUseCaseTest {
         fun `given non-existent boardId, when execute, then throw EntityNotFoundException`() {
             // Given
             val nonExistentBoardId = 999L
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
 
             val request = GetBoardById.Request(boardId = nonExistentBoardId)
 
@@ -179,7 +179,7 @@ class GetBoardByIdUseCaseTest {
         @DisplayName("CounterService에서 예외 발생 시 전파")
         fun `given counterService throws exception, when execute, then exception propagates`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val counterException = RuntimeException("Redis connection failed")
             whenever(counterService.getSingleBoardCounters(any(), any(), any(), any()))
                 .thenThrow(counterException)

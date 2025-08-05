@@ -10,8 +10,9 @@ import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.MalformedJwtException
 import org.slf4j.LoggerFactory
-import org.springframework.cloud.gateway.filter.GatewayFilter
-import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory
+import org.springframework.cloud.gateway.filter.GatewayFilterChain
+import org.springframework.cloud.gateway.filter.GlobalFilter
+import org.springframework.core.Ordered
 import org.springframework.core.io.buffer.DataBuffer
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -25,7 +26,7 @@ import java.security.SignatureException
 class AuthenticationFilter(
     private val jwtTokenParser: JwtTokenParser,
     private val objectMapper: ObjectMapper,
-) : AbstractGatewayFilterFactory<AuthenticationFilter.Config>(Config::class.java) {
+) : GlobalFilter, Ordered {
     private val log = LoggerFactory.getLogger(javaClass)
 
     companion object {
@@ -43,53 +44,55 @@ class AuthenticationFilter(
             )
     }
 
-    override fun apply(config: Config): GatewayFilter {
-        return GatewayFilter { exchange, chain ->
-            val request = exchange.request
-            val path = request.uri.path
+    override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
+        val request = exchange.request
+        val path = request.uri.path
 
-            if (isGatewaySpecificPublicPath(path)) {
-                return@GatewayFilter chain.filter(exchange)
-            }
-
-            val authHeader = request.headers.getFirst(HttpHeaders.AUTHORIZATION)
-
-            if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
-                val token = authHeader.substring(BEARER_PREFIX.length)
-                var accessPayload: AccessPayload? = null
-
-                try {
-                    accessPayload = jwtTokenParser.validateToken(token)
-                } catch (e: Exception) {
-                    val (errorMessage, errorCode, httpStatus) =
-                        when (e) {
-                            is SignatureException, is MalformedJwtException -> Triple("Invalid token signature or format", ErrorCode.TOKEN_INVALID, HttpStatus.UNAUTHORIZED)
-                            is ExpiredJwtException -> Triple("Token has expired", ErrorCode.TOKEN_INVALID, HttpStatus.UNAUTHORIZED)
-                            is AppException -> Triple(e.message, e.errorCode, HttpStatus.valueOf(e.errorCode.defaultHttpStatus.value()))
-                            else -> {
-                                log.error("Unexpected error during token validation for path: {}", path, e)
-                                Triple("Internal server error during token validation", ErrorCode.INTERNAL_ERROR, HttpStatus.INTERNAL_SERVER_ERROR)
-                            }
-                        }
-                    return@GatewayFilter onError(exchange, errorMessage, httpStatus, errorCode)
-                }
-
-                if (accessPayload != null) {
-                    val mutatedRequest =
-                        request
-                            .mutate()
-                            .header(HEADER_USER_ID, accessPayload.id.toString())
-                            .header(HEADER_USER_ROLES, accessPayload.roles.joinToString(","))
-                            .build()
-                    return@GatewayFilter chain.filter(exchange.mutate().request(mutatedRequest).build())
-                } else {
-                    log.warn("Token was present but validation resulted in null payload for path: {}", path)
-                    return@GatewayFilter onError(exchange, "Token validation failed unexpectedly", HttpStatus.UNAUTHORIZED, ErrorCode.TOKEN_INVALID)
-                }
-            } else {
-                return@GatewayFilter chain.filter(exchange)
-            }
+        if (isGatewaySpecificPublicPath(path)) {
+            return chain.filter(exchange)
         }
+
+        val authHeader = request.headers.getFirst(HttpHeaders.AUTHORIZATION)
+
+        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+            return chain.filter(exchange)
+        }
+
+        val token = authHeader.substring(BEARER_PREFIX.length)
+        var accessPayload: AccessPayload? = null
+
+        try {
+            accessPayload = jwtTokenParser.validateToken(token)
+        } catch (e: Exception) {
+            val (errorMessage, errorCode, httpStatus) =
+                when (e) {
+                    is SignatureException, is MalformedJwtException -> Triple("유효하지 않은 토큰입니다.", ErrorCode.TOKEN_INVALID, HttpStatus.UNAUTHORIZED)
+                    is ExpiredJwtException -> Triple("토큰만료", ErrorCode.TOKEN_INVALID, HttpStatus.UNAUTHORIZED)
+                    is AppException -> Triple(e.message, e.errorCode, HttpStatus.valueOf(e.errorCode.defaultHttpStatus.value()))
+                    else -> {
+                        log.error("경로에 대한 토큰 검증 중 예상치 못한 오류가 발생했습니다.: {}", path, e)
+                        Triple("토큰 검증 중 내부 서버 오류가 발생했습니다.", ErrorCode.INTERNAL_ERROR, HttpStatus.INTERNAL_SERVER_ERROR)
+                    }
+                }
+            return onError(exchange, errorMessage, httpStatus, errorCode)
+        }
+
+        if (accessPayload != null) {
+            val mutatedRequest =
+                request
+                    .mutate()
+                    .header(HEADER_USER_ID, accessPayload.id.toString())
+                    .header(HEADER_USER_ROLES, accessPayload.roles.joinToString(","))
+                    .build()
+            return chain.filter(exchange.mutate().request(mutatedRequest).build())
+        } else {
+            log.warn("Token was present but validation resulted in null payload for path: {}", path)
+            return onError(exchange, "Token validation failed unexpectedly", HttpStatus.UNAUTHORIZED, ErrorCode.TOKEN_INVALID)
+        }
+    }
+
+    override fun getOrder(): Int { // *** 추가됨 ***
+        return -1
     }
 
     private fun isGatewaySpecificPublicPath(path: String): Boolean =
@@ -128,6 +131,4 @@ class AuthenticationFilter(
         }
         return response.writeWith(Mono.just(dataBuffer))
     }
-
-    class Config
 }

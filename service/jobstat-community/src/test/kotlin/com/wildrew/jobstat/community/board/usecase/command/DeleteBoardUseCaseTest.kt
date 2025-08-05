@@ -100,7 +100,7 @@ class DeleteBoardUseCaseTest {
         fun `given owner user, when delete own board, then success and publish event`() {
             // Given
             val board = createTestBoard(ownerUserId, null) // 사용자 ID로 생성된 게시글
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(ownerUserId)
             whenever(theadContextUtils.isAdmin()).thenReturn(false)
 
             val request = DeleteBoard.ExecuteRequest(board.id, null)
@@ -120,7 +120,7 @@ class DeleteBoardUseCaseTest {
                 eq(testCategory.id),
                 anyLong(),
             )
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
             verify(theadContextUtils).isAdmin()
         }
 
@@ -129,7 +129,7 @@ class DeleteBoardUseCaseTest {
         fun `given admin user, when delete other user board, then success and publish event`() {
             // Given
             val board = createTestBoard(otherUserId, null) // 다른 사용자 게시글
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(adminUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(adminUserId)
             whenever(theadContextUtils.isAdmin()).thenReturn(true) // 관리자 Mock
 
             val request = DeleteBoard.ExecuteRequest(board.id, null)
@@ -147,7 +147,7 @@ class DeleteBoardUseCaseTest {
                 eq(testCategory.id),
                 anyLong(),
             )
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
             verify(theadContextUtils).isAdmin()
         }
 
@@ -156,7 +156,7 @@ class DeleteBoardUseCaseTest {
         fun `given guest user with correct password, when delete guest board, then success and publish event`() {
             // Given
             val board = createTestBoard(guestUserId, correctPassword)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId)
 
             val request = DeleteBoard.ExecuteRequest(board.id, correctPassword)
 
@@ -188,7 +188,7 @@ class DeleteBoardUseCaseTest {
         fun `given non-owner user, when delete other user board, then throw AppException`() {
             // Given
             val board = createTestBoard(ownerUserId, null)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(otherUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(otherUserId)
             whenever(theadContextUtils.isAdmin()).thenReturn(false)
 
             val request = DeleteBoard.ExecuteRequest(board.id, null)
@@ -205,7 +205,7 @@ class DeleteBoardUseCaseTest {
         fun `given guest user with wrong password, when delete guest board, then throw AppException`() {
             // Given
             val board = createTestBoard(guestUserId, correctPassword)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId)
 
             val request = DeleteBoard.ExecuteRequest(board.id, wrongPassword)
 
@@ -222,7 +222,7 @@ class DeleteBoardUseCaseTest {
         fun `given guest user without password, when delete guest board, then throw AppException`() {
             // Given
             val board = createTestBoard(guestUserId, correctPassword)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId)
 
             val request = DeleteBoard.ExecuteRequest(board.id, null)
 
@@ -239,7 +239,7 @@ class DeleteBoardUseCaseTest {
         fun `given guest user, when delete member board, then throw AppException`() {
             // Given
             val board = createTestBoard(ownerUserId, null)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId)
 
             val request = DeleteBoard.ExecuteRequest(board.id, null)
 
@@ -260,7 +260,7 @@ class DeleteBoardUseCaseTest {
         fun `given non-existent boardId, when delete board, then throw EntityNotFoundException`() {
             // Given
             val nonExistentBoardId = 999L
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(ownerUserId)
 
             val request = DeleteBoard.ExecuteRequest(nonExistentBoardId, null)
 

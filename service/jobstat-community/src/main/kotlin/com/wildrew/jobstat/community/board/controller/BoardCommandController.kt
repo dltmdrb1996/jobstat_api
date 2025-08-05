@@ -1,7 +1,6 @@
 package com.wildrew.jobstat.community.board.controller
 
 import com.wildrew.jobstat.community.board.usecase.command.*
-import com.wildrew.jobstat.core.core_security.annotation.PublicWithTokenCheck
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
@@ -10,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerResponse
 
@@ -23,7 +23,7 @@ class BoardCommandController(
     private val likeBoard: LikeBoard,
     private val unlikeBoard: UnlikeBoard,
 ) {
-    @PublicWithTokenCheck
+    @PreAuthorize("permitAll()")
     @PostMapping("/boards")
     @Operation(
         summary = "게시글 작성",
@@ -39,7 +39,7 @@ class BoardCommandController(
         @RequestBody request: CreateBoard.Request,
     ): ResponseEntity<ApiResponse<CreateBoard.Response>> = ApiResponse.ok(createBoard.invoke(request))
 
-    @PublicWithTokenCheck
+    @PreAuthorize("permitAll()")
     @PutMapping("/boards/{boardId}")
     @Operation(
         summary = "게시글 수정",
@@ -57,7 +57,7 @@ class BoardCommandController(
         @RequestBody request: UpdateBoard.Request,
     ): ResponseEntity<ApiResponse<UpdateBoard.Response>> = ApiResponse.ok(updateBoard(request.of(boardId)))
 
-    @PublicWithTokenCheck
+    @PreAuthorize("permitAll()")
     @DeleteMapping("/boards/{boardId}")
     @Operation(
         summary = "게시글 삭제",
@@ -88,6 +88,7 @@ class BoardCommandController(
         return ApiResponse.ok(deleteBoard.invoke(executeRequest))
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/boards/{boardId}/likes")
     @Operation(
         summary = "게시글 좋아요",
@@ -113,6 +114,7 @@ class BoardCommandController(
         @PathVariable boardId: Long,
     ): ResponseEntity<ApiResponse<LikeBoard.Response>> = ApiResponse.ok(likeBoard(LikeBoard.Request(boardId)))
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/boards/{boardId}/likes")
     @Operation(
         summary = "게시글 좋아요 취소",

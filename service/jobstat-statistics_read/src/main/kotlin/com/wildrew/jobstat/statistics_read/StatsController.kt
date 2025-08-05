@@ -1,7 +1,6 @@
 package com.wildrew.jobstat.statistics_read
 
 import com.wildrew.jobstat.core.core_global.model.BaseDate
-import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import com.wildrew.jobstat.statistics_read.stats.registry.StatsType
@@ -12,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 
@@ -26,7 +26,7 @@ class StatsController(
     private val getSkillProfile: GetSkillProfile,
     private val compareSkills: CompareSkills,
 ) {
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/{statsType}/entity/{entityId}")
     @Operation(
         summary = "엔티티별 통계 조회",
@@ -56,7 +56,7 @@ class StatsController(
         return ApiResponse.ok(getStatsByEntityId(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/{statsType}/{baseDate}/entities")
     @Operation(
         summary = "다중 엔티티 통계 조회",
@@ -93,7 +93,7 @@ class StatsController(
         return ApiResponse.ok(getStatsByEntityIds(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/{statsType}/entity/{entityId}/latest")
     @Operation(
         summary = "최신 통계 조회",
@@ -123,7 +123,7 @@ class StatsController(
         return ApiResponse.ok(getLatestStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/{statsType}/{baseDate}/entity/{entityId}")
     @Operation(
         summary = "시점별 통계 조회",
@@ -160,7 +160,7 @@ class StatsController(
         return ApiResponse.ok(getStatsByEntityIdAndBaseDate(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/skills/{skillId}/profile")
     @Operation(summary = "기술 스택 상세 프로필 조회")
     fun getSkillProfile(
@@ -180,7 +180,7 @@ class StatsController(
         return ApiResponse.ok(getSkillProfile(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/skills/compare")
     @Operation(summary = "기술 스택 비교")
     fun compareSkills(

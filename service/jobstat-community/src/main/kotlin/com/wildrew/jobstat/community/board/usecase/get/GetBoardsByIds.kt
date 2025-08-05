@@ -28,7 +28,7 @@ class GetBoardsByIds(
 ) : ValidUseCase<GetBoardsByIds.Request, GetBoardsByIds.Response>(validator) {
     override fun execute(request: Request): Response {
         // 현재 사용자 ID 확인
-        val userId = theadContextUtils.getCurrentUserId()?.toString()
+        val userId = theadContextUtils.getCurrentUserIdOrNull()?.toString()
 
         // ID 목록으로 게시글 조회
         val boards = boardService.getBoardsByIds(request.boardIds)

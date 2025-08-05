@@ -75,7 +75,7 @@ class LikeBoardUseCaseTest {
         @DisplayName("로그인 사용자가 게시글 좋아요 성공")
         fun `given logged in user and existing board, when like board, then increment count and publish event`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val initialLikeCount = boardRepository.findLikeCountById(testBoard.id) ?: 0
             val expectedLikeCount = initialLikeCount + 1
 
@@ -97,7 +97,7 @@ class LikeBoardUseCaseTest {
             assertEquals(expectedLikeCount, response.likeCount)
 
             // Verify
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
             verify(counterService).incrementLikeCount(
                 boardId = eq(testBoard.id),
                 userId = eq(testUserId.toString()),
@@ -119,7 +119,7 @@ class LikeBoardUseCaseTest {
             @DisplayName("비로그인 사용자가 좋아요 시 AppException(AUTHENTICATION_FAILURE) 발생")
             fun `given guest user, when like board, then throw AppException`() {
                 // Given
-                whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 Mock
+                whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId) // 비로그인 Mock
                 val request = LikeBoard.Request(boardId = testBoard.id)
 
                 // When & Then
@@ -128,7 +128,7 @@ class LikeBoardUseCaseTest {
                 assertTrue(exception.message.contains("로그인이 필요합니다"))
 
                 // Verify
-                verify(theadContextUtils).getCurrentUserId()
+                verify(theadContextUtils).getCurrentUserIdOrNull()
                 verifyNoInteractions(counterService, eventPublisher) // 카운터, 이벤트 미호출 확인
             }
 
@@ -137,7 +137,7 @@ class LikeBoardUseCaseTest {
             fun `given non-existent boardId, when like board, then throw AppException`() {
                 // Given
                 val nonExistentBoardId = 999L
-                whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+                whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
 
                 val request = LikeBoard.Request(boardId = nonExistentBoardId)
 
@@ -147,7 +147,7 @@ class LikeBoardUseCaseTest {
                 assertTrue(exception.message.contains("게시글을 찾을 수 없습니다"))
 
                 // Verify
-                verify(theadContextUtils).getCurrentUserId()
+                verify(theadContextUtils).getCurrentUserIdOrNull()
                 verifyNoInteractions(counterService, eventPublisher)
             }
 
@@ -155,7 +155,7 @@ class LikeBoardUseCaseTest {
             @DisplayName("CounterService에서 예외 발생 시 전파되는지 확인 (예시)")
             fun `given counterService throws exception, when like board, then exception propagates`() {
                 // Given
-                whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+                whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
                 val initialLikeCount = boardRepository.findLikeCountById(testBoard.id) ?: 0
                 val counterException = RuntimeException("Redis connection failed")
 
@@ -174,7 +174,7 @@ class LikeBoardUseCaseTest {
                 assertEquals(counterException, thrownException)
 
                 // Verify
-                verify(theadContextUtils).getCurrentUserId()
+                verify(theadContextUtils).getCurrentUserIdOrNull()
                 verify(counterService).incrementLikeCount(any(), any(), any())
                 verifyNoInteractions(eventPublisher)
             }

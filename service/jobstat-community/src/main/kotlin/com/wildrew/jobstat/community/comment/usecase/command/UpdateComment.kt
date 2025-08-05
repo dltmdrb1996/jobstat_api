@@ -93,7 +93,7 @@ class UpdateComment(
 
     private fun validateMemberPermission(comment: Comment) {
         val currentUserId =
-            theadContextUtils.getCurrentUserId()
+            theadContextUtils.getCurrentUserIdOrNull()
                 ?: throw AppException.fromErrorCode(
                     ErrorCode.AUTHENTICATION_FAILURE,
                     "로그인이 필요합니다",

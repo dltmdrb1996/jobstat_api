@@ -2,7 +2,6 @@ package com.wildrew.jobstat.auth.email
 
 import com.wildrew.jobstat.auth.email.usecase.RequestEmailVerification
 import com.wildrew.jobstat.auth.email.usecase.VerifyEmail
-import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
@@ -10,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,7 +23,7 @@ class EmailVerificationController(
     private val requestEmailVerification: RequestEmailVerification,
     private val verifyEmail: VerifyEmail,
 ) {
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/request")
     @Operation(
         summary = "이메일 인증 요청",
@@ -49,7 +49,7 @@ class EmailVerificationController(
         @RequestBody request: RequestEmailVerification.Request,
     ): ResponseEntity<ApiResponse<Unit>> = ApiResponse.ok(requestEmailVerification(request))
 
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/verify")
     @Operation(
         summary = "이메일 인증 코드 검증",
