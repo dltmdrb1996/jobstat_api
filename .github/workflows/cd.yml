@@ -2,7 +2,7 @@ name: Build and Update Manifests
 
 on:
   push:
-    branches: [ '**' ]
+    branches: [ "main" ]
   workflow_dispatch:
     inputs:
       services_to_deploy:
