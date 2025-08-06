@@ -113,6 +113,7 @@ class CoreOpenApiAutoConfiguration {
         val securityRequirements = mutableListOf<SecurityRequirement>()
 
         if (gatewayHeaderAuthEnabled) {
+            // 1. 보안 스키마들을 먼저 정의합니다.
             components.addSecuritySchemes(
                 xUserIdSchemeName,
                 SecurityScheme()
@@ -121,8 +122,6 @@ class CoreOpenApiAutoConfiguration {
                     .name("X-User-Id")
                     .description("게이트웨이에서 전달되는 사용자 ID"),
             )
-            securityRequirements.add(SecurityRequirement().addList(xUserIdSchemeName))
-
             components.addSecuritySchemes(
                 xUserRolesSchemeName,
                 SecurityScheme()
@@ -131,11 +130,15 @@ class CoreOpenApiAutoConfiguration {
                     .name("X-User-Roles")
                     .description("게이트웨이에서 전달되는 사용자 역할 (쉼표로 구분)"),
             )
-            securityRequirements.add(SecurityRequirement().addList(xUserRolesSchemeName))
+
+            // 2. 하나의 SecurityRequirement 객체에 두 스키마를 모두 추가(AND 조건)합니다.
+            val gatewayAuthRequirement =
+                SecurityRequirement()
+                    .addList(xUserIdSchemeName)
+                    .addList(xUserRolesSchemeName)
+
+            securityRequirements.add(gatewayAuthRequirement)
         }
-        // else if (bearerAuthEnabled) { // 만약 기존 Bearer 인증도 옵션으로 남겨두고 싶다면
-        //    // 기존 Bearer 토큰 설정
-        // }
 
         if (components.securitySchemes?.isNotEmpty() == true) {
             openApi.components(components)

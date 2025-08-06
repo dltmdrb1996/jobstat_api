@@ -26,7 +26,7 @@ import org.springframework.security.web.SecurityFilterChain
     matchIfMissing = true,
 )
 @AutoConfigureAfter(
-    CoreWebSecurityAutoConfiguration::class,
+    MicroserviceWebSecurityConfig::class,
     CorePasswordUtilConfig::class,
 )
 class CoreAdminPageSecurityAutoConfiguration {

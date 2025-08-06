@@ -105,7 +105,7 @@ class GetBoardsByIdsUseCaseTest {
         @DisplayName("로그인 사용자가 여러 게시글 ID로 조회 성공")
         fun `given logged in user and list of existing boardIds, when execute, then return board items with counters`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val requestedIds = listOf(board1.id, board3.id)
             val dbBoardsWithCounts =
                 listOf(
@@ -148,7 +148,7 @@ class GetBoardsByIdsUseCaseTest {
             assertFalse(boardItem3.userLiked)
 
             // Verify interactions
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
             verify(counterService).getBulkBoardCounters(eq(dbBoardsWithCounts), eq(testUserId.toString()))
         }
 
@@ -156,7 +156,7 @@ class GetBoardsByIdsUseCaseTest {
         @DisplayName("비로그인 사용자가 여러 게시글 ID로 조회 성공")
         fun `given guest user and list of existing boardIds, when execute, then return board items without user liked info`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId) // 비로그인
             val requestedIds = listOf(board1.id, board2.id)
             val dbBoardsWithCounts =
                 listOf(
@@ -183,7 +183,7 @@ class GetBoardsByIdsUseCaseTest {
             assertTrue(response.boards.all { !it.userLiked })
 
             // Verify
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
             verify(counterService).getBulkBoardCounters(eq(dbBoardsWithCounts), eq(null))
         }
 
@@ -191,7 +191,7 @@ class GetBoardsByIdsUseCaseTest {
         @DisplayName("존재하지 않는 ID 포함하여 조회 시 존재하는 게시글만 반환")
         fun `given mixed existing and non-existing ids, when execute, then return only existing boards`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val nonExistentId = 999L
             val requestedIds = listOf(board1.id, nonExistentId, board3.id)
             val expectedDbBoardsWithCounts =
@@ -226,7 +226,7 @@ class GetBoardsByIdsUseCaseTest {
         @DisplayName("ID 목록이 비어있으면 빈 목록 반환")
         fun `given empty id list, when execute, then return empty list`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val request = GetBoardsByIds.Request(boardIds = emptyList())
 
             // When & Then
@@ -238,7 +238,7 @@ class GetBoardsByIdsUseCaseTest {
         @DisplayName("조회된 게시글이 없으면 빈 목록 반환")
         fun `given id list with only non-existing ids, when execute, then return empty list`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val nonExistentIds = listOf(998L, 999L)
             val request = GetBoardsByIds.Request(boardIds = nonExistentIds)
 
@@ -258,7 +258,7 @@ class GetBoardsByIdsUseCaseTest {
         @DisplayName("CounterService에서 예외 발생 시 전파")
         fun `given counterService throws exception, when execute, then exception propagates`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val requestedIds = listOf(board1.id, board2.id)
             val dbBoardsWithCounts =
                 listOf(
@@ -279,7 +279,7 @@ class GetBoardsByIdsUseCaseTest {
         @DisplayName("CounterService 결과 누락 시 AppException(REDIS_OPERATION_FAILED) 발생")
         fun `given counterService returns incomplete data, when execute, then throw AppException`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val requestedIds = listOf(board1.id, board2.id) // 2개 요청
             val dbBoardsWithCounts =
                 listOf(

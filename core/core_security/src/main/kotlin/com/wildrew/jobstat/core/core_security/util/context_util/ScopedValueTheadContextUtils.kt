@@ -1,9 +1,10 @@
 package com.wildrew.jobstat.core.core_security.util.context_util
 
+import com.wildrew.jobstat.core.core_error.model.AppException
+import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_security.util.ScopedSecurityContextHolder
 
-class ScopedValueTheadContextUtils : TheadContextUtils { // 인터페이스 구현
-
+class ScopedValueTheadContextUtils : TheadContextUtils {
     private object Constants {
         const val ROLE_PREFIX = "ROLE_"
     }
@@ -14,17 +15,18 @@ class ScopedValueTheadContextUtils : TheadContextUtils { // 인터페이스 구�
             authentication.principal is Long
     }
 
-    override fun getCurrentUserId(): Long? {
+    override fun getCurrentUserIdOrFail(): Long = getCurrentUserIdOrNull() ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
+
+    override fun getCurrentUserIdOrNull(): Long? {
         val authentication = ScopedSecurityContextHolder.getContext().authentication
         return when (val principal = authentication?.principal) {
             is Long -> principal
-            else -> null // 인증되지 않았거나 principal이 Long 타입이 아닌 경우
+            else -> null
         }
     }
 
     override fun getCurrentUserRoles(): List<String> {
         val authentication = ScopedSecurityContextHolder.getContext().authentication
-        // isAuthenticated() 와 유사한 조건 사용
         return if (authentication?.principal != null && authentication.principal is Long) {
             authentication.authorities?.map { it.authority.removePrefix(Constants.ROLE_PREFIX) } ?: emptyList()
         } else {
@@ -58,7 +60,7 @@ class ScopedValueTheadContextUtils : TheadContextUtils { // 인터페이스 구�
 
     override fun canAccess(resourceUserId: Long): Boolean {
         if (!isAuthenticated()) return false
-        return isAdmin() || getCurrentUserId() == resourceUserId
+        return isAdmin() || getCurrentUserIdOrNull() == resourceUserId
     }
 
     override fun getHighestRole(): String? {

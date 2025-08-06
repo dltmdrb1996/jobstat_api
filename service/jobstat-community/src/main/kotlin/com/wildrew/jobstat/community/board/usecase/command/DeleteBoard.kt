@@ -61,7 +61,7 @@ class DeleteBoard(
         board: Board,
         password: String?,
     ) {
-        board.password?.let { storedPassword ->
+        board.password?.let {
             validatePasswordAccess(board, password)
         } ?: run {
             validateMemberAccess(board)
@@ -89,12 +89,7 @@ class DeleteBoard(
     }
 
     private fun validateMemberAccess(board: Board) {
-        val currentUserId =
-            theadContextUtils.getCurrentUserId()
-                ?: throw AppException.fromErrorCode(
-                    ErrorCode.AUTHENTICATION_FAILURE,
-                    "로그인이 필요합니다",
-                )
+        val currentUserId = theadContextUtils.getCurrentUserIdOrFail()
 
         when {
             theadContextUtils.isAdmin() -> {

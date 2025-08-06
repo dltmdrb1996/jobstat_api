@@ -24,7 +24,7 @@ class GetBoardById(
 
     override fun execute(request: Request): Response {
         val board = boardService.getBoard(request.boardId)
-        val userId = theadContextUtils.getCurrentUserId()?.toString()
+        val userId = theadContextUtils.getCurrentUserIdOrNull()?.toString()
 
         val finalCounters =
             counterService.getSingleBoardCounters(

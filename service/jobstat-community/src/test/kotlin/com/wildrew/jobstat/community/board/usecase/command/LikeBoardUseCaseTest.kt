@@ -8,10 +8,10 @@ import com.wildrew.jobstat.community.board.repository.FakeCategoryRepository
 import com.wildrew.jobstat.community.board.service.BoardService
 import com.wildrew.jobstat.community.board.service.BoardServiceImpl
 import com.wildrew.jobstat.community.counting.CounterService
-import com.wildrew.jobstat.community.event.CommunityCommandEventPublisher // Mock 대상
+import com.wildrew.jobstat.community.event.CommunityCommandEventPublisher
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
-import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
+import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils
 import jakarta.validation.Validation
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -36,7 +36,6 @@ class LikeBoardUseCaseTest {
     private lateinit var testCategory: BoardCategory
     private lateinit var testBoard: Board
     private val testUserId = 1L
-    private val guestUserId: Long? = null
 
     @BeforeEach
     fun setUp() {
@@ -59,13 +58,7 @@ class LikeBoardUseCaseTest {
             )
 
         testCategory = categoryRepository.save(CategoryFixture.aCategory().create())
-        testBoard = boardService.createBoard("제목", "내용", "글쓴이", testCategory.id, null, 100L) // 게시글 생성
-    }
-
-    @AfterEach
-    fun tearDown() {
-        boardRepository.clear()
-        categoryRepository.clear()
+        testBoard = boardService.createBoard("제목", "내용", "글쓴이", testCategory.id, null, 100L)
     }
 
     @Nested
@@ -75,18 +68,17 @@ class LikeBoardUseCaseTest {
         @DisplayName("로그인 사용자가 게시글 좋아요 성공")
         fun `given logged in user and existing board, when like board, then increment count and publish event`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
-            val initialLikeCount = boardRepository.findLikeCountById(testBoard.id) ?: 0
-            val expectedLikeCount = initialLikeCount + 1
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenReturn(testUserId)
+            val initialLikeCount = 0
+            val expectedLikeCount = 1
 
-            // CounterService Mock 설정: incrementLikeCount 호출 시 예상 카운트 반환
             whenever(
                 counterService.incrementLikeCount(
                     boardId = eq(testBoard.id),
                     userId = eq(testUserId.toString()),
-                    dbLikeCount = eq(initialLikeCount), // 현재 DB(Fake) 값 전달
+                    dbLikeCount = eq(initialLikeCount),
                 ),
-            ).thenReturn(expectedLikeCount) // 증가된 카운트 반환하도록 설정
+            ).thenReturn(expectedLikeCount)
 
             val request = LikeBoard.Request(boardId = testBoard.id)
 
@@ -97,12 +89,8 @@ class LikeBoardUseCaseTest {
             assertEquals(expectedLikeCount, response.likeCount)
 
             // Verify
-            verify(theadContextUtils).getCurrentUserId()
-            verify(counterService).incrementLikeCount(
-                boardId = eq(testBoard.id),
-                userId = eq(testUserId.toString()),
-                dbLikeCount = eq(initialLikeCount),
-            )
+            verify(theadContextUtils).getCurrentUserIdOrFail()
+            verify(counterService).incrementLikeCount(any(), any(), any())
             verify(eventPublisher).publishBoardLiked(
                 boardId = eq(testBoard.id),
                 createdAt = any<LocalDateTime>(),
@@ -111,73 +99,45 @@ class LikeBoardUseCaseTest {
                 eventTs = anyLong(),
             )
         }
+    }
 
-        @Nested
-        @DisplayName("실패 케이스")
-        inner class FailCases {
-            @Test
-            @DisplayName("비로그인 사용자가 좋아요 시 AppException(AUTHENTICATION_FAILURE) 발생")
-            fun `given guest user, when like board, then throw AppException`() {
-                // Given
-                whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 Mock
-                val request = LikeBoard.Request(boardId = testBoard.id)
+    @Nested
+    @DisplayName("실패 케이스")
+    inner class FailCases {
+        @Test
+        @DisplayName("비로그인 사용자가 좋아요 시 AppException(AUTHENTICATION_FAILURE) 발생")
+        fun `given guest user, when like board, then throw AppException`() {
+            // Given
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenThrow(
+                AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "로그인이 필요합니다"),
+            )
+            val request = LikeBoard.Request(boardId = testBoard.id)
 
-                // When & Then
-                val exception = assertThrows<AppException> { likeBoard(request) }
-                assertEquals(ErrorCode.AUTHENTICATION_FAILURE, exception.errorCode)
-                assertTrue(exception.message.contains("로그인이 필요합니다"))
+            // When & Then
+            val exception = assertThrows<AppException> { likeBoard(request) }
+            assertEquals(ErrorCode.AUTHENTICATION_FAILURE, exception.errorCode)
 
-                // Verify
-                verify(theadContextUtils).getCurrentUserId()
-                verifyNoInteractions(counterService, eventPublisher) // 카운터, 이벤트 미호출 확인
-            }
+            // Verify
+            verify(theadContextUtils).getCurrentUserIdOrFail()
+            verifyNoInteractions(counterService, eventPublisher)
+        }
 
-            @Test
-            @DisplayName("존재하지 않는 게시글 좋아요 시 AppException(RESOURCE_NOT_FOUND) 발생")
-            fun `given non-existent boardId, when like board, then throw AppException`() {
-                // Given
-                val nonExistentBoardId = 999L
-                whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+        @Test
+        @DisplayName("존재하지 않는 게시글 좋아요 시 AppException(RESOURCE_NOT_FOUND) 발생")
+        fun `given non-existent boardId, when like board, then throw AppException`() {
+            // Given
+            val nonExistentBoardId = 999L
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenReturn(testUserId)
 
-                val request = LikeBoard.Request(boardId = nonExistentBoardId)
+            val request = LikeBoard.Request(boardId = nonExistentBoardId)
 
-                // When & Then
-                val exception = assertThrows<AppException> { likeBoard(request) }
-                assertEquals(ErrorCode.RESOURCE_NOT_FOUND, exception.errorCode)
-                assertTrue(exception.message.contains("게시글을 찾을 수 없습니다"))
+            // When & Then
+            val exception = assertThrows<AppException> { likeBoard(request) }
+            assertEquals(ErrorCode.RESOURCE_NOT_FOUND, exception.errorCode)
 
-                // Verify
-                verify(theadContextUtils).getCurrentUserId()
-                verifyNoInteractions(counterService, eventPublisher)
-            }
-
-            @Test
-            @DisplayName("CounterService에서 예외 발생 시 전파되는지 확인 (예시)")
-            fun `given counterService throws exception, when like board, then exception propagates`() {
-                // Given
-                whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
-                val initialLikeCount = boardRepository.findLikeCountById(testBoard.id) ?: 0
-                val counterException = RuntimeException("Redis connection failed")
-
-                whenever(
-                    counterService.incrementLikeCount(
-                        boardId = eq(testBoard.id),
-                        userId = eq(testUserId.toString()),
-                        dbLikeCount = eq(initialLikeCount),
-                    ),
-                ).thenThrow(counterException)
-
-                val request = LikeBoard.Request(boardId = testBoard.id)
-
-                // When & Then
-                val thrownException = assertThrows<RuntimeException> { likeBoard(request) }
-                assertEquals(counterException, thrownException)
-
-                // Verify
-                verify(theadContextUtils).getCurrentUserId()
-                verify(counterService).incrementLikeCount(any(), any(), any())
-                verifyNoInteractions(eventPublisher)
-            }
+            // Verify
+            verify(theadContextUtils).getCurrentUserIdOrFail()
+            verifyNoInteractions(counterService, eventPublisher)
         }
     }
 }

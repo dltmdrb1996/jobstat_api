@@ -3,12 +3,16 @@ package com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import com.wildrew.jobstat.statistics_read.common.orThrowNotFound
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.RankingSlice
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.repository.BaseRankingRepository.Companion.DEFAULT_PAGE_SIZE
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.springframework.data.mongodb.core.MongoOperations
+import org.springframework.data.mongodb.core.aggregation.*
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.repository.query.MongoEntityInformation
 import org.springframework.data.repository.NoRepositoryBean
 import kotlin.math.abs
@@ -70,6 +74,12 @@ interface BaseRankingRepository<T : BaseRankingDocument<E>, E : RankingEntry, ID
         months: Int,
         maxRank: Int,
     ): List<E>
+
+    fun findRankingsSlice(
+        baseDate: String,
+        cursor: Int?,
+        limit: Int,
+    ): RankingSlice<E>
 
     companion object {
         const val DEFAULT_PAGE_SIZE = 100
@@ -289,5 +299,27 @@ abstract class BaseRankingRepositoryImpl<T : BaseRankingDocument<E>, E : Ranking
             ?.rankings
             ?.filter { it.entityId in consistentEntities }
             ?: emptyList()
+    }
+
+    override fun findRankingsSlice(
+        baseDate: String,
+        cursor: Int?,
+        limit: Int,
+    ): RankingSlice<E> {
+        val startIndex = cursor ?: 0
+        val query = Query(Criteria.where("base_date").`is`(baseDate))
+        query
+            .fields()
+            .include("_id", "base_date", "period", "metrics", "page")
+            .slice("rankings", startIndex, limit)
+
+        val document =
+            mongoOperations.findOne(query, entityInformation.javaType)
+                ?: return RankingSlice()
+
+        return RankingSlice(
+            totalCount = document.metrics.rankedCount,
+            items = document.rankings,
+        )
     }
 }

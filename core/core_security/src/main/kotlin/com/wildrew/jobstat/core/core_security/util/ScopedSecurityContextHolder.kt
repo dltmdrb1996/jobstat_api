@@ -4,20 +4,8 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextImpl
 
 object ScopedSecurityContextHolder {
-    /**
-     * SecurityContext를 저장하기 위한 ScopedValue 인스턴스.
-     * 이 ScopedValue는 각 가상 스레드 (또는 플랫폼 스레드)의 특정 스코프 내에서
-     * SecurityContext를 바인딩하는 데 사용됩니다.
-     */
     private val SCOPED_SECURITY_CONTEXT: ScopedValue<SecurityContext> = ScopedValue.newInstance()
 
-    /**
-     * 현재 스코프에 바인딩된 SecurityContext를 반환합니다.
-     * 바인딩된 컨텍스트가 없으면 새로운 (비어있는) SecurityContext를 생성하여 반환합니다.
-     * 이는 기존 SecurityContextHolder.getContext()와 유사하게 동작하도록 하기 위함입니다.
-     * (엄밀히 말하면, ScopedValue가 바인딩되지 않았을 때 get()을 호출하면 예외가 발생하므로,
-     * isBound 체크가 중요합니다.)
-     */
     fun getContext(): SecurityContext =
         if (SCOPED_SECURITY_CONTEXT.isBound) {
             SCOPED_SECURITY_CONTEXT.get()
@@ -83,7 +71,7 @@ object ScopedSecurityContextHolder {
         // SAM 변환을 통해 호환됩니다.
         ScopedValue
             .where(SCOPED_SECURITY_CONTEXT, context)
-            .run(task) // task는 RunnableOp (또는 Runnable)으로 취급됨
+            .run(task)
     }
 
     /**

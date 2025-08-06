@@ -89,12 +89,7 @@ class UpdateBoard(
     }
 
     private fun validateMemberPermission(board: Board) {
-        val currentUserId =
-            theadContextUtils.getCurrentUserId()
-                ?: throw AppException.fromErrorCode(
-                    ErrorCode.AUTHENTICATION_FAILURE,
-                    "로그인이 필요합니다",
-                )
+        val currentUserId = theadContextUtils.getCurrentUserIdOrFail()
 
         if (board.userId != currentUserId && !theadContextUtils.isAdmin()) {
             throw AppException.fromErrorCode(

@@ -5,7 +5,6 @@ import com.wildrew.jobstat.community.board.usecase.get.dto.BoardIdsResponse
 import com.wildrew.jobstat.community.board.utils.BoardConstants
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
 import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
-import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
@@ -14,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerResponse
 
@@ -34,7 +34,7 @@ class BoardGetController(
     private val getAuthorBoardIdsByCursorUseCase: GetAuthorBoardIdsByCursorUseCase,
     private val getRankingBoardIdsByCursorUseCase: GetRankingBoardIdsByCursorUseCase,
 ) {
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/boards/{boardId}")
     @Operation(
         summary = "게시글 상세 조회",
@@ -58,7 +58,7 @@ class BoardGetController(
         return ApiResponse.ok(getBoardById(request))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/boards/bulk")
     @Operation(
         summary = "게시글 벌크 조회",
@@ -78,7 +78,7 @@ class BoardGetController(
         @Parameter(description = "조회할 게시글 ID 목록", example = "[1, 2, 3, 4, 5]") @RequestBody request: GetBoardsByIds.Request,
     ): ResponseEntity<ApiResponse<GetBoardsByIds.Response>> = ApiResponse.ok(getBoardsByIds(request))
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/boards-fetch/ids")
     @Operation(
         summary = "게시글 ID 목록 조회 (Offset)",
@@ -124,7 +124,7 @@ class BoardGetController(
             }
         }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/boards-fetch/ids/after")
     @Operation(
         summary = "특정 ID 이후 게시글 ID 목록 조회 (Cursor)",
@@ -171,7 +171,7 @@ class BoardGetController(
         }
 
     // --- 랭킹별 게시글 ID 목록 조회 (Offset) ---
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/boards-fetch/ranks/{metric}/{period}/ids")
     @Operation(
         summary = "랭킹별 게시글 ID 목록 조회 (Offset)",
@@ -220,7 +220,7 @@ class BoardGetController(
         return ApiResponse.ok(getRankingBoardIdsByOffsetUseCase(request))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/boards-fetch/ranks/{metric}/{period}/ids/after")
     @Operation(
         summary = "랭킹별 특정 ID 이후 게시글 ID 목록 조회 (Cursor - ID 기반)",

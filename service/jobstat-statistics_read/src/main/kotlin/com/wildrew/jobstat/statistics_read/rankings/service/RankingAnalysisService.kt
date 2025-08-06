@@ -126,37 +126,70 @@ class RankingAnalysisServiceImpl(
         )
     }
 
+//    private fun findPureRankings(
+//        rankingType: RankingType,
+//        baseDate: BaseDate,
+//        cursor: Int?,
+//        limit: Int,
+//    ): PureRankingPage {
+//        val repository = repositoryRegistry.getRepository<BaseRankingDocument<*>>(rankingType)
+//
+//        val startRank = cursor?.let { it + 1 } ?: 1
+//        val endRank = startRank + limit - 1
+//        val startPage = (startRank - 1) / PAGE_SIZE + 1
+//        val endPage = (endRank - 1) / PAGE_SIZE + 1
+//
+//        val rankings =
+//            repository
+//                .findByPageRange(baseDate.toString(), startPage, endPage)
+//                .flatMap { it.rankings }
+//                .filter { it.rank in startRank..endRank }
+//                .take(limit)
+//
+//        if (rankings.isEmpty()) {
+//            return PureRankingPage(emptyList(), 0, false, null)
+//        }
+//
+//        val lastItem = rankings.last()
+//        val totalCount = repository.findByPage(baseDate.toString(), 1).metrics.rankedCount
+//        val hasNextPage = lastItem.rank < totalCount
+//        val nextCursor = if (hasNextPage) lastItem.rank else null
+//
+//        return PureRankingPage(
+//            items = rankings,
+//            totalCount = totalCount,
+//            hasNextPage = hasNextPage,
+//            nextCursor = nextCursor,
+//        )
+//    }
+
     private fun findPureRankings(
         rankingType: RankingType,
         baseDate: BaseDate,
         cursor: Int?,
         limit: Int,
     ): PureRankingPage {
+        // 제네릭 타입을 맞추기 위해 캐스팅이 필요합니다.
         val repository = repositoryRegistry.getRepository<BaseRankingDocument<*>>(rankingType)
 
-        val startRank = cursor?.let { it + 1 } ?: 1
-        val endRank = startRank + limit - 1
-        val startPage = (startRank - 1) / PAGE_SIZE + 1
-        val endPage = (endRank - 1) / PAGE_SIZE + 1
+        // 1. DB에서 직접 슬라이싱된 데이터를 가져옵니다.
+        val rankingSlice = repository.findRankingsSlice(baseDate.toString(), cursor, limit)
 
-        val rankings =
-            repository
-                .findByPageRange(baseDate.toString(), startPage, endPage)
-                .flatMap { it.rankings }
-                .filter { it.rank in startRank..endRank }
-                .take(limit)
+        val items = rankingSlice.items
+        val totalCount = rankingSlice.totalCount
 
-        if (rankings.isEmpty()) {
-            return PureRankingPage(emptyList(), 0, false, null)
+        if (items.isEmpty()) {
+            return PureRankingPage(emptyList(), totalCount, false, null)
         }
 
-        val lastItem = rankings.last()
-        val totalCount = repository.findByPage(baseDate.toString(), 1).metrics.rankedCount
+        val lastItem = items.last()
+
         val hasNextPage = lastItem.rank < totalCount
+
         val nextCursor = if (hasNextPage) lastItem.rank else null
 
         return PureRankingPage(
-            items = rankings,
+            items = items,
             totalCount = totalCount,
             hasNextPage = hasNextPage,
             nextCursor = nextCursor,

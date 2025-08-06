@@ -90,7 +90,7 @@ class UpdateCommentUseCaseTest {
         @DisplayName("로그인 사용자가 자신의 댓글 수정 성공")
         fun `given owner user and valid request, when update own comment, then success and publish event`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(ownerUserId)
             whenever(theadContextUtils.isAdmin()).thenReturn(false)
             val newContent = "수정된 멤버 댓글 내용"
             val requestDto = UpdateComment.Request(content = newContent, password = null)
@@ -113,14 +113,14 @@ class UpdateCommentUseCaseTest {
                 comment = argThat { id == memberComment.id && content == newContent },
                 boardId = eq(testBoard.id),
             )
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
         }
 
         @Test
         @DisplayName("관리자가 다른 사용자 댓글 수정 성공")
         fun `given admin user, when update other user comment, then success`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(adminUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(adminUserId)
             whenever(theadContextUtils.isAdmin()).thenReturn(true)
             val newContent = "관리자가 수정한 댓글"
             val requestDto = UpdateComment.Request(content = newContent, password = null)
@@ -165,7 +165,7 @@ class UpdateCommentUseCaseTest {
         @DisplayName("로그인 사용자가 다른 사용자 댓글 수정 시 AppException(INSUFFICIENT_PERMISSION) 발생")
         fun `given non-owner user, when update other user comment, then throw AppException`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(otherUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(otherUserId)
             whenever(theadContextUtils.isAdmin()).thenReturn(false)
             val requestDto = UpdateComment.Request("수정 시도", null)
             val request = requestDto.of(memberComment.id)
@@ -200,7 +200,7 @@ class UpdateCommentUseCaseTest {
         fun setupValidationCase() {
             commentId = memberComment.id
 
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(ownerUserId)
             whenever(theadContextUtils.isAdmin()).thenReturn(false)
         }
 
@@ -239,7 +239,7 @@ class UpdateCommentUseCaseTest {
         fun `given non-existent commentId, when update comment, then throw EntityNotFoundException`() {
             // Given
             val nonExistentCommentId = 999L
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId) // 권한은 있음
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(ownerUserId) // 권한은 있음
             val requestDto = UpdateComment.Request("내용", null)
             val request = requestDto.of(nonExistentCommentId)
 

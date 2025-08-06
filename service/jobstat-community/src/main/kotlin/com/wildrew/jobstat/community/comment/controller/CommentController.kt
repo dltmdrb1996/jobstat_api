@@ -5,8 +5,6 @@ import com.wildrew.jobstat.community.comment.usecase.command.CreateComment
 import com.wildrew.jobstat.community.comment.usecase.command.DeleteComment
 import com.wildrew.jobstat.community.comment.usecase.command.UpdateComment
 import com.wildrew.jobstat.community.comment.usecase.get.*
-import com.wildrew.jobstat.core.core_security.annotation.Public
-import com.wildrew.jobstat.core.core_security.annotation.PublicWithTokenCheck
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
@@ -15,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerResponse
 
@@ -36,7 +35,7 @@ class CommentController(
     // 댓글 생성/수정/삭제 관련 API (POST, PUT, DELETE)
     // ===================================================
 
-    @PublicWithTokenCheck
+    @PreAuthorize("permitAll()")
     @PostMapping("/boards/{boardId}/comments")
     @Operation(
         summary = "댓글 작성",
@@ -62,7 +61,7 @@ class CommentController(
         @Parameter(description = "댓글 작성 정보", required = true) @RequestBody request: CreateComment.Request,
     ): ResponseEntity<ApiResponse<CreateComment.Response>> = ApiResponse.ok(createComment(request.of(boardId)))
 
-    @PublicWithTokenCheck
+    @PreAuthorize("permitAll()")
     @PutMapping("/comments/{commentId}")
     @Operation(
         summary = "댓글 수정",
@@ -93,7 +92,7 @@ class CommentController(
         @Parameter(description = "댓글 수정 정보", required = true) @RequestBody request: UpdateComment.Request,
     ): ResponseEntity<ApiResponse<UpdateComment.Response>> = ApiResponse.ok(updateComment(request.of(commentId)))
 
-    @PublicWithTokenCheck
+    @PreAuthorize("permitAll()")
     @DeleteMapping("/comments/{commentId}")
     @Operation(
         summary = "댓글 삭제",
@@ -123,7 +122,7 @@ class CommentController(
     // 댓글 조회 관련 API (GET)
     // ===================================================
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/comments/{commentId}")
     @Operation(
         summary = "댓글 단일 조회",
@@ -143,7 +142,7 @@ class CommentController(
         @Parameter(description = "댓글 ID", required = true, example = "1") @PathVariable commentId: Long,
     ): ResponseEntity<ApiResponse<GetCommentDetail.Response>> = ApiResponse.ok(getCommentDetail(GetCommentDetail.Request(commentId)))
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/boards/{boardId}/comments")
     @Operation(
         summary = "게시글별 댓글 목록 조회",
@@ -164,7 +163,7 @@ class CommentController(
         @Parameter(description = "페이지 번호 (0부터 시작)", required = false, example = "0") @RequestParam(required = false) page: Int?,
     ): ResponseEntity<ApiResponse<GetCommentsByBoardId.Response>> = ApiResponse.ok(getCommentsByBoardId(GetCommentsByBoardId.Request(boardId, page)))
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/boards/{boardId}/comments/after")
     @Operation(
         summary = "게시글별 댓글 무한 스크롤 조회",
@@ -190,7 +189,7 @@ class CommentController(
     // 댓글 일괄 조회 관련 API (POST)
     // ===================================================
 
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/comments/bulk")
     @Operation(
         summary = "여러 댓글 일괄 조회",
@@ -214,7 +213,7 @@ class CommentController(
     // 비활성화된 API (주석 처리)
     // ===================================================
 
-//    @Public
+//    @PreAuthorize("permitAll()")
 //    @GetMapping("/authors/{author}/activities")
 //    @Operation(
 //        summary = "작성자 활동 조회",
@@ -235,7 +234,7 @@ class CommentController(
 //        @Parameter(description = "페이지 번호", required = false, example = "0") @RequestParam(required = false) page: Int?,
 //    ): ResponseEntity<ApiResponse<GetAuthorActivities.Response>> = ApiResponse.ok(getAuthorActivities(GetAuthorActivities.Request(author, page)))
 
-//    @Public
+//    @PreAuthorize("permitAll()")
 //    @GetMapping("/authors/{author}/comments")
 //    @Operation(
 //        summary = "작성자별 댓글 조회",
