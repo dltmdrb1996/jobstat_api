@@ -1,5 +1,3 @@
-// 루트 프로젝트의 build.gradle.kts
-
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
@@ -52,15 +50,10 @@ subprojects {
         val tag = System.getenv("GITHUB_SHA")?.take(7)
             ?: "dev-${LocalDate.now()}"
 
-
-
         val svcName = project.name
             .removePrefix("jobstat-")
             .replace('_', '-')
 
-        println("DEBUG > dockerUser = '$dockerUser', tag = '$tag'")
-        println("DEBUG > dockerPassword = '${dockerPassword}'")
-        println("DEBUG > svcName = '$svcName'")
 
         imageName.set("$dockerUser/jobstat-$svcName:$tag")
         publish.set(true)

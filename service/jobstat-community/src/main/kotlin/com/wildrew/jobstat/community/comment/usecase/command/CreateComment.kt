@@ -29,7 +29,7 @@ class CreateComment(
     override fun invoke(request: ExecuteRequest): Response = super.invoke(request)
 
     override fun execute(request: ExecuteRequest): Response {
-        val userId = theadContextUtils.getCurrentUserId()
+        val userId = theadContextUtils.getCurrentUserIdOrNull()
         validatePasswordIfNotLoggedIn(userId, request.password)
         val encodedPassword = processPassword(userId, request.password)
 

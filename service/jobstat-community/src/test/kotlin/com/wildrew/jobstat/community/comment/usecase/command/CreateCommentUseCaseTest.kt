@@ -83,7 +83,7 @@ class CreateCommentUseCaseTest {
         @DisplayName("로그인 사용자가 유효한 정보로 댓글 생성 성공")
         fun `given logged in user and valid request, when execute, then create comment and publish event`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
             val requestDto =
                 CreateComment.Request(
                     content = "로그인 사용자 댓글 내용",
@@ -118,14 +118,14 @@ class CreateCommentUseCaseTest {
                 boardId = eq(testBoard.id),
                 userId = eq(testUserId),
             )
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
         }
 
         @Test
         @DisplayName("비로그인 사용자가 비밀번호와 함께 유효한 정보로 댓글 생성 성공")
         fun `given guest user with password and valid request, when execute, then create comment with encoded password`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId)
             val rawPassword = "guestPassword"
             val requestDto =
                 CreateComment.Request(
@@ -158,7 +158,7 @@ class CreateCommentUseCaseTest {
                 boardId = eq(testBoard.id),
                 userId = eq(guestUserId),
             )
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
         }
     }
 
@@ -168,7 +168,7 @@ class CreateCommentUseCaseTest {
         @BeforeEach
         fun setup() {
             // 기본적으로 로그인 상태로 설정
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
         }
 
         @Test
@@ -215,7 +215,7 @@ class CreateCommentUseCaseTest {
         @DisplayName("비밀번호가 너무 짧으면 ConstraintViolationException 발생 (비회원)")
         fun `given guest user and too short password, when execute, then throw ConstraintViolationException`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId)
             val requestDto = CreateComment.Request(content = "정상 내용", author = "방문자", password = "123") // 길이 부족
             val request = requestDto.of(testBoard.id)
 
@@ -233,7 +233,7 @@ class CreateCommentUseCaseTest {
         @DisplayName("비로그인 사용자가 비밀번호 없이 생성 시 AppException(AUTHENTICATION_FAILURE) 발생")
         fun `given guest user without password, when execute, then throw AppException`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId)
             val requestDto = CreateComment.Request(content = "내용", author = "방문자", password = null) // 비밀번호 없음
             val request = requestDto.of(testBoard.id)
 
@@ -255,7 +255,7 @@ class CreateCommentUseCaseTest {
         @DisplayName("존재하지 않는 게시글 ID로 생성 시 EntityNotFoundException 발생 (CommentService 레벨)")
         fun `given non-existent boardId, when execute, then throw EntityNotFoundException`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(testUserId) // 로그인 상태
+            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId) // 로그인 상태
             val nonExistentBoardId = 999L
             val requestDto = CreateComment.Request(content = "내용", author = "멤버", password = null)
             val request = requestDto.of(nonExistentBoardId) // 존재하지 않는 게시글 ID

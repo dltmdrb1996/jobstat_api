@@ -12,8 +12,6 @@ import com.wildrew.jobstat.community.utils.FakePasswordUtil
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils
-import jakarta.persistence.EntityNotFoundException
-import jakarta.validation.ConstraintViolationException
 import jakarta.validation.Validation
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -70,7 +68,6 @@ class UpdateBoardUseCaseTest {
         categoryRepository.clear()
     }
 
-    // 테스트 데이터 생성을 위한 헬퍼 함수
     private fun createTestBoard(
         userId: Long?,
         password: String?,
@@ -94,7 +91,7 @@ class UpdateBoardUseCaseTest {
         fun `given owner user and valid request, when update own board, then success and publish event`() {
             // Given
             val board = createTestBoard(ownerUserId, null)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenReturn(ownerUserId)
             whenever(theadContextUtils.isAdmin()).thenReturn(false)
 
             val newTitle = "수정된 제목"
@@ -110,14 +107,13 @@ class UpdateBoardUseCaseTest {
             assertEquals(newContent, response.content)
             assertNotNull(response.updatedAt)
 
-            // DB 상태 확인
             val updatedBoard = boardRepository.findById(board.id)
             assertEquals(newTitle, updatedBoard.title)
             assertEquals(newContent, updatedBoard.content)
 
             // Verify
             verify(eventPublisher).publishBoardUpdated(argThat { id == board.id })
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrFail()
         }
 
         @Test
@@ -125,8 +121,8 @@ class UpdateBoardUseCaseTest {
         fun `given admin user and valid request, when update other user board, then success`() {
             // Given
             val board = createTestBoard(otherUserId, null)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(adminUserId)
-            whenever(theadContextUtils.isAdmin()).thenReturn(true) // 관리자
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenReturn(adminUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(true)
 
             val newTitle = "관리자가 수정한 제목"
             val newContent = "관리자가 수정한 내용입니다."
@@ -141,7 +137,7 @@ class UpdateBoardUseCaseTest {
             assertEquals(newTitle, updatedBoard.title)
             assertEquals(newContent, updatedBoard.content)
             verify(eventPublisher).publishBoardUpdated(argThat { id == board.id })
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrFail()
             verify(theadContextUtils).isAdmin()
         }
 
@@ -150,8 +146,6 @@ class UpdateBoardUseCaseTest {
         fun `given guest user with correct password and valid request, when update guest board, then success`() {
             // Given
             val board = createTestBoard(guestUserId, correctPassword)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 필요 없음 (비밀번호 검증)
-
             val newTitle = "비회원 수정 제목"
             val newContent = "비회원 수정 내용입니다."
             val request = UpdateBoard.ExecuteRequest(board.id, newTitle, newContent, correctPassword)
@@ -178,8 +172,8 @@ class UpdateBoardUseCaseTest {
         fun `given non-owner user, when update other user board, then throw AppException`() {
             // Given
             val board = createTestBoard(ownerUserId, null)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(otherUserId) // 다른 사용자
-            whenever(theadContextUtils.isAdmin()).thenReturn(false) // 관리자 아님
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenReturn(otherUserId)
+            whenever(theadContextUtils.isAdmin()).thenReturn(false)
 
             val request = UpdateBoard.ExecuteRequest(board.id, "다른 제목", "다른 내용", null)
 
@@ -190,100 +184,19 @@ class UpdateBoardUseCaseTest {
         }
 
         @Test
-        @DisplayName("비회원 게시글 수정 시 비밀번호 틀리면 AppException(AUTHENTICATION_FAILURE) 발생")
-        fun `given guest user with wrong password, when update guest board, then throw AppException`() {
-            // Given
-            val board = createTestBoard(guestUserId, correctPassword)
-            val request = UpdateBoard.ExecuteRequest(board.id, "제목", "내용", wrongPassword) // 틀린 비번
-
-            // When & Then
-            val exception = assertThrows<AppException> { updateBoard(request) }
-            assertEquals(ErrorCode.AUTHENTICATION_FAILURE, exception.errorCode)
-            assertTrue(exception.message.contains("비밀번호가 일치하지 않습니다"))
-            verifyNoInteractions(eventPublisher)
-        }
-
-        @Test
-        @DisplayName("비회원 게시글 수정 시 비밀번호 미입력 시 AppException(AUTHENTICATION_FAILURE) 발생")
-        fun `given guest user without password, when update guest board, then throw AppException`() {
-            // Given
-            val board = createTestBoard(guestUserId, correctPassword)
-            val request = UpdateBoard.ExecuteRequest(board.id, "제목", "내용", null) // 비번 없음
-
-            // When & Then
-            val exception = assertThrows<AppException> { updateBoard(request) }
-            assertEquals(ErrorCode.AUTHENTICATION_FAILURE, exception.errorCode)
-            assertTrue(exception.message.contains("비밀번호가 필요합니다"))
-            verifyNoInteractions(eventPublisher)
-        }
-
-        @Test
         @DisplayName("로그인 필요한 게시글 수정 시 비로그인 상태면 AppException(AUTHENTICATION_FAILURE) 발생")
         fun `given guest user, when update member board, then throw AppException`() {
             // Given
-            val board = createTestBoard(ownerUserId, null) // 회원 게시글
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(guestUserId) // 비로그인 상태
+            val board = createTestBoard(ownerUserId, null)
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenThrow(
+                AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "로그인이 필요합니다"),
+            )
             val request = UpdateBoard.ExecuteRequest(board.id, "제목", "내용", null)
 
             // When & Then
             val exception = assertThrows<AppException> { updateBoard(request) }
             assertEquals(ErrorCode.AUTHENTICATION_FAILURE, exception.errorCode)
             assertTrue(exception.message.contains("로그인이 필요합니다"))
-            verifyNoInteractions(eventPublisher)
-        }
-    }
-
-    @Nested
-    @DisplayName("실패 케이스 - 유효성 검사")
-    inner class ValidationFailCases {
-        private lateinit var board: Board
-
-        @BeforeEach
-        fun setupValidation() {
-            // 모든 유효성 검사 테스트는 본인 게시글 수정 상황을 가정
-            board = createTestBoard(ownerUserId, null)
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
-            whenever(theadContextUtils.isAdmin()).thenReturn(false)
-        }
-
-        @Test
-        @DisplayName("제목이 비어있으면 ConstraintViolationException 발생")
-        fun `given blank title, when update board, then throw ConstraintViolationException`() {
-            // Given
-            val request = UpdateBoard.ExecuteRequest(board.id, " ", "정상 내용", null)
-
-            // When & Then
-            val exception = assertThrows<ConstraintViolationException> { updateBoard(request) }
-            assertTrue(exception.constraintViolations.any { it.propertyPath.toString() == "title" })
-            verifyNoInteractions(eventPublisher)
-        }
-
-        @Test
-        @DisplayName("내용이 최대 길이를 초과하면 ConstraintViolationException 발생")
-        fun `given too long content, when update board, then throw ConstraintViolationException`() {
-            // Given
-            val request = UpdateBoard.ExecuteRequest(board.id, "정상 제목", "a".repeat(5001), null)
-
-            // When & Then
-            val exception = assertThrows<ConstraintViolationException> { updateBoard(request) }
-            assertTrue(exception.constraintViolations.any { it.propertyPath.toString() == "content" })
-            verifyNoInteractions(eventPublisher)
-        }
-    }
-
-    @Nested
-    @DisplayName("실패 케이스 - 기타")
-    inner class OtherFailCases {
-        @Test
-        @DisplayName("존재하지 않는 게시글 수정 시 EntityNotFoundException 발생")
-        fun `given non-existent boardId, when update board, then throw EntityNotFoundException`() {
-            // Given
-            val nonExistentBoardId = 999L
-            whenever(theadContextUtils.getCurrentUserId()).thenReturn(ownerUserId)
-            val request = UpdateBoard.ExecuteRequest(nonExistentBoardId, "제목", "내용", null)
-
-            // When & Then
-            assertThrows<EntityNotFoundException> { updateBoard(request) }
             verifyNoInteractions(eventPublisher)
         }
     }

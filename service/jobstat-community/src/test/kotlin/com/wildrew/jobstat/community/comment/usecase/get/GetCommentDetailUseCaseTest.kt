@@ -94,7 +94,7 @@ class GetCommentDetailUseCaseTest {
             assertEquals(testComment.updatedAt, response.updatedAt)
             assertNotNull(response.eventTs)
 
-            verify(theadContextUtils).getCurrentUserId()
+            verify(theadContextUtils).getCurrentUserIdOrNull()
         }
     }
 

@@ -3,7 +3,9 @@ package com.wildrew.jobstat.core.core_security.util.context_util
 interface TheadContextUtils {
     fun isAuthenticated(): Boolean
 
-    fun getCurrentUserId(): Long?
+    fun getCurrentUserIdOrFail(): Long
+
+    fun getCurrentUserIdOrNull(): Long?
 
     fun getCurrentUserRoles(): List<String>
 

@@ -7,6 +7,12 @@ spring:
   config:
     import: "optional:configserver:"
 
+# spring bean 주입 로깅 추가
+logging:
+  level:
+    org.springframework.beans.factory: DEBUG
+    org.springframework.cloud: DEBUG
+    org.springframework.web: DEBUG
 ---
 
 spring:

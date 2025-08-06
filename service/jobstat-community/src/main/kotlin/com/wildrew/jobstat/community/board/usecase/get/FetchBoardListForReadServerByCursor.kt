@@ -22,7 +22,7 @@
 //    validator: Validator,
 // ) : ValidUseCase<FetchBoardListForReadServerByCursor.Request, FetchBoardListForReadServerByCursor.Response>(validator) {
 //    override fun execute(request: Request): Response {
-//        val userId = securityUtils.getCurrentUserId()?.toString()
+//        val userId = securityUtils.getCurrentUserIdOrNull()?.toString()
 //        val limit = request.limit.coerceAtMost(BoardConstants.DEFAULT_PAGE_SIZE)
 //
 //        val boards =

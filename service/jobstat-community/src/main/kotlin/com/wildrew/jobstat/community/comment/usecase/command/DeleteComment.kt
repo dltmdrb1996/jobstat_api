@@ -89,7 +89,7 @@ class DeleteComment(
     private fun validateMemberAccess(comment: Comment) {
         // 현재 사용자 ID 확인
         val currentUserId =
-            theadContextUtils.getCurrentUserId()
+            theadContextUtils.getCurrentUserIdOrNull()
                 ?: throw AppException.fromErrorCode(
                     ErrorCode.AUTHENTICATION_FAILURE,
                     "로그인이 필요합니다",

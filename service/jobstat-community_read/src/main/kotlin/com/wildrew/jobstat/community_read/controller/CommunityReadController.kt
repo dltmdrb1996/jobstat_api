@@ -5,7 +5,6 @@ import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_global.model.BoardRankingMetric
 import com.wildrew.jobstat.core.core_global.model.BoardRankingPeriod
-import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -14,13 +13,13 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.slf4j.LoggerFactory
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerResponse
 
 @RestController
 @RequestMapping("/api/v1/community/read/boards")
 @Tag(name = "게시판 조회(Read)", description = "게시글 및 댓글 조회 관련 API")
-@Public
 class CommunityReadController(
     private val getBoardDetailById: GetBoardDetailById,
     private val getBoardListByOffsetUseCase: GetBoardListByOffsetUseCase,
@@ -30,6 +29,7 @@ class CommunityReadController(
 ) {
     private val log = LoggerFactory.getLogger(this::class.java)
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/{id}")
     @Operation(
         summary = "게시글 상세 조회",
@@ -61,6 +61,7 @@ class CommunityReadController(
         )
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping
     @Operation(
         summary = "최신 게시글 목록 조회 (Offset)",
@@ -86,6 +87,7 @@ class CommunityReadController(
         return ApiResponse.ok(getBoardListByOffsetUseCase(request))
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/after")
     @Operation(
         summary = "최신 게시글 목록 조회 (Cursor)",
@@ -111,6 +113,7 @@ class CommunityReadController(
         return ApiResponse.ok(getBoardListByCursorUseCase(request))
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/category/{categoryId}")
     @Operation(
         summary = "카테고리별 게시글 목록 조회 (Offset)",
@@ -138,6 +141,7 @@ class CommunityReadController(
         return ApiResponse.ok(getBoardListByOffsetUseCase(request))
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/category/{categoryId}/after")
     @Operation(
         summary = "카테고리별 게시글 목록 조회 (Cursor)",
@@ -165,6 +169,7 @@ class CommunityReadController(
         return ApiResponse.ok(getBoardListByCursorUseCase(request))
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/ranking/{metric}/{period}")
     @Operation(
         summary = "랭킹별 게시글 목록 조회 (Offset)",
@@ -214,6 +219,7 @@ class CommunityReadController(
         return ApiResponse.ok(getBoardListByOffsetUseCase(request))
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/ranking/{metric}/{period}/after")
     @Operation(
         summary = "랭킹별 게시글 목록 조회 (Cursor)",
@@ -266,6 +272,7 @@ class CommunityReadController(
         return ApiResponse.ok(getBoardListByCursorUseCase(request))
     }
 
+    @PreAuthorize("permitAll()")
     @GetMapping("/{boardId}/comments")
     @Operation(summary = "게시글 댓글 목록 조회 (Offset)")
     @SwaggerResponse(
@@ -289,6 +296,7 @@ class CommunityReadController(
         return ApiResponse.ok(getCommentsByBoardId(request))
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/bulk")
     @Operation(summary = "게시글 ID 목록으로 게시글 조회")
     @SwaggerResponse(

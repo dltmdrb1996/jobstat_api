@@ -1,7 +1,8 @@
 # core security
-com.wildrew.jobstat.core.core_security.config.CoreWebSecurityAutoConfiguration
+#com.wildrew.jobstat.core.core_security.config.CoreWebSecurityAutoConfiguration
 com.wildrew.jobstat.core.core_security.config.CoreAdminPageSecurityAutoConfiguration
 com.wildrew.jobstat.core.core_security.config.CoreAspectAutoConfiguration
 com.wildrew.jobstat.core.core_security.config.CorePasswordUtilConfig
 com.wildrew.jobstat.core.core_security.config.CoreTheadContextUtilsAutoConfiguration
 com.wildrew.jobstat.core.core_security.config.CoreFilterAutoConfiguration
+com.wildrew.jobstat.core.core_security.config.MicroserviceWebSecurityConfig

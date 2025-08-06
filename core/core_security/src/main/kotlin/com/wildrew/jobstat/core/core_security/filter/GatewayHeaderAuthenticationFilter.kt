@@ -13,7 +13,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 
-class ThreadLocalGatewayHeaderAuthenticationFilter(
+class GatewayHeaderAuthenticationFilter(
     private val objectMapper: ObjectMapper,
 ) : OncePerRequestFilter() {
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
@@ -23,18 +23,15 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
         const val HEADER_USER_ROLES = "X-User-Roles"
     }
 
-    override fun shouldNotFilter(request: HttpServletRequest): Boolean = false
-
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain,
     ) {
-        SecurityContextHolder.clearContext()
-        try {
-            val userIdHeader = request.getHeader(HEADER_USER_ID)
-            val userRolesHeader = request.getHeader(HEADER_USER_ROLES)
+        val userIdHeader = request.getHeader(HEADER_USER_ID)
+        val userRolesHeader = request.getHeader(HEADER_USER_ROLES)
 
+        try {
             if (userIdHeader != null && userRolesHeader != null) {
                 try {
                     val userId = userIdHeader.toLong()
@@ -45,17 +42,22 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
                             .map { SimpleGrantedAuthority("ROLE_" + it.trim()) }
 
                     val authentication = UsernamePasswordAuthenticationToken(userId, null, roles)
+
                     SecurityContextHolder.getContext().authentication = authentication
+                    log.info("인증 객체가 SecurityContextHolder에 설정되었습니다: {}", authentication)
                 } catch (e: Exception) {
                     log.error("게이트웨이 인증 헤더 처리 실패. userId: {}, roles: {}", userIdHeader, userRolesHeader, e)
                     sendErrorResponse(response, ErrorCode.INTERNAL_ERROR, "Invalid authentication headers from gateway.")
                     return
                 }
+            } else {
+                log.warn("게이트웨이 인증 헤더가 없습니다. 익명 사용자로 진행합니다.")
             }
 
             filterChain.doFilter(request, response)
         } finally {
             SecurityContextHolder.clearContext()
+            log.info("SecurityContext cleared for request: {}", request.requestURI)
         }
     }
 
@@ -70,7 +72,6 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
                 status = errorCode.defaultHttpStatus,
                 message = message,
             )
-
         response.apply {
             characterEncoding = "UTF-8"
             status = errorCode.defaultHttpStatus.value()
@@ -78,7 +79,7 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
             try {
                 writer.write(objectMapper.writeValueAsString(apiResponse))
             } catch (e: Exception) {
-                log.error("ThreadLocalGatewayHeaderAuthenticationFilter sendErrorResponse 에러발생", e)
+                log.error("에러 응답 작성 중 오류 발생", e)
             }
         }
     }

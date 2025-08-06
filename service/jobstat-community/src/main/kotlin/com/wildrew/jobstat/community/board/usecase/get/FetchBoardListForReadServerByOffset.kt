@@ -24,7 +24,7 @@
 // ) : ValidUseCase<FetchBoardListForReadServerByOffset.Request, FetchBoardListForReadServerByOffset.Response>(validator) {
 //    override fun execute(request: Request): Response {
 //        // 현재 사용자 ID 확인
-//        val userId = securityUtils.getCurrentUserId()?.toString()
+//        val userId = securityUtils.getCurrentUserIdOrNull()?.toString()
 //
 //        // 페이지 요청 객체 생성
 //        val pageable = PageRequest.of(request.page ?: 0, request.size ?: BoardConstants.DEFAULT_PAGE_SIZE)

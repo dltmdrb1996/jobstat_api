@@ -1,6 +1,7 @@
 package com.wildrew.jobstat.statistics_read.rankings.service
 
 import com.wildrew.jobstat.core.core_global.model.BaseDate
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.RankingSlice
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.SnapshotPeriod
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.BaseRankingDocument
 import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.ranking.RankingEntry
@@ -30,7 +31,7 @@ class RankingAnalysisServiceTest {
 
     @BeforeEach
     fun setUp() {
-        mockRepository = mock()
+        mockRepository = mock() // <--- 이 부분에 주목
         mockStatsService = mock()
         mockRepositoryRegistry = mock()
 
@@ -130,22 +131,22 @@ class RankingAnalysisServiceTest {
     @Test
     @DisplayName("통계와 랭킹 정보를 함께 조회할 수 있다 (커서 기반)")
     fun findStatsWithRankingSuccessfully() {
+        // Given: 테스트 데이터 준비
         val baseDate = BaseDate("202501")
         val cursor = 100
         val limit = 20
         val startRank = 101
         val endRank = 120
-        val startPage = 2
-        val endPage = 2
 
         val mockRankingsPage2 = (101..200).map { createMockEntry(it, "Skill_$it", entityId = it.toLong()) }
-        val mockDocPage2 = createMockDocument(2, mockRankingsPage2)
-
-        val mockRankingsPage1 = (1..100).map { createMockEntry(it, "Skill_$it", entityId = it.toLong()) }
-        val mockDocPage1 = createMockDocument(1, mockRankingsPage1)
-
         val expectedRankings = mockRankingsPage2.filter { it.rank in startRank..endRank }
         val expectedEntityIds = expectedRankings.map { it.entityId }
+
+        val mockRankingSlice =
+            RankingSlice(
+                totalCount = 200,
+                items = expectedRankings,
+            )
 
         val mockStatsMap =
             expectedEntityIds.associateWith { entityId ->
@@ -155,8 +156,7 @@ class RankingAnalysisServiceTest {
                 }
             }
 
-        doReturn(listOf(mockDocPage2)).whenever(mockRepository).findByPageRange(baseDate.toString(), startPage, endPage)
-        doReturn(mockDocPage1).whenever(mockRepository).findByPage(baseDate.toString(), 1)
+        doReturn(mockRankingSlice).whenever(mockRepository).findRankingsSlice(baseDate.toString(), cursor, limit)
         doReturn(mockStatsMap).whenever(mockStatsService).findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(any(), eq(baseDate), eq(expectedEntityIds))
 
         val result =
@@ -184,7 +184,8 @@ class RankingAnalysisServiceTest {
         assertEquals(200, result.totalCount)
         assertTrue(result.hasNextPage)
         assertEquals(endRank, result.nextCursor)
-        verify(mockRepository).findByPageRange(baseDate.toString(), startPage, endPage)
+
+        verify(mockRepository).findRankingsSlice(baseDate.toString(), cursor, limit)
         verify(mockStatsService).findStatsByEntityIdsAndBaseDate<BaseStatsDocument>(any(), eq(baseDate), eq(expectedEntityIds))
     }
 }

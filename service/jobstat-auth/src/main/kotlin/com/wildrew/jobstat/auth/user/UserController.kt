@@ -1,7 +1,6 @@
 package com.wildrew.jobstat.auth.user
 
 import com.wildrew.jobstat.auth.user.usecase.Register
-import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
@@ -9,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -21,7 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerResponse
 class UserController(
     private val register: Register,
 ) {
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/register")
     @Operation(
         summary = "회원 가입",

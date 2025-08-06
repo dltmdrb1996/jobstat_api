@@ -1,7 +1,6 @@
 package com.wildrew.jobstat.statistics_read
 
 import com.wildrew.jobstat.core.core_global.model.BaseDate
-import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import com.wildrew.jobstat.statistics_read.rankings.model.rankingtype.*
@@ -10,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -41,7 +41,7 @@ class RankingController(
     private val getCertificationRanking: GetCertificationRanking,
     private val getEducationRanking: GetEducationRanking,
 ) {
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/skills/{rankingType}/{baseDate}/stats")
     fun getSkillRankingsWithStats(
         @PathVariable rankingType: SkillRankingType,
@@ -53,7 +53,7 @@ class RankingController(
         return ApiResponse.ok(getSkillRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/skills/{rankingType}/{baseDate}")
     fun getSkillRankings(
         @PathVariable rankingType: SkillRankingType,
@@ -65,7 +65,7 @@ class RankingController(
         return ApiResponse.ok(getSkillRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/category/{rankingType}/{baseDate}/stats")
     fun getJobCategoryRankingsWithStats(
         @PathVariable rankingType: JobCategoryRankingType,
@@ -77,7 +77,7 @@ class RankingController(
         return ApiResponse.ok(getJobCategoryRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/category/{rankingType}/{baseDate}")
     fun getJobCategoryRankings(
         @PathVariable rankingType: JobCategoryRankingType,
@@ -89,7 +89,7 @@ class RankingController(
         return ApiResponse.ok(getJobCategoryRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/industry/{rankingType}/{baseDate}/stats")
     fun getIndustryRankingsWithStats(
         @PathVariable rankingType: IndustryRankingType,
@@ -101,7 +101,7 @@ class RankingController(
         return ApiResponse.ok(getIndustryRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/industry/{rankingType}/{baseDate}")
     fun getIndustryRankings(
         @PathVariable rankingType: IndustryRankingType,
@@ -113,7 +113,7 @@ class RankingController(
         return ApiResponse.ok(getIndustryRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/location/{rankingType}/{baseDate}/stats")
     fun getLocationRankingsWithStats(
         @PathVariable rankingType: LocationRankingType,
@@ -125,7 +125,7 @@ class RankingController(
         return ApiResponse.ok(getLocationRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/location/{rankingType}/{baseDate}")
     fun getLocationRankings(
         @PathVariable rankingType: LocationRankingType,
@@ -137,7 +137,7 @@ class RankingController(
         return ApiResponse.ok(getLocationRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/benefit/{rankingType}/{baseDate}/stats")
     fun getBenefitRankingsWithStats(
         @PathVariable rankingType: BenefitRankingType,
@@ -149,7 +149,7 @@ class RankingController(
         return ApiResponse.ok(getBenefitRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/benefit/{rankingType}/{baseDate}")
     fun getBenefitRankings(
         @PathVariable rankingType: BenefitRankingType,
@@ -161,7 +161,7 @@ class RankingController(
         return ApiResponse.ok(getBenefitRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/company-size/{rankingType}/{baseDate}/stats")
     fun getCompanySizeRankingsWithStats(
         @PathVariable rankingType: CompanySizeRankingType,
@@ -173,7 +173,7 @@ class RankingController(
         return ApiResponse.ok(getCompanySizeRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/company-size/{rankingType}/{baseDate}")
     fun getCompanySizeRankings(
         @PathVariable rankingType: CompanySizeRankingType,
@@ -185,7 +185,7 @@ class RankingController(
         return ApiResponse.ok(getCompanySizeRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/experience/{rankingType}/{baseDate}/stats")
     fun getExperienceRankingsWithStats(
         @PathVariable rankingType: ExperienceRankingType,
@@ -197,7 +197,7 @@ class RankingController(
         return ApiResponse.ok(getExperienceRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/experience/{rankingType}/{baseDate}")
     fun getExperienceRankings(
         @PathVariable rankingType: ExperienceRankingType,
@@ -209,7 +209,7 @@ class RankingController(
         return ApiResponse.ok(getExperienceRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/contract-type/{rankingType}/{baseDate}/stats")
     fun getContractTypeRankingsWithStats(
         @PathVariable rankingType: ContractTypeRankingType,
@@ -221,7 +221,7 @@ class RankingController(
         return ApiResponse.ok(getContractTypeRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/contract-type/{rankingType}/{baseDate}")
     fun getContractTypeRankings(
         @PathVariable rankingType: ContractTypeRankingType,
@@ -233,7 +233,7 @@ class RankingController(
         return ApiResponse.ok(getContractTypeRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/remote-work-type/{rankingType}/{baseDate}/stats")
     fun getRemoteWorkTypeRankingsWithStats(
         @PathVariable rankingType: RemoteWorkTypeRankingType,
@@ -245,7 +245,7 @@ class RankingController(
         return ApiResponse.ok(getRemoteWorkTypeRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/remote-work-type/{rankingType}/{baseDate}")
     fun getRemoteWorkTypeRankings(
         @PathVariable rankingType: RemoteWorkTypeRankingType,
@@ -257,7 +257,7 @@ class RankingController(
         return ApiResponse.ok(getRemoteWorkTypeRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/company/{rankingType}/{baseDate}/stats")
     fun getCompanyRankingsWithStats(
         @PathVariable rankingType: CompanyRankingType,
@@ -269,7 +269,7 @@ class RankingController(
         return ApiResponse.ok(getCompanyRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/company/{rankingType}/{baseDate}")
     fun getCompanyRankings(
         @PathVariable rankingType: CompanyRankingType,
@@ -281,7 +281,7 @@ class RankingController(
         return ApiResponse.ok(getCompanyRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/certification/{rankingType}/{baseDate}/stats")
     fun getCertificationRankingsWithStats(
         @PathVariable rankingType: CertificationRankingType,
@@ -293,7 +293,7 @@ class RankingController(
         return ApiResponse.ok(getCertificationRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/certification/{rankingType}/{baseDate}")
     fun getCertificationRankings(
         @PathVariable rankingType: CertificationRankingType,
@@ -305,7 +305,7 @@ class RankingController(
         return ApiResponse.ok(getCertificationRanking(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/education/{rankingType}/{baseDate}/stats")
     fun getEducationRankingsWithStats(
         @PathVariable rankingType: EducationRankingType,
@@ -317,7 +317,7 @@ class RankingController(
         return ApiResponse.ok(getEducationRankingWithStats(req))
     }
 
-    @Public
+    @PreAuthorize("permitAll()")
     @GetMapping("/education/{rankingType}/{baseDate}")
     fun getEducationRankings(
         @PathVariable rankingType: EducationRankingType,

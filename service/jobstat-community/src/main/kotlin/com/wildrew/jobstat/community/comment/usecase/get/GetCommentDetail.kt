@@ -19,7 +19,7 @@ class GetCommentDetail(
 ) : ValidUseCase<com.wildrew.jobstat.community.comment.usecase.get.GetCommentDetail.Request, _root_ide_package_.com.wildrew.jobstat.community.comment.usecase.get.GetCommentDetail.Response>(validator) {
     override fun execute(request: _root_ide_package_.com.wildrew.jobstat.community.comment.usecase.get.GetCommentDetail.Request): _root_ide_package_.com.wildrew.jobstat.community.comment.usecase.get.GetCommentDetail.Response {
         val comment = commentService.getCommentById(request.commentId)
-        val userId = theadContextUtils.getCurrentUserId()
+        val userId = theadContextUtils.getCurrentUserIdOrNull()
 
         return _root_ide_package_.com.wildrew.jobstat.community.comment.usecase.get.GetCommentDetail.Response.Companion.from(
             comment,

@@ -3,12 +3,12 @@ package com.wildrew.jobstat.auth
 import com.wildrew.jobstat.auth.token.usecase.RefreshToken
 import com.wildrew.jobstat.auth.user.usecase.Login
 import com.wildrew.jobstat.auth.user.usecase.Register
-import com.wildrew.jobstat.core.core_security.annotation.Public
 import com.wildrew.jobstat.core.core_web_util.ApiResponse
 import com.wildrew.jobstat.core.core_web_util.RestConstants
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,21 +22,21 @@ class AuthController(
     private val loginUseCase: Login,
     private val refreshTokenUseCase: RefreshToken,
 ) {
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/register")
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다.")
     fun signUp(
         @RequestBody registerRequest: Register.Request,
     ): ResponseEntity<ApiResponse<Register.Response>> = ApiResponse.ok(registerUseCase(registerRequest))
 
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "사용자 인증 후 토큰을 발급합니다.")
     fun signIn(
         @RequestBody loginRequest: Login.Request,
     ): ResponseEntity<ApiResponse<Login.Response>> = ApiResponse.ok(loginUseCase(loginRequest))
 
-    @Public
+    @PreAuthorize("permitAll()")
     @PostMapping("/refresh")
     @Operation(summary = "토큰 갱신", description = "만료된 토큰을 갱신합니다.")
     fun refreshToken(

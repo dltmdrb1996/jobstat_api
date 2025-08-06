@@ -11,10 +11,10 @@ dependencies {
     implementation("org.springframework.cloud:spring-cloud-starter-gateway") // Spring Cloud Gateway
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client") // Eureka Client (서비스 디스커버리용)
     implementation("org.springframework.cloud:spring-cloud-starter-config") // Config Server로부터 설정 로드
+    implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("io.micrometer:micrometer-registry-prometheus")
 
-    // JWT 토큰 파싱을 위해 core_token 모듈 의존성 추가
     implementation(project(":core:core_token"))
     implementation(project(":core:core_error"))
     implementation(project(":core:core_web_util"))
