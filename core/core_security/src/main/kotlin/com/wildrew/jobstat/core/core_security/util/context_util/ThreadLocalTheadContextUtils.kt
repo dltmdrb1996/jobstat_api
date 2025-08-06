@@ -17,9 +17,7 @@ class ThreadLocalTheadContextUtils : TheadContextUtils {
             authentication.principal is Long
     }
 
-    override fun getCurrentUserIdOrFail(): Long {
-        return getCurrentUserIdOrNull() ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-    }
+    override fun getCurrentUserIdOrFail(): Long = getCurrentUserIdOrNull() ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
 
     override fun getCurrentUserIdOrNull(): Long? {
         val authentication = SecurityContextHolder.getContext().authentication
@@ -60,9 +58,7 @@ class ThreadLocalTheadContextUtils : TheadContextUtils {
         }
     }
 
-    override fun isAdmin(): Boolean {
-        return hasRole("ADMIN")
-    }
+    override fun isAdmin(): Boolean = hasRole("ADMIN")
 
     override fun canAccess(resourceUserId: Long): Boolean {
         if (!isAuthenticated()) return false

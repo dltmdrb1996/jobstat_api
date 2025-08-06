@@ -27,15 +27,14 @@ import org.springframework.web.filter.OncePerRequestFilter
     CoreSerializerAutoConfiguration::class,
 )
 class MicroserviceWebSecurityConfig(
-    private val environment: Environment
+    private val environment: Environment,
 ) {
-
     private val log by lazy { LoggerFactory.getLogger(this::class.java) }
 
     @Bean
     fun securityFilterChain(
         http: HttpSecurity,
-        coreSecurityFilter: OncePerRequestFilter
+        coreSecurityFilter: OncePerRequestFilter,
     ): SecurityFilterChain {
         http
             .cors { it.disable() }
@@ -45,9 +44,8 @@ class MicroserviceWebSecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .addFilterBefore(
                 coreSecurityFilter,
-                UsernamePasswordAuthenticationFilter::class.java
-            )
-            .authorizeHttpRequests { it.anyRequest().permitAll() }
+                UsernamePasswordAuthenticationFilter::class.java,
+            ).authorizeHttpRequests { it.anyRequest().permitAll() }
 
 //        if (environment.acceptsProfiles(Profiles.of("!prod"))) {
 //            log.info("Applying local CORS configuration for non-prod profile.")

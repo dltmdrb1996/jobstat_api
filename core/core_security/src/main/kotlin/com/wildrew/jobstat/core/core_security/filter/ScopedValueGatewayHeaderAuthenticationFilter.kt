@@ -41,19 +41,21 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
         log.info("Received Header -> {}: {}", HEADER_USER_ROLES, userRolesHeader)
 
         if (userIdHeader != null && userRolesHeader != null) {
-
             log.info(">>> Headers FOUND. Attempting to create Authentication object.")
 
             try {
                 val userId = userIdHeader.toLong()
-                val roles = userRolesHeader.split(",")
-                    .filter { it.isNotBlank() }
-                    .map { SimpleGrantedAuthority("ROLE_" + it.trim()) }
+                val roles =
+                    userRolesHeader
+                        .split(",")
+                        .filter { it.isNotBlank() }
+                        .map { SimpleGrantedAuthority("ROLE_" + it.trim()) }
 
                 val authentication = UsernamePasswordAuthenticationToken(userId, null, roles)
-                val securityContext = SecurityContextImpl().apply {
-                    this.authentication = authentication
-                }
+                val securityContext =
+                    SecurityContextImpl().apply {
+                        this.authentication = authentication
+                    }
 
                 log.info("Authentication object created successfully: {}", authentication)
 
@@ -73,15 +75,19 @@ class ScopedValueGatewayHeaderAuthenticationFilter(
         }
 
         log.info("==================== Gateway Auth Filter - END ======================")
-
     }
 
-    private fun sendErrorResponse(response: HttpServletResponse, errorCode: ErrorCode, message: String) {
-        val apiResponse = ApiResponse<Unit>(
-            code = errorCode.defaultHttpStatus.value(),
-            status = errorCode.defaultHttpStatus,
-            message = message,
-        )
+    private fun sendErrorResponse(
+        response: HttpServletResponse,
+        errorCode: ErrorCode,
+        message: String,
+    ) {
+        val apiResponse =
+            ApiResponse<Unit>(
+                code = errorCode.defaultHttpStatus.value(),
+                status = errorCode.defaultHttpStatus,
+                message = message,
+            )
 
         response.apply {
             characterEncoding = "UTF-8"

@@ -75,7 +75,11 @@ interface BaseRankingRepository<T : BaseRankingDocument<E>, E : RankingEntry, ID
         maxRank: Int,
     ): List<E>
 
-    fun findRankingsSlice(baseDate: String, cursor: Int?, limit: Int): RankingSlice<E>
+    fun findRankingsSlice(
+        baseDate: String,
+        cursor: Int?,
+        limit: Int,
+    ): RankingSlice<E>
 
     companion object {
         const val DEFAULT_PAGE_SIZE = 100
@@ -297,19 +301,25 @@ abstract class BaseRankingRepositoryImpl<T : BaseRankingDocument<E>, E : Ranking
             ?: emptyList()
     }
 
-    override fun findRankingsSlice(baseDate: String, cursor: Int?, limit: Int): RankingSlice<E> {
+    override fun findRankingsSlice(
+        baseDate: String,
+        cursor: Int?,
+        limit: Int,
+    ): RankingSlice<E> {
         val startIndex = cursor ?: 0
         val query = Query(Criteria.where("base_date").`is`(baseDate))
-        query.fields()
+        query
+            .fields()
             .include("_id", "base_date", "period", "metrics", "page")
             .slice("rankings", startIndex, limit)
 
-        val document = mongoOperations.findOne(query, entityInformation.javaType)
-            ?: return RankingSlice()
+        val document =
+            mongoOperations.findOne(query, entityInformation.javaType)
+                ?: return RankingSlice()
 
         return RankingSlice(
             totalCount = document.metrics.rankedCount,
-            items = document.rankings
+            items = document.rankings,
         )
     }
 }

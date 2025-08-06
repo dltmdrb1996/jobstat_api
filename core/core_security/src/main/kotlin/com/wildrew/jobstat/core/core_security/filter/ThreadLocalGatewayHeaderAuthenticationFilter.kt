@@ -38,9 +38,11 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
             if (userIdHeader != null && userRolesHeader != null) {
                 try {
                     val userId = userIdHeader.toLong()
-                    val roles = userRolesHeader.split(",")
-                        .filter { it.isNotBlank() }
-                        .map { SimpleGrantedAuthority("ROLE_" + it.trim()) }
+                    val roles =
+                        userRolesHeader
+                            .split(",")
+                            .filter { it.isNotBlank() }
+                            .map { SimpleGrantedAuthority("ROLE_" + it.trim()) }
 
                     val authentication = UsernamePasswordAuthenticationToken(userId, null, roles)
                     SecurityContextHolder.getContext().authentication = authentication
@@ -50,20 +52,24 @@ class ThreadLocalGatewayHeaderAuthenticationFilter(
                     return
                 }
             }
-            
-            filterChain.doFilter(request, response)
 
+            filterChain.doFilter(request, response)
         } finally {
             SecurityContextHolder.clearContext()
         }
     }
 
-    private fun sendErrorResponse(response: HttpServletResponse, errorCode: ErrorCode, message: String) {
-        val apiResponse = ApiResponse<Unit>(
-            code = errorCode.defaultHttpStatus.value(),
-            status = errorCode.defaultHttpStatus,
-            message = message,
-        )
+    private fun sendErrorResponse(
+        response: HttpServletResponse,
+        errorCode: ErrorCode,
+        message: String,
+    ) {
+        val apiResponse =
+            ApiResponse<Unit>(
+                code = errorCode.defaultHttpStatus.value(),
+                status = errorCode.defaultHttpStatus,
+                message = message,
+            )
 
         response.apply {
             characterEncoding = "UTF-8"

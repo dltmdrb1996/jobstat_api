@@ -4,7 +4,6 @@ import org.springframework.security.core.context.SecurityContext
 import org.springframework.security.core.context.SecurityContextImpl
 
 object ScopedSecurityContextHolder {
-
     private val SCOPED_SECURITY_CONTEXT: ScopedValue<SecurityContext> = ScopedValue.newInstance()
 
     fun getContext(): SecurityContext =

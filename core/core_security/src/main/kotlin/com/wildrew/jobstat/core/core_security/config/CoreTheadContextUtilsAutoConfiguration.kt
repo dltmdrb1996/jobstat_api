@@ -1,17 +1,11 @@
 package com.wildrew.jobstat.core.core_security.config
 
-import com.wildrew.jobstat.core.core_security.util.ScopedSecurityContextHolder
-import com.wildrew.jobstat.core.core_security.util.context_util.ScopedValueTheadContextUtils
 import com.wildrew.jobstat.core.core_security.util.context_util.SecurityContextUtils
 import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils
-import com.wildrew.jobstat.core.core_security.util.context_util.ThreadLocalTheadContextUtils
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.AutoConfiguration
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 
 @AutoConfiguration
 class CoreTheadContextUtilsAutoConfiguration {
@@ -19,9 +13,7 @@ class CoreTheadContextUtilsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(TheadContextUtils::class)
-    fun theadContextUtils(): TheadContextUtils {
-        return SecurityContextUtils()
-    }
+    fun theadContextUtils(): TheadContextUtils = SecurityContextUtils()
 
 //    @Configuration
 //    @ConditionalOnProperty(

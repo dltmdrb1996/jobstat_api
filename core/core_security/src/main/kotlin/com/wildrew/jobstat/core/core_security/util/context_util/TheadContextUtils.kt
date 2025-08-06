@@ -1,8 +1,5 @@
 package com.wildrew.jobstat.core.core_security.util.context_util
 
-import com.wildrew.jobstat.core.core_error.model.AppException
-import com.wildrew.jobstat.core.core_error.model.ErrorCode
-
 interface TheadContextUtils {
     fun isAuthenticated(): Boolean
 
@@ -15,8 +12,6 @@ interface TheadContextUtils {
     fun hasRole(role: String): Boolean
 
     fun hasAnyRole(vararg roles: String): Boolean
-
-
 
     fun hasAllRoles(vararg roles: String): Boolean
 

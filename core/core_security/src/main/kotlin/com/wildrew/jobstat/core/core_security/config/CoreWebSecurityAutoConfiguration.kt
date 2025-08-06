@@ -1,41 +1,41 @@
-//package com.wildrew.jobstat.core.core_security.config
+// package com.wildrew.jobstat.core.core_security.config
 //
-//import com.fasterxml.jackson.databind.ObjectMapper
-//import com.wildrew.jobstat.core.core_security.util.JwtAuthenticationEntryPoint
-//import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
-//import jakarta.servlet.Filter
-//import org.slf4j.Logger
-//import org.slf4j.LoggerFactory
-//import org.springframework.beans.factory.annotation.Qualifier
-//import org.springframework.beans.factory.annotation.Value
-//import org.springframework.boot.autoconfigure.AutoConfiguration
-//import org.springframework.boot.autoconfigure.AutoConfigureAfter
-//import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
-//import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
-//import org.springframework.context.annotation.Bean
-//import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-//import org.springframework.security.config.http.SessionCreationPolicy
-//import org.springframework.security.core.context.SecurityContextHolder
-//import org.springframework.security.web.AuthenticationEntryPoint
-//import org.springframework.security.web.SecurityFilterChain
-//import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-//import org.springframework.security.web.context.SecurityContextRepository
-//import org.springframework.web.cors.CorsConfiguration
-//import org.springframework.web.cors.CorsConfigurationSource
-//import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-//import org.springframework.web.server.adapter.ForwardedHeaderTransformer
+// import com.fasterxml.jackson.databind.ObjectMapper
+// import com.wildrew.jobstat.core.core_security.util.JwtAuthenticationEntryPoint
+// import com.wildrew.jobstat.core.core_serializer.config.CoreSerializerAutoConfiguration
+// import jakarta.servlet.Filter
+// import org.slf4j.Logger
+// import org.slf4j.LoggerFactory
+// import org.springframework.beans.factory.annotation.Qualifier
+// import org.springframework.beans.factory.annotation.Value
+// import org.springframework.boot.autoconfigure.AutoConfiguration
+// import org.springframework.boot.autoconfigure.AutoConfigureAfter
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+// import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
+// import org.springframework.context.annotation.Bean
+// import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
+// import org.springframework.security.config.annotation.web.builders.HttpSecurity
+// import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+// import org.springframework.security.config.http.SessionCreationPolicy
+// import org.springframework.security.core.context.SecurityContextHolder
+// import org.springframework.security.web.AuthenticationEntryPoint
+// import org.springframework.security.web.SecurityFilterChain
+// import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+// import org.springframework.security.web.context.SecurityContextRepository
+// import org.springframework.web.cors.CorsConfiguration
+// import org.springframework.web.cors.CorsConfigurationSource
+// import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+// import org.springframework.web.server.adapter.ForwardedHeaderTransformer
 //
-//@AutoConfiguration
-//@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-//@EnableWebSecurity
-//@EnableMethodSecurity(prePostEnabled = true)
-//@AutoConfigureAfter(
+// @AutoConfiguration
+// @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
+// @EnableWebSecurity
+// @EnableMethodSecurity(prePostEnabled = true)
+// @AutoConfigureAfter(
 //    CoreFilterAutoConfiguration::class,
 //    CoreSerializerAutoConfiguration::class,
-//)
-//class CoreWebSecurityAutoConfiguration {
+// )
+// class CoreWebSecurityAutoConfiguration {
 //    @Value("\${ddns.domain:http://localhost:8080}")
 //    private lateinit var ddnsDomain: String
 //
@@ -110,4 +110,4 @@
 //        source.registerCorsConfiguration("/**", configuration)
 //        return source
 //    }
-//}
+// }

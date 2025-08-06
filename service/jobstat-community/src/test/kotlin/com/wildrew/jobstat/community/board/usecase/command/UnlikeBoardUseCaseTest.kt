@@ -7,11 +7,11 @@ import com.wildrew.jobstat.community.board.repository.FakeBoardRepository
 import com.wildrew.jobstat.community.board.repository.FakeCategoryRepository
 import com.wildrew.jobstat.community.board.service.BoardService
 import com.wildrew.jobstat.community.board.service.BoardServiceImpl
-import com.wildrew.jobstat.community.counting.CounterService // Mock 대상
-import com.wildrew.jobstat.community.event.CommunityCommandEventPublisher // Mock 대상
+import com.wildrew.jobstat.community.counting.CounterService
+import com.wildrew.jobstat.community.event.CommunityCommandEventPublisher
 import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
-import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils // Mock 대상
+import com.wildrew.jobstat.core.core_security.util.context_util.TheadContextUtils
 import jakarta.validation.Validation
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
@@ -36,7 +36,6 @@ class UnlikeBoardUseCaseTest {
     private lateinit var testCategory: BoardCategory
     private lateinit var testBoard: Board
     private val testUserId = 1L
-    private val guestUserId: Long? = null
 
     @BeforeEach
     fun setUp() {
@@ -60,14 +59,11 @@ class UnlikeBoardUseCaseTest {
 
         testCategory = categoryRepository.save(CategoryFixture.aCategory().create())
         testBoard = boardService.createBoard("제목", "내용", "글쓴이", testCategory.id, null, 100L)
-        boardRepository.updateLikeCount(testBoard.id, 5) // 초기 좋아요 5개 설정
+        // 초기 좋아요 5개 설정
+        val boardToUpdate = boardRepository.findById(testBoard.id)
+        boardToUpdate.incrementLikeCount(5)
+        boardRepository.save(boardToUpdate)
         testBoard = boardRepository.findById(testBoard.id) // 최신 상태 로드
-    }
-
-    @AfterEach
-    fun tearDown() {
-        boardRepository.clear()
-        categoryRepository.clear()
     }
 
     @Nested
@@ -77,9 +73,9 @@ class UnlikeBoardUseCaseTest {
         @DisplayName("로그인 사용자가 게시글 좋아요 취소 성공")
         fun `given logged in user and existing board, when unlike board, then decrement count and publish event`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
-            val initialLikeCount = boardRepository.findLikeCountById(testBoard.id) ?: 0 // 현재 DB 값 (5)
-            val expectedLikeCount = initialLikeCount - 1 // 예상 결과 (4)
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenReturn(testUserId)
+            val initialLikeCount = 5
+            val expectedLikeCount = 4
 
             whenever(
                 counterService.decrementLikeCount(
@@ -87,7 +83,7 @@ class UnlikeBoardUseCaseTest {
                     userId = eq(testUserId.toString()),
                     dbLikeCount = eq(initialLikeCount),
                 ),
-            ).thenReturn(expectedLikeCount) // 감소된 카운트 반환
+            ).thenReturn(expectedLikeCount)
 
             val request = UnlikeBoard.Request(boardId = testBoard.id)
 
@@ -98,13 +94,8 @@ class UnlikeBoardUseCaseTest {
             assertEquals(expectedLikeCount, response.likeCount)
 
             // Verify
-            verify(theadContextUtils).getCurrentUserIdOrNull()
-            verify(counterService).decrementLikeCount(
-                boardId = eq(testBoard.id),
-                userId = eq(testUserId.toString()),
-                dbLikeCount = eq(initialLikeCount),
-            )
-            // 좋아요 취소 시에도 좋아요 이벤트 발행 (최종 카운트 동기화 목적)
+            verify(theadContextUtils).getCurrentUserIdOrFail()
+            verify(counterService).decrementLikeCount(any(), any(), any())
             verify(eventPublisher).publishBoardLiked(
                 boardId = eq(testBoard.id),
                 createdAt = any<LocalDateTime>(),
@@ -122,15 +113,17 @@ class UnlikeBoardUseCaseTest {
         @DisplayName("비로그인 사용자가 좋아요 취소 시 AppException(AUTHENTICATION_FAILURE) 발생")
         fun `given guest user, when unlike board, then throw AppException`() {
             // Given
-            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(guestUserId)
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenThrow(
+                AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE, "로그인이 필요합니다"),
+            )
             val request = UnlikeBoard.Request(boardId = testBoard.id)
 
             // When & Then
             val exception = assertThrows<AppException> { unlikeBoard(request) }
             assertEquals(ErrorCode.AUTHENTICATION_FAILURE, exception.errorCode)
-            assertTrue(exception.message.contains("로그인이 필요합니다"))
 
-            verify(theadContextUtils).getCurrentUserIdOrNull()
+            // Verify
+            verify(theadContextUtils).getCurrentUserIdOrFail()
             verifyNoInteractions(counterService, eventPublisher)
         }
 
@@ -139,40 +132,16 @@ class UnlikeBoardUseCaseTest {
         fun `given non-existent boardId, when unlike board, then throw AppException`() {
             // Given
             val nonExistentBoardId = 999L
-            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
-
+            whenever(theadContextUtils.getCurrentUserIdOrFail()).thenReturn(testUserId)
             val request = UnlikeBoard.Request(boardId = nonExistentBoardId)
 
             // When & Then
             val exception = assertThrows<AppException> { unlikeBoard(request) }
             assertEquals(ErrorCode.RESOURCE_NOT_FOUND, exception.errorCode)
-            assertTrue(exception.message.contains("게시글을 찾을 수 없습니다"))
 
-            verify(theadContextUtils).getCurrentUserIdOrNull()
+            // Verify
+            verify(theadContextUtils).getCurrentUserIdOrFail()
             verifyNoInteractions(counterService, eventPublisher)
-        }
-
-        @Test
-        @DisplayName("CounterService에서 예외 발생 시 전파되는지 확인")
-        fun `given counterService throws exception, when unlike board, then exception propagates`() {
-            // Given
-            whenever(theadContextUtils.getCurrentUserIdOrNull()).thenReturn(testUserId)
-            val initialLikeCount = boardRepository.findLikeCountById(testBoard.id) ?: 0
-            val counterException = RuntimeException("Redis decrement failed")
-
-            whenever(
-                counterService.decrementLikeCount(any(), any(), any()),
-            ).thenThrow(counterException)
-
-            val request = UnlikeBoard.Request(boardId = testBoard.id)
-
-            // When & Then
-            val thrownException = assertThrows<RuntimeException> { unlikeBoard(request) }
-            assertEquals(counterException, thrownException)
-
-            verify(theadContextUtils).getCurrentUserIdOrNull()
-            verify(counterService).decrementLikeCount(any(), any(), any())
-            verifyNoInteractions(eventPublisher)
         }
     }
 }

@@ -5,7 +5,6 @@ import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import com.wildrew.jobstat.core.core_security.util.ScopedSecurityContextHolder
 
 class ScopedValueTheadContextUtils : TheadContextUtils {
-
     private object Constants {
         const val ROLE_PREFIX = "ROLE_"
     }
@@ -16,9 +15,7 @@ class ScopedValueTheadContextUtils : TheadContextUtils {
             authentication.principal is Long
     }
 
-    override fun getCurrentUserIdOrFail(): Long {
-        return getCurrentUserIdOrNull() ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-    }
+    override fun getCurrentUserIdOrFail(): Long = getCurrentUserIdOrNull() ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
 
     override fun getCurrentUserIdOrNull(): Long? {
         val authentication = ScopedSecurityContextHolder.getContext().authentication

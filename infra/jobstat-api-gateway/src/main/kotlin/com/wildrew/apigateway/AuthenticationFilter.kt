@@ -26,7 +26,8 @@ import java.security.SignatureException
 class AuthenticationFilter(
     private val jwtTokenParser: JwtTokenParser,
     private val objectMapper: ObjectMapper,
-) : GlobalFilter, Ordered {
+) : GlobalFilter,
+    Ordered {
     private val log = LoggerFactory.getLogger(javaClass)
 
     companion object {
@@ -44,7 +45,10 @@ class AuthenticationFilter(
             )
     }
 
-    override fun filter(exchange: ServerWebExchange, chain: GatewayFilterChain): Mono<Void> {
+    override fun filter(
+        exchange: ServerWebExchange,
+        chain: GatewayFilterChain,
+    ): Mono<Void> {
         val request = exchange.request
         val path = request.uri.path
 

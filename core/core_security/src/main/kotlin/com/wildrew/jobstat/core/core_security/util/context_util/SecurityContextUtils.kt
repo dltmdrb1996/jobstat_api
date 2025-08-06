@@ -4,18 +4,14 @@ import com.wildrew.jobstat.core.core_error.model.AppException
 import com.wildrew.jobstat.core.core_error.model.ErrorCode
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.stereotype.Component
 
 class SecurityContextUtils : TheadContextUtils {
-
     private object Constants {
         const val ROLE_PREFIX = "ROLE_"
         const val ANONYMOUS_USER = "anonymousUser"
     }
 
-    private fun getAuthentication(): Authentication? {
-        return SecurityContextHolder.getContext().authentication
-    }
+    private fun getAuthentication(): Authentication? = SecurityContextHolder.getContext().authentication
 
     override fun isAuthenticated(): Boolean {
         val auth = getAuthentication()
@@ -26,9 +22,7 @@ class SecurityContextUtils : TheadContextUtils {
             auth.principal is Long
     }
 
-    override fun getCurrentUserIdOrFail(): Long {
-        return getCurrentUserIdOrNull() ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
-    }
+    override fun getCurrentUserIdOrFail(): Long = getCurrentUserIdOrNull() ?: throw AppException.fromErrorCode(ErrorCode.AUTHENTICATION_FAILURE)
 
     override fun getCurrentUserIdOrNull(): Long? {
         if (!isAuthenticated()) {
@@ -41,7 +35,8 @@ class SecurityContextUtils : TheadContextUtils {
         if (!isAuthenticated()) {
             return emptyList()
         }
-        return getAuthentication()?.authorities
+        return getAuthentication()
+            ?.authorities
             ?.map { it.authority.removePrefix(Constants.ROLE_PREFIX) }
             ?: emptyList()
     }

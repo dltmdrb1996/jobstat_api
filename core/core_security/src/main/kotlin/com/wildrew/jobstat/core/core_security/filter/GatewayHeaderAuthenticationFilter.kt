@@ -16,7 +16,6 @@ import org.springframework.web.filter.OncePerRequestFilter
 class GatewayHeaderAuthenticationFilter(
     private val objectMapper: ObjectMapper,
 ) : OncePerRequestFilter() {
-
     private val log: Logger by lazy { LoggerFactory.getLogger(this::class.java) }
 
     companion object {
@@ -36,15 +35,16 @@ class GatewayHeaderAuthenticationFilter(
             if (userIdHeader != null && userRolesHeader != null) {
                 try {
                     val userId = userIdHeader.toLong()
-                    val roles = userRolesHeader.split(",")
-                        .filter { it.isNotBlank() }
-                        .map { SimpleGrantedAuthority("ROLE_" + it.trim()) }
+                    val roles =
+                        userRolesHeader
+                            .split(",")
+                            .filter { it.isNotBlank() }
+                            .map { SimpleGrantedAuthority("ROLE_" + it.trim()) }
 
                     val authentication = UsernamePasswordAuthenticationToken(userId, null, roles)
 
                     SecurityContextHolder.getContext().authentication = authentication
                     log.info("인증 객체가 SecurityContextHolder에 설정되었습니다: {}", authentication)
-
                 } catch (e: Exception) {
                     log.error("게이트웨이 인증 헤더 처리 실패. userId: {}, roles: {}", userIdHeader, userRolesHeader, e)
                     sendErrorResponse(response, ErrorCode.INTERNAL_ERROR, "Invalid authentication headers from gateway.")
@@ -55,19 +55,23 @@ class GatewayHeaderAuthenticationFilter(
             }
 
             filterChain.doFilter(request, response)
-
         } finally {
             SecurityContextHolder.clearContext()
             log.info("SecurityContext cleared for request: {}", request.requestURI)
         }
     }
 
-    private fun sendErrorResponse(response: HttpServletResponse, errorCode: ErrorCode, message: String) {
-        val apiResponse = ApiResponse<Unit>(
-            code = errorCode.defaultHttpStatus.value(),
-            status = errorCode.defaultHttpStatus,
-            message = message,
-        )
+    private fun sendErrorResponse(
+        response: HttpServletResponse,
+        errorCode: ErrorCode,
+        message: String,
+    ) {
+        val apiResponse =
+            ApiResponse<Unit>(
+                code = errorCode.defaultHttpStatus.value(),
+                status = errorCode.defaultHttpStatus,
+                message = message,
+            )
         response.apply {
             characterEncoding = "UTF-8"
             status = errorCode.defaultHttpStatus.value()

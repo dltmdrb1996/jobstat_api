@@ -13,12 +13,11 @@ import org.springframework.security.core.context.SecurityContextHolder
  * 이 방법은 Config 서버를 사용하는 MSA 환경의 공통 라이브러리에 가장 적합합니다.
  */
 class SecurityStrategyInitializer : ApplicationListener<ApplicationEnvironmentPreparedEvent> {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     override fun onApplicationEvent(event: ApplicationEnvironmentPreparedEvent) {
         val environment: ConfigurableEnvironment = event.environment
-        
+
         // [핵심] System.getProperty 대신, Config 서버의 값이 포함된 environment에서 프로퍼티를 읽습니다.
         val isVirtualThreadEnabled = environment.getProperty("spring.threads.virtual.enabled", "false").toBoolean()
 

@@ -12,7 +12,6 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
 @Configuration
 @EnableWebFluxSecurity
 class ApiGatewayWebSecurityConfig {
-
     @Bean
     fun springSecurityFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain {
         http
@@ -28,11 +27,12 @@ class ApiGatewayWebSecurityConfig {
     @Bean // Bean으로 등록하여 다른 곳에서도 주입받아 사용할 수 있도록 함
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOriginPatterns = listOf(
-            "https://*.jobstatanalysis.com",
-            "https://jobstatanalysis.com",
-            "http://localhost:*"
-        )
+        configuration.allowedOriginPatterns =
+            listOf(
+                "https://*.jobstatanalysis.com",
+                "https://jobstatanalysis.com",
+                "http://localhost:*",
+            )
 
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")
         configuration.allowedHeaders = listOf("Authorization", "Content-Type", "X-Requested-With")

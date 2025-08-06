@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController
 @Component
 @RestController
 class SecurityStrategyLogger {
-
     // Kotlin 스타일의 간결한 로거 선언
     private val log: Logger = LoggerFactory.getLogger(javaClass)
 

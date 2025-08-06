@@ -132,9 +132,10 @@ class CoreOpenApiAutoConfiguration {
             )
 
             // 2. 하나의 SecurityRequirement 객체에 두 스키마를 모두 추가(AND 조건)합니다.
-            val gatewayAuthRequirement = SecurityRequirement()
-                .addList(xUserIdSchemeName)
-                .addList(xUserRolesSchemeName)
+            val gatewayAuthRequirement =
+                SecurityRequirement()
+                    .addList(xUserIdSchemeName)
+                    .addList(xUserRolesSchemeName)
 
             securityRequirements.add(gatewayAuthRequirement)
         }

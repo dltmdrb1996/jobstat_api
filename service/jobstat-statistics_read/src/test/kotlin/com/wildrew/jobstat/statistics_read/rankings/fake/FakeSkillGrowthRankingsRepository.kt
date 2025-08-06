@@ -1,5 +1,6 @@
 package com.wildrew.jobstat.statistics_read.rankings.fake
 
+import com.wildrew.jobstat.statistics_read.core.core_mongo_base.model.RankingSlice
 import com.wildrew.jobstat.statistics_read.fake.AbstractFakeSimpleRankingRepository
 import com.wildrew.jobstat.statistics_read.rankings.document.SkillGrowthRankingsDocument
 import com.wildrew.jobstat.statistics_read.rankings.repository.SkillGrowthRankingsRepository
@@ -112,6 +113,14 @@ class FakeSkillGrowthRankingsRepository :
             .flatMap { it.rankings }
             .filter { it.entityId in consistentEntityIds }
             .sortedBy { it.rank }
+    }
+
+    override fun findRankingsSlice(
+        baseDate: String,
+        cursor: Int?,
+        limit: Int,
+    ): RankingSlice<SkillGrowthRankingsDocument.SkillGrowthRankingEntry> {
+        TODO("Not yet implemented")
     }
 
     override fun findVolatileEntities(
